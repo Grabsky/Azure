@@ -42,11 +42,14 @@ public class Lang {
     public static String PRIVATE_MESSAGE_FORMAT;
     public static Component NO_PLAYER_TO_REPLY;
     public static String SKULL_RECEIVED;
-    public static Component ITEM_NAME_UPDATED;
-    public static Component ITEM_LORE_UPDATED;
-    public static Component ITEM_NO_LORE;
-    public static Component ITEM_ENCHANTS_UPDATED;
-    public static Component ITEM_NO_SUCH_ENCHANTMENT;
+    public static Component NAME_UPDATED;
+    public static Component NAME_CLEARED;
+    public static Component LORE_UPDATED;
+    public static Component LORE_CLEARED;
+    public static String LORE_INDEX_OUT_OF_BOUNDS;
+    public static Component ITEM_HAS_NO_LORE;
+    public static Component ENCHANTMENTS_UPDATED;
+    public static Component ITEM_HAS_NO_SUCH_ENCHANTMENT;
 
 
     public Lang(Azure instance) {
@@ -86,13 +89,16 @@ public class Lang {
         // Skull
         SKULL_RECEIVED = string("commands.skull.skull-received");
         // Name
-        ITEM_NAME_UPDATED = component("commands.name.item-name-updated");
+        NAME_UPDATED = component("commands.name.name-updated");
+        NAME_CLEARED = component("commands.name.name-cleared");
         // Lore
-        ITEM_LORE_UPDATED = component("commands.lore.item-lore-updated");
-        ITEM_NO_LORE = component("commands.lore.item-no-lore");
+        LORE_UPDATED = component("commands.lore.lore-updated");
+        LORE_CLEARED = component("commands.lore.lore-cleared");
+        LORE_INDEX_OUT_OF_BOUNDS = string("commands.lore.lore-index-out-of-bounds");
+        ITEM_HAS_NO_LORE = component("commands.lore.item-has-no-lore");
         // Enchant
-        ITEM_ENCHANTS_UPDATED = component("commands.enchant.item-enchants-updated");
-        ITEM_NO_SUCH_ENCHANTMENT = component("commands.enchant.item-no-such-enchantment");
+        ENCHANTMENTS_UPDATED = component("commands.enchant.enchantments-updated");
+        ITEM_HAS_NO_SUCH_ENCHANTMENT = component("commands.enchant.item-has-no-such-enchantment");
     }
 
     private String string(String path) {
