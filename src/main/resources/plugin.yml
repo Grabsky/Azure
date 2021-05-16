@@ -1,0 +1,7 @@
+name: Azure
+version: ${project.version}
+main: net.skydistrict.azure.Azure
+api-version: 1.16
+authors: [Grabsky]
+depend: [Indigo]
+softdepend: [CommandAPI, Vault]

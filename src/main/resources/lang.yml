@@ -1,0 +1,45 @@
+# You can use bukkit color codes, hex, json elements and multiple lines everywhere! \o/
+#
+# Colors: §cThis is in red. <red>This is also in red. <#FF5555>Why so much red?!?
+# Gradients: <gradient:#FF55FF:#55FFFF>That looks great.</gradient>
+#
+# I'm too lazy to give an example of each json element. Please visit https://docs.adventure.kyori.net/minimessage instead.
+#
+# Placeholders are represented as {n} where n is an integer >= 0 that represents a specific (hard-coded) replacement.
+# I'm not going to add full guide of what each number transforms to because it's different for each key. Just pay attention when editing the file.
+#
+# If you want to use < or > as string characters, you have to include '\' character before.
+general:
+  missing-permissions: '§6§lS§e§lD§8 §8» §cBrak uprawnień'
+  player-not-online: '§6§lS§e§lD§8 §8» §cNie znaleziono takiego gracza.'
+  player-never-played: '§6§lS§e§lD§8 §8» §cTen gracz jest teraz offline.'
+  cant-use-on-yourself: '§6§lS§e§lD§8 §8» §cNie możesz tego wykonać na sobie.'
+  targets-are-the-same: '§6§lS§e§lD§8 §8» §cMusisz podać dwóch różnych graczy.'
+  no-item-in-hand: '§6§lS§e§lD§8 §8» §cMusisz mieć w ręce jakiś przedmiot.'
+commands:
+  azure:
+    help:
+      - ''
+      - '§7Author: §eGrabsky'
+      - '§7Plugin version: §e0.0.1'
+      - ''
+    reload:
+      reload-success: '§6§lS§e§lD§8 §8» §7Plugin has been reloaded.'
+      reload-fail: '§6§lS§e§lD§8 §8» §cPlugin reload failed.'
+  teleport:
+    you-have-been-teleported-to-player: '§6§lS§e§lD§8 §8» §7Zostałeś teleportowany do gracza §e{target}§7.'
+    you-have-been-teleported-to-location: '§6§lS§e§lD§8 §8» §7Zostałeś teleportowany na §e{x}§7, {y}§7, §e{z}§7.'
+    teleported-player-to-player: '§6§lS§e§lD§8 §8» §7Teleportowano gracza §e{player}§7 do §e{target}§7.'
+    teleported-player-to-location: '§6§lS§e§lD§8 §8» §7Teleportowano gracza §e{player}§7 na §e{x}§7, {y}§7, §e{z}§7.'
+    player-teleported-to-you: '§6§lS§e§lD§8 §8» §e{player}§7 został do ciebie teleportowany.'
+  message:
+    format: '§8[§e{sender}§8]§7 » §8[§6{recipient}§8]: §7'
+    no-player-to-reply: '§6§lS§e§lD§8 §8» §cNie masz komu odpisać.'
+  skull:
+    skull-received: '§6§lS§e§lD§8 §8» §7Otrzymałeś głowę gracza §e{player}'
+  item-modifications:
+    item-name-updated: '§6§lS§e§lD§8 §8» §7Nazwa przedmiotu została zaktualizowana.'
+    item-lore-updated: '§6§lS§e§lD§8 §8» §7Opis przedmiotu został zaktualizowany.'
+    item-no-lore: '§6§lS§e§lD§8 §8» §cTen przedmiot nie ma opisu.'
+    item-enchants-updated: '§6§lS§e§lD§8 §8» §7Zaklęcia przedmiotu zostały zaktualizowane.'
+    item-no-such-enchantment: '§6§lS§e§lD§8 §8» §cTen przedmiot nie ma takiego zaklęcia.'
