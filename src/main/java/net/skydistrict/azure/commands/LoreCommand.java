@@ -3,8 +3,10 @@ package net.skydistrict.azure.commands;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
+import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.skydistrict.azure.config.Lang;
 import org.bukkit.Material;
@@ -32,17 +34,17 @@ public class LoreCommand {
                         .withArguments(new GreedyStringArgument("text"))
                         .executesPlayer((sender, args) -> {
                             if (sender.getInventory().getItemInMainHand().getType() != Material.AIR) {
-                                // Updating name of ItemStack held by player
+                                // Updating lore of ItemStack held by player
                                 final ItemStack item = sender.getInventory().getItemInMainHand();
                                 final ItemMeta meta = item.getItemMeta();
                                 final List<Component> lines = new ArrayList<>();
                                 for (String line : String.valueOf(args[0]).split("\\|")){
-                                    lines.add(LegacyComponentSerializer.legacyAmpersand().deserialize(line));
+                                    lines.add(Component.empty().decoration(TextDecoration.ITALIC, false).append(LegacyComponentSerializer.legacyAmpersand().deserialize(line)));
                                 }
                                 meta.lore(lines);
                                 item.setItemMeta(meta);
                                 // Sending message
-                                Lang.send(sender, Lang.ITEM_LORE_UPDATED);
+                                Lang.send(sender, Lang.LORE_UPDATED);
                                 return;
                             }
                             Lang.send(sender, Lang.NO_ITEM_IN_HAND);
@@ -52,40 +54,40 @@ public class LoreCommand {
                         .withArguments(new StringArgument("text"))
                         .executesPlayer((sender, args) -> {
                             if (sender.getInventory().getItemInMainHand().getType() != Material.AIR) {
-                                // Updating name of ItemStack held by player
+                                // Updating lore of ItemStack held by player
                                 final ItemStack item = sender.getInventory().getItemInMainHand();
                                 final ItemMeta meta = item.getItemMeta();
-                                if (meta.hasLore()) {
-                                    final List<Component> lines = meta.lore();
-                                    lines.add(LegacyComponentSerializer.legacyAmpersand().deserialize(String.valueOf(args[0])));
-                                    item.lore(lines);
-                                    item.setItemMeta(meta);
-                                    // Sending message
-                                    Lang.send(sender, Lang.ITEM_LORE_UPDATED);
-                                    return;
-                                }
-                                Lang.send(sender, Lang.ITEM_NO_LORE);
+                                final List<Component> lines = new ArrayList<>(meta.lore());
+                                lines.add(Component.empty().decoration(TextDecoration.ITALIC, false).append(LegacyComponentSerializer.legacyAmpersand().deserialize(String.valueOf(args[0]))));
+                                meta.lore(lines);
+                                item.setItemMeta(meta);
+                                // Sending message
+                                Lang.send(sender, Lang.LORE_UPDATED);
                                 return;
                             }
                             Lang.send(sender, Lang.NO_ITEM_IN_HAND);
                         })
                 ).withSubcommand(new CommandAPICommand("remove")
                         .withPermission("skydistrict.command.lore.remove")
+                        .withArguments(new IntegerArgument("line", 0))
                         .executesPlayer((sender, args) -> {
                             if (sender.getInventory().getItemInMainHand().getType() != Material.AIR) {
-                                // Updating name of ItemStack held by player
+                                // Updating lore of ItemStack held by player
                                 final ItemStack item = sender.getInventory().getItemInMainHand();
                                 final ItemMeta meta = item.getItemMeta();
                                 if (meta.hasLore()) {
-                                    final List<Component> lines = meta.lore();
-                                    lines.remove(lines.size() - 1);
-                                    item.lore(lines);
-                                    item.setItemMeta(meta);
-                                    // Sending message
-                                    Lang.send(sender, Lang.ITEM_LORE_UPDATED);
-                                    return;
+                                    final List<Component> lines = new ArrayList<>(meta.lore());
+                                    if (lines.size() > (int) args[0]) {
+                                        lines.remove((int) args[0]);
+                                        meta.lore(lines);
+                                        item.setItemMeta(meta);
+                                        // Sending message
+                                        Lang.send(sender, Lang.LORE_UPDATED);
+                                        return;
+                                    }
+
                                 }
-                                Lang.send(sender, Lang.ITEM_NO_LORE);
+                                Lang.send(sender, Lang.ITEM_HAS_NO_LORE);
                                 return;
                             }
                             Lang.send(sender, Lang.NO_ITEM_IN_HAND);
@@ -94,17 +96,17 @@ public class LoreCommand {
                         .withPermission("skydistrict.command.lore.clear")
                         .executesPlayer((sender, args) -> {
                             if (sender.getInventory().getItemInMainHand().getType() != Material.AIR) {
-                                // Updating name of ItemStack held by player
+                                // Clearing lore of ItemStack held by player
                                 final ItemStack item = sender.getInventory().getItemInMainHand();
                                 final ItemMeta meta = item.getItemMeta();
                                 if (meta.hasLore()) {
                                     meta.lore(new ArrayList<>());
                                     item.setItemMeta(meta);
                                     // Sending message
-                                    Lang.send(sender, Lang.ITEM_LORE_UPDATED);
+                                    Lang.send(sender, Lang.LORE_CLEARED);
                                     return;
                                 }
-                                Lang.send(sender, Lang.ITEM_NO_LORE);
+                                Lang.send(sender, Lang.ITEM_HAS_NO_LORE);
                                 return;
                             }
                             Lang.send(sender, Lang.NO_ITEM_IN_HAND);

@@ -29,7 +29,7 @@ public class EnchantCommand {
                                 meta.addEnchant((Enchantment) args[0], (int) args[1], true);
                                 item.setItemMeta(meta);
                                 // Sending message
-                                Lang.send(sender, Lang.ITEM_ENCHANTS_UPDATED);
+                                Lang.send(sender, Lang.ENCHANTMENTS_UPDATED);
                                 return;
                             }
                             Lang.send(sender, Lang.NO_ITEM_IN_HAND);
@@ -39,17 +39,17 @@ public class EnchantCommand {
                         .withArguments(new EnchantmentArgument("enchantment"))
                         .executesPlayer((sender, args) -> {
                             if (sender.getInventory().getItemInMainHand().getType() != Material.AIR) {
-                                // Updating name of ItemStack held by player
+                                // Removing existing enchantment
                                 final ItemStack item = sender.getInventory().getItemInMainHand();
                                 final ItemMeta meta = item.getItemMeta();
                                 if (meta.hasEnchant((Enchantment) args[0])) {
                                     meta.removeEnchant((Enchantment) args[0]);
                                     item.setItemMeta(meta);
                                     // Sending message
-                                    Lang.send(sender, Lang.ITEM_ENCHANTS_UPDATED);
+                                    Lang.send(sender, Lang.ENCHANTMENTS_UPDATED);
                                     return;
                                 }
-                                Lang.send(sender, Lang.ITEM_NO_SUCH_ENCHANTMENT);
+                                Lang.send(sender, Lang.ITEM_HAS_NO_SUCH_ENCHANTMENT);
                                 return;
                             }
                             Lang.send(sender, Lang.NO_ITEM_IN_HAND);

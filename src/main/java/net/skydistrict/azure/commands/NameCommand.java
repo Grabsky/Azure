@@ -19,19 +19,37 @@ public class NameCommand {
     public CommandAPICommand onNameChange() {
         return new CommandAPICommand("name")
                 .withPermission("skydistrict.command.name")
-                .withArguments(new GreedyStringArgument("name"))
-                .executesPlayer((sender, args) -> {
-                    if (sender.getInventory().getItemInMainHand().getType() != Material.AIR) {
-                        // Updating name of ItemStack held by player
-                        final ItemStack item = sender.getInventory().getItemInMainHand();
-                        final ItemMeta meta = item.getItemMeta();
-                        meta.displayName(Component.empty().decoration(TextDecoration.ITALIC, false).append(LegacyComponentSerializer.legacyAmpersand().deserialize(String.valueOf(args[0]))));
-                        item.setItemMeta(meta);
-                        // Sending message
-                        Lang.send(sender, Lang.ITEM_NAME_UPDATED);
-                        return;
-                    }
-                    Lang.send(sender, Lang.NO_ITEM_IN_HAND);
-                });
+                .withSubcommand(new CommandAPICommand("set")
+                        .withPermission("skydistrict.command.name.set")
+                        .withArguments(new GreedyStringArgument("text"))
+                        .executesPlayer((sender, args) -> {
+                            if (sender.getInventory().getItemInMainHand().getType() != Material.AIR) {
+                                // Updating name of ItemStack held by player
+                                final ItemStack item = sender.getInventory().getItemInMainHand();
+                                final ItemMeta meta = item.getItemMeta();
+                                meta.displayName(Component.empty().decoration(TextDecoration.ITALIC, false).append(LegacyComponentSerializer.legacyAmpersand().deserialize(String.valueOf(args[0]))));
+                                item.setItemMeta(meta);
+                                // Sending message
+                                Lang.send(sender, Lang.NAME_UPDATED);
+                                return;
+                            }
+                            Lang.send(sender, Lang.NO_ITEM_IN_HAND);
+                        })
+                ).withSubcommand(new CommandAPICommand("clear")
+                        .withPermission("skydistrict.command.name.clear")
+                        .executesPlayer((sender, args) -> {
+                            if (sender.getInventory().getItemInMainHand().getType() != Material.AIR) {
+                                // Clearing name of ItemStack held by player
+                                final ItemStack item = sender.getInventory().getItemInMainHand();
+                                final ItemMeta meta = item.getItemMeta();
+                                meta.setDisplayName("");
+                                item.setItemMeta(meta);
+                                // Sending message
+                                Lang.send(sender, Lang.NAME_CLEARED);
+                                return;
+                            }
+                            Lang.send(sender, Lang.NO_ITEM_IN_HAND);
+                        })
+                );
     }
 }
