@@ -37,9 +37,11 @@ commands:
     no-player-to-reply: '§6§lS§e§lD§8 §8» §cNie masz komu odpisać.'
   skull:
     skull-received: '§6§lS§e§lD§8 §8» §7Otrzymałeś głowę gracza §e{player}'
-  item-modifications:
+  name:
     item-name-updated: '§6§lS§e§lD§8 §8» §7Nazwa przedmiotu została zaktualizowana.'
+  lore:
     item-lore-updated: '§6§lS§e§lD§8 §8» §7Opis przedmiotu został zaktualizowany.'
     item-no-lore: '§6§lS§e§lD§8 §8» §cTen przedmiot nie ma opisu.'
+  enchant:
     item-enchants-updated: '§6§lS§e§lD§8 §8» §7Zaklęcia przedmiotu zostały zaktualizowane.'
     item-no-such-enchantment: '§6§lS§e§lD§8 §8» §cTen przedmiot nie ma takiego zaklęcia.'

@@ -85,12 +85,14 @@ public class Lang {
         NO_PLAYER_TO_REPLY = component("commands.message.no-player-to-reply");
         // Skull
         SKULL_RECEIVED = string("commands.skull.skull-received");
-        // ItemCommandBundle
-        ITEM_NAME_UPDATED = component("commands.item-modifications.item-name-updated");
-        ITEM_LORE_UPDATED = component("commands.item-modifications.item-lore-updated");
-        ITEM_NO_LORE = component("commands.item-modifications.item-no-lore");
-        ITEM_ENCHANTS_UPDATED = component("commands.item-modifications.item-enchants-updated");
-        ITEM_NO_SUCH_ENCHANTMENT = component("commands.item-modifications.item-no-such-enchantment");
+        // Name
+        ITEM_NAME_UPDATED = component("commands.name.item-name-updated");
+        // Lore
+        ITEM_LORE_UPDATED = component("commands.lore.item-lore-updated");
+        ITEM_NO_LORE = component("commands.lore.item-no-lore");
+        // Enchant
+        ITEM_ENCHANTS_UPDATED = component("commands.enchant.item-enchants-updated");
+        ITEM_NO_SUCH_ENCHANTMENT = component("commands.enchant.item-no-such-enchantment");
     }
 
     private String string(String path) {
