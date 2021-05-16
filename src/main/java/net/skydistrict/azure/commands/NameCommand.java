@@ -2,6 +2,8 @@ package net.skydistrict.azure.commands;
 
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.skydistrict.azure.config.Lang;
 import org.bukkit.Material;
@@ -23,7 +25,7 @@ public class NameCommand {
                         // Updating name of ItemStack held by player
                         final ItemStack item = sender.getInventory().getItemInMainHand();
                         final ItemMeta meta = item.getItemMeta();
-                        meta.displayName(LegacyComponentSerializer.legacyAmpersand().deserialize(String.valueOf(args[0])));
+                        meta.displayName(Component.empty().decoration(TextDecoration.ITALIC, false).append(LegacyComponentSerializer.legacyAmpersand().deserialize(String.valueOf(args[0]))));
                         item.setItemMeta(meta);
                         // Sending message
                         Lang.send(sender, Lang.ITEM_NAME_UPDATED);
