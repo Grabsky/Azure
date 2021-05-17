@@ -66,6 +66,9 @@ public class Lang {
         }
         // Overriding...
         this.fileConfiguration = YamlConfiguration.loadConfiguration(file);
+        if (fileConfiguration.getInt("version") != 1) {
+            consoleLogger.error("Your lang.yml file is outdated. Some messages may not display properly.");
+        }
         // Global
         CORRECT_USAGE = component("general.correct-usage");
         MISSING_PERMISSIONS = component("general.missing-permissions");
@@ -150,6 +153,5 @@ public class Lang {
             sender.sendMessage(identity, component);
         }
     }
-
 
 }

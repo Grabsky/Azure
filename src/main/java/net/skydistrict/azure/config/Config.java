@@ -1,5 +1,6 @@
 package net.skydistrict.azure.config;
 
+import me.grabsky.indigo.logger.ConsoleLogger;
 import net.skydistrict.azure.Azure;
 import net.skydistrict.azure.storage.SQLManager;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -9,9 +10,11 @@ import java.io.File;
 
 public class Config {
     private final Azure instance;
+    private final ConsoleLogger consoleLogger;
 
     public Config(Azure instance) {
         this.instance = instance;
+        this.consoleLogger = instance.getConsoleLogger();
     }
 
     public static int CACHE_MODE;
@@ -26,6 +29,9 @@ public class Config {
         }
         // Overriding...
         FileConfiguration fc = YamlConfiguration.loadConfiguration(file);
+        if (fc.getInt("version") != 1) {
+            consoleLogger.error("Your lang.yml file is outdated. Some messages may not display properly.");
+        }
         // Passing credentials to SQLManager class
         if(reloadCredentials) {
             SQLManager sql = instance.getSQLManager();

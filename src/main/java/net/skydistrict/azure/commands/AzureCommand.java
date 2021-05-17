@@ -1,9 +1,6 @@
 package net.skydistrict.azure.commands;
 
 import dev.jorel.commandapi.CommandAPICommand;
-import dev.jorel.commandapi.arguments.AdventureChatComponentArgument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import net.kyori.adventure.text.Component;
 import net.skydistrict.azure.Azure;
 import net.skydistrict.azure.config.Lang;
 
@@ -28,16 +25,6 @@ public class AzureCommand {
                                 return;
                             }
                             Lang.send(sender, Lang.AZURE_RELOAD_FAIL);
-                        })
-                )
-                .withArguments(new EntitySelectorArgument("players", EntitySelectorArgument.EntitySelector.ONE_PLAYER))
-                .executes((sender, args) -> {
-                    sender.sendMessage("test");
-                })
-                .withSubcommand(new CommandAPICommand("test")
-                        .withArguments(new AdventureChatComponentArgument("component"))
-                        .executes((sender, args) -> {
-                            sender.sendMessage((Component) args[0]);
                         })
                 );
     }
