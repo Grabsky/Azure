@@ -1,9 +1,9 @@
 package net.skydistrict.azure.config;
 
-import me.grabsky.indigo.adventure.MiniMessage;
 import me.grabsky.indigo.logger.ConsoleLogger;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.skydistrict.azure.Azure;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -13,17 +13,14 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.util.List;
 
-// READ BEFORE RE-WRITING:
-// Having per-player locales is nice, but not really worth an effort.
-// It works good ONLY if EVERY SINGLE PLUGIN you use, have something similar implemented.
-// Don't waste your time and do something cool instead!
 public class Lang {
     private final Azure instance;
     private final ConsoleLogger consoleLogger;
     private final File file;
-    private final int currentVersion = 1;
+
     private FileConfiguration fileConfiguration;
 
+    // General
     public static Component CORRECT_USAGE;
     public static Component MISSING_PERMISSIONS;
     public static Component PLAYER_NOT_ONLINE;
@@ -31,26 +28,47 @@ public class Lang {
     public static Component CANT_USE_ON_YOURSELF;
     public static Component TARGETS_ARE_THE_SAME;
     public static Component NO_ITEM_IN_HAND;
-    public static Component AZURE_HELP;
-    public static Component AZURE_RELOAD_SUCCESS;
-    public static Component AZURE_RELOAD_FAIL;
+    public static String TELEPORTING;
+    public static Component INVALID_COORDS;
+    // Azure
+    public static Component PLUGIN_HELP;
+    public static Component RELOAD_SUCCEED;
+    public static Component RELOAD_FAILED;
+    // Teleport
+    public static Component TELEPORT_CANCELLED;
+    public static Component TELEPORT_FAILED;
     public static String TELEPORTED_TO_PLAYER;
     public static String TELEPORTED_TO_LOCATION;
     public static String TELEPORTED_PLAYER_TO_PLAYER;
     public static String TELEPORTED_PLAYER_TO_LOCATION;
     public static String PLAYER_TELEPORTED_TO_YOU;
+    public static Component OUTSIDE_WORLD_BORDER;
+    // Teleport Request
+    public static String TELEPORT_REQUEST_SENT;
+    public static String TELEPORT_REQUEST_RECEIVED;
+    public static Component TELEPORT_REQUEST_ACCEPTED;
+    public static String TELEPORT_REQUEST_ACCEPTED_TARGET;
+    public static Component TELEPORT_REQUEST_DENIED;
+    public static String TELEPORT_REQUEST_DENIED_TARGET;
+    public static Component TELEPORT_REQUEST_ALREADY_SENT;
+    public static Component TELEPORT_REQUEST_NOT_FOUND;
+    public static Component TELEPORT_REQUEST_CANCELLED;
+    // Private Message
     public static String PRIVATE_MESSAGE_FORMAT;
     public static Component NO_PLAYER_TO_REPLY;
+    // Skull
     public static String SKULL_RECEIVED;
+    // Name
     public static Component NAME_UPDATED;
     public static Component NAME_CLEARED;
+    // Lore
     public static Component LORE_UPDATED;
     public static Component LORE_CLEARED;
     public static String LORE_INDEX_OUT_OF_BOUNDS;
     public static Component ITEM_HAS_NO_LORE;
+    // Enchant
     public static Component ENCHANTMENTS_UPDATED;
     public static Component ITEM_HAS_NO_SUCH_ENCHANTMENT;
-
 
     public Lang(Azure instance) {
         this.instance = instance;
@@ -69,24 +87,38 @@ public class Lang {
         if (fileConfiguration.getInt("version") != 1) {
             consoleLogger.error("Your lang.yml file is outdated. Some messages may not display properly.");
         }
-        // Global
-        CORRECT_USAGE = component("general.correct-usage");
+        // General
         MISSING_PERMISSIONS = component("general.missing-permissions");
         PLAYER_NOT_ONLINE = component("general.player-not-online");
         PLAYER_NEVER_PLAYED = component("general.player-never-played");
         CANT_USE_ON_YOURSELF = component("general.cant-use-on-yourself");
         TARGETS_ARE_THE_SAME = component("general.targets-are-the-same");
         NO_ITEM_IN_HAND = component("general.no-item-in-hand");
+        TELEPORTING = string("general.teleporting");
+        TELEPORT_CANCELLED = component("general.teleport-cancelled");
+        TELEPORT_FAILED = component("general.teleport-failed");
+        INVALID_COORDS = component("general.invalid-coords");
         // Azure
-        AZURE_RELOAD_SUCCESS = component("commands.azure.reload.reload-success");
-        AZURE_RELOAD_FAIL = component("commands.azure.reload.reload-fail");
-        // TeleportCommandBundle
-        TELEPORTED_TO_PLAYER = string("commands.teleport.you-have-been-teleported-to-player");
-        TELEPORTED_TO_LOCATION = string("commands.teleport.you-have-been-teleported-to-location");
+        PLUGIN_HELP = component("commands.azure.help");
+        RELOAD_SUCCEED = component("commands.azure.reload.reload-succeed");
+        RELOAD_FAILED = component("commands.azure.reload.reload-failed");
+        // Teleport
+        TELEPORTED_TO_PLAYER = string("commands.teleport.teleported-to-player");
+        TELEPORTED_TO_LOCATION = string("commands.teleport.teleported-to-location");
         TELEPORTED_PLAYER_TO_PLAYER = string("commands.teleport.teleported-player-to-player");
         TELEPORTED_PLAYER_TO_LOCATION = string("commands.teleport.teleported-player-to-location");
         PLAYER_TELEPORTED_TO_YOU = string("commands.teleport.player-teleported-to-you");
-        // MessageCommandBundle
+        OUTSIDE_WORLD_BORDER = component("commands.teleport.outside-world-border");
+        // Teleport Request
+        TELEPORT_REQUEST_SENT = string("commands.tprequest.request-sent");
+        TELEPORT_REQUEST_RECEIVED = string("commands.tprequest.request-received");
+        TELEPORT_REQUEST_ACCEPTED = component("commands.tprequest.request-accepted");
+        TELEPORT_REQUEST_DENIED = component("commands.tprequest.request-denied");
+        TELEPORT_REQUEST_DENIED_TARGET = string("commands.tprequest.request-denied-target");
+        TELEPORT_REQUEST_ALREADY_SENT = component("commands.tprequest.request-already-sent");
+        TELEPORT_REQUEST_NOT_FOUND = component("commands.tprequest.request-not-found");
+        TELEPORT_REQUEST_CANCELLED = component("commands.tprequest.request-cancelled");
+        // Private Message
         PRIVATE_MESSAGE_FORMAT = string("commands.message.format");
         NO_PLAYER_TO_REPLY = component("commands.message.no-player-to-reply");
         // Skull
@@ -121,7 +153,7 @@ public class Lang {
     }
 
     private Component component(String path) {
-        return MiniMessage.get().parse(this.string(path));
+        return LegacyComponentSerializer.legacySection().deserialize(this.string(path));
     }
 
     /** Sends parsed component */
@@ -133,7 +165,7 @@ public class Lang {
 
     /** Parses and sends component */
     public static void send(@NotNull CommandSender sender, @NotNull String text) {
-        final Component component = MiniMessage.get().parse(text);
+        final Component component = LegacyComponentSerializer.legacySection().deserialize(text);
         if (component != Component.empty()) {
             sender.sendMessage(component);
         }
@@ -148,7 +180,7 @@ public class Lang {
 
     /** Parses and sends component (with specified identity) */
     public static void send(@NotNull CommandSender sender, @NotNull String text, @NotNull Identity identity) {
-        final Component component = MiniMessage.get().parse(text);
+        final Component component = LegacyComponentSerializer.legacySection().deserialize(text);
         if (component != Component.empty()) {
             sender.sendMessage(identity, component);
         }

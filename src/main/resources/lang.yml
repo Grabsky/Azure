@@ -1,40 +1,70 @@
 version: 1 # Do not modify this unless you know what you're doing
 
 general:
-  missing-permissions: '§6§lS§e§lD§8 §8» §cBrak uprawnień'
-  player-not-online: '§6§lS§e§lD§8 §8» §cNie znaleziono takiego gracza.'
-  player-never-played: '§6§lS§e§lD§8 §8» §cTen gracz jest teraz offline.'
-  cant-use-on-yourself: '§6§lS§e§lD§8 §8» §cNie możesz tego wykonać na sobie.'
-  targets-are-the-same: '§6§lS§e§lD§8 §8» §cMusisz podać dwóch różnych graczy.'
-  no-item-in-hand: '§6§lS§e§lD§8 §8» §cMusisz mieć w ręce jakiś przedmiot.'
+  missing-permissions: '§6§lS§e§lD§8 » §cBrak uprawnień'
+  player-not-online: '§6§lS§e§lD§8 » §cNie znaleziono takiego gracza.'
+  player-never-played: '§6§lS§e§lD§8 » §cTen gracz jest teraz offline.'
+  cant-use-on-yourself: '§6§lS§e§lD§8 » §cNie możesz wskazać samego siebie.'
+  targets-are-the-same: '§6§lS§e§lD§8 » §cMusisz podać dwóch różnych graczy.'
+  no-item-in-hand: '§6§lS§e§lD§8 » §cMusisz mieć w ręce jakiś przedmiot.'
+  teleporting: '§6§lS§e§lD§8 » §7Zostaniesz przeteleportowany za §e{delay}§7 sekund.'
+  teleport-cancelled: '§6§lS§e§lD§8 » §cTeleportacja anulowana. Ruszyłeś się.'
+  teleport-failed: '§6§lS§e§lD§8 » §cCoś poszło nie tak, spróbuj ponownie.'
+  invalid-coords: '§6§lS§e§lD§8 » §cPodane koordynaty są nieprawidłowe.'
+
 commands:
   azure:
     help:
       - ''
-      - '§8» §e/azure reload§8 - §7Reloads the config'
+      - '» §e/azure reload§8 - §7Reloads the config'
       - ''
     reload:
-      reload-success: '§6§lS§e§lD§8 » §7Konfiguracja została pomyślnie przeładowana.'
-      reload-fail: '§6§lS§e§lD§8 » §cWystąpił błąd podczas ładowania konfiguracji.'
+      reload-succeed: '§6§lS§e§lD§8 » §7Konfiguracja została pomyślnie przeładowana.'
+      reload-failed: '§6§lS§e§lD§8 » §cWystąpił błąd podczas ładowania konfiguracji.'
+
   teleport:
-    you-have-been-teleported-to-player: '§6§lS§e§lD§8 §8» §7Zostałeś teleportowany do gracza §e{target}§7.'
-    you-have-been-teleported-to-location: '§6§lS§e§lD§8 §8» §7Zostałeś teleportowany na §e{x}§7, {y}§7, §e{z}§7.'
-    teleported-player-to-player: '§6§lS§e§lD§8 §8» §7Teleportowano gracza §e{player}§7 do §e{target}§7.'
-    teleported-player-to-location: '§6§lS§e§lD§8 §8» §7Teleportowano gracza §e{player}§7 na §e{x}§7, {y}§7, §e{z}§7.'
-    player-teleported-to-you: '§6§lS§e§lD§8 §8» §e{player}§7 został do ciebie teleportowany.'
+    teleported-to-player: '§6§lS§e§lD§8 » §7Zostałeś teleportowany do gracza §e{target}§7.'
+    teleported-to-location: '§6§lS§e§lD§8 » §7Zostałeś teleportowany na §e{x}§7, §e{y}§7, §e{z}§7.'
+    teleported-player-to-player: '§6§lS§e§lD§8 » §7Teleportowano gracza §e{player}§7 do §e{target}§7.'
+    teleported-player-to-location: '§6§lS§e§lD§8 » §7Teleportowano gracza §e{player}§7 na §e{x}§7, §e{y}§7, §e{z}§7.'
+    player-teleported-to-you: '§6§lS§e§lD§8 » §e{player}§7 został do ciebie teleportowany.'
+    outside-world-border: '§6§lS§e§lD§8 » §cTa lokalizacja znajduje się granicą świata.'
+
+  tprequest:
+    request-sent: '§6§lS§e§lD§8 » §7Wysłano zapytanie do §e{player}§7.'
+    request-received:
+      - ''
+      - '§6§lS§e§lD§8 » §e{player}§7 chce się do Ciebie teleportować.'
+      - '§8› §7Wpisz §a/tpaccept {player}§7, aby zaakceptować.'
+      - '§8› §7Wpisz §c/tpdeny {player}§7, aby odrzucić.'
+      - ''
+      - '§c§lUWAGA: §7Akceptujesz na własną odpowiedzialność.'
+      - ''
+    request-accepted: '§6§lS§e§lD§8 » §7Zaakceptowałeś prośbę o teleportację.'
+    request-accepted-target: '§6§lS§e§lD§8 » §e{player}§7 zaakceptował prośbę o teleportację.'
+    request-denied: '§6§lS§e§lD§8 » §7Odrzuciłeś prośbę o teleportację.'
+    request-denied-target: '§6§lS§e§lD§8 » §e{player}§7 odrzucił Twoją prośbę o teleportację.'
+    request-already-sent: '§6§lS§e§lD§8 » §cTwoja poprzednia prośba oczekuje na zaakceptowanie. Użyj §e/tpcancel§c, aby ją anulować.'
+    request-not-found: '§6§lS§e§lD§8 » §cProśba o teleportację nie istnieje lub została przedawniona.'
+    request-cancelled: '§6§lS§e§lD§8 » §7Anulowałeś prośbę o teleportację.'
+
   message:
     format: '§8[§e{sender}§8]§7 » §8[§6{recipient}§8]: §7'
-    no-player-to-reply: '§6§lS§e§lD§8 §8» §cNie masz komu odpisać.'
+    no-player-to-reply: '§6§lS§e§lD§8 » §cNie masz komu odpisać.'
+
   skull:
-    skull-received: '§6§lS§e§lD§8 §8» §7Otrzymałeś głowę gracza §e{player}'
+    skull-received: '§6§lS§e§lD§8 » §7Otrzymałeś głowę gracza §e{player}'
+
   name:
-    name-updated: '§6§lS§e§lD§8 §8» §7Nazwa przedmiotu została zaktualizowana.'
-    name-cleared: '§6§lS§e§lD§8 §8» §7Nazwa przedmiotu została wyczyszczona.'
+    name-updated: '§6§lS§e§lD§8 » §7Nazwa przedmiotu została zaktualizowana.'
+    name-cleared: '§6§lS§e§lD§8 » §7Nazwa przedmiotu została wyczyszczona.'
+
   lore:
-    lore-updated: '§6§lS§e§lD§8 §8» §7Opis przedmiotu został zaktualizowany.'
-    lore-cleared: '§6§lS§e§lD§8 §8» §7Opis przedmiotu został wyczyszczony.'
-    lore-index-out-of-bounds: '§6§lS§e§lD§8 §8» §cPodany indeks jest za duży. (Min: 0, Max: {length})'
-    item-has-no-lore: '§6§lS§e§lD§8 §8» §cTen przedmiot nie ma opisu.'
+    lore-updated: '§6§lS§e§lD§8 » §7Opis przedmiotu został zaktualizowany.'
+    lore-cleared: '§6§lS§e§lD§8 » §7Opis przedmiotu został wyczyszczony.'
+    lore-index-out-of-bounds: '§6§lS§e§lD§8 » §cPodany indeks jest za duży. (Min: 0, Max: {length})'
+    item-has-no-lore: '§6§lS§e§lD§8 » §cTen przedmiot nie ma opisu.'
+
   enchant:
-    enchantments-updated: '§6§lS§e§lD§8 §8» §7Zaklęcia przedmiotu zostały zaktualizowane.'
-    item-has-no-such-enchantment: '§6§lS§e§lD§8 §8» §cTen przedmiot nie ma takiego zaklęcia.'
+    enchantments-updated: '§6§lS§e§lD§8 » §7Zaklęcia przedmiotu zostały zaktualizowane.'
+    item-has-no-such-enchantment: '§6§lS§e§lD§8 » §cTen przedmiot nie ma takiego zaklęcia.'

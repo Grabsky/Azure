@@ -1,10 +1,12 @@
 package net.skydistrict.azure;
 
+import me.grabsky.indigo.framework.commands.CommandManager;
 import me.grabsky.indigo.logger.ConsoleLogger;
 import net.milkbowl.vault.chat.Chat;
+import net.skydistrict.azure.commands.AzureCommand;
 import net.skydistrict.azure.config.Config;
 import net.skydistrict.azure.config.Lang;
-import net.skydistrict.azure.manager.CommandManager;
+import net.skydistrict.azure.manager.TeleportRequestManager;
 import net.skydistrict.azure.storage.DataManager;
 import net.skydistrict.azure.storage.SQLManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -18,12 +20,14 @@ public class Azure extends JavaPlugin {
     private Lang lang;
     private SQLManager sql;
     private DataManager dataManager;
+    private TeleportRequestManager teleportRequestManager;
     private Chat chat;
     // Getters
     public static Azure getInstance() { return instance; }
     public ConsoleLogger getConsoleLogger() { return consoleLogger; }
     public SQLManager getSQLManager() { return sql; }
     public DataManager getDataManager() { return dataManager; }
+    public TeleportRequestManager getTeleportRequestManager() { return teleportRequestManager; }
     public Chat getVaultChat() { return chat; }
 
     @Override
@@ -38,10 +42,13 @@ public class Azure extends JavaPlugin {
         // this.sql = new SQLManager();
         this.reload(false);
 
-        // Register custom commands if CommandAPI is present
-        if (this.getServer().getPluginManager().getPlugin("CommandAPI") != null) {
-            new CommandManager().registerCommands();
-        }
+        this.teleportRequestManager = new TeleportRequestManager(this);
+
+        // Registering commands
+        final CommandManager commands = new CommandManager(this);
+        commands.register(
+                new AzureCommand(this)
+        );
 
         // Hook into Vault if plugin is present
         final RegisteredServiceProvider<Chat> rsp = getServer().getServicesManager().getRegistration(Chat.class);

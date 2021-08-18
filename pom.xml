@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>net.skydistrict</groupId>
+    <groupId>me.grabsky</groupId>
     <artifactId>Azure</artifactId>
-    <version>1.0.0-dev</version>
+    <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Azure</name>
@@ -14,7 +14,7 @@
     <properties>
         <java.version>16</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <builds.local>C:/Users/admin/Development/builds</builds.local>
+        <builds.local>D:/java/builds</builds.local>
     </properties>
 
     <build>
@@ -60,11 +60,6 @@
             <id>papermc-repo</id>
             <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
-        <!-- CommandAPI -->
-        <repository>
-            <id>commandapi</id>
-            <url>https://raw.githubusercontent.com/JorelAli/CommandAPI/mvn-repo/</url>
-        </repository>
         <!-- VaultAPI -->
         <repository>
             <id>jitpack.io</id>
@@ -75,23 +70,9 @@
     <dependencies>
         <!-- PaperMC -->
         <dependency>
-            <groupId>com.destroystokyo.paper</groupId>
+            <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.16.5-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <!-- CommandAPI Core -->
-        <dependency>
-            <groupId>dev.jorel</groupId>
-            <artifactId>commandapi-core</artifactId>
-            <version>5.11</version>
-            <scope>provided</scope>
-        </dependency>
-        <!-- CommandAPI Annotations -->
-        <dependency>
-            <groupId>dev.jorel</groupId>
-            <artifactId>commandapi-annotations</artifactId>
-            <version>5.11</version>
+            <version>1.17.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <!-- PaperLib -->
@@ -105,7 +86,7 @@
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>LATEST</version>
+            <version>5.0.0</version>
             <scope>compile</scope>
         </dependency>
         <!-- VaultAPI -->

@@ -19,6 +19,8 @@ public class Config {
 
     public static int CACHE_MODE;
     public static int SOFT_CACHE_EXPIRE_AFTER;
+    public static int TELEPORT_DELAY = 5; // s
+    public static long TELEPORT_REQUEST_LIFESPAN = 30000; // ms
 
     // Reloads translations
     public void reload(boolean reloadCredentials) {
