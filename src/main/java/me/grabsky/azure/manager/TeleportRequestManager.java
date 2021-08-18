@@ -1,7 +1,7 @@
-package net.skydistrict.azure.manager;
+package me.grabsky.azure.manager;
 
-import net.skydistrict.azure.Azure;
-import net.skydistrict.azure.config.Lang;
+import me.grabsky.azure.Azure;
+import me.grabsky.azure.config.AzureLang;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -61,11 +61,11 @@ public class TeleportRequestManager {
     public void teleport(Player player, Player target, int delay) {
         if (delay == 0 || player.hasPermission("skydistrict.bypass.azure.teleportdelay")) {
             if (player.teleport(target, PlayerTeleportEvent.TeleportCause.COMMAND)) {
-                Lang.send(player, Lang.TELEPORTED_TO_PLAYER.replace("{player}", target.getName()));
-                Lang.send(target, Lang.PLAYER_TELEPORTED_TO_YOU.replace("{player}", player.getName()));
+                AzureLang.send(player, AzureLang.TELEPORTED_TO_PLAYER.replace("{player}", target.getName()));
+                AzureLang.send(target, AzureLang.PLAYER_TELEPORTED_TO_YOU.replace("{player}", player.getName()));
                 return;
             }
-            Lang.send(player, Lang.TELEPORT_FAILED);
+            AzureLang.send(player, AzureLang.TELEPORT_FAILED);
             return;
         }
         final Location initialLoc = player.getLocation();
@@ -75,15 +75,15 @@ public class TeleportRequestManager {
             public void run() {
                 secondsLeft--;
                 if (initialLoc.distance(player.getLocation()) > 1D) {
-                    Lang.send(player, Lang.TELEPORT_CANCELLED);
+                    AzureLang.send(player, AzureLang.TELEPORT_CANCELLED);
                     this.cancel();
                 } else if (secondsLeft == 0) {
                     if (player.teleport(target, PlayerTeleportEvent.TeleportCause.PLUGIN)) {
-                        Lang.send(player, Lang.TELEPORTED_TO_PLAYER.replace("{player}", target.getName()));
-                        Lang.send(target, Lang.PLAYER_TELEPORTED_TO_YOU.replace("{player}", player.getName()));
+                        AzureLang.send(player, AzureLang.TELEPORTED_TO_PLAYER.replace("{player}", target.getName()));
+                        AzureLang.send(target, AzureLang.PLAYER_TELEPORTED_TO_YOU.replace("{player}", player.getName()));
                         return;
                     }
-                    Lang.send(player, Lang.TELEPORT_FAILED);
+                    AzureLang.send(player, AzureLang.TELEPORT_FAILED);
                     this.cancel();
                 }
             }

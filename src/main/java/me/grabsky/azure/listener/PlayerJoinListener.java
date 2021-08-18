@@ -1,4 +1,4 @@
-package net.skydistrict.azure.listener;
+package me.grabsky.azure.listener;
 
 import org.bukkit.event.Listener;
 

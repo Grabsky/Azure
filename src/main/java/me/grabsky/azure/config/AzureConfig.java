@@ -1,18 +1,18 @@
-package net.skydistrict.azure.config;
+package me.grabsky.azure.config;
 
+import me.grabsky.azure.Azure;
+import me.grabsky.azure.storage.SQLManager;
 import me.grabsky.indigo.logger.ConsoleLogger;
-import net.skydistrict.azure.Azure;
-import net.skydistrict.azure.storage.SQLManager;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 
-public class Config {
+public class AzureConfig {
     private final Azure instance;
     private final ConsoleLogger consoleLogger;
 
-    public Config(Azure instance) {
+    public AzureConfig(Azure instance) {
         this.instance = instance;
         this.consoleLogger = instance.getConsoleLogger();
     }

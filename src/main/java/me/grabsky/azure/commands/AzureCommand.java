@@ -1,10 +1,10 @@
-package net.skydistrict.azure.commands;
+package me.grabsky.azure.commands;
 
+import me.grabsky.azure.Azure;
+import me.grabsky.azure.config.AzureLang;
 import me.grabsky.indigo.configuration.Global;
 import me.grabsky.indigo.framework.commands.BaseCommand;
 import me.grabsky.indigo.framework.commands.ExecutorType;
-import net.skydistrict.azure.Azure;
-import net.skydistrict.azure.config.Lang;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,7 +21,7 @@ public class AzureCommand extends BaseCommand {
 
     @Override
     public List<String> tabComplete(CommandSender sender, String arg, int index) {
-        if (index == 0) return Collections.singletonList("reload");
+        if (index == 0) return List.of("reload");
         return Collections.emptyList();
     }
 
@@ -30,15 +30,15 @@ public class AzureCommand extends BaseCommand {
         if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
             if (sender.hasPermission("skydistrict.command.azure.reload")) {
                 if (instance.reload(false)) {
-                    Lang.send(sender, Global.RELOAD_SUCCESS);
+                    AzureLang.send(sender, Global.RELOAD_SUCCESS);
                 } else {
-                    Lang.send(sender, Global.RELOAD_FAIL);
+                    AzureLang.send(sender, Global.RELOAD_FAIL);
                 }
                 return;
             }
-            Lang.send(sender, Global.MISSING_PERMISSIONS);
+            AzureLang.send(sender, Global.MISSING_PERMISSIONS);
             return;
         }
-        Lang.send(sender, Lang.PLUGIN_HELP);
+        AzureLang.send(sender, AzureLang.PLUGIN_HELP);
     }
 }

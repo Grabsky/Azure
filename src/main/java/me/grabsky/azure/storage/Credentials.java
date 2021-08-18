@@ -1,4 +1,4 @@
-package net.skydistrict.azure.storage;
+package me.grabsky.azure.storage;
 
 public class Credentials {
     private String type;

@@ -1,4 +1,4 @@
-package net.skydistrict.azure.storage.data;
+package me.grabsky.azure.storage.data;
 
 import java.util.UUID;
 

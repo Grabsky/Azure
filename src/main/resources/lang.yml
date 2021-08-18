@@ -1,34 +1,23 @@
 version: 1 # Do not modify this unless you know what you're doing
 
 general:
-  missing-permissions: '§6§lS§e§lD§8 » §cBrak uprawnień'
-  player-not-online: '§6§lS§e§lD§8 » §cNie znaleziono takiego gracza.'
-  player-never-played: '§6§lS§e§lD§8 » §cTen gracz jest teraz offline.'
-  cant-use-on-yourself: '§6§lS§e§lD§8 » §cNie możesz wskazać samego siebie.'
-  targets-are-the-same: '§6§lS§e§lD§8 » §cMusisz podać dwóch różnych graczy.'
-  no-item-in-hand: '§6§lS§e§lD§8 » §cMusisz mieć w ręce jakiś przedmiot.'
-  teleporting: '§6§lS§e§lD§8 » §7Zostaniesz przeteleportowany za §e{delay}§7 sekund.'
-  teleport-cancelled: '§6§lS§e§lD§8 » §cTeleportacja anulowana. Ruszyłeś się.'
-  teleport-failed: '§6§lS§e§lD§8 » §cCoś poszło nie tak, spróbuj ponownie.'
   invalid-coords: '§6§lS§e§lD§8 » §cPodane koordynaty są nieprawidłowe.'
 
+# Following section(s) supports classic color codes (§) and hex colors (§#)
 commands:
   azure:
     help:
       - ''
       - '» §e/azure reload§8 - §7Reloads the config'
       - ''
-    reload:
-      reload-succeed: '§6§lS§e§lD§8 » §7Konfiguracja została pomyślnie przeładowana.'
-      reload-failed: '§6§lS§e§lD§8 » §cWystąpił błąd podczas ładowania konfiguracji.'
 
   teleport:
     teleported-to-player: '§6§lS§e§lD§8 » §7Zostałeś teleportowany do gracza §e{target}§7.'
     teleported-to-location: '§6§lS§e§lD§8 » §7Zostałeś teleportowany na §e{x}§7, §e{y}§7, §e{z}§7.'
-    teleported-player-to-player: '§6§lS§e§lD§8 » §7Teleportowano gracza §e{player}§7 do §e{target}§7.'
-    teleported-player-to-location: '§6§lS§e§lD§8 » §7Teleportowano gracza §e{player}§7 na §e{x}§7, §e{y}§7, §e{z}§7.'
-    player-teleported-to-you: '§6§lS§e§lD§8 » §e{player}§7 został do ciebie teleportowany.'
-    outside-world-border: '§6§lS§e§lD§8 » §cTa lokalizacja znajduje się granicą świata.'
+    teleported-player-to-player: '§6§lS§e§lD§8 » §7Teleportowano gracza §e{player_one}§7 do §e{player_two}§7.'
+    teleported-player-to-location: '§6§lS§e§lD§8 » §7Teleportowano gracza §e{target}§7 na §e{x}§7, §e{y}§7, §e{z}§7.'
+    player-teleported-to-you: '§6§lS§e§lD§8 » §e{target}§7 został do ciebie teleportowany.'
+    outside-world-border: '§6§lS§e§lD§8 » §cTa lokalizacja znajduje się poza granicą świata.'
 
   tprequest:
     request-sent: '§6§lS§e§lD§8 » §7Wysłano zapytanie do §e{player}§7.'

@@ -1,10 +1,10 @@
-package net.skydistrict.azure.storage.cache;
+package me.grabsky.azure.storage.cache;
 
+import me.grabsky.azure.Azure;
+import me.grabsky.azure.config.AzureConfig;
+import me.grabsky.azure.storage.DataManager;
+import me.grabsky.azure.storage.data.PlayerData;
 import me.grabsky.indigo.logger.ConsoleLogger;
-import net.skydistrict.azure.Azure;
-import net.skydistrict.azure.config.Config;
-import net.skydistrict.azure.storage.DataManager;
-import net.skydistrict.azure.storage.data.PlayerData;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -73,7 +73,7 @@ public class PlayerCache {
     // Schedules data unload for given uuid
     public static void scheduleUnload(UUID uuid) {
         // Calculating time for data removal
-        long targetedTime = System.currentTimeMillis() + (Config.SOFT_CACHE_EXPIRE_AFTER * 30L * 1000L);
+        long targetedTime = System.currentTimeMillis() + (AzureConfig.SOFT_CACHE_EXPIRE_AFTER * 30L * 1000L);
         scheduledUnloads.put(uuid, targetedTime);
     }
 

@@ -1,39 +1,22 @@
-package net.skydistrict.azure.config;
+package me.grabsky.azure.config;
 
+import me.grabsky.azure.Azure;
+import me.grabsky.indigo.framework.lang.AbstractLang;
 import me.grabsky.indigo.logger.ConsoleLogger;
-import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.skydistrict.azure.Azure;
-import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.List;
 
-public class Lang {
+public class AzureLang extends AbstractLang {
     private final Azure instance;
     private final ConsoleLogger consoleLogger;
     private final File file;
 
-    private FileConfiguration fileConfiguration;
-
     // General
-    public static Component CORRECT_USAGE;
-    public static Component MISSING_PERMISSIONS;
-    public static Component PLAYER_NOT_ONLINE;
-    public static Component PLAYER_NEVER_PLAYED;
-    public static Component CANT_USE_ON_YOURSELF;
-    public static Component TARGETS_ARE_THE_SAME;
-    public static Component NO_ITEM_IN_HAND;
-    public static String TELEPORTING;
     public static Component INVALID_COORDS;
     // Azure
     public static Component PLUGIN_HELP;
-    public static Component RELOAD_SUCCEED;
-    public static Component RELOAD_FAILED;
     // Teleport
     public static Component TELEPORT_CANCELLED;
     public static Component TELEPORT_FAILED;
@@ -70,13 +53,14 @@ public class Lang {
     public static Component ENCHANTMENTS_UPDATED;
     public static Component ITEM_HAS_NO_SUCH_ENCHANTMENT;
 
-    public Lang(Azure instance) {
+    public AzureLang(Azure instance) {
+        super(instance);
         this.instance = instance;
         this.consoleLogger = instance.getConsoleLogger();
         this.file = new File(instance.getDataFolder() + File.separator + "lang.yml");
     }
 
-    // Reloads translations
+    @Override
     public void reload() {
         // Saving default plugin translation file
         if(!file.exists()) {
@@ -88,20 +72,9 @@ public class Lang {
             consoleLogger.error("Your lang.yml file is outdated. Some messages may not display properly.");
         }
         // General
-        MISSING_PERMISSIONS = component("general.missing-permissions");
-        PLAYER_NOT_ONLINE = component("general.player-not-online");
-        PLAYER_NEVER_PLAYED = component("general.player-never-played");
-        CANT_USE_ON_YOURSELF = component("general.cant-use-on-yourself");
-        TARGETS_ARE_THE_SAME = component("general.targets-are-the-same");
-        NO_ITEM_IN_HAND = component("general.no-item-in-hand");
-        TELEPORTING = string("general.teleporting");
-        TELEPORT_CANCELLED = component("general.teleport-cancelled");
-        TELEPORT_FAILED = component("general.teleport-failed");
         INVALID_COORDS = component("general.invalid-coords");
         // Azure
         PLUGIN_HELP = component("commands.azure.help");
-        RELOAD_SUCCEED = component("commands.azure.reload.reload-succeed");
-        RELOAD_FAILED = component("commands.azure.reload.reload-failed");
         // Teleport
         TELEPORTED_TO_PLAYER = string("commands.teleport.teleported-to-player");
         TELEPORTED_TO_LOCATION = string("commands.teleport.teleported-to-location");
@@ -135,55 +108,4 @@ public class Lang {
         ENCHANTMENTS_UPDATED = component("commands.enchant.enchantments-updated");
         ITEM_HAS_NO_SUCH_ENCHANTMENT = component("commands.enchant.item-has-no-such-enchantment");
     }
-
-    private String string(String path) {
-        final StringBuilder sb = new StringBuilder();
-        if (fileConfiguration.isList(path)) {
-            final List<String> list = fileConfiguration.getStringList(path);
-            for (int i = 0; i < list.size(); i++) {
-                sb.append(list.get(i));
-                if (i + 1 != list.size()) {
-                    sb.append("\n");
-                }
-            }
-        } else {
-            sb.append(fileConfiguration.getString(path));
-        }
-        return sb.toString();
-    }
-
-    private Component component(String path) {
-        return LegacyComponentSerializer.legacySection().deserialize(this.string(path));
-    }
-
-    /** Sends parsed component */
-    public static void send(@NotNull CommandSender sender, @NotNull Component component) {
-        if (component != Component.empty()) {
-            sender.sendMessage(component);
-        }
-    }
-
-    /** Parses and sends component */
-    public static void send(@NotNull CommandSender sender, @NotNull String text) {
-        final Component component = LegacyComponentSerializer.legacySection().deserialize(text);
-        if (component != Component.empty()) {
-            sender.sendMessage(component);
-        }
-    }
-
-    /** Sends parsed component (with specified identity) */
-    public static void send(@NotNull CommandSender sender, @NotNull Component component, @NotNull Identity identity) {
-        if (component != Component.empty()) {
-            sender.sendMessage(identity, component);
-        }
-    }
-
-    /** Parses and sends component (with specified identity) */
-    public static void send(@NotNull CommandSender sender, @NotNull String text, @NotNull Identity identity) {
-        final Component component = LegacyComponentSerializer.legacySection().deserialize(text);
-        if (component != Component.empty()) {
-            sender.sendMessage(identity, component);
-        }
-    }
-
 }

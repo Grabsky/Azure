@@ -1,9 +1,9 @@
-package net.skydistrict.azure.storage;
+package me.grabsky.azure.storage;
 
 import com.destroystokyo.paper.ClientOption;
 import com.zaxxer.hikari.HikariDataSource;
-import net.skydistrict.azure.Azure;
-import net.skydistrict.azure.storage.data.PlayerData;
+import me.grabsky.azure.Azure;
+import me.grabsky.azure.storage.data.PlayerData;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

@@ -1,6 +1,6 @@
-package net.skydistrict.azure.manager;
+package me.grabsky.azure.manager;
 
-import net.skydistrict.azure.config.Config;
+import me.grabsky.azure.config.AzureConfig;
 
 import java.util.UUID;
 
@@ -10,7 +10,7 @@ public class TeleportRequest {
 
     public TeleportRequest(UUID target) {
         this.target = target;
-        this.expirationDate = System.currentTimeMillis() + Config.TELEPORT_REQUEST_LIFESPAN;
+        this.expirationDate = System.currentTimeMillis() + AzureConfig.TELEPORT_REQUEST_LIFESPAN;
     }
 
     public UUID getTarget() {

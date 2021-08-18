@@ -1,8 +1,8 @@
-package net.skydistrict.azure.storage;
+package me.grabsky.azure.storage;
 
 import com.zaxxer.hikari.HikariDataSource;
+import me.grabsky.azure.Azure;
 import me.grabsky.indigo.logger.ConsoleLogger;
-import net.skydistrict.azure.Azure;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

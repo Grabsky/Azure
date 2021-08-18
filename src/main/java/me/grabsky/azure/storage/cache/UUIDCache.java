@@ -1,4 +1,4 @@
-package net.skydistrict.azure.storage.cache;
+package me.grabsky.azure.storage.cache;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;

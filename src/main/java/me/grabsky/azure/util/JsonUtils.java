@@ -1,9 +1,9 @@
-package net.skydistrict.azure.util;
+package me.grabsky.azure.util;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import net.skydistrict.azure.Azure;
+import me.grabsky.azure.Azure;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
