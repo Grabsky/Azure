@@ -1,4 +1,4 @@
-package me.grabsky.azure.commands;
+package me.grabsky.azure.commands.teleport;
 
 import me.grabsky.azure.Azure;
 import me.grabsky.azure.config.AzureLang;
