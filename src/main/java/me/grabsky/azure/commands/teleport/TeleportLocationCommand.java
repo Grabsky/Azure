@@ -58,7 +58,7 @@ public class TeleportLocationCommand extends BaseCommand {
         if (sender instanceof Player executor) {
             final Double x = Numbers.parseDouble(stringX), y = Numbers.parseDouble(stringY), z = Numbers.parseDouble(stringZ);
             if (x != null && y != null && z != null) {
-                final Location loc = new Location(executor.getWorld(), x, y, z);
+                final Location loc = new Location(executor.getWorld(), x, y, z, executor.getLocation().getYaw(), executor.getLocation().getPitch());
                 if (executor.getWorld().getWorldBorder().isInside(loc)) {
                     PaperLib.teleportAsync(executor, loc).thenAccept((t) -> AzureLang.send(sender, AzureLang.TELEPORTED_TO_LOCATION.replace("{x}", stringX).replace("{y}", stringY).replace("{z}", stringZ)));
                     return;
