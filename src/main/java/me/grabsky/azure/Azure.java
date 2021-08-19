@@ -1,7 +1,9 @@
 package me.grabsky.azure;
 
 import me.grabsky.azure.commands.AzureCommand;
-import me.grabsky.azure.commands.TeleportCommand;
+import me.grabsky.azure.commands.teleport.TeleportCommand;
+import me.grabsky.azure.commands.teleport.TeleportHereCommand;
+import me.grabsky.azure.commands.teleport.TeleportLocationCommand;
 import me.grabsky.azure.config.AzureConfig;
 import me.grabsky.azure.config.AzureLang;
 import me.grabsky.azure.manager.TeleportRequestManager;
@@ -48,7 +50,9 @@ public class Azure extends JavaPlugin {
         final CommandManager commands = new CommandManager(this);
         commands.register(
                 new AzureCommand(this),
-                new TeleportCommand(this)
+                new TeleportCommand(this),
+                new TeleportHereCommand(this),
+                new TeleportLocationCommand(this)
         );
 
         // Hook into Vault if plugin is present

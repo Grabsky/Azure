@@ -5,3 +5,22 @@ api-version: 1.17
 authors: [Grabsky]
 depend: [Indigo]
 softdepend: [Vault]
+permissions:
+  skydistrict.command.azure.*:
+    description: 'Access /azure command'
+    children:
+      skydistrict.command.azure: false
+      skydistrict.command.azure.reload: false
+  skydistrict.command.teleport.*:
+    description: 'Access /teleport command'
+    children:
+      skydistrict.command.teleport: false
+      skydistrict.command.teleport.others: false
+  skydistrict.command.teleporthere.*:
+    description: 'Access /teleporthere command'
+    children:
+      skydistrict.command.teleporthere: false
+  skydistrict.command.teleportlocation.*:
+    description: 'Access /teleportlocation command'
+    children:
+      skydistrict.command.teleportlocation: false

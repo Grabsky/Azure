@@ -49,21 +49,17 @@ public class TeleportCommand extends BaseCommand {
     @SubCommand
     public void onTeleportToPlayer(CommandSender sender, String targetName) {
         if (sender instanceof Player executor) {
-            if (sender.hasPermission("skydistrict.command.teleport.self")) {
-                final Player target = Bukkit.getPlayer(targetName);
-                if (target != null && target.isOnline()) {
-                    if (executor != target) {
-                        executor.teleport(target);
-                        AzureLang.send(sender, AzureLang.TELEPORTED_TO_PLAYER.replace("{target}", target.getName()));
-                        return;
-                    }
-                    AzureLang.send(sender, Global.CANT_USE_ON_YOURSELF);
+            final Player target = Bukkit.getPlayer(targetName);
+            if (target != null && target.isOnline()) {
+                if (executor != target) {
+                    executor.teleport(target);
+                    AzureLang.send(sender, AzureLang.TELEPORTED_TO_PLAYER.replace("{target}", target.getName()));
                     return;
                 }
-                AzureLang.send(sender, Global.PLAYER_NOT_FOUND);
+                AzureLang.send(sender, Global.CANT_USE_ON_YOURSELF);
                 return;
             }
-            AzureLang.send(sender, Global.MISSING_PERMISSIONS);
+            AzureLang.send(sender, Global.PLAYER_NOT_FOUND);
             return;
         }
         AzureLang.send(sender, Global.PLAYER_ONLY_COMMAND);
