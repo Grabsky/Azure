@@ -1,9 +1,6 @@
 package me.grabsky.azure;
 
-import me.grabsky.azure.commands.AzureCommand;
-import me.grabsky.azure.commands.EnchantCommand;
-import me.grabsky.azure.commands.LoreCommand;
-import me.grabsky.azure.commands.RenameCommand;
+import me.grabsky.azure.commands.*;
 import me.grabsky.azure.commands.teleport.TeleportCommand;
 import me.grabsky.azure.commands.teleport.TeleportHereCommand;
 import me.grabsky.azure.commands.teleport.TeleportLocationCommand;
@@ -48,7 +45,8 @@ public class Azure extends JavaPlugin {
                 new TeleportLocationCommand(this),
                 new EnchantCommand(this),
                 new RenameCommand(this),
-                new LoreCommand(this)
+                new LoreCommand(this),
+                new SkullCommand(this)
         );
         // Hook into Vault if plugin is present
         // final RegisteredServiceProvider<Chat> rsp = getServer().getServicesManager().getRegistration(Chat.class);
