@@ -1,4 +1,4 @@
-package me.grabsky.azure.config;
+package me.grabsky.azure.configuration;
 
 import me.grabsky.azure.Azure;
 import me.grabsky.indigo.framework.lang.AbstractLang;
@@ -45,13 +45,17 @@ public class AzureLang extends AbstractLang {
     public static Component NAME_UPDATED;
     public static Component NAME_CLEARED;
     // Lore
+    public static Component LORE_USAGE;
     public static Component LORE_UPDATED;
     public static Component LORE_CLEARED;
-    public static String LORE_INDEX_OUT_OF_BOUNDS;
+    public static Component LORE_INDEX_TOO_LOW;
+    public static String LORE_INDEX_TOO_HIGH;
     public static Component ITEM_HAS_NO_LORE;
     // Enchant
+    public static Component ENCHANT_USAGE;
     public static Component ENCHANTMENTS_UPDATED;
     public static Component ITEM_HAS_NO_SUCH_ENCHANTMENT;
+    public static Component ENCHANMENT_NOT_FOUND;
 
     public AzureLang(Azure instance) {
         super(instance);
@@ -100,12 +104,16 @@ public class AzureLang extends AbstractLang {
         NAME_UPDATED = component("commands.name.name-updated");
         NAME_CLEARED = component("commands.name.name-cleared");
         // Lore
+        LORE_USAGE = component("commands.lore.usage");
         LORE_UPDATED = component("commands.lore.lore-updated");
         LORE_CLEARED = component("commands.lore.lore-cleared");
-        LORE_INDEX_OUT_OF_BOUNDS = string("commands.lore.lore-index-out-of-bounds");
+        LORE_INDEX_TOO_LOW = component("commands.lore.lore-index-too-low");
+        LORE_INDEX_TOO_HIGH = string("commands.lore.lore-index-too-high");
         ITEM_HAS_NO_LORE = component("commands.lore.item-has-no-lore");
         // Enchant
+        ENCHANT_USAGE = component("commands.enchant.usage");
         ENCHANTMENTS_UPDATED = component("commands.enchant.enchantments-updated");
         ITEM_HAS_NO_SUCH_ENCHANTMENT = component("commands.enchant.item-has-no-such-enchantment");
+        ENCHANMENT_NOT_FOUND = component("commands.enchant.enchantment-not-found");
     }
 }

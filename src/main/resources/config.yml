@@ -1,3 +1,5 @@
+version: 1 # Do not modify this unless you know what you're doing
+
 settings:
   data:
     # Valid modes:
@@ -5,9 +7,9 @@ settings:
     # 1 - hard cache data for all players on startup (no expiration)
     cache-mode: 0
     soft-cache-expire-after: 30 # in minutes
-    # Valid types: JSON, SQLite, MySQL
+    # Valid types: JSON
     storage:
-      type: mysql
+      type: json
       address: localhost
       port: 3306
       database: azure_testing

@@ -2,7 +2,7 @@ package me.grabsky.azure.commands.teleport;
 
 import io.papermc.lib.PaperLib;
 import me.grabsky.azure.Azure;
-import me.grabsky.azure.config.AzureLang;
+import me.grabsky.azure.configuration.AzureLang;
 import me.grabsky.indigo.configuration.Global;
 import me.grabsky.indigo.framework.commands.BaseCommand;
 import me.grabsky.indigo.framework.commands.ExecutorType;

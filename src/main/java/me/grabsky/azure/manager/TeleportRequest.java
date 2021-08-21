@@ -1,6 +1,6 @@
 package me.grabsky.azure.manager;
 
-import me.grabsky.azure.config.AzureConfig;
+import me.grabsky.azure.configuration.AzureConfig;
 
 import java.util.UUID;
 

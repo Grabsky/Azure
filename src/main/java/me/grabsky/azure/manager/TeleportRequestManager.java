@@ -1,7 +1,7 @@
 package me.grabsky.azure.manager;
 
 import me.grabsky.azure.Azure;
-import me.grabsky.azure.config.AzureLang;
+import me.grabsky.azure.configuration.AzureLang;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;

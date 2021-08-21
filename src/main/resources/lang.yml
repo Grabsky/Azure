@@ -49,11 +49,25 @@ commands:
     name-cleared: '§6§lS§e§lD§8 » §7Nazwa przedmiotu została wyczyszczona.'
 
   lore:
+    usage:
+      - ''
+      - '§8» §e/lore add <lore...>§8 - §7Adds line of lore'
+      - '§8» §e/lore clear§8 - §7Clears lore'
+      - '§8» §e/lore remove <line>§8 - §7Removes specific line of lore'
+      - '§8» §e/lore set <line> <lore...>§8 - §7Modifies specific line of lore'
+      - ''
     lore-updated: '§6§lS§e§lD§8 » §7Opis przedmiotu został zaktualizowany.'
     lore-cleared: '§6§lS§e§lD§8 » §7Opis przedmiotu został wyczyszczony.'
-    lore-index-out-of-bounds: '§6§lS§e§lD§8 » §cPodany indeks jest za duży. (Min: 0, Max: {length})'
+    lore-index-too-low: '§6§lS§e§lD§8 » §cIndeks musi być większy niż 0.'
+    lore-index-too-high: '§6§lS§e§lD§8 » §cPodany indeks jest za duży. (Max: {num})'
     item-has-no-lore: '§6§lS§e§lD§8 » §cTen przedmiot nie ma opisu.'
 
   enchant:
+    usage:
+      - ''
+      - '§8» §e/enchant add <enchantment> [level]§8 - §7Adds enchantment'
+      - '§8» §e/enchant remove <enchantment>§8 - §7Removes enchantment'
+      - ''
     enchantments-updated: '§6§lS§e§lD§8 » §7Zaklęcia przedmiotu zostały zaktualizowane.'
     item-has-no-such-enchantment: '§6§lS§e§lD§8 » §cTen przedmiot nie ma takiego zaklęcia.'
+    enchantment-not-found: '§6§lS§e§lD§8 » §cNie odnaleziono takiego zaklęcia.'

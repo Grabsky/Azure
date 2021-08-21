@@ -1,10 +1,12 @@
 package me.grabsky.azure.commands;
 
 import me.grabsky.azure.Azure;
-import me.grabsky.azure.config.AzureLang;
+import me.grabsky.azure.configuration.AzureLang;
 import me.grabsky.indigo.configuration.Global;
 import me.grabsky.indigo.framework.commands.BaseCommand;
 import me.grabsky.indigo.framework.commands.ExecutorType;
+import me.grabsky.indigo.framework.commands.annotations.DefaultCommand;
+import me.grabsky.indigo.framework.commands.annotations.SubCommand;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,17 +30,27 @@ public class AzureCommand extends BaseCommand {
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
-            if (sender.hasPermission("skydistrict.command.azure.reload")) {
-                if (instance.reload(false)) {
-                    AzureLang.send(sender, Global.RELOAD_SUCCESS);
-                } else {
-                    AzureLang.send(sender, Global.RELOAD_FAIL);
-                }
-                return;
-            }
-            AzureLang.send(sender, Global.MISSING_PERMISSIONS);
+            this.onReload(sender);
             return;
         }
+        this.onDefault(sender);
+    }
+
+    @DefaultCommand
+    public void onDefault(CommandSender sender) {
         AzureLang.send(sender, AzureLang.PLUGIN_HELP);
+    }
+
+    @SubCommand
+    public void onReload(CommandSender sender) {
+        if (sender.hasPermission("skydistrict.command.azure.reload")) {
+            if (instance.reload()) {
+                AzureLang.send(sender, Global.RELOAD_SUCCESS);
+            } else {
+                AzureLang.send(sender, Global.RELOAD_FAIL);
+            }
+            return;
+        }
+        AzureLang.send(sender, Global.MISSING_PERMISSIONS);
     }
 }
