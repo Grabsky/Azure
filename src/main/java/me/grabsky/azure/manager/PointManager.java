@@ -52,22 +52,20 @@ public class PointManager {
                             points.put(name, jsonLocation);
                         }
                     } catch (IOException e) {
-                        consoleLogger.error("Error occurred while trying to load '" + name + "' location.");
+                        consoleLogger.error("Error occurred while trying to load point with id '" + name + "'.");
                         e.printStackTrace();
                     }
                 }
             }
             ids = new ArrayList<>(points.keySet().stream().sorted().toList());
-            consoleLogger.success("Locations has been loaded and sorted in " + (System.nanoTime() - s1) / 1000000D + "ms");
+            consoleLogger.success("Loaded " + ids.size() + " points in " + (System.nanoTime() - s1) / 1000000D + "ms");
         }
     }
 
     public void addPoint(String id, Location location) {
         points.put(id, new JsonLocation(location.getWorld().getName(), location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch()));
-        modified.add(id);
-        if (!ids.contains(id)) {
-            ids.add(id);
-        }
+        if (!ids.contains(id)) ids.add(id);
+        if (!modified.contains(id)) modified.add(id);
     }
 
     public void deletePoint(String id) {
@@ -107,7 +105,7 @@ public class PointManager {
             }
             ids = new ArrayList<>(points.keySet().stream().sorted().toList());
             modified.clear();
-            consoleLogger.success("Points (" + size + ") has been saved and sorted in " + (System.nanoTime() - s1) / 1000000D + "ms");
+            consoleLogger.success("Saved " + size + " points in " + (System.nanoTime() - s1) / 1000000D + "ms");
         }
     }
 

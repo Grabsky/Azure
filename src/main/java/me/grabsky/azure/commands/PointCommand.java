@@ -29,7 +29,7 @@ public class PointCommand extends BaseCommand {
     public List<String> tabComplete(CommandSender sender, String arg, int index) {
         if (index == 0) return List.of("save", "del", "tp");
         if (index == 1) return switch (arg) {
-            case "save", "tp" -> manager.getIds();
+            case "del", "tp" -> manager.getIds();
             default -> Collections.emptyList();
         };
         return Collections.emptyList();
@@ -74,7 +74,7 @@ public class PointCommand extends BaseCommand {
     public void onPointAdd(CommandSender sender, String id) {
         if (sender instanceof Player executor) {
             if (sender.hasPermission("firedot.command.point.save")) {
-                if (!id.matches("^[a-zA-Z0-9_-]+")) {
+                if (id.matches("[a-zA-Z0-9_-]+")) {
                     final boolean wasSet = manager.hasPoint(id);
                     manager.addPoint(id, executor.getLocation());
                     AzureLang.send(sender, ((wasSet) ? AzureLang.POINT_OVERWRITTEN : AzureLang.POINT_ADDED).replace("{id}", id));
@@ -107,7 +107,7 @@ public class PointCommand extends BaseCommand {
     public void onPointTeleport(CommandSender sender, String id) {
         if (sender instanceof Player executor) {
             if (sender.hasPermission("firedot.command.point.teleport")) {
-                if (manager.getPoint(id) != null) {
+                if (manager.hasPoint(id)) {
                     PaperLib.teleportAsync(executor, manager.getPoint(id));
                     AzureLang.send(sender, AzureLang.TELEPORTED_TO_POINT.replace("{id}", id));
                     return;
