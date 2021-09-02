@@ -2,16 +2,7 @@ version: 1 # Do not modify this unless you know what you're doing
 
 settings:
   data:
-    # Valid modes:
-    # 0 (default) - soft load cache on join and store it for x time after player has left
-    # 1 - hard cache data for all players on startup (no expiration)
-    cache-mode: 0
-    soft-cache-expire-after: 30 # in minutes
-    # Valid types: JSON
-    storage:
-      type: json
-      address: localhost
-      port: 3306
-      database: azure_testing
-      username: azure_testing
-      password: secretpwD
+    player-data:
+      save-interval: 300 # in seconds
+    points:
+      save-interval: 600 # in seconds

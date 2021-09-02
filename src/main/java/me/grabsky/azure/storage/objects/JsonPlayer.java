@@ -1,7 +1,5 @@
 package me.grabsky.azure.storage.objects;
 
-import org.bukkit.Location;
-
 import java.util.Map;
 import java.util.UUID;
 
@@ -13,10 +11,10 @@ public class JsonPlayer {
     private String country;
     private String language;
     // Offline specific
-    private long lastSeen;
+    private long lastOnline;
     private JsonLocation lastLocation;
     // Homes
-    private Map<String, Location> homes;
+    private Map<String, JsonLocation> homes;
 
     public JsonPlayer(UUID uuid, String name) {
         this.uuid = uuid;
@@ -24,14 +22,14 @@ public class JsonPlayer {
     }
 
     // This one is used for creating data for the first time
-    public JsonPlayer(UUID uuid, String name, String displayName, String ipAddress, String country, String language, long lastSeen, JsonLocation lastLocation) {
+    public JsonPlayer(UUID uuid, String name, String displayName, String ipAddress, String country, String language, long lastOnline, JsonLocation lastLocation) {
         this.uuid = uuid;
         this.name = name;
         this.customName = displayName;
         this.ipAddress = ipAddress;
         this.country = country;
         this.language = language;
-        this.lastSeen = lastSeen;
+        this.lastOnline = lastOnline;
         this.lastLocation = lastLocation;
     }
 
@@ -54,8 +52,8 @@ public class JsonPlayer {
     public String getLanguage() {
         return language;
     }
-    public long getLastSeen() {
-        return lastSeen;
+    public long getLastOnline() {
+        return lastOnline;
     }
     public JsonLocation getLastLocation() {
         return lastLocation;
@@ -77,8 +75,8 @@ public class JsonPlayer {
     public void setLanguage(String language) {
         this.language = language;
     }
-    public void setLastSeen(long lastSeen) {
-        this.lastSeen = lastSeen;
+    public void setLastOnline(long lastSeen) {
+        this.lastOnline = lastSeen;
     }
     public void setLastLocation(JsonLocation lastLocation) { this.lastLocation = lastLocation; }
 }

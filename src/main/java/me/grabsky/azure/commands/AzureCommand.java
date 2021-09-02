@@ -17,7 +17,7 @@ public class AzureCommand extends BaseCommand {
     private final Azure instance;
 
     public AzureCommand(@NotNull Azure instance) {
-        super("azure", null, "skydistrict.command.azure", ExecutorType.ALL);
+        super("azure", null, "firedot.command.azure", ExecutorType.ALL);
         this.instance = instance;
     }
 
@@ -43,7 +43,7 @@ public class AzureCommand extends BaseCommand {
 
     @SubCommand
     public void onReload(CommandSender sender) {
-        if (sender.hasPermission("skydistrict.command.azure.reload")) {
+        if (sender.hasPermission("firedot.command.azure.reload")) {
             if (instance.reload()) {
                 AzureLang.send(sender, Global.RELOAD_SUCCESS);
             } else {

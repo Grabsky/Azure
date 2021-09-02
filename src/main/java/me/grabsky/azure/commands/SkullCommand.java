@@ -21,7 +21,7 @@ public class SkullCommand extends BaseCommand {
     private final Azure instance;
 
     public SkullCommand(Azure instance) {
-        super("skull", null, "skydistrict.command.skull", ExecutorType.ALL);
+        super("skull", null, "firedot.command.skull", ExecutorType.ALL);
         this.instance = instance;
     }
 

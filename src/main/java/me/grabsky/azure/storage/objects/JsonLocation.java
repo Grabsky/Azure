@@ -5,12 +5,12 @@ import org.bukkit.Location;
 import org.bukkit.World;
 
 public class JsonLocation {
-    private String world;
-    private double x;
-    private double y;
-    private double z;
-    private float yaw;
-    private float pitch;
+    public String world;
+    public double x;
+    public double y;
+    public double z;
+    public float yaw;
+    public float pitch;
     private Location location;
 
     public JsonLocation() {}

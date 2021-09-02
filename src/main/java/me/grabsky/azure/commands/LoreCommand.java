@@ -26,7 +26,7 @@ public class LoreCommand extends BaseCommand {
     private final Azure instance;
 
     public LoreCommand(Azure instance) {
-        super("lore", null, "skydistrict.command.lore", ExecutorType.PLAYER);
+        super("lore", null, "firedot.command.lore", ExecutorType.PLAYER);
         this.instance = instance;
     }
 
@@ -83,7 +83,7 @@ public class LoreCommand extends BaseCommand {
     @SubCommand
     public void onLoreAdd(CommandSender sender, String[] args) {
         if (sender instanceof Player executor) {
-            if (sender.hasPermission("skydistrict.command.lore.add")) {
+            if (sender.hasPermission("firedot.command.lore.add")) {
                 final ItemStack item = executor.getInventory().getItemInMainHand();
                 if (item.getType() != Material.AIR) {
                     // Convert args to lore
@@ -111,7 +111,7 @@ public class LoreCommand extends BaseCommand {
     @SubCommand
     public void onLoreSet(CommandSender sender, String stringLineNumber, String[] args) {
         if (sender instanceof Player executor) {
-            if (sender.hasPermission("skydistrict.command.lore.set")) {
+            if (sender.hasPermission("firedot.command.lore.set")) {
                 final ItemStack item = executor.getInventory().getItemInMainHand();
                 if (item.getType() != Material.AIR) {
                     final Integer lineNumber = Numbers.parseInt(stringLineNumber);
@@ -152,7 +152,7 @@ public class LoreCommand extends BaseCommand {
     @SubCommand
     public void onLoreRemove(CommandSender sender, String stringLineNumber) {
         if (sender instanceof Player executor) {
-            if (sender.hasPermission("skydistrict.command.lore.set")) {
+            if (sender.hasPermission("firedot.command.lore.remove")) {
                 final ItemStack item = executor.getInventory().getItemInMainHand();
                 if (item.getType() != Material.AIR) {
                     final Integer lineNumber = Numbers.parseInt(stringLineNumber);
@@ -190,7 +190,7 @@ public class LoreCommand extends BaseCommand {
 
     public void onLoreClear(CommandSender sender) {
         if (sender instanceof Player executor) {
-            if (sender.hasPermission("skydistrict.command.lore.set")) {
+            if (sender.hasPermission("firedot.command.lore.clear")) {
                 final ItemStack item = executor.getInventory().getItemInMainHand();
                 if (item.getType() != Material.AIR) {
                     final ItemMeta meta = item.getItemMeta();

@@ -21,7 +21,7 @@ public class TeleportLocationCommand extends BaseCommand {
     private final Azure instance;
 
     public TeleportLocationCommand(Azure instance) {
-        super("teleportlocation", List.of("tploc"), "skydistrict.command.teleportlocation", ExecutorType.ALL);
+        super("teleportlocation", List.of("tploc"), "firedot.command.teleportlocation", ExecutorType.ALL);
         this.instance = instance;
     }
 

@@ -71,3 +71,17 @@ commands:
     enchantments-updated: '§6§lS§e§lD§8 » §7Zaklęcia przedmiotu zostały zaktualizowane.'
     item-has-no-such-enchantment: '§6§lS§e§lD§8 » §cTen przedmiot nie ma takiego zaklęcia.'
     enchantment-not-found: '§6§lS§e§lD§8 » §cNie odnaleziono takiego zaklęcia.'
+
+  point:
+    usage:
+      - ''
+      - '§8» §e/point tp <id>§8 - §7Teleportuje do punktu'
+      - '§8» §e/point save <id>§8 - §7Ustawia nowy punkt'
+      - '§8» §e/point del <id>§8 - §7Usuwa punkt'
+      - ''
+    point-added: '§6§lS§e§lD§8 » §7Punkt §e{id}§7 został dodany.'
+    point-overwritten: '§6§lS§e§lD§8 » §7Punkt §e{id}§7 został nadpisany.'
+    invalid-characters: '§6§lS§e§lD§8 » §cPodane ID zawiera niedozwolone znaki.'
+    point-deleted: '§6§lS§e§lD§8 » §7Punkt §e{id}§7 został usunięty.'
+    teleported-to-point: '§6§lS§e§lD§8 » §7Zostałeś przeteleportowany do punktu §e{id}§7.'
+    point-not-found: '§6§lS§e§lD§8 » §cNie znaleziono punktu o takim ID.'

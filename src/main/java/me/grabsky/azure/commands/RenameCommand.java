@@ -22,7 +22,7 @@ public class RenameCommand extends BaseCommand {
     private final Azure instance;
 
     public RenameCommand(Azure instance) {
-        super("rename", null, "skydistrict.command.rename", ExecutorType.PLAYER);
+        super("rename", null, "firedot.command.rename", ExecutorType.PLAYER);
         this.instance = instance;
     }
 

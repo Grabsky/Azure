@@ -59,7 +59,7 @@ public class TeleportRequestManager {
     }
 
     public void teleport(Player player, Player target, int delay) {
-        if (delay == 0 || player.hasPermission("skydistrict.bypass.azure.teleportdelay")) {
+        if (delay == 0 || player.hasPermission("firedot.bypass.azure.teleportdelay")) {
             if (player.teleport(target, PlayerTeleportEvent.TeleportCause.COMMAND)) {
                 AzureLang.send(player, AzureLang.TELEPORTED_TO_PLAYER.replace("{player}", target.getName()));
                 AzureLang.send(target, AzureLang.PLAYER_TELEPORTED_TO_YOU.replace("{player}", player.getName()));

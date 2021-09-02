@@ -55,7 +55,17 @@ public class AzureLang extends AbstractLang {
     public static Component ENCHANT_USAGE;
     public static Component ENCHANTMENTS_UPDATED;
     public static Component ITEM_HAS_NO_SUCH_ENCHANTMENT;
-    public static Component ENCHANMENT_NOT_FOUND;
+    public static Component ENCHANTMENT_NOT_FOUND;
+    // Point
+    public static Component POINT_USAGE;
+    public static String POINT_ADDED;
+    public static String POINT_OVERWRITTEN;
+    public static Component INVALID_CHARACTERS;
+    public static String POINT_DELETED;
+    public static String TELEPORTED_TO_POINT;
+    public static Component POINT_NOT_FOUND;
+
+
 
     public AzureLang(Azure instance) {
         super(instance);
@@ -114,6 +124,14 @@ public class AzureLang extends AbstractLang {
         ENCHANT_USAGE = component("commands.enchant.usage");
         ENCHANTMENTS_UPDATED = component("commands.enchant.enchantments-updated");
         ITEM_HAS_NO_SUCH_ENCHANTMENT = component("commands.enchant.item-has-no-such-enchantment");
-        ENCHANMENT_NOT_FOUND = component("commands.enchant.enchantment-not-found");
+        ENCHANTMENT_NOT_FOUND = component("commands.enchant.enchantment-not-found");
+        // Point
+        POINT_USAGE = component("commands.point.usage");
+        POINT_ADDED = string("commands.point.point-added");
+        POINT_OVERWRITTEN = string("commands.point.point-overwritten");
+        INVALID_CHARACTERS = component("commands.point.invalid-characters");
+        POINT_DELETED = string("commands.point.point-deleted");
+        TELEPORTED_TO_POINT = string("commands.point.teleported-to-point");
+        POINT_NOT_FOUND = component("commands.point.point-not-found");
     }
 }

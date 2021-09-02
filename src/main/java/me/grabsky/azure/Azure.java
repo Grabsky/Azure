@@ -6,7 +6,10 @@ import me.grabsky.azure.commands.teleport.TeleportHereCommand;
 import me.grabsky.azure.commands.teleport.TeleportLocationCommand;
 import me.grabsky.azure.configuration.AzureConfig;
 import me.grabsky.azure.configuration.AzureLang;
+import me.grabsky.azure.listener.PlayerJoinListener;
+import me.grabsky.azure.manager.PointManager;
 import me.grabsky.azure.manager.TeleportRequestManager;
+import me.grabsky.azure.storage.data.DataManager;
 import me.grabsky.indigo.framework.commands.CommandManager;
 import me.grabsky.indigo.logger.ConsoleLogger;
 import net.milkbowl.vault.chat.Chat;
@@ -18,12 +21,16 @@ public class Azure extends JavaPlugin {
     private ConsoleLogger consoleLogger;
     private AzureConfig config;
     private AzureLang lang;
+    private DataManager dataManager;
     private TeleportRequestManager teleportRequestManager;
+    private PointManager pointManager;
     private Chat chat;
     // Getters
     public static Azure getInstance() { return instance; }
     public ConsoleLogger getConsoleLogger() { return consoleLogger; }
+    public DataManager getDataManager() { return dataManager; }
     public TeleportRequestManager getTeleportRequestManager() { return teleportRequestManager; }
+    public PointManager getLocationsManager() { return pointManager; }
     public Chat getVaultChat() { return chat; }
 
     @Override
@@ -35,7 +42,12 @@ public class Azure extends JavaPlugin {
         this.config = new AzureConfig(this);
         this.reload();
         // Initializing TeleportRequestManager
+        this.dataManager = new DataManager(this);
         this.teleportRequestManager = new TeleportRequestManager(this);
+        // Initializing PointManager
+        this.pointManager = new PointManager(this);
+        pointManager.loadAll();
+        pointManager.runSaveTask();
         // Registering commands
         final CommandManager commands = new CommandManager(this);
         commands.register(
@@ -46,8 +58,10 @@ public class Azure extends JavaPlugin {
                 new EnchantCommand(this),
                 new RenameCommand(this),
                 new LoreCommand(this),
-                new SkullCommand(this)
+                new SkullCommand(this),
+                new PointCommand(this)
         );
+        this.getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
         // Hook into Vault if plugin is present
         // final RegisteredServiceProvider<Chat> rsp = getServer().getServicesManager().getRegistration(Chat.class);
         // this.chat = (rsp != null) ? rsp.getProvider() : null;
@@ -55,7 +69,7 @@ public class Azure extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // Save data
+        pointManager.saveAll();
     }
 
     public boolean reload() {

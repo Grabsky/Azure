@@ -24,7 +24,7 @@ public class EnchantCommand extends BaseCommand {
     private final List<String> enchantments;
 
     public EnchantCommand(@NotNull Azure instance) {
-        super("enchant", null, "skydistrict.command.enchant", ExecutorType.ALL);
+        super("enchant", null, "firedot.command.enchant", ExecutorType.ALL);
         this.instance = instance;
         this.enchantments = List.of("aqua_affinity", "bane_of_arthropods", "binding_curse", "blast_protection", "channeling", "depth_strider", "efficiency", "feather_falling", "fire_aspect", "fire_protection", "flame", "fortune", "frost_walker", "impaling", "infinity", "knockback", "looting", "loyalty", "luck_of_the_sea", "lure", "mending", "multishot", "piercing", "power", "projectile_protection", "protection", "punch", "quick_charge", "respiration", "riptide", "sharpness", "silk_touch", "smite", "soul_speed", "sweeping", "thorns", "unbreaking", "vanishing_curse");
     }
@@ -72,7 +72,7 @@ public class EnchantCommand extends BaseCommand {
 
     public void onEnchantAdd(CommandSender sender, String enchantmentName, String stringLevel) {
         if (sender instanceof Player executor) {
-            if (sender.hasPermission("skydistrict.command.enchant.add")) {
+            if (sender.hasPermission("firedot.command.enchant.add")) {
                 final ItemStack item = executor.getInventory().getItemInMainHand();
                 if (item.getType() != Material.AIR) {
                     final Enchantment enchantment = Enchantments.fromName(enchantmentName);
@@ -89,7 +89,7 @@ public class EnchantCommand extends BaseCommand {
                         AzureLang.send(executor, Global.INVALID_NUMBER);
                         return;
                     }
-                    AzureLang.send(executor, AzureLang.ENCHANMENT_NOT_FOUND);
+                    AzureLang.send(executor, AzureLang.ENCHANTMENT_NOT_FOUND);
                     return;
                 }
                 AzureLang.send(executor, Global.NO_ITEM_IN_HAND);
@@ -103,7 +103,7 @@ public class EnchantCommand extends BaseCommand {
 
     public void onEnchantRemove(CommandSender sender, String enchantmentName) {
         if (sender instanceof Player executor) {
-            if (sender.hasPermission("skydistrict.command.enchant.add")) {
+            if (sender.hasPermission("firedot.command.enchant.remove")) {
                 final ItemStack item = executor.getInventory().getItemInMainHand();
                 if (item.getType() != Material.AIR) {
                     final Enchantment enchantment = Enchantments.fromName(enchantmentName);
@@ -118,7 +118,7 @@ public class EnchantCommand extends BaseCommand {
                         AzureLang.send(executor, AzureLang.ITEM_HAS_NO_SUCH_ENCHANTMENT);
                         return;
                     }
-                    AzureLang.send(executor, AzureLang.ENCHANMENT_NOT_FOUND);
+                    AzureLang.send(executor, AzureLang.ENCHANTMENT_NOT_FOUND);
                     return;
                 }
                 AzureLang.send(executor, Global.NO_ITEM_IN_HAND);
