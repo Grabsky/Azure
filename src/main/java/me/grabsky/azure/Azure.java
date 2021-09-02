@@ -12,7 +12,6 @@ import me.grabsky.azure.manager.TeleportRequestManager;
 import me.grabsky.azure.storage.data.DataManager;
 import me.grabsky.indigo.framework.commands.CommandManager;
 import me.grabsky.indigo.logger.ConsoleLogger;
-import net.milkbowl.vault.chat.Chat;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Azure extends JavaPlugin {
@@ -24,14 +23,12 @@ public class Azure extends JavaPlugin {
     private DataManager dataManager;
     private TeleportRequestManager teleportRequestManager;
     private PointManager pointManager;
-    private Chat chat;
     // Getters
     public static Azure getInstance() { return instance; }
     public ConsoleLogger getConsoleLogger() { return consoleLogger; }
     public DataManager getDataManager() { return dataManager; }
     public TeleportRequestManager getTeleportRequestManager() { return teleportRequestManager; }
     public PointManager getLocationsManager() { return pointManager; }
-    public Chat getVaultChat() { return chat; }
 
     @Override
     public void onEnable() {
@@ -62,9 +59,6 @@ public class Azure extends JavaPlugin {
                 new PointCommand(this)
         );
         this.getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
-        // Hook into Vault if plugin is present
-        // final RegisteredServiceProvider<Chat> rsp = getServer().getServicesManager().getRegistration(Chat.class);
-        // this.chat = (rsp != null) ? rsp.getProvider() : null;
     }
 
     @Override
