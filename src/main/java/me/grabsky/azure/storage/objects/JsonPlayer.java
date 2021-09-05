@@ -1,35 +1,25 @@
 package me.grabsky.azure.storage.objects;
 
-import java.util.Map;
+import com.google.gson.annotations.Expose;
+import me.grabsky.indigo.user.UserCache;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.UUID;
 
 public class JsonPlayer {
-    private UUID uuid;
-    private String name;
-    private String customName;
-    private String ipAddress;
-    private String country;
-    private String language;
-    // Offline specific
-    private long lastOnline;
-    private JsonLocation lastLocation;
-    // Homes
-    private Map<String, JsonLocation> homes;
-
-    public JsonPlayer(UUID uuid, String name) {
-        this.uuid = uuid;
-        this.name = name;
-    }
+    @Expose private UUID uuid;
+    @Expose private String customName;
+    @Expose private String country;
+    @Expose private String lastAddress;
+    @Expose private JsonLocation lastLocation;
 
     // This one is used for creating data for the first time
-    public JsonPlayer(UUID uuid, String name, String displayName, String ipAddress, String country, String language, long lastOnline, JsonLocation lastLocation) {
+    public JsonPlayer(@NotNull final UUID uuid, @Nullable final String customName, @NotNull final String address, @NotNull final String country, @NotNull final JsonLocation lastLocation) {
         this.uuid = uuid;
-        this.name = name;
-        this.customName = displayName;
-        this.ipAddress = ipAddress;
+        this.customName = customName;
         this.country = country;
-        this.language = language;
-        this.lastOnline = lastOnline;
+        this.lastAddress = address;
         this.lastLocation = lastLocation;
     }
 
@@ -38,45 +28,29 @@ public class JsonPlayer {
         return uuid;
     }
     public String getName() {
-        return name;
+        return UserCache.get(uuid).getName();
     }
     public String getCustomName() {
         return customName;
     }
-    public String getIpAddress() {
-        return ipAddress;
-    }
     public String getCountry() {
         return country;
     }
-    public String getLanguage() {
-        return language;
-    }
-    public long getLastOnline() {
-        return lastOnline;
+    public String getLastAddress() {
+        return lastAddress;
     }
     public JsonLocation getLastLocation() {
         return lastLocation;
     }
 
     // Setters
-    public String setName() {
-        return name;
-    }
-    public void setCustomName(String displayName) {
+    public void setCustomName(@NotNull final String displayName) {
         this.customName = displayName;
     }
-    public void setIpAddress(String ipAddress) {
-        this.ipAddress = ipAddress;
+    public void setLastAddress(@NotNull final String address) {
+        this.lastAddress = address;
     }
-    public void setCountry(String country) {
+    public void setCountry(@NotNull final String country) {
         this.country = country;
     }
-    public void setLanguage(String language) {
-        this.language = language;
-    }
-    public void setLastOnline(long lastSeen) {
-        this.lastOnline = lastSeen;
-    }
-    public void setLastLocation(JsonLocation lastLocation) { this.lastLocation = lastLocation; }
 }

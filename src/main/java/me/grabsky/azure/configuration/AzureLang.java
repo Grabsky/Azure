@@ -64,8 +64,9 @@ public class AzureLang extends AbstractLang {
     public static String POINT_DELETED;
     public static String TELEPORTED_TO_POINT;
     public static Component POINT_NOT_FOUND;
-
-
+    // PlayerInfo
+    public static String PLAYERINFO_ONLINE;
+    public static String PLAYERINFO_OFFLINE;
 
     public AzureLang(Azure instance) {
         super(instance);
@@ -133,5 +134,8 @@ public class AzureLang extends AbstractLang {
         POINT_DELETED = string("commands.point.point-deleted");
         TELEPORTED_TO_POINT = string("commands.point.teleported-to-point");
         POINT_NOT_FOUND = component("commands.point.point-not-found");
+        // PlayerInfo
+        PLAYERINFO_ONLINE = string("commands.playerinfo.online");
+        PLAYERINFO_OFFLINE = string("commands.playerinfo.offline");
     }
 }

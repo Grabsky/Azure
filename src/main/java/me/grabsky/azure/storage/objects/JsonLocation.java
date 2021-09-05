@@ -1,31 +1,26 @@
 package me.grabsky.azure.storage.objects;
 
+import com.google.gson.annotations.Expose;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.World;
 
-public class JsonLocation {
-    public String world;
-    public double x;
-    public double y;
-    public double z;
-    public float yaw;
-    public float pitch;
-    private Location location;
+public final class JsonLocation {
+    @Expose private final String world;
+    @Expose private final float x;
+    @Expose private final float y;
+    @Expose private final float z;
+    @Expose private final float yaw;
+    @Expose private final float pitch;
+    private final Location location;
 
-    public JsonLocation() {}
-
-    public JsonLocation(String world, double x, double y, double z, float yaw, float pitch) {
-        final World gameWorld = Bukkit.getWorld(world);
-        if (gameWorld != null) {
-            this.world = world;
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            this.yaw = yaw;
-            this.pitch = pitch;
-            this.location = new Location(gameWorld, x, y, z, yaw, pitch);
-        }
+    public JsonLocation(String world, float x, float y, float z, float yaw, float pitch) {
+        this.world = world;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.yaw = yaw;
+        this.pitch = pitch;
+        this.location = (Bukkit.getWorld(world) != null) ? new Location(Bukkit.getWorld(world), x, y, z, yaw, pitch) : null;
     }
 
     public Location toLocation() {

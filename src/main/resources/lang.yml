@@ -85,3 +85,31 @@ commands:
     point-deleted: '§6§lS§e§lD§8 » §7Punkt §e{id}§7 został usunięty.'
     teleported-to-point: '§6§lS§e§lD§8 » §7Zostałeś przeteleportowany do punktu §e{id}§7.'
     point-not-found: '§6§lS§e§lD§8 » §cNie znaleziono punktu o takim ID.'
+    
+  playerinfo:
+    online:
+      - ''
+      - '§8» §7Gracz: §e{name}§8 / §7Identyfikator: §e{uuid}...'
+      - '§8» §7Adres IP: §e{ip}§8 / §7Kraj: §e{country}§8 / §7Opóźnienie: §e{ping}ms'
+      - '§8» §7Czas gry: §e{time_played}h§8 / §7Online od: §a{online_since}'
+      - '§8» §7Lokalizacja: §e{x}§7, §e{y}§7, §e{z}§8 / §7Świat: §e{world}'
+      - '§8» §7Tryb gry: §e{gamemode}§8 / §7Latanie: §e{is_flying}§8 / §7Nietykalność: §e{is_invulnerable}'
+      - '§8» §7Zdrowie: §e{health}/10§8 / §7Głód: §e{hunger}/10§8 / §7Poziom: §e{level} §7(§e{progress}%§7)'
+      - '§8» §7Zbanowany: {is_banned}§8 / §7Wyciszony: {is_muted}§8 / §7Ostrzeżenia: {warns}'
+      - ''
+    offline:
+      - ''
+      - '§8» §7Gracz: §e{name}§8 / §7Identyfikator: §e{uuid}...'
+      - '§8» §7Adres IP: §e{ip}§8 / §7Kraj: §e{country}'
+      - '§8» §7Czas gry: §e{time_played}h§8 / §7Offline od: §a{online_since}'
+      - '§8» §7Lokalizacja: §e{x}§7, §e{y}§7, §e{z}§8 / §7Świat: §e{world}'
+      - '§8» §7Zbanowany: {is_banned}§8 / §7Wyciszony: {is_muted}§8 / §7Ostrzeżenia: {warns}'
+      - ''
+
+  heal:
+    you-have-been-healed: '§6§lS§e§lD§8 » §7Zostałeś uleczony.'
+    player-has-been-healed: '§6§lS§e§lD§8 » §7Gracz §e{player}§7 został uleczony.'
+
+  feed:
+    you-have-been-fed: '§6§lS§e§lD§8 » §7Twój głód został zaspokojony.'
+    player-has-been-fed: '§6§lS§e§lD§8 » §7Głód gracza §e{player}§7 został zaspokojony.'

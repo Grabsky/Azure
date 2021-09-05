@@ -1,7 +1,7 @@
 package me.grabsky.azure.listener;
 
 import me.grabsky.azure.Azure;
-import me.grabsky.azure.storage.data.DataManager;
+import me.grabsky.azure.storage.DataManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -17,11 +17,7 @@ public class PlayerJoinListener implements Listener {
 
     @EventHandler
     public void onJoin(final PlayerJoinEvent event) {
-        // try {
-        //     data.createDataFor(event.getPlayer());
-        // } catch (IOException e) {
-        //     e.printStackTrace();
-        // }
+        data.create(event.getPlayer());
     }
 
 }
