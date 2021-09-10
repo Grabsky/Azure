@@ -22,30 +22,24 @@ public class JsonUtils {
 
     // Sends JSON request to given URL
     public static JsonElement sendJsonRequest(String url, int maxRetries) {
-        int retries = 0;
-        do {
+        for (int retries = 1; retries <= maxRetries; retries++) {
             try {
                 // Sending request to an API
-                URL u = new URL(url);
-                URLConnection req = u.openConnection();
+                final URL u = new URL(url);
+                final URLConnection req = u.openConnection();
                 // Getting request from an API and store it
-                BufferedReader in = new BufferedReader(new InputStreamReader(u.openStream()));
-                JsonParser jp = new JsonParser();
+                final BufferedReader in = new BufferedReader(new InputStreamReader(u.openStream()));
+                final JsonParser jp = new JsonParser();
                 // Convert the input stream to a json element
-                JsonElement el = jp.parse(new InputStreamReader((InputStream) req.getContent()));
+                final JsonElement el = jp.parse(new InputStreamReader((InputStream) req.getContent()));
                 // Close connection
                 in.close();
                 // Return root JsonObject
                 return el;
             } catch (IOException e) {
-                retries++;
-                if (retries < maxRetries) {
-                    Azure.getInstance().getLogger().warning(ChatColor.RED + "An error occurred while trying to send request to '" + url + "'... retrying...");
-                    continue;
-                }
+                Azure.getInstance().getConsoleLogger().error(ChatColor.RED + "An error occurred while trying to send request to '" + url + "'... retrying...");
             }
-            break;
-        } while (true);
+        }
         return null;
     }
 

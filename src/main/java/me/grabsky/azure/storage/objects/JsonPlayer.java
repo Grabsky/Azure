@@ -53,4 +53,7 @@ public class JsonPlayer {
     public void setCountry(@NotNull final String country) {
         this.country = country;
     }
+    public void setLastLocation(@NotNull final JsonLocation jsonLocation) {
+        this.lastLocation = jsonLocation;
+    }
 }

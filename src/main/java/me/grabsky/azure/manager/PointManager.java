@@ -39,12 +39,13 @@ public class PointManager {
         this.ids = new ArrayList<>();
     }
 
+    // Loads all points saved in Azure/points directory
     public void loadAll() {
-        // Create Azure/points directory if not existent
+        // Creating Azure/points directory if not existent
         if (!pointsDirectory.exists()) {
             pointsDirectory.mkdirs();
         }
-        // List files if any
+        // Listing files if any
         if (pointsDirectory.list() != null) {
             final long s1 = System.nanoTime(); // PERF
             // Iterating over all files in Azure/points directory; Shouldn't be null
@@ -56,7 +57,7 @@ public class PointManager {
                     try {
                         // Creating BufferedReader to read the <point>.json file
                         final BufferedReader reader = Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8);
-                        // Parsing file content to a JsonElement
+                        // Parsing file content to a JsonLocation object
                         final JsonLocation jsonLocation = gson.fromJson(reader, JsonLocation.class);
                         // Making sure file content was parsed successfully
                         if (jsonLocation != null) {
@@ -65,7 +66,7 @@ public class PointManager {
                         } else {
                             consoleLogger.error("Error occurred while trying to load point with id '" + id + "'.");
                         }
-                        // Closing BufferedReader as we now have everything needed
+                        // Closing BufferedWriter as everything have been done
                         reader.close();
                     } catch (IOException e) {
                         consoleLogger.error("Error occurred while trying to load point with id '" + id + "'.");
@@ -108,6 +109,7 @@ public class PointManager {
         return ids;
     }
 
+    // Saves all MODIFIED points to Azure/Points directory
     public void saveAll() {
         final long s1 = System.nanoTime();
         final int size = modified.size();
@@ -129,7 +131,7 @@ public class PointManager {
                     // Saving values into to .json file
                     final String json = gson.toJson(points.get(id), JsonLocation.class);
                     writer.write(json);
-                    // Closing BufferedWriter as everything has been done
+                    // Closing BufferedWriter as everything have been done
                     writer.flush();
                     writer.close();
                 } catch (IOException e) {

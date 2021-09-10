@@ -2,6 +2,7 @@ package me.grabsky.azure.commands;
 
 import me.grabsky.azure.Azure;
 import me.grabsky.azure.configuration.AzureLang;
+import me.grabsky.azure.storage.objects.JsonPlayer;
 import me.grabsky.indigo.configuration.Global;
 import me.grabsky.indigo.framework.commands.BaseCommand;
 import me.grabsky.indigo.framework.commands.ExecutorType;
@@ -14,6 +15,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 public class PlayerInfoCommand extends BaseCommand {
     private final Azure instance;
@@ -49,14 +51,18 @@ public class PlayerInfoCommand extends BaseCommand {
         if (player != null && player.isOnline()) {
             final Location loc = player.getLocation();
             final String address = (sender.hasPermission("firedot.command.playerinfo.view.address")) ? player.getAddress().getHostName() : "§o*****§r";
+            final JsonPlayer jsonPlayer = instance.getDataManager().getData(player.getUniqueId());
             // TO-DO: Ban plugin support
             AzureLang.send(sender, AzureLang.PLAYERINFO_ONLINE
                     .replace("{name}", player.getName())
                     .replace("{uuid}", player.getUniqueId().toString().substring(0, 13))
                     .replace("{ip}", address)
-                    .replace("{country}", "PL") // TO-DO: Get this one from data
+                    .replace("{country}", jsonPlayer.getCountry())
                     .replace("{ping}", this.coloredPing(player.getPing()))
+                    .replace("{first_join}", Beautifier.DD_MM_YYYY.format(player.getFirstPlayed()))
                     .replace("{time_played}", Beautifier.ONE_DECIMAL_PLACE.format(player.getStatistic(Statistic.PLAY_ONE_MINUTE) / 20D / 60D / 60D))
+                    .replace("{client}", (player.getClientBrandName() != null) ? player.getClientBrandName() : "N/A")
+                    .replace("{version}", this.version(player.getProtocolVersion()))
                     .replace("{online_since}", Beautifier.formatTimestamp(System.currentTimeMillis() - player.getLastLogin()))
                     .replace("{x}", Beautifier.THREE_DECIMAL_PLACES.format(loc.getX()))
                     .replace("{y}", Beautifier.THREE_DECIMAL_PLACES.format(loc.getY()))
@@ -69,26 +75,33 @@ public class PlayerInfoCommand extends BaseCommand {
                     .replace("{hunger}", Beautifier.ONE_DECIMAL_PLACE.format(player.getFoodLevel() / 2D))
                     .replace("{level}", String.valueOf(player.getLevel()))
                     .replace("{progress}", String.valueOf(Math.round(player.getExp() * 100)))
+                    // TO-DO: Actual implementation
+                    .replace("{is_banned}", Global.NO)
+                    .replace("{is_muted}", Global.NO)
+                    .replace("{warns}", String.valueOf(0))
             );
             return;
         } else if (UserCache.contains(playerName) ) {
             final User user = UserCache.get(playerName);
-            // final JsonPlayer jsonPlayer = null;
-            final OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(user.getUniqueId());
-            final Location lastLocation = new Location(null, 0, 0, 0);
-            final String lastAddress = "127.0.0.1";
-            final String lastCountry = "PL";
+            final UUID uuid = user.getUniqueId();
+            final OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
+            final JsonPlayer jsonPlayer = instance.getDataManager().getData(uuid);
+            final Location lastLocation = jsonPlayer.getLastLocation().toLocation();
             AzureLang.send(sender, AzureLang.PLAYERINFO_ONLINE
                     .replace("{name}", user.getName())
                     .replace("{uuid}", user.getUniqueId().toString().substring(0, 13))
-                    .replace("{last_ip}", lastAddress)
-                    .replace("{last_country}", lastCountry) // TO-DO: Get this one from data
+                    .replace("{last_ip}", jsonPlayer.getLastAddress())
+                    .replace("{last_country}", jsonPlayer.getCountry())
                     .replace("{time_played}", Beautifier.ONE_DECIMAL_PLACE.format(offlinePlayer.getStatistic(Statistic.PLAY_ONE_MINUTE) / 20D / 60D / 60D))
                     .replace("{offline_since}", Beautifier.formatTimestamp(System.currentTimeMillis() - offlinePlayer.getLastSeen()))
                     .replace("{x}", Beautifier.THREE_DECIMAL_PLACES.format(lastLocation.getX()))
                     .replace("{y}", Beautifier.THREE_DECIMAL_PLACES.format(lastLocation.getY()))
                     .replace("{z}", Beautifier.THREE_DECIMAL_PLACES.format(lastLocation.getZ()))
                     .replace("{world}", lastLocation.getWorld().getName())
+                    // TO-DO: Actual implementation
+                    .replace("{is_banned}", Global.NO)
+                    .replace("{is_muted}", Global.NO)
+                    .replace("{warns}", String.valueOf(0))
             );
             return;
         }
@@ -108,5 +121,14 @@ public class PlayerInfoCommand extends BaseCommand {
         if (num < 60) return "§a" + num;
         if (num < 120) return "§e" + num;
         return "§c" + num;
+    }
+
+    private String version(final int protocolVersion) {
+        return switch (protocolVersion) {
+            case 755 -> "1.17";
+            case 756 -> "1.17.1";
+            case 757 -> "1.18 (?)";
+            default -> "Unknown";
+        };
     }
 }

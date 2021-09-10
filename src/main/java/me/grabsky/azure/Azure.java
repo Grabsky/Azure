@@ -37,6 +37,7 @@ public class Azure extends JavaPlugin {
     public TeleportRequestManager getTeleportRequestManager() { return teleportRequestManager; }
     public PointManager getLocationsManager() { return pointManager; }
 
+    private int playerDataSaveTaskId;
     private int pointsSaveTaskId;
 
     @Override
@@ -52,8 +53,10 @@ public class Azure extends JavaPlugin {
                 .excludeFieldsWithoutExposeAnnotation()
                 .registerTypeAdapter(JsonLocation.class, new JsonLocationDeserializer())
                 .create();
-        // Initializing TeleportRequestManager
+        // Initializing DataManager
         this.dataManager = new DataManager(this);
+        this.playerDataSaveTaskId = dataManager.runSaveTask();
+        // Initializing TeleportRequestManager
         this.teleportRequestManager = new TeleportRequestManager(this);
         // Initializing PointManager
         this.pointManager = new PointManager(this);
@@ -79,8 +82,10 @@ public class Azure extends JavaPlugin {
     @Override
     public void onDisable() {
         // Cancelling tasks to prevent concurrent saves
+        Bukkit.getScheduler().cancelTask(playerDataSaveTaskId);
         Bukkit.getScheduler().cancelTask(pointsSaveTaskId);
         // Saving data synchronously
+        dataManager.saveAll();
         pointManager.saveAll();
     }
 

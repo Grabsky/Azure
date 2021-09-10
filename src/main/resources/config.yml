@@ -2,7 +2,10 @@ version: 1 # Do not modify this unless you know what you're doing
 
 settings:
   data:
+    # API token for https://app.ipgeolocation.io/ to get country from IP address
+    country-api-token: 'API_KEY'
     player-data:
+      data-expires-after: 300 # in seconds
       save-interval: 300 # in seconds
     points:
       save-interval: 600 # in seconds
