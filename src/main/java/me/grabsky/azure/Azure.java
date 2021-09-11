@@ -9,6 +9,7 @@ import me.grabsky.azure.commands.teleport.TeleportLocationCommand;
 import me.grabsky.azure.configuration.AzureConfig;
 import me.grabsky.azure.configuration.AzureLang;
 import me.grabsky.azure.listener.PlayerJoinListener;
+import me.grabsky.azure.listener.PlayerQuitListener;
 import me.grabsky.azure.manager.PointManager;
 import me.grabsky.azure.manager.TeleportRequestManager;
 import me.grabsky.azure.storage.DataManager;
@@ -77,6 +78,7 @@ public class Azure extends JavaPlugin {
                 new PlayerInfoCommand(this)
         );
         this.getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerQuitListener(this), this);
     }
 
     @Override

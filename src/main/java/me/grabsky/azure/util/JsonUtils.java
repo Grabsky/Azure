@@ -22,7 +22,7 @@ public class JsonUtils {
 
     // Sends JSON request to given URL
     public static JsonElement sendJsonRequest(String url, int maxRetries) {
-        for (int retries = 1; retries <= maxRetries; retries++) {
+        for (int retries = 0; retries < maxRetries; retries++) {
             try {
                 // Sending request to an API
                 final URL u = new URL(url);

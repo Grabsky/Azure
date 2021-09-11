@@ -51,7 +51,7 @@ public class PlayerInfoCommand extends BaseCommand {
         if (player != null && player.isOnline()) {
             final Location loc = player.getLocation();
             final String address = (sender.hasPermission("firedot.command.playerinfo.view.address")) ? player.getAddress().getHostName() : "§o*****§r";
-            final JsonPlayer jsonPlayer = instance.getDataManager().getData(player.getUniqueId());
+            final JsonPlayer jsonPlayer = instance.getDataManager().getOnlineData(player.getUniqueId());
             // TO-DO: Ban plugin support
             AzureLang.send(sender, AzureLang.PLAYERINFO_ONLINE
                     .replace("{name}", player.getName())
@@ -85,24 +85,25 @@ public class PlayerInfoCommand extends BaseCommand {
             final User user = UserCache.get(playerName);
             final UUID uuid = user.getUniqueId();
             final OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
-            final JsonPlayer jsonPlayer = instance.getDataManager().getData(uuid);
-            final Location lastLocation = jsonPlayer.getLastLocation().toLocation();
-            AzureLang.send(sender, AzureLang.PLAYERINFO_ONLINE
-                    .replace("{name}", user.getName())
-                    .replace("{uuid}", user.getUniqueId().toString().substring(0, 13))
-                    .replace("{last_ip}", jsonPlayer.getLastAddress())
-                    .replace("{last_country}", jsonPlayer.getCountry())
-                    .replace("{time_played}", Beautifier.ONE_DECIMAL_PLACE.format(offlinePlayer.getStatistic(Statistic.PLAY_ONE_MINUTE) / 20D / 60D / 60D))
-                    .replace("{offline_since}", Beautifier.formatTimestamp(System.currentTimeMillis() - offlinePlayer.getLastSeen()))
-                    .replace("{x}", Beautifier.THREE_DECIMAL_PLACES.format(lastLocation.getX()))
-                    .replace("{y}", Beautifier.THREE_DECIMAL_PLACES.format(lastLocation.getY()))
-                    .replace("{z}", Beautifier.THREE_DECIMAL_PLACES.format(lastLocation.getZ()))
-                    .replace("{world}", lastLocation.getWorld().getName())
-                    // TO-DO: Actual implementation
-                    .replace("{is_banned}", Global.NO)
-                    .replace("{is_muted}", Global.NO)
-                    .replace("{warns}", String.valueOf(0))
-            );
+            instance.getDataManager().getOfflineData(uuid, true).thenAccept((jsonPlayer ) -> {
+                final Location lastLocation = jsonPlayer.getLastLocation().toLocation();
+                AzureLang.send(sender, AzureLang.PLAYERINFO_OFFLINE
+                        .replace("{name}", user.getName())
+                        .replace("{uuid}", user.getUniqueId().toString().substring(0, 13))
+                        .replace("{ip}", jsonPlayer.getLastAddress())
+                        .replace("{country}", jsonPlayer.getCountry())
+                        .replace("{time_played}", Beautifier.ONE_DECIMAL_PLACE.format(offlinePlayer.getStatistic(Statistic.PLAY_ONE_MINUTE) / 20D / 60D / 60D))
+                        .replace("{offline_since}", Beautifier.formatTimestamp(System.currentTimeMillis() - offlinePlayer.getLastSeen()))
+                        .replace("{x}", Beautifier.THREE_DECIMAL_PLACES.format(lastLocation.getX()))
+                        .replace("{y}", Beautifier.THREE_DECIMAL_PLACES.format(lastLocation.getY()))
+                        .replace("{z}", Beautifier.THREE_DECIMAL_PLACES.format(lastLocation.getZ()))
+                        .replace("{world}", lastLocation.getWorld().getName())
+                        // TO-DO: Actual implementation
+                        .replace("{is_banned}", Global.NO)
+                        .replace("{is_muted}", Global.NO)
+                        .replace("{warns}", String.valueOf(0))
+                );
+            });
             return;
         }
         AzureLang.send(sender, Global.PLAYER_NOT_FOUND);

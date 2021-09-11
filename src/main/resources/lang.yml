@@ -102,7 +102,7 @@ commands:
       - ''
       - '§8» §7Gracz: §e{name}§8 / §7Identyfikator: §e{uuid}...'
       - '§8» §7Adres IP: §e{ip}§8 / §7Kraj: §e{country}'
-      - '§8» §7Czas gry: §e{time_played}h§8 / §7Offline od: §a{online_since}'
+      - '§8» §7Czas gry: §e{time_played}h§8 / §7Offline od: §a{offline_since}'
       - '§8» §7Lokalizacja: §e{x}§7, §e{y}§7, §e{z}§8 / §7Świat: §e{world}'
       - '§8» §7Zbanowany: {is_banned}§8 / §7Wyciszony: {is_muted}§8 / §7Ostrzeżenia: {warns}'
       - ''

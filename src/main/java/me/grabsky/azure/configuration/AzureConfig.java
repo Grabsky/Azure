@@ -35,7 +35,7 @@ public class AzureConfig {
         }
         COUNTRY_API_TOKEN = fc.getString("settings.data.country-api-token", "API_KEY");
         PLAYER_SAVE_INTERVAL = fc.getLong("settings.data.player-data.save-interval", 300) * 20L;
-        PLAYER_DATA_EXPIRES_AFTER = fc.getLong("settings.data.player-data.data-expires-after", 300) * 20L;
+        PLAYER_DATA_EXPIRES_AFTER = fc.getLong("settings.data.player-data.data-expires-after", 300) * 1000;
         POINTS_SAVE_INTERVAL = fc.getLong("settings.data.point.save-interval", 600) * 20L;
 
     }
