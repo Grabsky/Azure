@@ -12,7 +12,7 @@ import me.grabsky.azure.listener.PlayerJoinListener;
 import me.grabsky.azure.listener.PlayerQuitListener;
 import me.grabsky.azure.manager.PointManager;
 import me.grabsky.azure.manager.TeleportRequestManager;
-import me.grabsky.azure.storage.DataManager;
+import me.grabsky.azure.storage.PlayerDataManager;
 import me.grabsky.azure.storage.objects.JsonLocation;
 import me.grabsky.azure.storage.objects.deserializers.JsonLocationDeserializer;
 import me.grabsky.indigo.framework.commands.CommandManager;
@@ -27,14 +27,14 @@ public class Azure extends JavaPlugin {
     private AzureConfig config;
     private AzureLang lang;
     private Gson gson;
-    private DataManager dataManager;
+    private PlayerDataManager dataManager;
     private TeleportRequestManager teleportRequestManager;
     private PointManager pointManager;
     // Getters
     public static Azure getInstance() { return instance; }
     public ConsoleLogger getConsoleLogger() { return consoleLogger; }
     public Gson getGson() { return gson; }
-    public DataManager getDataManager() { return dataManager; }
+    public PlayerDataManager getDataManager() { return dataManager; }
     public TeleportRequestManager getTeleportRequestManager() { return teleportRequestManager; }
     public PointManager getLocationsManager() { return pointManager; }
 
@@ -55,7 +55,7 @@ public class Azure extends JavaPlugin {
                 .registerTypeAdapter(JsonLocation.class, new JsonLocationDeserializer())
                 .create();
         // Initializing DataManager
-        this.dataManager = new DataManager(this);
+        this.dataManager = new PlayerDataManager(this);
         this.playerDataSaveTaskId = dataManager.runSaveTask();
         // Initializing TeleportRequestManager
         this.teleportRequestManager = new TeleportRequestManager(this);

@@ -23,33 +23,32 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-public class DataManager {
+public class PlayerDataManager {
     private final Azure instance;
     private final ConsoleLogger consoleLogger;
     private final File dataDirectory;
     private final Gson gson;
     private final Map<UUID, JsonPlayer> players;
-    private final Map<UUID, Long> expirations;
-    private long secondsSinceLastSave;
+    private long millisecondsSinceLastSave;
 
-    public DataManager(Azure instance) {
+    public PlayerDataManager(Azure instance) {
         this.instance = instance;
         this.consoleLogger = instance.getConsoleLogger();
         this.dataDirectory = new File(instance.getDataFolder() + File.separator + "playerdata");
         this.gson = instance.getGson();
         this.players = new HashMap<>();
-        this.expirations = new HashMap<>();
-        this.secondsSinceLastSave = 0;
+        this.millisecondsSinceLastSave = 0;
     }
 
     // Asynchronously creates a new data file or loads existing
     @Nullable("This is null only if either file fails to be created or existing file is malformed.")
     public CompletableFuture<JsonPlayer> createOrLoad(final Player player) {
         final UUID uuid = player.getUniqueId();
-        expirations.remove(uuid);
         return new CompletableFuture<JsonPlayer>().completeAsync(() -> {
-            if (hasDataOf(uuid)) return this.loadDataOf(uuid);
-            return this.create(uuid);
+            final JsonPlayer jsonPlayer = (hasDataOf(uuid)) ? this.loadDataOf(uuid) : this.create(uuid);
+            // Disable expiration
+            jsonPlayer.setExpireTimestamp(-1);
+            return jsonPlayer;
         });
     }
 
@@ -99,12 +98,12 @@ public class DataManager {
     }
 
     @Nullable("You should first check if data exists using DataManager#hasDataOf(UUID uuid) method.")
-    public CompletableFuture<JsonPlayer> getOfflineData(final UUID uuid, boolean queueUnload) {
+    public CompletableFuture<JsonPlayer> getOfflineData(final UUID uuid, boolean scheduleUnload) {
         return new CompletableFuture<JsonPlayer>().completeAsync(() -> {
             // Loading and then returning data of player (offline)
             final JsonPlayer jsonPlayer = this.loadDataOf(uuid);
-            if (queueUnload) {
-                expirations.put(uuid, System.currentTimeMillis());
+            if (jsonPlayer != null && scheduleUnload) {
+                jsonPlayer.setExpireTimestamp(System.currentTimeMillis() + AzureConfig.PLAYER_DATA_EXPIRES_AFTER);
             }
             return jsonPlayer;
         });
@@ -170,32 +169,10 @@ public class DataManager {
         }
     }
 
-    public void queueUnload(final UUID uuid) {
-        expirations.put(uuid, System.currentTimeMillis());
-    }
-
-    // Synchronously saves and unloads expired data
-    private void unloadExpired() {
-        long expiredCount = 0;
-        // Iterating over objects scheduled to expire
-        for (final Map.Entry<UUID, Long> en : expirations.entrySet()) {
-            // Checking if their time has come
-            if ((System.currentTimeMillis() - en.getValue()) > AzureConfig.PLAYER_DATA_EXPIRES_AFTER) {
-                // Saving and then removing
-                this.saveDataOf(en.getKey());
-                players.remove(en.getKey());
-                expirations.remove(en.getKey());
-                expiredCount++;
-            }
-        }
-        if (expiredCount > 0) {
-            consoleLogger.success("Successfully unloaded (expired) data of " + expiredCount + " player(s).");
-        }
-    }
-
     // Synchronously saves data of all cached players
     public void saveAll() {
-        long savedCount = 0;
+        final long s1 = System.nanoTime();
+        long saveCount = 0;
         // Iterating over cached data objects
         for (Map.Entry<UUID, JsonPlayer> en : players.entrySet()) {
             final Player player = Bukkit.getPlayer(en.getKey());
@@ -205,24 +182,49 @@ public class DataManager {
             }
             // Saving data
             this.saveDataOf(en.getKey());
-            savedCount++;
+            saveCount++;
         }
-        if (savedCount > 0) {
-            consoleLogger.success("Successfully saved data of " + savedCount + " player(s).");
+        if (saveCount > 0) {
+            consoleLogger.success("Successfully saved data of " + saveCount + " player(s) in " + (System.nanoTime() - s1) / 1000000D + "ms");
         }
     }
 
+    final long taskIntervalMs = 10000;
+
     // Creates asynchronous task for saving (and removing expired) data of all cached players
     public int runSaveTask() {
-        secondsSinceLastSave += 60; // Adding 60 seconds
         return Bukkit.getScheduler().runTaskTimerAsynchronously(instance, () -> {
+            final long s1 = System.nanoTime();
+            long saveCount = 0;
+            // Updating
+            final boolean readyToSave = (millisecondsSinceLastSave >= AzureConfig.PLAYER_DATA_SAVE_INTERVAL);
+            millisecondsSinceLastSave = (readyToSave) ? 0 : millisecondsSinceLastSave + taskIntervalMs;
             // Unloading expired data
-            this.unloadExpired();
-            // Saving all data every nth minute
-            if (secondsSinceLastSave >= AzureConfig.PLAYER_SAVE_INTERVAL) {
-                secondsSinceLastSave = 0;
-                this.saveAll();
+            for (Map.Entry<UUID, JsonPlayer> en : players.entrySet()) {
+                final UUID uuid = en.getKey();
+                final JsonPlayer jsonPlayer= en.getValue();
+                // Checking if data has expired
+                if (jsonPlayer.getExpireTimestamp() != -1 && jsonPlayer.getExpireTimestamp() >= System.currentTimeMillis()) {
+                    // Saving, and then removing data
+                    this.saveDataOf(uuid);
+                    players.remove(uuid);
+                    continue;
+                }
+                // Saving data if ready (every fifth task cycle)
+                if (readyToSave) {
+                    final Player player = Bukkit.getPlayer(en.getKey());
+                    // Updating player's last location in case server crash or w/e
+                    if (player != null && player.isOnline()) {
+                        en.getValue().setLastLocation(new JsonLocation(player.getLocation()));
+                    }
+                    // Saving data
+                    this.saveDataOf(uuid);
+                    saveCount++;
+                }
             }
-        }, 1200L, 1200L).getTaskId();
+            if (saveCount > 0) {
+                consoleLogger.success("Successfully saved data of " + saveCount + " player(s) in " + (System.nanoTime() - s1) / 1000000D + "ms");
+            }
+        }, taskIntervalMs / 50, taskIntervalMs / 50).getTaskId();
     }
 }

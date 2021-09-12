@@ -1,11 +1,14 @@
 version: 1 # Do not modify this unless you know what you're doing
 
 settings:
+  # Configuration section for, basically, everything plugin saves to re-use after server restart.
   data:
-    # API token for https://app.ipgeolocation.io/ to get country from IP address
-    country-api-token: 'API_KEY'
     player-data:
-      data-expires-after: 300 # in seconds
-      save-interval: 300 # in seconds
+      # How long should it take for offline player data to expire? In milliseconds.
+      data-expires-after: 300000
+      # Defines time interval between player data saves. In milliseconds.
+      save-interval: 300000
+
     points:
-      save-interval: 600 # in seconds
+      # Defines time interval between point (/point) saves. In milliseconds.
+      save-interval: 600000

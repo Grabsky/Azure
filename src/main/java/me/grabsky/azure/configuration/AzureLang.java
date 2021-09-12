@@ -1,6 +1,7 @@
 package me.grabsky.azure.configuration;
 
 import me.grabsky.azure.Azure;
+import me.grabsky.indigo.configuration.Global;
 import me.grabsky.indigo.framework.lang.AbstractLang;
 import me.grabsky.indigo.logger.ConsoleLogger;
 import net.kyori.adventure.text.Component;
@@ -84,7 +85,7 @@ public class AzureLang extends AbstractLang {
         // Overriding...
         this.fileConfiguration = YamlConfiguration.loadConfiguration(file);
         if (fileConfiguration.getInt("version") != 1) {
-            consoleLogger.error("Your lang.yml file is outdated. Some messages may not display properly.");
+            consoleLogger.error(Global.OUTDATED_LANG);
         }
         // General
         INVALID_COORDS = component("general.invalid-coords");

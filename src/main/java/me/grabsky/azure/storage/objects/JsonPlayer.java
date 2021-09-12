@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public class JsonPlayer {
+public class JsonPlayer extends ExpirableData {
     @Expose private UUID uuid;
     @Expose private String customName;
     @Expose private String country;

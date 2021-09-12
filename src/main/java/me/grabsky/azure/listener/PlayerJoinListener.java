@@ -1,7 +1,7 @@
 package me.grabsky.azure.listener;
 
 import me.grabsky.azure.Azure;
-import me.grabsky.azure.storage.DataManager;
+import me.grabsky.azure.storage.PlayerDataManager;
 import me.grabsky.indigo.logger.ConsoleLogger;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -17,7 +17,7 @@ import java.net.URL;
 public class PlayerJoinListener implements Listener {
     private final Azure instance;
     private final ConsoleLogger consoleLogger;
-    private final DataManager data;
+    private final PlayerDataManager data;
 
     public PlayerJoinListener(Azure instance) {
         this.instance = instance;
