@@ -9,18 +9,17 @@ import me.grabsky.indigo.framework.commands.annotations.DefaultCommand;
 import me.grabsky.indigo.framework.commands.annotations.SubCommand;
 import me.grabsky.indigo.user.UserCache;
 import org.bukkit.Bukkit;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Collections;
 import java.util.List;
 
-public class HealCommand extends BaseCommand {
+public class EnderchestCommand extends BaseCommand {
     private final Azure instance;
 
-    public HealCommand(Azure instance) {
-        super("heal", null, "firedot.command.heal", ExecutorType.ALL);
+    public EnderchestCommand(Azure instance) {
+        super("enderchest", List.of("ec"), "firedot.command.enderchest", ExecutorType.PLAYER);
         this.instance = instance;
     }
 
@@ -32,30 +31,26 @@ public class HealCommand extends BaseCommand {
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if (args.length == 0) {
-            this.onDefault(sender);
+        if (args.length == 1) {
+            this.onEnderchestOthers(sender, args[0]);
         } else {
-            this.onHealPlayer(sender, args[0]);
+            this.onDefault(sender);
         }
     }
 
     @DefaultCommand
     public void onDefault(CommandSender sender) {
-        if (sender instanceof Player executor) {
-            executor.setHealth(executor.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-            AzureLang.send(sender, AzureLang.YOU_HAVE_BEEN_HEALED);
-            return;
-        }
-        AzureLang.send(sender, Global.PLAYER_ONLY_COMMAND);
+        final Player executor = (Player) sender;
+        executor.openInventory(executor.getEnderChest());
     }
 
     @SubCommand
-    public void onHealPlayer(CommandSender sender, String playerName) {
-        if (sender.hasPermission("firedot.command.heal.others")) {
-            final Player player = Bukkit.getPlayer(playerName);
-            if (player != null && player.isOnline()) {
-                player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-                AzureLang.send(sender, AzureLang.PLAYER_HAS_BEEN_HEALED.replace("{player}", player.getName()));
+    public void onEnderchestOthers(CommandSender sender, String targetName) {
+        if (sender.hasPermission("firedot.command.enderchest.others")) {
+            final Player executor = (Player) sender;
+            final Player target = Bukkit.getPlayer(targetName);
+            if (target != null && target.isOnline()) {
+                executor.openInventory(target.getEnderChest());
                 return;
             }
             AzureLang.send(sender, Global.PLAYER_NOT_FOUND);
@@ -63,5 +58,4 @@ public class HealCommand extends BaseCommand {
         }
         AzureLang.send(sender, Global.MISSING_PERMISSIONS);
     }
-
 }

@@ -9,18 +9,17 @@ import me.grabsky.indigo.framework.commands.annotations.DefaultCommand;
 import me.grabsky.indigo.framework.commands.annotations.SubCommand;
 import me.grabsky.indigo.user.UserCache;
 import org.bukkit.Bukkit;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Collections;
 import java.util.List;
 
-public class HealCommand extends BaseCommand {
+public class FeedCommand extends BaseCommand {
     private final Azure instance;
 
-    public HealCommand(Azure instance) {
-        super("heal", null, "firedot.command.heal", ExecutorType.ALL);
+    public FeedCommand(Azure instance) {
+        super("feed", null, "firedot.command.feed", ExecutorType.ALL);
         this.instance = instance;
     }
 
@@ -42,8 +41,8 @@ public class HealCommand extends BaseCommand {
     @DefaultCommand
     public void onDefault(CommandSender sender) {
         if (sender instanceof Player executor) {
-            executor.setHealth(executor.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-            AzureLang.send(sender, AzureLang.YOU_HAVE_BEEN_HEALED);
+            executor.setFoodLevel(20);
+            AzureLang.send(sender, AzureLang.YOU_HAVE_BEEN_FED);
             return;
         }
         AzureLang.send(sender, Global.PLAYER_ONLY_COMMAND);
@@ -51,11 +50,11 @@ public class HealCommand extends BaseCommand {
 
     @SubCommand
     public void onHealPlayer(CommandSender sender, String playerName) {
-        if (sender.hasPermission("firedot.command.heal.others")) {
+        if (sender.hasPermission("firedot.command.feed.others")) {
             final Player player = Bukkit.getPlayer(playerName);
             if (player != null && player.isOnline()) {
-                player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-                AzureLang.send(sender, AzureLang.PLAYER_HAS_BEEN_HEALED.replace("{player}", player.getName()));
+                player.setFoodLevel(20);
+                AzureLang.send(sender, AzureLang.PLAYER_HAS_BEEN_FED.replace("{player}", player.getName()));
                 return;
             }
             AzureLang.send(sender, Global.PLAYER_NOT_FOUND);
