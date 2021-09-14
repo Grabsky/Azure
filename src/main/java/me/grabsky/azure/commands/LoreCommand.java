@@ -188,6 +188,7 @@ public class LoreCommand extends BaseCommand {
         AzureLang.send(sender, Global.PLAYER_ONLY_COMMAND);
     }
 
+    @SubCommand
     public void onLoreClear(CommandSender sender) {
         if (sender instanceof Player executor) {
             if (sender.hasPermission("firedot.command.lore.clear")) {

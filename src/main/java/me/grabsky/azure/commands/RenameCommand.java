@@ -5,6 +5,8 @@ import me.grabsky.azure.configuration.AzureLang;
 import me.grabsky.indigo.configuration.Global;
 import me.grabsky.indigo.framework.commands.BaseCommand;
 import me.grabsky.indigo.framework.commands.ExecutorType;
+import me.grabsky.indigo.framework.commands.annotations.DefaultCommand;
+import me.grabsky.indigo.framework.commands.annotations.SubCommand;
 import me.grabsky.indigo.utils.Components;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -40,6 +42,7 @@ public class RenameCommand extends BaseCommand {
         }
     }
 
+    @DefaultCommand
     public void onDefault(CommandSender sender) {
         final Player executor = (Player) sender;
         final ItemStack item = executor.getInventory().getItemInMainHand();
@@ -53,6 +56,7 @@ public class RenameCommand extends BaseCommand {
         AzureLang.send(sender, Global.NO_ITEM_IN_HAND);
     }
 
+    @SubCommand
     public void onItemRename(CommandSender sender, String name) {
         final Player executor = (Player) sender;
         final ItemStack item = executor.getInventory().getItemInMainHand();

@@ -7,6 +7,7 @@ import me.grabsky.indigo.configuration.Global;
 import me.grabsky.indigo.framework.commands.BaseCommand;
 import me.grabsky.indigo.framework.commands.ExecutorType;
 import me.grabsky.indigo.framework.commands.annotations.DefaultCommand;
+import me.grabsky.indigo.framework.commands.annotations.SubCommand;
 import me.grabsky.indigo.utils.Numbers;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -70,6 +71,7 @@ public class EnchantCommand extends BaseCommand {
         AzureLang.send(sender, AzureLang.ENCHANT_USAGE);
     }
 
+    @SubCommand
     public void onEnchantAdd(CommandSender sender, String enchantmentName, String stringLevel) {
         if (sender instanceof Player executor) {
             if (sender.hasPermission("firedot.command.enchant.add")) {
@@ -101,6 +103,7 @@ public class EnchantCommand extends BaseCommand {
         AzureLang.send(sender, Global.PLAYER_ONLY_COMMAND);
     }
 
+    @SubCommand
     public void onEnchantRemove(CommandSender sender, String enchantmentName) {
         if (sender instanceof Player executor) {
             if (sender.hasPermission("firedot.command.enchant.remove")) {
