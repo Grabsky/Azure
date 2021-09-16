@@ -2,7 +2,11 @@ package me.grabsky.azure;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import me.grabsky.azure.api.PlayerDataAPI;
 import me.grabsky.azure.commands.*;
+import me.grabsky.azure.commands.homes.DelHomeCommand;
+import me.grabsky.azure.commands.homes.HomeCommand;
+import me.grabsky.azure.commands.homes.SetHomeCommand;
 import me.grabsky.azure.commands.teleport.TeleportCommand;
 import me.grabsky.azure.commands.teleport.TeleportHereCommand;
 import me.grabsky.azure.commands.teleport.TeleportLocationCommand;
@@ -10,8 +14,6 @@ import me.grabsky.azure.configuration.AzureConfig;
 import me.grabsky.azure.configuration.AzureLang;
 import me.grabsky.azure.listener.PlayerJoinListener;
 import me.grabsky.azure.listener.PlayerQuitListener;
-import me.grabsky.azure.manager.PointManager;
-import me.grabsky.azure.manager.TeleportRequestManager;
 import me.grabsky.azure.storage.PlayerDataManager;
 import me.grabsky.azure.storage.objects.JsonLocation;
 import me.grabsky.azure.storage.objects.deserializers.JsonLocationDeserializer;
@@ -28,18 +30,14 @@ public class Azure extends JavaPlugin {
     private AzureLang lang;
     private Gson gson;
     private PlayerDataManager dataManager;
-    private TeleportRequestManager teleportRequestManager;
-    private PointManager pointManager;
     // Getters
     public static Azure getInstance() { return instance; }
     public ConsoleLogger getConsoleLogger() { return consoleLogger; }
     public Gson getGson() { return gson; }
     public PlayerDataManager getDataManager() { return dataManager; }
-    public TeleportRequestManager getTeleportRequestManager() { return teleportRequestManager; }
-    public PointManager getLocationsManager() { return pointManager; }
+    public PlayerDataAPI getPlayerDataAPI() { return dataManager; }
 
     private int playerDataSaveTaskId;
-    private int pointsSaveTaskId;
 
     @Override
     public void onEnable() {
@@ -57,12 +55,6 @@ public class Azure extends JavaPlugin {
         // Initializing DataManager
         this.dataManager = new PlayerDataManager(this);
         this.playerDataSaveTaskId = dataManager.runSaveTask();
-        // Initializing TeleportRequestManager
-        this.teleportRequestManager = new TeleportRequestManager(this);
-        // Initializing PointManager
-        this.pointManager = new PointManager(this);
-        pointManager.loadAll();
-        this.pointsSaveTaskId = pointManager.runSaveTask();
         // Registering commands
         final CommandManager commands = new CommandManager(this);
         commands.register(
@@ -74,7 +66,11 @@ public class Azure extends JavaPlugin {
                 new RenameCommand(this),
                 new LoreCommand(this),
                 new SkullCommand(this),
-                new PointCommand(this),
+                new HomeCommand(this),
+                new SetHomeCommand(this),
+                new DelHomeCommand(this),
+                new HealCommand(this),
+                new FeedCommand(this),
                 new PlayerInfoCommand(this)
         );
         this.getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
@@ -85,10 +81,8 @@ public class Azure extends JavaPlugin {
     public void onDisable() {
         // Cancelling tasks to prevent concurrent saves
         Bukkit.getScheduler().cancelTask(playerDataSaveTaskId);
-        Bukkit.getScheduler().cancelTask(pointsSaveTaskId);
         // Saving data synchronously
         dataManager.saveAll();
-        pointManager.saveAll();
     }
 
     public boolean reload() {

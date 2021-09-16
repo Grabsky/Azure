@@ -2,10 +2,13 @@ package me.grabsky.azure.commands;
 
 import me.grabsky.azure.Azure;
 import me.grabsky.azure.configuration.AzureLang;
+import me.grabsky.azure.storage.PlayerDataManager;
 import me.grabsky.azure.storage.objects.JsonPlayer;
 import me.grabsky.indigo.configuration.Global;
 import me.grabsky.indigo.framework.commands.BaseCommand;
 import me.grabsky.indigo.framework.commands.ExecutorType;
+import me.grabsky.indigo.framework.commands.annotations.DefaultCommand;
+import me.grabsky.indigo.framework.commands.annotations.SubCommand;
 import me.grabsky.indigo.user.User;
 import me.grabsky.indigo.user.UserCache;
 import me.grabsky.indigo.utils.Beautifier;
@@ -19,10 +22,12 @@ import java.util.UUID;
 
 public class PlayerInfoCommand extends BaseCommand {
     private final Azure instance;
+    private final PlayerDataManager data;
 
     public PlayerInfoCommand(Azure instance) {
         super("playerinfo", List.of("pi"), "firedot.command.playerinfo", ExecutorType.ALL);
         this.instance = instance;
+        this.data = instance.getDataManager();
     }
 
 
@@ -41,11 +46,13 @@ public class PlayerInfoCommand extends BaseCommand {
         }
     }
 
+    @DefaultCommand
     public void onDefault(final CommandSender sender) {
         AzureLang.send(sender, Global.CORRECT_USAGE + "/playerinfo <player>");
     }
 
     // TO-DO: Add IP filter for players without proper permissions
+    @SubCommand
     public void onPlayerInfo(final CommandSender sender, final String playerName) {
         final Player player = Bukkit.getPlayer(playerName);
         if (player != null && player.isOnline()) {
@@ -81,29 +88,35 @@ public class PlayerInfoCommand extends BaseCommand {
                     .replace("{warns}", String.valueOf(0))
             );
             return;
-        } else if (UserCache.contains(playerName) ) {
+        } else if (UserCache.contains(playerName)) {
             final User user = UserCache.get(playerName);
             final UUID uuid = user.getUniqueId();
-            final OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
-            instance.getDataManager().getOfflineData(uuid, true).thenAccept((jsonPlayer ) -> {
-                final Location lastLocation = jsonPlayer.getLastLocation().toLocation();
-                AzureLang.send(sender, AzureLang.PLAYERINFO_OFFLINE
-                        .replace("{name}", user.getName())
-                        .replace("{uuid}", user.getUniqueId().toString().substring(0, 13))
-                        .replace("{ip}", jsonPlayer.getLastAddress())
-                        .replace("{country}", jsonPlayer.getCountry())
-                        .replace("{time_played}", Beautifier.ONE_DECIMAL_PLACE.format(offlinePlayer.getStatistic(Statistic.PLAY_ONE_MINUTE) / 20D / 60D / 60D))
-                        .replace("{offline_since}", Beautifier.formatTimestamp(System.currentTimeMillis() - offlinePlayer.getLastSeen()))
-                        .replace("{x}", Beautifier.THREE_DECIMAL_PLACES.format(lastLocation.getX()))
-                        .replace("{y}", Beautifier.THREE_DECIMAL_PLACES.format(lastLocation.getY()))
-                        .replace("{z}", Beautifier.THREE_DECIMAL_PLACES.format(lastLocation.getZ()))
-                        .replace("{world}", lastLocation.getWorld().getName())
-                        // TO-DO: Actual implementation
-                        .replace("{is_banned}", Global.NO)
-                        .replace("{is_muted}", Global.NO)
-                        .replace("{warns}", String.valueOf(0))
-                );
-            });
+            if (data.hasDataOf(uuid)) {
+                final OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
+                data.getOfflineData(uuid, true).thenAccept((jsonPlayer) -> {
+                    if (jsonPlayer != null) {
+                        final Location lastLocation = jsonPlayer.getLastLocation().toLocation();
+                        AzureLang.send(sender, AzureLang.PLAYERINFO_OFFLINE
+                                .replace("{name}", user.getName())
+                                .replace("{uuid}", user.getUniqueId().toString().substring(0, 13))
+                                .replace("{ip}", jsonPlayer.getLastAddress())
+                                .replace("{country}", jsonPlayer.getCountry())
+                                .replace("{time_played}", Beautifier.ONE_DECIMAL_PLACE.format(offlinePlayer.getStatistic(Statistic.PLAY_ONE_MINUTE) / 20D / 60D / 60D))
+                                .replace("{offline_since}", Beautifier.formatTimestamp(System.currentTimeMillis() - offlinePlayer.getLastSeen()))
+                                .replace("{x}", Beautifier.THREE_DECIMAL_PLACES.format(lastLocation.getX()))
+                                .replace("{y}", Beautifier.THREE_DECIMAL_PLACES.format(lastLocation.getY()))
+                                .replace("{z}", Beautifier.THREE_DECIMAL_PLACES.format(lastLocation.getZ()))
+                                .replace("{world}", lastLocation.getWorld().getName())
+                                // TO-DO: Actual implementation
+                                .replace("{is_banned}", Global.NO)
+                                .replace("{is_muted}", Global.NO)
+                                .replace("{warns}", String.valueOf(0))
+                        );
+                    }
+                });
+                return;
+            }
+            AzureLang.send(sender, Global.PLAYER_NOT_FOUND);
             return;
         }
         AzureLang.send(sender, Global.PLAYER_NOT_FOUND);

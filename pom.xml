@@ -79,9 +79,9 @@
         </dependency>
         <!-- Indigo -->
         <dependency>
-            <groupId>net.skydistrict</groupId>
+            <groupId>me.grabsky</groupId>
             <artifactId>Indigo</artifactId>
-            <version>latest</version>
+            <version>1.0-SNAPSHOT</version>
             <scope>system</scope>
             <systemPath>${builds.local}/Indigo.jar</systemPath>
         </dependency>

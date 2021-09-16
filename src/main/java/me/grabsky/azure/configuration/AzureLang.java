@@ -57,14 +57,19 @@ public class AzureLang extends AbstractLang {
     public static Component ENCHANTMENTS_UPDATED;
     public static Component ITEM_HAS_NO_SUCH_ENCHANTMENT;
     public static Component ENCHANTMENT_NOT_FOUND;
-    // Point
-    public static Component POINT_USAGE;
-    public static String POINT_ADDED;
-    public static String POINT_OVERWRITTEN;
+    // Homes
+    public static String TELEPORTED_TO_HOME;
+    public static String HOME_SET;
+    public static String HOME_NOT_FOUND;
+    public static Component HOME_LIMIT_EXCEEDED;
     public static Component INVALID_CHARACTERS;
-    public static String POINT_DELETED;
-    public static String TELEPORTED_TO_POINT;
-    public static Component POINT_NOT_FOUND;
+    public static String HOME_DELETED;
+    // Heal
+    public static Component YOU_HAVE_BEEN_HEALED;
+    public static String PLAYER_HAS_BEEN_HEALED;
+    // Feed
+    public static Component YOU_HAVE_BEEN_FED;
+    public static String PLAYER_HAS_BEEN_FED;
     // PlayerInfo
     public static String PLAYERINFO_ONLINE;
     public static String PLAYERINFO_OFFLINE;
@@ -127,14 +132,19 @@ public class AzureLang extends AbstractLang {
         ENCHANTMENTS_UPDATED = component("commands.enchant.enchantments-updated");
         ITEM_HAS_NO_SUCH_ENCHANTMENT = component("commands.enchant.item-has-no-such-enchantment");
         ENCHANTMENT_NOT_FOUND = component("commands.enchant.enchantment-not-found");
-        // Point
-        POINT_USAGE = component("commands.point.usage");
-        POINT_ADDED = string("commands.point.point-added");
-        POINT_OVERWRITTEN = string("commands.point.point-overwritten");
-        INVALID_CHARACTERS = component("commands.point.invalid-characters");
-        POINT_DELETED = string("commands.point.point-deleted");
-        TELEPORTED_TO_POINT = string("commands.point.teleported-to-point");
-        POINT_NOT_FOUND = component("commands.point.point-not-found");
+        // Homes
+        TELEPORTED_TO_HOME = string("commands.home.teleported-to-home");
+        HOME_NOT_FOUND = string("commands.home.home-not-found");
+        HOME_SET = string("commands.sethome.home-set");
+        INVALID_CHARACTERS = component("commands.sethome.invalid-characters");
+        HOME_LIMIT_EXCEEDED = component("commands.sethome.home-limit-exceeded");
+        HOME_DELETED = string("commands.delhome.home-deleted");
+        // Heal
+        YOU_HAVE_BEEN_HEALED = component("commands.heal.you-have-been-healed");
+        PLAYER_HAS_BEEN_HEALED = string("commands.heal.player-has-been-healed");
+        // Feed
+        YOU_HAVE_BEEN_FED = component("commands.feed.you-have-been-fed");
+        PLAYER_HAS_BEEN_FED = string("commands.feed.player-has-been-fed");
         // PlayerInfo
         PLAYERINFO_ONLINE = string("commands.playerinfo.online");
         PLAYERINFO_OFFLINE = string("commands.playerinfo.offline");

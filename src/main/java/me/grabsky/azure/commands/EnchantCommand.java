@@ -77,7 +77,7 @@ public class EnchantCommand extends BaseCommand {
             if (sender.hasPermission("firedot.command.enchant.add")) {
                 final ItemStack item = executor.getInventory().getItemInMainHand();
                 if (item.getType() != Material.AIR) {
-                    final Enchantment enchantment = Enchantments.fromName(enchantmentName);
+                    final Enchantment enchantment = Enchantments.fromVanillaName(enchantmentName);
                     if (enchantment != null) {
                         final Integer level = Numbers.parseInt(stringLevel);
                         if (level != null && level > 0) {
@@ -109,7 +109,7 @@ public class EnchantCommand extends BaseCommand {
             if (sender.hasPermission("firedot.command.enchant.remove")) {
                 final ItemStack item = executor.getInventory().getItemInMainHand();
                 if (item.getType() != Material.AIR) {
-                    final Enchantment enchantment = Enchantments.fromName(enchantmentName);
+                    final Enchantment enchantment = Enchantments.fromVanillaName(enchantmentName);
                     if (enchantment != null) {
                         final ItemMeta meta = item.getItemMeta();
                         if (meta.hasEnchant(enchantment)) {

@@ -7,49 +7,70 @@ depend: [Indigo]
 softdepend: [Vault]
 permissions:
   firedot.command.azure.*:
-    description: 'Access /azure command'
     children:
       firedot.command.azure: false
       firedot.command.azure.reload: false
+
   firedot.command.teleport.*:
-    description: 'Access /teleport command'
     children:
       firedot.command.teleport: false
       firedot.command.teleport.others: false
+
   firedot.command.teleporthere.*:
-    description: 'Access /teleporthere command'
     children:
       firedot.command.teleporthere: false
+
   firedot.command.teleportlocation.*:
-    description: 'Access /teleportlocation command'
     children:
       firedot.command.teleportlocation: false
+
   firedot.command.rename.*:
-    description: 'Access /rename command'
     children:
       firedot.command.rename: false
+
   firedot.command.lore.*:
-    description: 'Access /lore command'
     children:
       firedot.command.lore: false
       firedot.command.lore.add: false
       firedot.command.lore.set: false
       firedot.command.lore.remove: false
       firedot.command.lore.clear: false
+
   firedot.command.enchant.*:
-    description: 'Access /enchant command'
     children:
       firedot.command.enchant: false
       firedot.command.enchant.add: false
       firedot.command.enchant.remove: false
+
   firedot.command.skull.*:
-    description: 'Access /teleportlocation command'
     children:
       firedot.command.skull: false
-  firedot.command.point.*:
-    description: 'Access /point command'
+
+  firedot.command.home.*:
     children:
-      firedot.command.point: false
-      firedot.command.point.teleport: false
-      firedot.command.point.save: false
-      firedot.command.point.delete: false
+      firedot.command.home: false
+
+  firedot.command.sethome.*:
+    children:
+      firedot.command.sethome: false
+
+  firedot.command.delhome.*:
+    children:
+      firedot.command.delhome: false
+
+  firedot.command.heal.*:
+    children:
+      firedot.command.heal: false
+
+  firedot.command.feed.*:
+    children:
+      firedot.command.feed: false
+
+  firedot.command.invsee.*:
+    children:
+      firedot.command.invsee: false
+
+  firedot.command.enderchest.*:
+    children:
+      firedot.command.enderchest: false
+      firedot.command.enderchest.others: false

@@ -3,7 +3,6 @@ package me.grabsky.azure.listener;
 import me.grabsky.azure.Azure;
 import me.grabsky.azure.configuration.AzureConfig;
 import me.grabsky.azure.storage.PlayerDataManager;
-import me.grabsky.azure.storage.objects.JsonLocation;
 import me.grabsky.azure.storage.objects.JsonPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -24,7 +23,7 @@ public class PlayerQuitListener implements Listener {
         final Player player = event.getPlayer();
         final JsonPlayer jsonPlayer = data.getOnlineData(player);
         // Updating last known location and marking data as pending expiration
-        jsonPlayer.setLastLocation(new JsonLocation(player.getLocation()));
-        jsonPlayer.setExpireTimestamp(System.currentTimeMillis() + AzureConfig.PLAYER_DATA_EXPIRES_AFTER);
+        jsonPlayer.setLastLocation(player.getLocation());
+        jsonPlayer.setExpiresAt(System.currentTimeMillis() + AzureConfig.PLAYER_DATA_EXPIRES_AFTER);
     }
 }

@@ -37,7 +37,5 @@ public class AzureConfig {
         PLAYER_DATA_SAVE_INTERVAL = fc.getLong("settings.data.player-data.save-interval", 300000); // No conversion needed
         PLAYER_DATA_EXPIRES_AFTER = fc.getLong("settings.data.player-data.data-expires-after", 300000); // No conversion needed
         POINTS_SAVE_INTERVAL = fc.getLong("settings.data.point.save-interval", 600000) / 1000 * 20; // Converted to ticks
-
     }
-
 }

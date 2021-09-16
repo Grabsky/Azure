@@ -4,7 +4,7 @@ import org.bukkit.enchantments.Enchantment;
 
 public class Enchantments {
     
-    public static Enchantment fromName(String name) {
+    public static Enchantment fromVanillaName(String name) {
         return switch (name.toLowerCase()) {
             case "aqua_affinity" -> Enchantment.WATER_WORKER;
             case "bane_of_arthropods" -> Enchantment.DAMAGE_ARTHROPODS;

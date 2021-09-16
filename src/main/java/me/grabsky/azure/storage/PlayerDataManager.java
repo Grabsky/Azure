@@ -3,6 +3,7 @@ package me.grabsky.azure.storage;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import me.grabsky.azure.Azure;
+import me.grabsky.azure.api.PlayerDataAPI;
 import me.grabsky.azure.configuration.AzureConfig;
 import me.grabsky.azure.storage.objects.JsonLocation;
 import me.grabsky.azure.storage.objects.JsonPlayer;
@@ -23,7 +24,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-public class PlayerDataManager {
+// TO-DO: Make sure to properly INVALIDATE/UNLOAD expired data in all relevant places.
+public class PlayerDataManager implements PlayerDataAPI {
     private final Azure instance;
     private final ConsoleLogger consoleLogger;
     private final File dataDirectory;
@@ -40,14 +42,12 @@ public class PlayerDataManager {
         this.millisecondsSinceLastSave = 0;
     }
 
-    // Asynchronously creates a new data file or loads existing
-    @Nullable("This is null only if either file fails to be created or existing file is malformed.")
+    @Override
     public CompletableFuture<JsonPlayer> createOrLoad(final Player player) {
         final UUID uuid = player.getUniqueId();
         return new CompletableFuture<JsonPlayer>().completeAsync(() -> {
-            final JsonPlayer jsonPlayer = (hasDataOf(uuid)) ? this.loadDataOf(uuid) : this.create(uuid);
-            // Disable expiration
-            jsonPlayer.setExpireTimestamp(-1);
+            final JsonPlayer jsonPlayer = (this.hasDataOf(uuid)) ? this.loadDataOf(uuid) : this.create(uuid);
+            jsonPlayer.setExpiresAt(-1); // Can't be null; Data shouldn't have expire-date as player is currently online
             return jsonPlayer;
         });
     }
@@ -61,7 +61,7 @@ public class PlayerDataManager {
             // Creating new file if it doesn't exist
             file.createNewFile();
             // Creating JsonPlayer object
-            final JsonPlayer jsonPlayer = new JsonPlayer(uuid, null, "N/A", "N/A", new JsonLocation(Bukkit.getWorlds().get(0).getSpawnLocation()));
+            final JsonPlayer jsonPlayer = new JsonPlayer(null, "N/A", "N/A", new JsonLocation(Bukkit.getWorlds().get(0).getSpawnLocation()), new HashMap<>());
             // Creating BufferedWriter to save player data to the .json file
             final BufferedWriter writer = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8);
             // Saving values into to .json file
@@ -80,66 +80,66 @@ public class PlayerDataManager {
         return null;
     }
 
-    // Returns true if data attached to specified UUID is currently in cache
+    @Override
     public boolean isCached(@NotNull final UUID uuid) {
         return players.containsKey(uuid);
     }
 
-    // Returns cached data attached to specified uuid
-    @Nullable("Direct call can be null if trying to get data attached to invalid/not-existent/non-online-player UUID.")
-    public JsonPlayer getOnlineData(@NotNull final UUID uuid) {
-        return players.get(uuid);
+    @Override
+    public boolean hasDataOf(final UUID uuid) {
+        return new File(dataDirectory + File.separator + uuid + ".json").exists();
     }
 
-    // Returns cached data attached to specified player; Technically could be null if data failed to load
-    @NotNull
+    @Override
     public JsonPlayer getOnlineData(@NotNull final Player player) {
         return players.get(player.getUniqueId());
     }
 
-    @Nullable("You should first check if data exists using DataManager#hasDataOf(UUID uuid) method.")
+    @Override
+    public JsonPlayer getOnlineData(@NotNull final UUID uuid) {
+        return players.get(uuid);
+    }
+
+    @Override
     public CompletableFuture<JsonPlayer> getOfflineData(final UUID uuid, boolean scheduleUnload) {
         return new CompletableFuture<JsonPlayer>().completeAsync(() -> {
-            // Loading and then returning data of player (offline)
+            // Loading and then returning data of player if
             final JsonPlayer jsonPlayer = this.loadDataOf(uuid);
             if (jsonPlayer != null && scheduleUnload) {
-                jsonPlayer.setExpireTimestamp(System.currentTimeMillis() + AzureConfig.PLAYER_DATA_EXPIRES_AFTER);
+                jsonPlayer.setExpiresAt(System.currentTimeMillis() + AzureConfig.PLAYER_DATA_EXPIRES_AFTER);
             }
             return jsonPlayer;
         });
     }
 
-    // Returns true if data file attached to specified UUID exists
-    public boolean hasDataOf(final UUID uuid) {
-        return new File(dataDirectory + File.separator + uuid + ".json").exists();
-    }
-
     // Synchronously loads data attached to specified UUID
-    @Nullable
+    @Nullable("You should first check if data exists using DataManager#hasDataOf(UUID uuid) method.")
     private JsonPlayer loadDataOf(final UUID uuid) {
         if (players.containsKey(uuid)) return players.get(uuid);
-        // Creating 'Azure/playerdata/' directory if it doesn't exist
-        dataDirectory.mkdirs();
-        final File file = new File(dataDirectory + File.separator + uuid + ".json");
-        try {
-            // Creating BufferedReader to read the <uuid>.json file
-            final BufferedReader reader = Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8);
-            // Parsing file content to a JsonLocation object
-            final JsonPlayer jsonPlayer = gson.fromJson(reader, JsonPlayer.class);
-            // Making sure file content was parsed successfully
-            if (jsonPlayer != null) {
-                // Saving JsonPlayer object to the HashMap
-                players.put(uuid, jsonPlayer);
-                return jsonPlayer;
+        if (this.hasDataOf(uuid)) {
+            // Creating 'Azure/playerdata/' directory if it doesn't exist
+            dataDirectory.mkdirs();
+            final File file = new File(dataDirectory + File.separator + uuid + ".json");
+            try {
+                // Creating BufferedReader to read the <uuid>.json file
+                final BufferedReader reader = Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8);
+                // Parsing file content to a JsonLocation object
+                final JsonPlayer jsonPlayer = gson.fromJson(reader, JsonPlayer.class);
+                // Making sure file content was parsed successfully
+                if (jsonPlayer != null) {
+                    // Saving JsonPlayer object to the HashMap
+                    players.put(uuid, jsonPlayer);
+                    return jsonPlayer;
+                }
+            } catch (JsonSyntaxException e) {
+                consoleLogger.error("Error occurred while trying to load data of player with uuid '" + uuid + "'. Malformed JSON?");
+                e.printStackTrace();
+                // Renaming invalid data file to _invalid.<uuid>.json and creating a new one
+                file.renameTo(new File(dataDirectory + File.separator + "_invalid." + uuid + ".json"));
+                return this.create(uuid);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (JsonSyntaxException e) {
-            consoleLogger.error("Error occurred while trying to load data of player with uuid '" + uuid + "'. Malformed JSON?");
-            e.printStackTrace();
-            // Renaming invalid data file to _invalid.<uuid>.json and creating a new one
-            file.renameTo(new File(dataDirectory + File.separator + "_invalid." + uuid + ".json"));
-            return this.create(uuid);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         return null;
     }
@@ -178,7 +178,7 @@ public class PlayerDataManager {
             final Player player = Bukkit.getPlayer(en.getKey());
             // Updating player's last location in case server crash or w/e
             if (player != null && player.isOnline()) {
-                en.getValue().setLastLocation(new JsonLocation(player.getLocation()));
+                en.getValue().setLastLocation(player.getLocation());
             }
             // Saving data
             this.saveDataOf(en.getKey());
@@ -189,10 +189,9 @@ public class PlayerDataManager {
         }
     }
 
-    final long taskIntervalMs = 10000;
-
     // Creates asynchronous task for saving (and removing expired) data of all cached players
     public int runSaveTask() {
+        final long taskIntervalMs = 60000; // Shouldn't be modified, it's here just for sake of accessibility
         return Bukkit.getScheduler().runTaskTimerAsynchronously(instance, () -> {
             final long s1 = System.nanoTime();
             long saveCount = 0;
@@ -204,7 +203,7 @@ public class PlayerDataManager {
                 final UUID uuid = en.getKey();
                 final JsonPlayer jsonPlayer= en.getValue();
                 // Checking if data has expired
-                if (jsonPlayer.getExpireTimestamp() != -1 && jsonPlayer.getExpireTimestamp() >= System.currentTimeMillis()) {
+                if (jsonPlayer.getExpiresAt() != -1 && jsonPlayer.getExpiresAt() >= System.currentTimeMillis()) {
                     // Saving, and then removing data
                     this.saveDataOf(uuid);
                     players.remove(uuid);
@@ -215,7 +214,7 @@ public class PlayerDataManager {
                     final Player player = Bukkit.getPlayer(en.getKey());
                     // Updating player's last location in case server crash or w/e
                     if (player != null && player.isOnline()) {
-                        en.getValue().setLastLocation(new JsonLocation(player.getLocation()));
+                        en.getValue().setLastLocation(player.getLocation());
                     }
                     // Saving data
                     this.saveDataOf(uuid);
