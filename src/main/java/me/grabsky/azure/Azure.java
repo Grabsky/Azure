@@ -71,6 +71,7 @@ public class Azure extends JavaPlugin {
                 new DelHomeCommand(this),
                 new HealCommand(this),
                 new FeedCommand(this),
+                new SpeedCommand(this),
                 new PlayerInfoCommand(this)
         );
         this.getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);

@@ -74,3 +74,7 @@ permissions:
     children:
       firedot.command.enderchest: false
       firedot.command.enderchest.others: false
+
+  firedot.command.speed.*:
+    children:
+      firedot.command.speed: false

@@ -19,24 +19,6 @@ commands:
     player-teleported-to-you: '§6§lS§e§lD§8 » §e{target}§7 został do ciebie teleportowany.'
     outside-world-border: '§6§lS§e§lD§8 » §cTa lokalizacja znajduje się poza granicą świata.'
 
-  tprequest:
-    request-sent: '§6§lS§e§lD§8 » §7Wysłano zapytanie do §e{player}§7.'
-    request-received:
-      - ''
-      - '§6§lS§e§lD§8 » §e{player}§7 chce się do Ciebie teleportować.'
-      - '§8› §7Wpisz §a/tpaccept {player}§7, aby zaakceptować.'
-      - '§8› §7Wpisz §c/tpdeny {player}§7, aby odrzucić.'
-      - ''
-      - '§c§lUWAGA: §7Akceptujesz na własną odpowiedzialność.'
-      - ''
-    request-accepted: '§6§lS§e§lD§8 » §7Zaakceptowałeś prośbę o teleportację.'
-    request-accepted-target: '§6§lS§e§lD§8 » §e{player}§7 zaakceptował prośbę o teleportację.'
-    request-denied: '§6§lS§e§lD§8 » §7Odrzuciłeś prośbę o teleportację.'
-    request-denied-target: '§6§lS§e§lD§8 » §e{player}§7 odrzucił Twoją prośbę o teleportację.'
-    request-already-sent: '§6§lS§e§lD§8 » §cTwoja poprzednia prośba oczekuje na zaakceptowanie. Użyj §e/tpcancel§c, aby ją anulować.'
-    request-not-found: '§6§lS§e§lD§8 » §cProśba o teleportację nie istnieje lub została przedawniona.'
-    request-cancelled: '§6§lS§e§lD§8 » §7Anulowałeś prośbę o teleportację.'
-
   message:
     format: '§8[§e{sender}§8]§7 » §8[§6{recipient}§8]: §7'
     no-player-to-reply: '§6§lS§e§lD§8 » §cNie masz komu odpisać.'
@@ -91,6 +73,10 @@ commands:
   feed:
     you-have-been-fed: '§6§lS§e§lD§8 » §7Twój głód został zaspokojony.'
     player-has-been-fed: '§6§lS§e§lD§8 » §7Głód gracza §e{player}§7 został zaspokojony.'
+
+  speed:
+    walk-speed-set: '§6§lS§e§lD§8 » §7Prędkość chodzenia została ustawiona na §e{speed}§7.'
+    fly-speed-set: '§6§lS§e§lD§8 » §7Prędkość latania została ustawiona na §e{speed}§7.'
 
   playerinfo:
     online:

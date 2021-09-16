@@ -70,6 +70,9 @@ public class AzureLang extends AbstractLang {
     // Feed
     public static Component YOU_HAVE_BEEN_FED;
     public static String PLAYER_HAS_BEEN_FED;
+    // Speed
+    public static String WALK_SPEED_SET;
+    public static String FLY_SPEED_SET;
     // PlayerInfo
     public static String PLAYERINFO_ONLINE;
     public static String PLAYERINFO_OFFLINE;
@@ -145,6 +148,9 @@ public class AzureLang extends AbstractLang {
         // Feed
         YOU_HAVE_BEEN_FED = component("commands.feed.you-have-been-fed");
         PLAYER_HAS_BEEN_FED = string("commands.feed.player-has-been-fed");
+        // Speed
+        WALK_SPEED_SET = string("commands.speed.walk-speed-set");
+        FLY_SPEED_SET = string("commands.speed.fly-speed-set");
         // PlayerInfo
         PLAYERINFO_ONLINE = string("commands.playerinfo.online");
         PLAYERINFO_OFFLINE = string("commands.playerinfo.offline");

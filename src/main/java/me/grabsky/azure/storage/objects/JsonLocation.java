@@ -4,7 +4,7 @@ import com.google.gson.annotations.Expose;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
-public final class JsonLocation {
+public class JsonLocation {
     @Expose private final String world;
     @Expose private final float x;
     @Expose private final float y;
