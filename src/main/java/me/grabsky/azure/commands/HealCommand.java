@@ -20,7 +20,7 @@ public class HealCommand extends BaseCommand {
     private final Azure instance;
 
     public HealCommand(Azure instance) {
-        super("heal", null, "firedot.command.heal", ExecutorType.ALL);
+        super("heal", null, "azure.command.heal", ExecutorType.ALL);
         this.instance = instance;
     }
 
@@ -51,7 +51,7 @@ public class HealCommand extends BaseCommand {
 
     @SubCommand
     public void onHealPlayer(CommandSender sender, String playerName) {
-        if (sender.hasPermission("firedot.command.heal.others")) {
+        if (sender.hasPermission("azure.command.heal.others")) {
             final Player player = Bukkit.getPlayer(playerName);
             if (player != null && player.isOnline()) {
                 player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());

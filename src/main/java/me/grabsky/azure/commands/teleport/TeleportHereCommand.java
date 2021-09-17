@@ -20,7 +20,7 @@ public class TeleportHereCommand extends BaseCommand {
     private final Azure instance;
 
     public TeleportHereCommand(Azure instance) {
-        super("teleporthere", List.of("tphere", "s"), "firedot.command.teleporthere", ExecutorType.ALL);
+        super("teleporthere", List.of("tphere", "s"), "azure.command.teleporthere", ExecutorType.ALL);
         this.instance = instance;
     }
 

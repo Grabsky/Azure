@@ -6,75 +6,75 @@ authors: [Grabsky]
 depend: [Indigo]
 softdepend: [Vault]
 permissions:
-  firedot.command.azure.*:
+  azure.command.azure.*:
     children:
-      firedot.command.azure: false
-      firedot.command.azure.reload: false
+      azure.command.azure: false
+      azure.command.azure.reload: false
 
-  firedot.command.teleport.*:
+  azure.command.teleport.*:
     children:
-      firedot.command.teleport: false
-      firedot.command.teleport.others: false
+      azure.command.teleport: false
+      azure.command.teleport.others: false
 
-  firedot.command.teleporthere.*:
+  azure.command.teleporthere.*:
     children:
-      firedot.command.teleporthere: false
+      azure.command.teleporthere: false
 
-  firedot.command.teleportlocation.*:
+  azure.command.teleportlocation.*:
     children:
-      firedot.command.teleportlocation: false
+      azure.command.teleportlocation: false
 
-  firedot.command.rename.*:
+  azure.command.rename.*:
     children:
-      firedot.command.rename: false
+      azure.command.rename: false
 
-  firedot.command.lore.*:
+  azure.command.lore.*:
     children:
-      firedot.command.lore: false
-      firedot.command.lore.add: false
-      firedot.command.lore.set: false
-      firedot.command.lore.remove: false
-      firedot.command.lore.clear: false
+      azure.command.lore: false
+      azure.command.lore.add: false
+      azure.command.lore.set: false
+      azure.command.lore.remove: false
+      azure.command.lore.clear: false
 
-  firedot.command.enchant.*:
+  azure.command.enchant.*:
     children:
-      firedot.command.enchant: false
-      firedot.command.enchant.add: false
-      firedot.command.enchant.remove: false
+      azure.command.enchant: false
+      azure.command.enchant.add: false
+      azure.command.enchant.remove: false
 
-  firedot.command.skull.*:
+  azure.command.skull.*:
     children:
-      firedot.command.skull: false
+      azure.command.skull: false
 
-  firedot.command.home.*:
+  azure.command.home.*:
     children:
-      firedot.command.home: false
+      azure.command.home: false
 
-  firedot.command.sethome.*:
+  azure.command.sethome.*:
     children:
-      firedot.command.sethome: false
+      azure.command.sethome: false
 
-  firedot.command.delhome.*:
+  azure.command.delhome.*:
     children:
-      firedot.command.delhome: false
+      azure.command.delhome: false
 
-  firedot.command.heal.*:
+  azure.command.heal.*:
     children:
-      firedot.command.heal: false
+      azure.command.heal: false
 
-  firedot.command.feed.*:
+  azure.command.feed.*:
     children:
-      firedot.command.feed: false
+      azure.command.feed: false
 
-  firedot.command.invsee.*:
+  azure.command.invsee.*:
     children:
-      firedot.command.invsee: false
+      azure.command.invsee: false
 
-  firedot.command.enderchest.*:
+  azure.command.enderchest.*:
     children:
-      firedot.command.enderchest: false
-      firedot.command.enderchest.others: false
+      azure.command.enderchest: false
+      azure.command.enderchest.others: false
 
-  firedot.command.speed.*:
+  azure.command.speed.*:
     children:
-      firedot.command.speed: false
+      azure.command.speed: false

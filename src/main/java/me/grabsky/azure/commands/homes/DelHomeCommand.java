@@ -22,7 +22,7 @@ public class DelHomeCommand extends BaseCommand {
     private final PlayerDataManager data;
 
     public DelHomeCommand(Azure instance) {
-        super("delhome", null, "firedot.command.delhome", ExecutorType.PLAYER);
+        super("delhome", null, "azure.command.delhome", ExecutorType.PLAYER);
         this.instance = instance;
         this.data = instance.getDataManager();
     }

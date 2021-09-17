@@ -20,7 +20,7 @@ public class TeleportCommand extends BaseCommand {
     private final Azure instance;
 
     public TeleportCommand(Azure instance) {
-        super("teleport", List.of("tp"), "firedot.command.teleport", ExecutorType.ALL);
+        super("teleport", List.of("tp"), "azure.command.teleport", ExecutorType.ALL);
         this.instance = instance;
     }
 
@@ -67,7 +67,7 @@ public class TeleportCommand extends BaseCommand {
 
     @SubCommand
     public void onTeleportPlayerToPlayer(CommandSender sender, String playerOneName, String playerTwoName) {
-        if (sender.hasPermission("firedot.command.teleport.others")) {
+        if (sender.hasPermission("azure.command.teleport.others")) {
             final Player playerOne = Bukkit.getPlayer(playerOneName);
             final Player playerTwo = Bukkit.getPlayer(playerTwoName);
             if (playerOne != null && playerOne.isOnline() && playerTwo != null && playerTwo.isOnline()) {

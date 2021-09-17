@@ -19,7 +19,7 @@ public class FeedCommand extends BaseCommand {
     private final Azure instance;
 
     public FeedCommand(Azure instance) {
-        super("feed", null, "firedot.command.feed", ExecutorType.ALL);
+        super("feed", null, "azure.command.feed", ExecutorType.ALL);
         this.instance = instance;
     }
 
@@ -50,7 +50,7 @@ public class FeedCommand extends BaseCommand {
 
     @SubCommand
     public void onHealPlayer(CommandSender sender, String playerName) {
-        if (sender.hasPermission("firedot.command.feed.others")) {
+        if (sender.hasPermission("azure.command.feed.others")) {
             final Player player = Bukkit.getPlayer(playerName);
             if (player != null && player.isOnline()) {
                 player.setFoodLevel(20);

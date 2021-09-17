@@ -19,7 +19,7 @@ public class InvseeCommand extends BaseCommand {
     private final Azure instance;
 
     public InvseeCommand(Azure instance) {
-        super("invsee", null, "firedot.command.invsee", ExecutorType.PLAYER);
+        super("invsee", null, "azure.command.invsee", ExecutorType.PLAYER);
         this.instance = instance;
     }
 

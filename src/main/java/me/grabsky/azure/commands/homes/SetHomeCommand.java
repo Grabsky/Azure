@@ -22,7 +22,7 @@ public class SetHomeCommand extends BaseCommand {
     private final PlayerDataManager data;
 
     public SetHomeCommand(Azure instance) {
-        super("sethome", null, "firedot.command.sethome", ExecutorType.PLAYER);
+        super("sethome", null, "azure.command.sethome", ExecutorType.PLAYER);
         this.instance = instance;
         this.data = instance.getDataManager();
     }

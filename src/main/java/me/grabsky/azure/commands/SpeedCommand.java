@@ -18,7 +18,7 @@ public class SpeedCommand extends BaseCommand {
     private final Azure instance;
 
     public SpeedCommand(Azure instance) {
-        super("speed", null, "firedot.command.speed", ExecutorType.PLAYER);
+        super("speed", null, "azure.command.speed", ExecutorType.PLAYER);
         this.instance = instance;
     }
 

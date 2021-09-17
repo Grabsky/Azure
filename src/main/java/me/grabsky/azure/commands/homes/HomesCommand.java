@@ -17,7 +17,7 @@ public class HomesCommand extends BaseCommand {
     private final PlayerDataManager data;
 
     public HomesCommand(Azure instance) {
-        super("homes", null, "firedot.command.homes", ExecutorType.ALL);
+        super("homes", null, "azure.command.homes", ExecutorType.ALL);
         this.instance = instance;
         this.data = instance.getDataManager();
     }

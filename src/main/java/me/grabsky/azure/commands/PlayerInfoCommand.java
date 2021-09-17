@@ -25,7 +25,7 @@ public class PlayerInfoCommand extends BaseCommand {
     private final PlayerDataManager data;
 
     public PlayerInfoCommand(Azure instance) {
-        super("playerinfo", List.of("pi"), "firedot.command.playerinfo", ExecutorType.ALL);
+        super("playerinfo", List.of("pi"), "azure.command.playerinfo", ExecutorType.ALL);
         this.instance = instance;
         this.data = instance.getDataManager();
     }
@@ -57,7 +57,7 @@ public class PlayerInfoCommand extends BaseCommand {
         final Player player = Bukkit.getPlayer(playerName);
         if (player != null && player.isOnline()) {
             final Location loc = player.getLocation();
-            final String address = (sender.hasPermission("firedot.command.playerinfo.view.address")) ? player.getAddress().getHostName() : "§o*****§r";
+            final String address = (sender.hasPermission("azure.command.playerinfo.view.address")) ? player.getAddress().getHostName() : "§o*****§r";
             final JsonPlayer jsonPlayer = instance.getDataManager().getOnlineData(player.getUniqueId());
             // TO-DO: Ban plugin support
             AzureLang.send(sender, AzureLang.PLAYERINFO_ONLINE

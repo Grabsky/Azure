@@ -19,7 +19,7 @@ public class EnderchestCommand extends BaseCommand {
     private final Azure instance;
 
     public EnderchestCommand(Azure instance) {
-        super("enderchest", List.of("ec"), "firedot.command.enderchest", ExecutorType.PLAYER);
+        super("enderchest", List.of("ec"), "azure.command.enderchest", ExecutorType.PLAYER);
         this.instance = instance;
     }
 
@@ -46,7 +46,7 @@ public class EnderchestCommand extends BaseCommand {
 
     @SubCommand
     public void onEnderchestOthers(CommandSender sender, String targetName) {
-        if (sender.hasPermission("firedot.command.enderchest.others")) {
+        if (sender.hasPermission("azure.command.enderchest.others")) {
             final Player executor = (Player) sender;
             final Player target = Bukkit.getPlayer(targetName);
             if (target != null && target.isOnline()) {
