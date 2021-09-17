@@ -33,6 +33,9 @@ public class PlayerJoinListener implements Listener {
             // Updating IP address if changed
             if (!ip.equals(jsonPlayer.getLastAddress())) {
                 jsonPlayer.setLastAddress(ip);
+                if (jsonPlayer.getCustomName() != null && !jsonPlayer.getCustomName().equals("")) {
+                    player.customName();
+                }
                 // Sending API request to get country from player's IP address
                 final long s1 = System.nanoTime(); // DEBUG: LATENCY
                 jsonPlayer.setCountry(this.fetchCountry("https://get.geojs.io/v1/ip/country/full/" + ip));
