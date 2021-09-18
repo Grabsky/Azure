@@ -28,7 +28,7 @@ public class PlayerJoinListener implements Listener {
     @EventHandler
     public void onJoin(final PlayerJoinEvent event) {
         final Player player = event.getPlayer();
-        final String ip = player.getAddress().getHostName();
+        final String ip = player.getAddress().getHostString();
         data.createOrLoad(player).thenAcceptAsync((jsonPlayer) -> {
             // Updating IP address if changed
             if (!ip.equals(jsonPlayer.getLastAddress())) {
