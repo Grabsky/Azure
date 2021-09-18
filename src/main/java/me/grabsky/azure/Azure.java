@@ -12,6 +12,7 @@ import me.grabsky.azure.commands.teleport.TeleportHereCommand;
 import me.grabsky.azure.commands.teleport.TeleportLocationCommand;
 import me.grabsky.azure.configuration.AzureConfig;
 import me.grabsky.azure.configuration.AzureLang;
+import me.grabsky.azure.listener.PlayerInvulnerableListener;
 import me.grabsky.azure.listener.PlayerJoinListener;
 import me.grabsky.azure.listener.PlayerQuitListener;
 import me.grabsky.azure.storage.PlayerDataManager;
@@ -72,10 +73,12 @@ public class Azure extends JavaPlugin {
                 new HealCommand(this),
                 new FeedCommand(this),
                 new SpeedCommand(this),
+                new InvulnerableCommand(this),
                 new PlayerInfoCommand(this)
         );
         this.getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
         this.getServer().getPluginManager().registerEvents(new PlayerQuitListener(this), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerInvulnerableListener(this), this);
     }
 
     @Override

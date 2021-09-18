@@ -78,6 +78,10 @@ commands:
     walk-speed-set: '§6§lS§e§lD§8 » §7Prędkość chodzenia została ustawiona na §e{speed}§7.'
     fly-speed-set: '§6§lS§e§lD§8 » §7Prędkość latania została ustawiona na §e{speed}§7.'
 
+  invulnerable:
+    invulnerable-on: '§6§lS§e§lD§8 » §7Tryb nietykalności został §awłączony§7.'
+    invulnerable-off: '§6§lS§e§lD§8 » §7Tryb nietykalności został §cwyłączony§7.'
+
   playerinfo:
     online:
       - ''

@@ -73,6 +73,9 @@ public class AzureLang extends AbstractLang {
     // Speed
     public static String WALK_SPEED_SET;
     public static String FLY_SPEED_SET;
+    // Invulnerable
+    public static Component INVULNERABLE_ON;
+    public static Component INVULNERABLE_OFF;
     // PlayerInfo
     public static String PLAYERINFO_ONLINE;
     public static String PLAYERINFO_OFFLINE;
@@ -151,6 +154,9 @@ public class AzureLang extends AbstractLang {
         // Speed
         WALK_SPEED_SET = string("commands.speed.walk-speed-set");
         FLY_SPEED_SET = string("commands.speed.fly-speed-set");
+        // Invulnerable
+        INVULNERABLE_ON = component("commands.invulnerable.invulnerable-on");
+        INVULNERABLE_OFF = component("commands.invulnerable.invulnerable-off");
         // PlayerInfo
         PLAYERINFO_ONLINE = string("commands.playerinfo.online");
         PLAYERINFO_OFFLINE = string("commands.playerinfo.offline");
