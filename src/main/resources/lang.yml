@@ -8,7 +8,7 @@ commands:
   azure:
     help:
       - ''
-      - '» §e/azure reload§8 - §7Reloads the config'
+      - '§8» §e/azure reload§8 - §7Reloads the config'
       - ''
 
   teleport:
