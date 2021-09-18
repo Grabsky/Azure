@@ -26,7 +26,7 @@ public class SkullCommand extends BaseCommand {
 
     @Override
     public List<String> tabComplete(CommandSender sender, String arg, int index) {
-        if (index == 0) return UserCache.getNamesOfOnlineUsers();
+        if (index == 0) return null;
         else return Collections.emptyList();
     }
 

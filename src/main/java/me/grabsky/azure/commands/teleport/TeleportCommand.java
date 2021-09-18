@@ -7,7 +7,6 @@ import me.grabsky.indigo.framework.commands.BaseCommand;
 import me.grabsky.indigo.framework.commands.ExecutorType;
 import me.grabsky.indigo.framework.commands.annotations.DefaultCommand;
 import me.grabsky.indigo.framework.commands.annotations.SubCommand;
-import me.grabsky.indigo.user.UserCache;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -27,7 +26,7 @@ public class TeleportCommand extends BaseCommand {
     @Override
     public List<String> tabComplete(CommandSender sender, String arg, int index) {
         return switch (index) {
-            case 0, 1 -> UserCache.getNamesOfOnlineUsers();
+            case 0, 1 -> null;
             default -> Collections.emptyList();
         };
     }

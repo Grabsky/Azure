@@ -33,7 +33,7 @@ public class PlayerInfoCommand extends BaseCommand {
 
     @Override
     public List<String> tabComplete(CommandSender sender, String sub, int index) {
-        if (index == 0) return UserCache.getNamesOfOnlineUsers();
+        if (index == 0) return null;
         return Collections.emptyList();
     }
 
