@@ -6,6 +6,7 @@ import me.grabsky.azure.storage.PlayerDataManager;
 import me.grabsky.azure.storage.objects.JsonPlayer;
 import me.grabsky.indigo.configuration.Global;
 import me.grabsky.indigo.framework.commands.BaseCommand;
+import me.grabsky.indigo.framework.commands.Context;
 import me.grabsky.indigo.framework.commands.ExecutorType;
 import me.grabsky.indigo.framework.commands.annotations.DefaultCommand;
 import me.grabsky.indigo.framework.commands.annotations.SubCommand;
@@ -28,7 +29,7 @@ public class SetHomeCommand extends BaseCommand {
     }
 
     @Override
-    public List<String> tabComplete(CommandSender sender, String arg, int index) {
+    public List<String> tabComplete(CommandSender sender, Context context, int index) {
         if (sender instanceof Player executor) {
             final Set<String> homes = data.getOnlineData(executor).getHomes();
             if (index == 0 && homes != null && !homes.isEmpty()) return new ArrayList<>(homes);

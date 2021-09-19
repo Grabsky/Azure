@@ -5,6 +5,7 @@ import me.grabsky.azure.Azure;
 import me.grabsky.azure.configuration.AzureLang;
 import me.grabsky.indigo.configuration.Global;
 import me.grabsky.indigo.framework.commands.BaseCommand;
+import me.grabsky.indigo.framework.commands.Context;
 import me.grabsky.indigo.framework.commands.ExecutorType;
 import me.grabsky.indigo.framework.commands.annotations.DefaultCommand;
 import me.grabsky.indigo.framework.commands.annotations.SubCommand;
@@ -26,7 +27,7 @@ public class TeleportLocationCommand extends BaseCommand {
     }
 
     @Override
-    public List<String> tabComplete(CommandSender sender, String sub, int index) {
+    public List<String> tabComplete(CommandSender sender, Context context, int index) {
         if (sender instanceof Player) {
             final Location loc = ((Player) sender).getLocation();
             return switch (index) {

@@ -4,6 +4,7 @@ import me.grabsky.azure.Azure;
 import me.grabsky.azure.configuration.AzureLang;
 import me.grabsky.indigo.configuration.Global;
 import me.grabsky.indigo.framework.commands.BaseCommand;
+import me.grabsky.indigo.framework.commands.Context;
 import me.grabsky.indigo.framework.commands.ExecutorType;
 import me.grabsky.indigo.framework.commands.annotations.DefaultCommand;
 import me.grabsky.indigo.framework.commands.annotations.SubCommand;
@@ -22,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class LoreCommand extends BaseCommand {
-
     private final Azure instance;
 
     public LoreCommand(Azure instance) {
@@ -31,9 +31,9 @@ public class LoreCommand extends BaseCommand {
     }
 
     @Override
-    public List<String> tabComplete(CommandSender sender, String sub, int index) {
+    public List<String> tabComplete(CommandSender sender, Context context, int index) {
         if (index == 0) return List.of("add", "clear", "remove", "set");
-        else switch (sub) {
+        else switch (context.get(0)) {
             case "remove", "set" -> {
                 if (index == 1) return List.of("1");
                 else return Collections.emptyList();

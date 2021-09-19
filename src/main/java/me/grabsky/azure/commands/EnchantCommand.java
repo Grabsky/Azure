@@ -5,6 +5,7 @@ import me.grabsky.azure.configuration.AzureLang;
 import me.grabsky.azure.util.Enchantments;
 import me.grabsky.indigo.configuration.Global;
 import me.grabsky.indigo.framework.commands.BaseCommand;
+import me.grabsky.indigo.framework.commands.Context;
 import me.grabsky.indigo.framework.commands.ExecutorType;
 import me.grabsky.indigo.framework.commands.annotations.DefaultCommand;
 import me.grabsky.indigo.framework.commands.annotations.SubCommand;
@@ -31,11 +32,10 @@ public class EnchantCommand extends BaseCommand {
     }
 
     @Override
-    public List<String> tabComplete(CommandSender sender, String arg, int index) {
+    public List<String> tabComplete(CommandSender sender, Context context, int index) {
         if (index == 0) return List.of("add", "remove");;
         if (index == 1) return enchantments;
-        System.out.println(arg);
-        if (index == 2 && arg.equalsIgnoreCase("add")) return List.of("1");
+        if (index == 2 && context.get(0).equalsIgnoreCase("add")) return List.of("1");
         return Collections.emptyList();
     }
 
