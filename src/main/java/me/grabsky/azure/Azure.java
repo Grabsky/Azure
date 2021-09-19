@@ -73,6 +73,8 @@ public class Azure extends JavaPlugin {
                 new HealCommand(this),
                 new FeedCommand(this),
                 new SpeedCommand(this),
+                new InvseeCommand(this),
+                new EnderchestCommand(this),
                 new InvulnerableCommand(this),
                 new PlayerInfoCommand(this)
         );
