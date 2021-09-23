@@ -70,10 +70,12 @@ permissions:
   azure.command.heal.*:
     children:
       azure.command.heal: false
+      azure.command.heal.others: false
 
   azure.command.feed.*:
     children:
       azure.command.feed: false
+      azure.command.feed.others: false
 
   azure.command.invsee.*:
     children:
