@@ -16,6 +16,8 @@ public class AzureLang extends AbstractLang {
 
     // General
     public static Component INVALID_COORDS;
+    // Chat
+    public static Component CHAT_COOLDOWN;
     // Azure
     public static Component PLUGIN_HELP;
     // Teleport
@@ -100,6 +102,8 @@ public class AzureLang extends AbstractLang {
         }
         // General
         INVALID_COORDS = component("general.invalid-coords");
+        // Chat
+        CHAT_COOLDOWN = component("chat.chat-cooldown");
         // Azure
         PLUGIN_HELP = component("commands.azure.help");
         // Teleport

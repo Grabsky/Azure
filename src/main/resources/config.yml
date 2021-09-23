@@ -9,6 +9,14 @@ settings:
       # Defines time interval between player data saves. In milliseconds.
       save-interval: 300000
 
-    points:
-      # Defines time interval between point (/point) saves. In milliseconds.
-      save-interval: 600000
+  chat:
+    # Defines wether chat messages should be sent to Discord via webhook.
+    webhook: false
+    # Defines webhook URL.
+    webhook-url: ''
+    # Defines minimum time player have to wait before sending chat message again. In milliseconds.
+    chat-cooldown: 1000
+    # Defines chat formats for each LuckPerms group. Available placeholders: {player}, {message}
+    format:
+      owner: '§8[§c§lWłaściciel§8] [§e{player}§8]: §c{message}'
+      default: '§8[§7Gracz§8] [§e{player}§8]: §7{message}'

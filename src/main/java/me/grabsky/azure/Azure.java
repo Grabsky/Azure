@@ -7,11 +7,14 @@ import me.grabsky.azure.commands.*;
 import me.grabsky.azure.commands.homes.DelHomeCommand;
 import me.grabsky.azure.commands.homes.HomeCommand;
 import me.grabsky.azure.commands.homes.SetHomeCommand;
+import me.grabsky.azure.commands.messages.MessageCommand;
+import me.grabsky.azure.commands.messages.ReplyCommand;
 import me.grabsky.azure.commands.teleport.TeleportCommand;
 import me.grabsky.azure.commands.teleport.TeleportHereCommand;
 import me.grabsky.azure.commands.teleport.TeleportLocationCommand;
 import me.grabsky.azure.configuration.AzureConfig;
 import me.grabsky.azure.configuration.AzureLang;
+import me.grabsky.azure.listener.PlayerChatListener;
 import me.grabsky.azure.listener.PlayerInvulnerableListener;
 import me.grabsky.azure.listener.PlayerJoinListener;
 import me.grabsky.azure.listener.PlayerQuitListener;
@@ -20,7 +23,9 @@ import me.grabsky.azure.storage.objects.JsonLocation;
 import me.grabsky.azure.storage.objects.deserializers.JsonLocationDeserializer;
 import me.grabsky.indigo.framework.commands.CommandManager;
 import me.grabsky.indigo.logger.ConsoleLogger;
+import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Azure extends JavaPlugin {
@@ -30,12 +35,14 @@ public class Azure extends JavaPlugin {
     private AzureConfig config;
     private AzureLang lang;
     private Gson gson;
+    private LuckPerms luckPerms;
     private PlayerDataManager dataManager;
     // Getters
     public static Azure getInstance() { return instance; }
     public ConsoleLogger getConsoleLogger() { return consoleLogger; }
     public Gson getGson() { return gson; }
     public PlayerDataManager getDataManager() { return dataManager; }
+    public LuckPerms getLuckPerms() { return luckPerms; }
     public PlayerDataAPI getPlayerDataAPI() { return dataManager; }
 
     private int playerDataSaveTaskId;
@@ -53,6 +60,11 @@ public class Azure extends JavaPlugin {
                 .excludeFieldsWithoutExposeAnnotation()
                 .registerTypeAdapter(JsonLocation.class, new JsonLocationDeserializer())
                 .create();
+        // Initializing LuckPerms API
+        final RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
+        if (provider != null) {
+            this.luckPerms = provider.getProvider();
+        }
         // Initializing DataManager
         this.dataManager = new PlayerDataManager(this);
         this.playerDataSaveTaskId = dataManager.runSaveTask();
@@ -76,11 +88,15 @@ public class Azure extends JavaPlugin {
                 new InvseeCommand(this),
                 new EnderchestCommand(this),
                 new InvulnerableCommand(this),
+                new NickCommand(this),
+                new MessageCommand(this),
+                new ReplyCommand(this),
                 new PlayerInfoCommand(this)
         );
         this.getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
         this.getServer().getPluginManager().registerEvents(new PlayerQuitListener(this), this);
         this.getServer().getPluginManager().registerEvents(new PlayerInvulnerableListener(this), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerChatListener(this), this);
     }
 
     @Override

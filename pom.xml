@@ -77,6 +77,13 @@
             <version>1.0.6</version>
             <scope>compile</scope>
         </dependency>
+        <!-- LuckPerms API -->
+        <dependency>
+            <groupId>net.luckperms</groupId>
+            <artifactId>api</artifactId>
+            <version>5.3</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- Indigo -->
         <dependency>
             <groupId>me.grabsky</groupId>

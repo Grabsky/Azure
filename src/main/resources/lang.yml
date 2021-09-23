@@ -3,6 +3,9 @@ version: 1 # Do not modify this unless you know what you're doing
 general:
   invalid-coords: '§6§lS§e§lD§8 » §cPodane koordynaty są nieprawidłowe.'
 
+chat:
+  chat-cooldown: '§6§lS§e§lD§8 » §cOdczekaj chwilę przed wysłaniem kolejnej wiadomości...'
+
 # Following section(s) supports classic color codes (§) and hex colors (§#)
 commands:
   azure:

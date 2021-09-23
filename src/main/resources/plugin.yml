@@ -3,9 +3,18 @@ version: ${project.version}
 main: me.grabsky.azure.Azure
 api-version: 1.17
 authors: [Grabsky]
-depend: [Indigo]
+depend: [Indigo, LuckPerms]
 softdepend: [Vault]
 permissions:
+
+  azure.chat.*:
+    children:
+      azure.chat.format: false
+
+  azure.bypass.*:
+    children:
+      azure.bypass.chatcooldown: false
+
   azure.command.azure.*:
     children:
       azure.command.azure: false
@@ -78,3 +87,20 @@ permissions:
   azure.command.speed.*:
     children:
       azure.command.speed: false
+
+  azure.command.nick.*:
+    children:
+      azure.command.nick: false
+
+  azure.command.message.*:
+    children:
+      azure.command.message: false
+
+  azure.command.reply.*:
+    children:
+      azure.command.reply: false
+
+  azure.command.playerinfo.*:
+    children:
+      azure.command.playerinfo: false
+      azure.command.playerinfo.view.address: false

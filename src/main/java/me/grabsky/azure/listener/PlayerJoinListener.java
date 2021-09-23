@@ -3,11 +3,15 @@ package me.grabsky.azure.listener;
 import me.grabsky.azure.Azure;
 import me.grabsky.azure.storage.PlayerDataManager;
 import me.grabsky.indigo.logger.ConsoleLogger;
+import me.grabsky.indigo.utils.Components;
 import org.bukkit.ChatColor;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,24 +22,29 @@ public class PlayerJoinListener implements Listener {
     private final Azure instance;
     private final ConsoleLogger consoleLogger;
     private final PlayerDataManager data;
+    private final NamespacedKey customNameKey;
 
     public PlayerJoinListener(Azure instance) {
         this.instance = instance;
         this.consoleLogger = instance.getConsoleLogger();
         this.data = instance.getDataManager();
+        this.customNameKey = new NamespacedKey(instance, "customName");
     }
 
     @EventHandler
     public void onJoin(final PlayerJoinEvent event) {
         final Player player = event.getPlayer();
         final String ip = player.getAddress().getHostString();
+        // Updating player's display name
+        final PersistentDataContainer container = player.getPersistentDataContainer();
+        if (container.has(customNameKey, PersistentDataType.STRING)) {
+            player.displayName(Components.parseAmpersand(container.get(customNameKey, PersistentDataType.STRING)));
+        }
+        // Loading existing or creating new data for joined player
         data.createOrLoad(player).thenAcceptAsync((jsonPlayer) -> {
             // Updating IP address if changed
             if (!ip.equals(jsonPlayer.getLastAddress())) {
                 jsonPlayer.setLastAddress(ip);
-                if (jsonPlayer.getCustomName() != null && !jsonPlayer.getCustomName().equals("")) {
-                    player.customName();
-                }
                 // Sending API request to get country from player's IP address
                 final long s1 = System.nanoTime(); // DEBUG: LATENCY
                 jsonPlayer.setCountry(this.fetchCountry("https://get.geojs.io/v1/ip/country/full/" + ip));
