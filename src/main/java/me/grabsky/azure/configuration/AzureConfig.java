@@ -14,6 +14,8 @@ public class AzureConfig {
     private final Azure instance;
     private final ConsoleLogger consoleLogger;
 
+    public static boolean DEBUG;
+
     // Disclaimer: All interval/time values are converted to final-usage unit.
     public static long PLAYER_DATA_SAVE_INTERVAL;
     public static long PLAYER_DATA_EXPIRES_AFTER;
@@ -40,6 +42,8 @@ public class AzureConfig {
         if (fc.getInt("version") != 1) {
             consoleLogger.error(Global.OUTDATED_CONFIG);
         }
+        DEBUG = fc.getBoolean("settings.debug", false);
+        // Data
         PLAYER_DATA_SAVE_INTERVAL = fc.getLong("settings.data.player-data.save-interval", 300000); // No conversion needed
         PLAYER_DATA_EXPIRES_AFTER = fc.getLong("settings.data.player-data.data-expires-after", 300000); // No conversion needed
         // Chat

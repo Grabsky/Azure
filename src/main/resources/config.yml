@@ -1,5 +1,8 @@
 version: 1 # Do not modify this unless you know what you're doing
 
+# Turn this on to see additional info in console and make plugin load online players' data after server reload.
+debug: false
+
 settings:
   # Configuration section for, basically, everything plugin saves to re-use after server restart.
   data:
