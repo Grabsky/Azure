@@ -20,9 +20,6 @@ public class PlayerInvulnerableListener implements Listener {
         if (event.getEntity() instanceof Player player) {
             if (player.isInvulnerable() && event.getCause() != EntityDamageEvent.DamageCause.VOID) {
                 event.setCancelled(true);
-                switch (event.getCause()) {
-                    case LAVA, FIRE, FIRE_TICK -> event.getEntity().setFireTicks(0);
-                }
             }
         }
     }
