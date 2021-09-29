@@ -1,11 +1,11 @@
 package me.grabsky.azure.listener;
 
 import me.grabsky.azure.Azure;
+import me.grabsky.azure.AzureKeys;
 import me.grabsky.azure.storage.PlayerDataManager;
 import me.grabsky.indigo.logger.ConsoleLogger;
 import me.grabsky.indigo.utils.Components;
 import org.bukkit.ChatColor;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,13 +22,11 @@ public class PlayerJoinListener implements Listener {
     private final Azure instance;
     private final ConsoleLogger consoleLogger;
     private final PlayerDataManager data;
-    private final NamespacedKey customNameKey;
 
     public PlayerJoinListener(Azure instance) {
         this.instance = instance;
         this.consoleLogger = instance.getConsoleLogger();
         this.data = instance.getDataManager();
-        this.customNameKey = new NamespacedKey(instance, "customName");
     }
 
     @EventHandler
@@ -37,8 +35,8 @@ public class PlayerJoinListener implements Listener {
         final String ip = player.getAddress().getHostString();
         // Updating player's display name
         final PersistentDataContainer container = player.getPersistentDataContainer();
-        if (container.has(customNameKey, PersistentDataType.STRING)) {
-            player.displayName(Components.parseAmpersand(container.get(customNameKey, PersistentDataType.STRING)));
+        if (container.has(AzureKeys.CUSTOM_NAME, PersistentDataType.STRING)) {
+            player.displayName(Components.parseAmpersand(container.get(AzureKeys.CUSTOM_NAME, PersistentDataType.STRING))); // Won't ever be null
         }
         // Loading existing or creating new data for joined player
         data.createOrLoad(player).thenAcceptAsync((jsonPlayer) -> {
@@ -50,6 +48,8 @@ public class PlayerJoinListener implements Listener {
                 jsonPlayer.setCountry(this.fetchCountry("https://get.geojs.io/v1/ip/country/full/" + ip));
                 consoleLogger.log("Fetched " + (System.nanoTime() - s1) / 1000000D + "ms"); // DEBUG: LATENCY
             }
+            // Updating player's social spy mode
+            jsonPlayer.setSocialSpy(container.getOrDefault(AzureKeys.SOCIAL_SPY, PersistentDataType.BYTE, (byte) 0) == (byte) 1);
         });
     }
 

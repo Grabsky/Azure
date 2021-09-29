@@ -8,6 +8,8 @@ import me.grabsky.azure.configuration.AzureConfig;
 import me.grabsky.azure.storage.objects.JsonLocation;
 import me.grabsky.azure.storage.objects.JsonPlayer;
 import me.grabsky.indigo.logger.ConsoleLogger;
+import me.grabsky.indigo.user.User;
+import me.grabsky.indigo.user.UserCache;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -61,7 +63,7 @@ public class PlayerDataManager implements PlayerDataAPI {
             // Creating new file if it doesn't exist
             file.createNewFile();
             // Creating JsonPlayer object
-            final JsonPlayer jsonPlayer = new JsonPlayer(null, "N/A", "N/A", new JsonLocation(Bukkit.getWorlds().get(0).getSpawnLocation()), new HashMap<>());
+            final JsonPlayer jsonPlayer = new JsonPlayer("N/A", "N/A", new JsonLocation(Bukkit.getWorlds().get(0).getSpawnLocation()), new HashMap<>());
             // Creating BufferedWriter to save player data to the .json file
             final BufferedWriter writer = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8);
             // Saving values into to .json file

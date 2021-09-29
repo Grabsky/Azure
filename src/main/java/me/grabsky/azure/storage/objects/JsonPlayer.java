@@ -7,26 +7,24 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 public class JsonPlayer extends ExpirableData {
-    @Expose private String customName;
     @Expose private String country;
     @Expose private String lastAddress;
     @Expose private JsonLocation lastLocation;
     @Expose private final Map<String, JsonLocation> homes;
+    private UUID lastRecipient;
+    private boolean socialSpy;
 
     // This one is used for creating data for the first time
-    public JsonPlayer(@Nullable final String customName, final String address, final String country, final JsonLocation lastLocation, final Map<String, JsonLocation> homes) {
-        this.customName = customName;
+    public JsonPlayer(final String address, final String country, final JsonLocation lastLocation, final Map<String, JsonLocation> homes) {
         this.country = country;
         this.lastAddress = address;
         this.lastLocation = lastLocation;
         this.homes = homes;
-    }
-
-    // Returns player's (non-parsed) custom name
-    public String getCustomName() {
-        return customName;
+        this.lastLocation = null;
+        this.socialSpy = false;
     }
 
     // Returns player's country
@@ -59,9 +57,12 @@ public class JsonPlayer extends ExpirableData {
         return this.homes.get(id).toLocation();
     }
 
-    // Updates player's custom name displayed in chat
-    public void setCustomName(@NotNull final String displayName) {
-        this.customName = displayName;
+    public UUID getLastRecipient() {
+        return this.lastRecipient;
+    }
+
+    public boolean getSocialSpy() {
+        return this.socialSpy;
     }
 
     // Updates player's last IP address
@@ -86,5 +87,15 @@ public class JsonPlayer extends ExpirableData {
         } else {
             homes.remove(name);
         }
+    }
+
+    // Updates player's last recipient
+    public void setLastRecipient(final UUID uuid) {
+        this.lastRecipient = uuid;
+    }
+
+    // Updates player's social spy mode
+    public void setSocialSpy(final boolean mode) {
+        this.socialSpy = mode;
     }
 }

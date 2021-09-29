@@ -42,6 +42,10 @@ public class AzureLang extends AbstractLang {
     // Private Message
     public static String PRIVATE_MESSAGE_FORMAT;
     public static Component NO_PLAYER_TO_REPLY;
+    // SocialSpy
+    public static String SOCIAL_SPY_FORMAT;
+    public static Component SOCIAL_SPY_ON;
+    public static Component SOCIAL_SPY_OFF;
     // Skull
     public static String SKULL_RECEIVED;
     // Name
@@ -125,6 +129,10 @@ public class AzureLang extends AbstractLang {
         // Private Message
         PRIVATE_MESSAGE_FORMAT = string("commands.message.format");
         NO_PLAYER_TO_REPLY = component("commands.message.no-player-to-reply");
+        // SocialSpy
+        SOCIAL_SPY_FORMAT = string("commands.socialspy.format");
+        SOCIAL_SPY_ON = component("commands.socialspy.socialspy-on");
+        SOCIAL_SPY_OFF = component("commands.socialspy.socialspy-off");
         // Skull
         SKULL_RECEIVED = string("commands.skull.skull-received");
         // Name

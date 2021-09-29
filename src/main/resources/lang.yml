@@ -26,6 +26,11 @@ commands:
     format: '§8[§e{sender}§8]§7 » §8[§6{recipient}§8]: §7'
     no-player-to-reply: '§6§lS§e§lD§8 » §cNie masz komu odpisać.'
 
+  socialspy:
+    format: '§8[§7§lSS§8] [§7{sender}§8]§7 » §8[§7{recipient}§8]: §7'
+    socialspy-on: '§6§lS§e§lD§8 » §7Podgląd wiadomości prywatnych został §awłączony§7.'
+    socialspy-off: '§6§lS§e§lD§8 » §7Podgląd wiadomości prywatnych został §cwyłączony§7.'
+
   skull:
     skull-received: '§6§lS§e§lD§8 » §7Otrzymałeś głowę gracza §e{player}'
 

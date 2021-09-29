@@ -2,6 +2,8 @@ package me.grabsky.azure.commands.messages;
 
 import me.grabsky.azure.Azure;
 import me.grabsky.azure.configuration.AzureLang;
+import me.grabsky.azure.storage.PlayerDataManager;
+import me.grabsky.azure.storage.objects.JsonPlayer;
 import me.grabsky.indigo.configuration.Global;
 import me.grabsky.indigo.framework.commands.BaseCommand;
 import me.grabsky.indigo.framework.commands.Context;
@@ -11,24 +13,19 @@ import me.grabsky.indigo.utils.Components;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 public class ReplyCommand extends BaseCommand {
-    private final Azure instance;
-    private final NamespacedKey lastRecipientKey;
+    private final PlayerDataManager data;
 
     public ReplyCommand(Azure instance) {
         super("reply", List.of("r"), "azure.command.reply", ExecutorType.PLAYER);
-        this.instance = instance;
-        this.lastRecipientKey = new NamespacedKey(instance, "lastRecipient");
+        this.data = instance.getDataManager();
     }
 
     @Override
@@ -51,11 +48,10 @@ public class ReplyCommand extends BaseCommand {
     }
 
     public void onReply(CommandSender sender, String[] args) {
-        final Player player = (Player) sender;
-        final PersistentDataContainer container = player.getPersistentDataContainer();
-        if (container.has(lastRecipientKey, PersistentDataType.STRING)) {
-            final UUID uuid = UUID.fromString(container.get(lastRecipientKey, PersistentDataType.STRING));
-            final Player recipient = Bukkit.getPlayer(uuid);
+        final Player executor = (Player) sender;
+        final UUID lastRecipient = data.getOnlineData(executor).getLastRecipient();
+        if (lastRecipient != null) {
+            final Player recipient = Bukkit.getPlayer(lastRecipient);
             if (recipient != null && recipient.isOnline()) {
                 final String format = AzureLang.PRIVATE_MESSAGE_FORMAT.replace("{sender}", sender.getName()).replace("{recipient}", recipient.getName());
                 final String message = String.join(" ", args);
@@ -63,8 +59,18 @@ public class ReplyCommand extends BaseCommand {
                 // Sending component (private message) to command sender
                 AzureLang.send(sender, privateMessage);
                 // Sending component (private message) to recipient
-                AzureLang.send(recipient, privateMessage, Identity.identity(player.getUniqueId()));
-                // TO-DO: Send component to staff with social spy enabled
+                AzureLang.send(recipient, privateMessage, Identity.identity(executor.getUniqueId()));
+                // Sending component (private message) to staff with social spy enabled
+                final String socialSpyFormat = AzureLang.SOCIAL_SPY_FORMAT.replace("{sender}", sender.getName()).replace("{recipient}", recipient.getName());
+                final Component socialSpyMessage = Components.parseSection(socialSpyFormat + message);
+                for (final Player player : Bukkit.getOnlinePlayers()) {
+                    // Skipping if player is message sender or receiver
+                    if (player == executor || player == recipient) continue;
+                    final JsonPlayer jsonPlayer = data.getOnlineData(player.getUniqueId());
+                    if (jsonPlayer != null && jsonPlayer.getSocialSpy()) {
+                        AzureLang.send(player, socialSpyMessage);
+                    }
+                }
                 return;
             }
         }

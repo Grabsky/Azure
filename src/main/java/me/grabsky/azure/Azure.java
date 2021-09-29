@@ -55,6 +55,8 @@ public class Azure extends JavaPlugin {
         this.lang = new AzureLang(this);
         this.config = new AzureConfig(this);
         this.reload();
+        // Initializing NamespacedKeys
+        new AzureKeys(this);
         // Registering custom json deserializers
         this.gson = new GsonBuilder()
                 .excludeFieldsWithoutExposeAnnotation()
@@ -75,6 +77,9 @@ public class Azure extends JavaPlugin {
                 new TeleportCommand(this),
                 new TeleportHereCommand(this),
                 new TeleportLocationCommand(this),
+                new MessageCommand(this),
+                new ReplyCommand(this),
+                new SocialSpyCommand(this),
                 new EnchantCommand(this),
                 new RenameCommand(this),
                 new LoreCommand(this),
@@ -89,10 +94,9 @@ public class Azure extends JavaPlugin {
                 new EnderchestCommand(this),
                 new InvulnerableCommand(this),
                 new NickCommand(this),
-                new MessageCommand(this),
-                new ReplyCommand(this),
                 new PlayerInfoCommand(this)
         );
+        // Register listeners
         this.getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
         this.getServer().getPluginManager().registerEvents(new PlayerQuitListener(this), this);
         this.getServer().getPluginManager().registerEvents(new PlayerInvulnerableListener(this), this);
