@@ -198,8 +198,8 @@ public class PlayerDataManager implements PlayerDataAPI {
     // Creates task for saving (and removing expired) data of all cached players
     public int runSaveTask() {
         final long taskIntervalMs = 60000; // Should NOT be modified, it's here just for sake of accessibility
-        final long s = System.nanoTime(); // Value required to calculate logic operation time
         return Bukkit.getScheduler().runTaskTimer(instance, () -> {
+            final long s = System.nanoTime(); // Value required to calculate logic operation time
             // Creating copy of player's data map to prevent concurrency issues
             final HashMap<UUID, JsonPlayer> playersCopy = new HashMap<>(players);
             // Running the rest of stuff off the main thread
