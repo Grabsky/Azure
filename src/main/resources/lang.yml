@@ -11,7 +11,7 @@ commands:
   azure:
     help:
       - ''
-      - '§8» §e/azure reload§8 - §7Reloads the config'
+      - '§8» §e/azure reload§8 - §7Przeładowuje konfigurację'
       - ''
 
   teleport:
@@ -41,10 +41,10 @@ commands:
   lore:
     usage:
       - ''
-      - '§8» §e/lore add <lore...>§8 - §7Adds line of lore'
-      - '§8» §e/lore clear§8 - §7Clears lore'
-      - '§8» §e/lore remove <line>§8 - §7Removes specific line of lore'
-      - '§8» §e/lore set <line> <lore...>§8 - §7Modifies specific line of lore'
+      - '§8» §e/lore add <lore...>§8 - §7Dodaje linię do opisu'
+      - '§8» §e/lore clear§8 - §7Usuwa opis'
+      - '§8» §e/lore remove <line>§8 - §7Usuwa linię z opisu'
+      - '§8» §e/lore set <line> <lore...>§8 - §7Modyfikuje linię opisu'
       - ''
     lore-updated: '§6§lS§e§lD§8 » §7Opis przedmiotu został zaktualizowany.'
     lore-cleared: '§6§lS§e§lD§8 » §7Opis przedmiotu został wyczyszczony.'
@@ -55,8 +55,8 @@ commands:
   enchant:
     usage:
       - ''
-      - '§8» §e/enchant add <enchantment> [level]§8 - §7Adds enchantment'
-      - '§8» §e/enchant remove <enchantment>§8 - §7Removes enchantment'
+      - '§8» §e/enchant add <enchantment> [level]§8 - §7Dodaje zaklęcie'
+      - '§8» §e/enchant remove <enchantment>§8 - §7Usuwa zaklęcie'
       - ''
     enchantments-updated: '§6§lS§e§lD§8 » §7Zaklęcia przedmiotu zostały zaktualizowane.'
     item-has-no-such-enchantment: '§6§lS§e§lD§8 » §cTen przedmiot nie ma takiego zaklęcia.'
@@ -89,6 +89,19 @@ commands:
   invulnerable:
     invulnerable-on: '§6§lS§e§lD§8 » §7Tryb nietykalności został §awłączony§7.'
     invulnerable-off: '§6§lS§e§lD§8 » §7Tryb nietykalności został §cwyłączony§7.'
+
+  nick:
+    usage:
+      - ''
+      - '§8» §e/nick <nick>§8 - §7Ustaw swój nick'
+      - '§8» §e/nick clear§8 - §7Zresetuj swój nick'
+      - '§8» §e/nick <player> <nick>§8 - §7Ustaw nick innego gracza'
+      - '§8» §e/nick <player> clear§8 - §7Zresetuj nick innego gracza'
+      - ''
+    nick-set: '§6§lS§e§lD§8 » §7Nick został zmieniony na §r{nick}§7'
+    nick-reset: '§6§lS§e§lD§8 » §7Nick został zresetowany.'
+    invalid-characters: '§6§lS§e§lD§8 » §cWybrany nick zawiera niedozwolone znaki.'
+    invalid-length: '§6§lS§e§lD§8 » §cWybrany nick musi mieć od 3 do 16 znaków.'
 
   playerinfo:
     online:

@@ -21,8 +21,6 @@ public class AzureLang extends AbstractLang {
     // Azure
     public static Component PLUGIN_HELP;
     // Teleport
-    public static Component TELEPORT_CANCELLED;
-    public static Component TELEPORT_FAILED;
     public static String TELEPORTED_TO_PLAYER;
     public static String TELEPORTED_TO_LOCATION;
     public static String TELEPORTED_PLAYER_TO_PLAYER;
@@ -58,7 +56,7 @@ public class AzureLang extends AbstractLang {
     public static String HOME_SET;
     public static String HOME_NOT_FOUND;
     public static Component HOME_LIMIT_EXCEEDED;
-    public static Component INVALID_CHARACTERS;
+    public static Component HOME_INVALID_CHARACTERS;
     public static String HOME_DELETED;
     // Heal
     public static Component YOU_HAVE_BEEN_HEALED;
@@ -72,6 +70,12 @@ public class AzureLang extends AbstractLang {
     // Invulnerable
     public static Component INVULNERABLE_ON;
     public static Component INVULNERABLE_OFF;
+    // Nick
+    public static Component NICK_USAGE;
+    public static String NICK_SET;
+    public static Component NICK_RESET;
+    public static Component NICK_INVALID_CHARACTERS;
+    public static Component NICK_INVALID_LENGTH;
     // PlayerInfo
     public static String PLAYERINFO_ONLINE;
     public static String PLAYERINFO_OFFLINE;
@@ -135,7 +139,7 @@ public class AzureLang extends AbstractLang {
         TELEPORTED_TO_HOME = string("commands.home.teleported-to-home");
         HOME_NOT_FOUND = string("commands.home.home-not-found");
         HOME_SET = string("commands.sethome.home-set");
-        INVALID_CHARACTERS = component("commands.sethome.invalid-characters");
+        HOME_INVALID_CHARACTERS = component("commands.sethome.invalid-characters");
         HOME_LIMIT_EXCEEDED = component("commands.sethome.home-limit-exceeded");
         HOME_DELETED = string("commands.delhome.home-deleted");
         // Heal
@@ -150,6 +154,12 @@ public class AzureLang extends AbstractLang {
         // Invulnerable
         INVULNERABLE_ON = component("commands.invulnerable.invulnerable-on");
         INVULNERABLE_OFF = component("commands.invulnerable.invulnerable-off");
+        // Nick
+        NICK_USAGE = component("commands.nick.usage");
+        NICK_SET = string("commands.nick.nick-set");
+        NICK_RESET = component("commands.nick.nick-reset");
+        NICK_INVALID_CHARACTERS = component("commands.nick.invalid-characters");
+        NICK_INVALID_LENGTH = component("commands.nick.invalid-length");
         // PlayerInfo
         PLAYERINFO_ONLINE = string("commands.playerinfo.online");
         PLAYERINFO_OFFLINE = string("commands.playerinfo.offline");

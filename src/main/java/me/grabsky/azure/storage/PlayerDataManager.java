@@ -25,7 +25,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 // TO-DO: Make sure to properly INVALIDATE/UNLOAD expired data in all relevant places.
-// Future TO-DO: Rewrite save task logic to be less hacky. Current approach does NOT scale properly.
+// Future TO-DO: Rewrite save task logic to be less hacky. Current approach is not very scalable.
 public class PlayerDataManager implements PlayerDataAPI {
     private final Azure instance;
     private final ConsoleLogger consoleLogger;

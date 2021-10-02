@@ -61,7 +61,7 @@ public class SetHomeCommand extends BaseCommand {
                 AzureLang.send(sender, AzureLang.HOME_SET.replace("{id}", id));
                 return;
             }
-            AzureLang.send(sender, AzureLang.INVALID_CHARACTERS);
+            AzureLang.send(sender, AzureLang.HOME_INVALID_CHARACTERS);
             return;
         }
         AzureLang.send(sender, AzureLang.HOME_LIMIT_EXCEEDED);
