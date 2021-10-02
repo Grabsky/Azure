@@ -29,16 +29,6 @@ public class AzureLang extends AbstractLang {
     public static String TELEPORTED_PLAYER_TO_LOCATION;
     public static String PLAYER_TELEPORTED_TO_YOU;
     public static Component OUTSIDE_WORLD_BORDER;
-    // Teleport Request
-    public static String TELEPORT_REQUEST_SENT;
-    public static String TELEPORT_REQUEST_RECEIVED;
-    public static Component TELEPORT_REQUEST_ACCEPTED;
-    public static String TELEPORT_REQUEST_ACCEPTED_TARGET;
-    public static Component TELEPORT_REQUEST_DENIED;
-    public static String TELEPORT_REQUEST_DENIED_TARGET;
-    public static Component TELEPORT_REQUEST_ALREADY_SENT;
-    public static Component TELEPORT_REQUEST_NOT_FOUND;
-    public static Component TELEPORT_REQUEST_CANCELLED;
     // Private Message
     public static String PRIVATE_MESSAGE_FORMAT;
     public static Component NO_PLAYER_TO_REPLY;
@@ -117,15 +107,6 @@ public class AzureLang extends AbstractLang {
         TELEPORTED_PLAYER_TO_LOCATION = string("commands.teleport.teleported-player-to-location");
         PLAYER_TELEPORTED_TO_YOU = string("commands.teleport.player-teleported-to-you");
         OUTSIDE_WORLD_BORDER = component("commands.teleport.outside-world-border");
-        // Teleport Request
-        TELEPORT_REQUEST_SENT = string("commands.tprequest.request-sent");
-        TELEPORT_REQUEST_RECEIVED = string("commands.tprequest.request-received");
-        TELEPORT_REQUEST_ACCEPTED = component("commands.tprequest.request-accepted");
-        TELEPORT_REQUEST_DENIED = component("commands.tprequest.request-denied");
-        TELEPORT_REQUEST_DENIED_TARGET = string("commands.tprequest.request-denied-target");
-        TELEPORT_REQUEST_ALREADY_SENT = component("commands.tprequest.request-already-sent");
-        TELEPORT_REQUEST_NOT_FOUND = component("commands.tprequest.request-not-found");
-        TELEPORT_REQUEST_CANCELLED = component("commands.tprequest.request-cancelled");
         // Private Message
         PRIVATE_MESSAGE_FORMAT = string("commands.message.format");
         NO_PLAYER_TO_REPLY = component("commands.message.no-player-to-reply");

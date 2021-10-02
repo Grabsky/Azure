@@ -7,13 +7,15 @@ settings:
   # Configuration section for, basically, everything plugin saves to re-use after server restart.
   data:
     player-data:
+      # Defines whether country is fetched upon player join. This takes ~100ms and is run off the main thread.
+      fetch-country: false
       # How long should it take for offline player data to expire? In milliseconds.
       data-expires-after: 300000
       # Defines time interval between player data saves. In milliseconds.
       save-interval: 300000
 
   chat:
-    # Defines wether chat messages should be sent to Discord via webhook.
+    # Defines whether chat messages should be sent to Discord via webhook.
     webhook: false
     # Defines webhook URL.
     webhook-url: ''

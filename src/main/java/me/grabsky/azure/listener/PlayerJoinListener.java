@@ -5,11 +5,13 @@ import me.grabsky.azure.AzureKeys;
 import me.grabsky.azure.storage.PlayerDataManager;
 import me.grabsky.indigo.logger.ConsoleLogger;
 import me.grabsky.indigo.utils.Components;
+import me.grabsky.indigo.utils.Numbers;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -32,14 +34,15 @@ public class PlayerJoinListener implements Listener {
     @EventHandler
     public void onJoin(final PlayerJoinEvent event) {
         final Player player = event.getPlayer();
-        final String ip = player.getAddress().getHostString();
+        final String ip = player.getAddress().getHostString(); // This can NOT be null
         // Updating player's display name
         final PersistentDataContainer container = player.getPersistentDataContainer();
         if (container.has(AzureKeys.CUSTOM_NAME, PersistentDataType.STRING)) {
-            player.displayName(Components.parseAmpersand(container.get(AzureKeys.CUSTOM_NAME, PersistentDataType.STRING))); // Won't ever be null
+            player.displayName(Components.parseAmpersand(container.get(AzureKeys.CUSTOM_NAME, PersistentDataType.STRING))); // This can NOT be null
         }
         // Loading existing or creating new data for joined player
         data.createOrLoad(player).thenAcceptAsync((jsonPlayer) -> {
+            jsonPlayer.setExpiresAt(-1); // Making sure data will NOT be unloaded while player is online
             // Updating IP address if changed
             if (!ip.equals(jsonPlayer.getLastAddress())) {
                 jsonPlayer.setLastAddress(ip);
@@ -50,6 +53,13 @@ public class PlayerJoinListener implements Listener {
             }
             // Updating player's social spy mode
             jsonPlayer.setSocialSpy(container.getOrDefault(AzureKeys.SOCIAL_SPY, PersistentDataType.BYTE, (byte) 0) == (byte) 1);
+            // Updating player's homes limit
+            for (final PermissionAttachmentInfo pai : player.getEffectivePermissions()) {
+                final String permission = pai.getPermission();
+                if (permission.startsWith("azure.command.sethome.limit.")) {
+                    jsonPlayer.setHomesLimit((!permission.endsWith(".*") ? Numbers.parseInt(permission.substring(permission.length() - 1), 0) : -1));
+                }
+            }
         });
     }
 

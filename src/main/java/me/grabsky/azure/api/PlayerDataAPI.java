@@ -14,8 +14,7 @@ public interface PlayerDataAPI {
      * Asynchronously creates a new data file or loads existing.
      * @return CompletableFuture containing JsonPlayer object which can be null.
      */
-    @Nullable("This is null only if either file fails to be created or existing file is malformed.")
-    CompletableFuture<JsonPlayer> createOrLoad(@NotNull final Player player);
+    CompletableFuture<@Nullable("This is null only if either file fails to be created or existing file is malformed.") JsonPlayer> createOrLoad(@NotNull final Player player);
 
     /**
      * Returns true if data attached to specified UUID is currently in cache.

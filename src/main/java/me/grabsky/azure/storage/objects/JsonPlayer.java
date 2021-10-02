@@ -10,21 +10,24 @@ import java.util.Set;
 import java.util.UUID;
 
 public class JsonPlayer extends ExpirableData {
+    // Persistent
     @Expose private String country;
     @Expose private String lastAddress;
     @Expose private JsonLocation lastLocation;
     @Expose private final Map<String, JsonLocation> homes;
+    // Temporary
     private UUID lastRecipient;
     private boolean socialSpy;
+    private int homesLimit;
 
-    // This one is used for creating data for the first time
     public JsonPlayer(final String address, final String country, final JsonLocation lastLocation, final Map<String, JsonLocation> homes) {
-        this.country = country;
         this.lastAddress = address;
+        this.country = country;
         this.lastLocation = lastLocation;
         this.homes = homes;
-        this.lastLocation = null;
+        this.lastRecipient = null;
         this.socialSpy = false;
+        this.homesLimit = 0;
     }
 
     // Returns player's country
@@ -48,12 +51,12 @@ public class JsonPlayer extends ExpirableData {
     }
 
     // Returns true if player has home with specified ID
-    public boolean hasHome(final String id) {
+    public boolean hasHome(@NotNull final String id) {
         return this.homes.containsKey(id);
     }
 
     // Returns home with specified ID
-    public Location getHome(final String id) {
+    public Location getHome(@NotNull final String id) {
         return this.homes.get(id).toLocation();
     }
 
@@ -63,6 +66,10 @@ public class JsonPlayer extends ExpirableData {
 
     public boolean getSocialSpy() {
         return this.socialSpy;
+    }
+
+    public int getHomesLimit() {
+        return homesLimit;
     }
 
     // Updates player's last IP address
@@ -84,18 +91,23 @@ public class JsonPlayer extends ExpirableData {
     public void setHome(@NotNull final String name, @Nullable final Location location) {
         if (location != null) {
             homes.put(name, new JsonLocation(location));
-        } else {
-            homes.remove(name);
+            return;
         }
+        homes.remove(name);
     }
 
     // Updates player's last recipient
-    public void setLastRecipient(final UUID uuid) {
+    public void setLastRecipient(@NotNull final UUID uuid) {
         this.lastRecipient = uuid;
     }
 
     // Updates player's social spy mode
     public void setSocialSpy(final boolean mode) {
         this.socialSpy = mode;
+    }
+
+    // Updates player's home limit
+    public void setHomesLimit(final int limit) {
+        this.homesLimit = limit;
     }
 }

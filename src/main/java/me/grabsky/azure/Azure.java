@@ -70,6 +70,10 @@ public class Azure extends JavaPlugin {
         // Initializing DataManager
         this.dataManager = new PlayerDataManager(this);
         this.playerDataSaveTaskId = dataManager.runSaveTask();
+        // DEBUG: Loading data of online players after server reload
+        if (AzureConfig.DEBUG && Bukkit.getOnlinePlayers().size() > 0) {
+            dataManager.loadDataOfOnlinePlayers();
+        }
         // Registering commands
         final CommandManager commands = new CommandManager(this);
         commands.register(

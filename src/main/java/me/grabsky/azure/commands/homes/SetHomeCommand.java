@@ -55,7 +55,7 @@ public class SetHomeCommand extends BaseCommand {
     public void onHomeSet(CommandSender sender, String id) {
         final Player executor = (Player) sender;
         final JsonPlayer jsonPlayer = data.getOnlineData(executor);
-        if (jsonPlayer.getHomes().size() < 10) {
+        if (jsonPlayer.getHomesLimit() == -1 || jsonPlayer.getHomes().size() < jsonPlayer.getHomesLimit()) {
             if (id.matches("[a-zA-Z0-9_-]+")) {
                 jsonPlayer.setHome(id, executor.getLocation());
                 AzureLang.send(sender, AzureLang.HOME_SET.replace("{id}", id));

@@ -13,10 +13,12 @@ import java.util.Map;
 public class AzureConfig {
     private final Azure instance;
     private final ConsoleLogger consoleLogger;
+    private final File file;
 
     public static boolean DEBUG;
 
     // Disclaimer: All interval/time values are converted to final-usage unit.
+    public static boolean FETCH_COUNTRY;
     public static long PLAYER_DATA_SAVE_INTERVAL;
     public static long PLAYER_DATA_EXPIRES_AFTER;
 
@@ -28,12 +30,12 @@ public class AzureConfig {
     public AzureConfig(Azure instance) {
         this.instance = instance;
         this.consoleLogger = instance.getConsoleLogger();
+        this.file = new File(instance.getDataFolder() + File.separator + "config.yml");
     }
 
     // Reloads translations
     public void reload() {
         // Saving default config
-        File file = new File(instance.getDataFolder() + File.separator + "config.yml");
         if(!file.exists()) {
             instance.saveResource("config.yml", false);
         }
@@ -42,8 +44,9 @@ public class AzureConfig {
         if (fc.getInt("version") != 1) {
             consoleLogger.error(Global.OUTDATED_CONFIG);
         }
-        DEBUG = fc.getBoolean("settings.debug", false);
+        DEBUG = fc.getBoolean("debug", false);
         // Data
+        FETCH_COUNTRY = fc.getBoolean("settings.data.player-data.fetch-contry", false);
         PLAYER_DATA_SAVE_INTERVAL = fc.getLong("settings.data.player-data.save-interval", 300000); // No conversion needed
         PLAYER_DATA_EXPIRES_AFTER = fc.getLong("settings.data.player-data.data-expires-after", 300000); // No conversion needed
         // Chat
