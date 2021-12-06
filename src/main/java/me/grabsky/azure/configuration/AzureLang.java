@@ -58,6 +58,10 @@ public class AzureLang extends AbstractLang {
     public static Component HOME_LIMIT_EXCEEDED;
     public static Component HOME_INVALID_CHARACTERS;
     public static String HOME_DELETED;
+    public static Component HOMES_LIST;
+    public static Component CLICK_TO_TELEPORT;
+    public static Component YOU_HAVE_NO_HOMES;
+    public static Component PLAYER_HAS_NO_HOMES;
     // Heal
     public static Component YOU_HAVE_BEEN_HEALED;
     public static String PLAYER_HAS_BEEN_HEALED;
@@ -142,6 +146,10 @@ public class AzureLang extends AbstractLang {
         HOME_INVALID_CHARACTERS = component("commands.sethome.invalid-characters");
         HOME_LIMIT_EXCEEDED = component("commands.sethome.home-limit-exceeded");
         HOME_DELETED = string("commands.delhome.home-deleted");
+        HOMES_LIST = component("commands.homes.list");
+        CLICK_TO_TELEPORT = component("commands.homes.click-to-teleport");
+        YOU_HAVE_NO_HOMES = component("commands.homes.you-have-no-homes");
+        PLAYER_HAS_NO_HOMES = component("commands.homes.player-has-no-homes");
         // Heal
         YOU_HAVE_BEEN_HEALED = component("commands.heal.you-have-been-healed");
         PLAYER_HAS_BEEN_HEALED = string("commands.heal.player-has-been-healed");

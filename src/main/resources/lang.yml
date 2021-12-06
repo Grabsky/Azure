@@ -74,6 +74,12 @@ commands:
   delhome:
     home-deleted: '6§lS§e§lD§8 » §7Dom §e{id}§7 został usunięty.'
 
+  homes:
+    list: '§6§lS§e§lD§8 » §7Domy: §7'
+    click-to-teleport: '§7Kliknij, aby się teleportować.'
+    you-have-no-homes: '§6§lS§e§lD§8 » §cNie posiadasz żadnego domu.'
+    player-has-no-homes: '§6§lS§e§lD§8 » §cTen gracz nie posiada żadnego domu.'
+
   heal:
     you-have-been-healed: '§6§lS§e§lD§8 » §7Zostałeś uleczony.'
     player-has-been-healed: '§6§lS§e§lD§8 » §7Gracz §e{player}§7 został uleczony.'

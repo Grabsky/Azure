@@ -1,7 +1,6 @@
 name: Azure
 version: ${project.version}
 main: me.grabsky.azure.Azure
-api-version: 1.17
+api-version: 1.18
 authors: [Grabsky]
 depend: [Indigo, LuckPerms]
-softdepend: [Vault]

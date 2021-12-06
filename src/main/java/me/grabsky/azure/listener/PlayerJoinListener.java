@@ -57,7 +57,8 @@ public class PlayerJoinListener implements Listener {
             for (final PermissionAttachmentInfo pai : player.getEffectivePermissions()) {
                 final String permission = pai.getPermission();
                 if (permission.startsWith("azure.command.sethome.limit.")) {
-                    jsonPlayer.setHomesLimit((!permission.endsWith(".*") ? Numbers.parseInt(permission.substring(permission.length() - 1), 0) : -1));
+                    final String[] splitPermission = permission.split("\\.");
+                    jsonPlayer.setHomesLimit((!permission.endsWith(".*") ? Numbers.parseInt(splitPermission[splitPermission.length - 1], 0) : -1));
                 }
             }
         });

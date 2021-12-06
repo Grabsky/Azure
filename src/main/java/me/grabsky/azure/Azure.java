@@ -6,6 +6,7 @@ import me.grabsky.azure.api.PlayerDataAPI;
 import me.grabsky.azure.commands.*;
 import me.grabsky.azure.commands.homes.DelHomeCommand;
 import me.grabsky.azure.commands.homes.HomeCommand;
+import me.grabsky.azure.commands.homes.HomesCommand;
 import me.grabsky.azure.commands.homes.SetHomeCommand;
 import me.grabsky.azure.commands.messages.MessageCommand;
 import me.grabsky.azure.commands.messages.ReplyCommand;
@@ -73,6 +74,7 @@ public class Azure extends JavaPlugin {
         // DEBUG: Loading data of online players after server reload
         if (AzureConfig.DEBUG && Bukkit.getOnlinePlayers().size() > 0) {
             dataManager.loadDataOfOnlinePlayers();
+            consoleLogger.error("Reloading server with players online is NOT supported and will result in UNEXPECTED BUGS and/or DATA LOSS even with debug mode enabled. Please don't use /reload and restart your server instead.");
         }
         // Registering commands
         final CommandManager commands = new CommandManager(this);
@@ -91,6 +93,7 @@ public class Azure extends JavaPlugin {
                 new HomeCommand(this),
                 new SetHomeCommand(this),
                 new DelHomeCommand(this),
+                new HomesCommand(this),
                 new HealCommand(this),
                 new FeedCommand(this),
                 new SpeedCommand(this),
