@@ -1,6 +1,6 @@
 name: Azure
 version: 1.0-SNAPSHOT
-main: me.grabsky.azure.Azure
+main: me.grabsky.indigo.Azure
 api-version: 1.18
 authors: [Grabsky]
-depend: [Indigo, LuckPerms]
+depend: [Indigo]
