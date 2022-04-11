@@ -5,30 +5,30 @@ import me.grabsky.azure.commands.WorldsCommand
 import me.grabsky.azure.configuration.AzureConfig
 import me.grabsky.azure.configuration.AzureLocale
 import me.grabsky.azure.listeners.ChatListener
-import me.grabsky.indigo.KotlinPlugin
+import me.grabsky.indigo.ServerPlugin
 import me.grabsky.indigo.api.commands.CommandManager
 import me.grabsky.indigo.api.config.ConfigManager
+import me.grabsky.indigo.api.config.NotAnObjectException
 import me.grabsky.indigo.api.logger.ConsoleLogger
-import me.grabsky.indigo.utils.operationTime
+import me.grabsky.libs.configurate.serialize.SerializationException
 import java.io.File
+import kotlin.system.measureTimeMillis
 
-class Azure : KotlinPlugin() {
+object AzureProvider {
+    internal lateinit var INS: Azure
+}
+
+class Azure : ServerPlugin() {
     override lateinit var consoleLogger: ConsoleLogger
-
-    companion object {
-        // This is Azure plugin instance (for internal use)
-        internal lateinit var INS: Azure
-            private set
-    }
 
     private lateinit var configManager: ConfigManager
     private lateinit var commandManager: CommandManager
 
     override fun onEnable() {
         super.onEnable()
-        val time = operationTime(func = {
+        val time = measureTimeMillis {
             // Creating an instance of main class
-            Azure.INS = this
+            AzureProvider.INS = this
             // Setting up loggers
             this.consoleLogger = ConsoleLogger(this)
             // Setting up configuration files
@@ -44,24 +44,46 @@ class Azure : KotlinPlugin() {
             )
             // Registering events
             this.server.pluginManager.registerEvents(ChatListener(), this)
-        })
+        }
     }
 
     override fun onDisable() {
         super.onDisable()
-        val time = operationTime(func = {
-            // Currently there is no disable logic
-        })
+        val time = measureTimeMillis {
+            // Running disable logic
+        }
     }
 
-    override fun onReload(): Boolean {
-        return this.reloadPluginConfiguration()
+    override fun onReload() {
+        super.onDisable()
+        val time = measureTimeMillis {
+            // Running reload logic
+            this.reloadPluginConfiguration()
+        }
     }
 
     // Reloads configuration files
     internal fun reloadPluginConfiguration(): Boolean {
-        configManager.reload(AzureConfig::class, File("${dataFolder}${File.separator}config.conf"))
-        configManager.reload(AzureLocale::class, File("${dataFolder}${File.separator}locale.conf"))
-        return true
+        var errorOccurred = false
+        // Creating a list of configurations available for this plugin
+        val configurations = arrayOf(
+            AzureConfig::class to File(dataFolder, "config.conf"),
+            AzureLocale::class to File(dataFolder, "locale.conf"),
+        )
+        // Iterating over configurations and trying to load them
+        configurations.forEach {
+            try {
+                configManager.reload(it.first, it.second)
+            } catch (e: NotAnObjectException) {
+                errorOccurred = true
+                consoleLogger.error("An error occured while trying to load '${it.second.name}' configuration file:")
+                consoleLogger.error("  ${e.message}")
+            } catch (e: SerializationException) {
+                errorOccurred = true
+                consoleLogger.error("An error occured while trying to load '${it.second.name}' configuration file:")
+                consoleLogger.error("  ${e.message}")
+            }
+        }
+        return errorOccurred
     }
 }
