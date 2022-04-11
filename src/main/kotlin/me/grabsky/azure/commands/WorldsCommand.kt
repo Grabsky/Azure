@@ -4,20 +4,24 @@ import me.grabsky.azure.Azure
 import me.grabsky.azure.configuration.AzureLocale
 import me.grabsky.indigo.configuration.GlobalLocale
 import me.grabsky.indigo.extensions.sendMessageOrIgnore
+import me.grabsky.indigo.utils.NamespacedKeys
 import me.grabsky.indigo.utils.Placeholders
 import me.grabsky.indigo.utils.TWO_DECIMAL_PLACE
-import me.grabsky.indigo.utils.operationTime
 import me.grabsky.libs.lamp.annotation.*
 import me.grabsky.libs.lamp.bukkit.annotation.CommandPermission
 import me.grabsky.libs.lamp.help.CommandHelp
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
+import org.bukkit.Bukkit
 import org.bukkit.World
 import org.bukkit.WorldCreator
 import org.bukkit.WorldType
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import java.io.File
+import kotlin.system.measureTimeMillis
+
+val WORLD_AUTOLOAD = NamespacedKeys.of("azure:autoload")
 
 @Command("worlds")
 @CommandPermission("azure.command.worlds")
@@ -30,19 +34,27 @@ class WorldsCommand(private val azure: Azure) {
         sender.sendMessageOrIgnore(GlobalLocale.COMMAND_USAGE_DIVIDER)
     }
 
-    @Subcommand("teleport")
-    @CommandPermission("azure.command.worlds.teleport")
-    @Usage("<world>")
-    fun onWorldTeleport(sender: Player, world: World) {
+    @Subcommand("spawn")
+    @CommandPermission("azure.command.worlds.spawn")
+    @Usage("[world]")
+    fun onWorldSpawn(sender: Player, @Default("self") world: World) {
+        Bukkit.unloadWorld(world, false)
         sender.teleport(world.spawnLocation)
         sender.sendMessageOrIgnore(AzureLocale.WORLD_TELEPORTED, Placeholders.BADGE_SUCCESS, Placeholder.unparsed("world", world.name))
     }
 
+    @Subcommand("setspawn")
+    @CommandPermission("azure.command.worlds.setspawn")
+    fun onWorldSetSpawn(sender: Player) {
+        sender.world.spawnLocation = sender.location
+        sender.sendMessageOrIgnore(AzureLocale.WORLD_SPAWN_SET)
+    }
+
     @Subcommand("create")
     @CommandPermission("azure.command.worlds.create")
-    @Usage("<name> <type> <env> [seed]")
-    fun onWorldCreate(sender: CommandSender, name: String, worldType: WorldType?, environment: World.Environment?, @Optional seed: Long?) {
-        if (azure.server.worlds.firstOrNull { it.name == name } == null) {
+    @Usage("<name> <type> <env> [seed] [-autoload]")
+    fun onWorldCreate(sender: CommandSender, name: String, worldType: WorldType?, environment: World.Environment?, @Optional seed: Long?, @Flag autoload: Boolean?) {
+        if (azure.server.worldContainer.list()?.contains(name) == false) {
             // Configuring WorldCreated
             val worldCreator = WorldCreator(name)
                 .type(worldType ?: WorldType.NORMAL)
@@ -60,26 +72,12 @@ class WorldsCommand(private val azure: Azure) {
         sender.sendMessageOrIgnore(text = AzureLocale.WORLD_ALREADY_EXISTS, Placeholders.BADGE_ERROR, Placeholder.unparsed("world", name))
     }
 
-    @Subcommand("backup")
-    @CommandPermission("azure.command.worlds.backup")
-    @Usage("<world> [-save]")
-    fun onWorldBackup(sender: CommandSender, world: World, @Switch("save", defaultValue = false) save: Boolean) {
-        // Saving world if applicable
-        if (save) world.save()
-        // TO-DO: Archive the world folder and then back it up
-        // TO-DO: Add missing locale nodes
-        world.worldFolder.copyTo(File("/backups/${world.name}_${System.currentTimeMillis()}"))
-        sender.sendMessageOrIgnore(text = AzureLocale.WORLD_BACKED_UP, Placeholders.BADGE_SUCCESS, Placeholder.unparsed("world", world.name))
-    }
-
     @Subcommand("save")
     @CommandPermission("azure.command.worlds.save")
     @Usage("<world>")
     fun onWorldSave(sender: CommandSender, world: World) {
-        val time = operationTime({
-            world.save()
-        })
-        sender.sendMessageOrIgnore(text = AzureLocale.WORLD_SAVED, Placeholders.BADGE_SUCCESS, Placeholder.unparsed("world", world.name), Placeholder.unparsed("time", TWO_DECIMAL_PLACE.format(time)))
+        val saveOperationTime = measureTimeMillis { world.save() }
+        sender.sendMessageOrIgnore(text = AzureLocale.WORLD_SAVED, Placeholders.BADGE_SUCCESS, Placeholder.unparsed("world", world.name), Placeholder.unparsed("time", TWO_DECIMAL_PLACE.format(saveOperationTime)))
     }
 
     @Subcommand("delete")
@@ -87,7 +85,9 @@ class WorldsCommand(private val azure: Azure) {
     @Usage("<world> [-confirm]")
     fun onWorldDelete(sender: CommandSender, world: World, @Optional @Switch("confirm") confirm: Boolean?) {
         if (confirm != null && confirm) {
-            // TO-DO: Logic
+            azure.server.unloadWorld(world, false)
+            val worldDir = File(azure.server.worldContainer, world.name)
+            worldDir.walk().forEach(::println)
             return
         }
         sender.sendMessageOrIgnore(text = AzureLocale.WORLD_DELETE_CONFIRM, Placeholders.BADGE_ERROR, Placeholder.unparsed("world", world.name))
