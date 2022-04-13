@@ -2,9 +2,9 @@ package me.grabsky.azure.commands
 
 import me.grabsky.azure.Azure
 import me.grabsky.azure.configuration.AzureLocale
+import me.grabsky.indigo.api.utils.NamespacedKeys
 import me.grabsky.indigo.configuration.GlobalLocale
 import me.grabsky.indigo.extensions.sendMessageOrIgnore
-import me.grabsky.indigo.utils.NamespacedKeys
 import me.grabsky.indigo.utils.Placeholders
 import me.grabsky.indigo.utils.TWO_DECIMAL_PLACE
 import me.grabsky.libs.lamp.annotation.*
