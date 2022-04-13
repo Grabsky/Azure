@@ -39,4 +39,10 @@ object AzureLocale {
     var EDITOR_ITEM_LORE_UPDATED: Component? = null
     @ConfigPath("commands.editor.item-lore-reset")
     var EDITOR_ITEM_LORE_RESET: Component? = null
+    @ConfigPath("commands.editor.enchant-added")
+    var EDITOR_ITEM_ENCHANT_ADDED: String? = null
+    @ConfigPath("commands.editor.enchant-removed")
+    var EDITOR_ITEM_ENCHANT_REMOVED: String? = null
+    @ConfigPath("commands.editor.enchant-reset")
+    var EDITOR_ITEM_ENCHANT_RESET: Component? = null
 }
