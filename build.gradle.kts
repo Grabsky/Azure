@@ -27,7 +27,6 @@ dependencies {
     // Dependencies
     compileOnly(files(buildsDirectory + File.separator + "Indigo.jar"))
     compileOnly("net.luckperms", "api", "5.4")
-
 }
 
 tasks {
