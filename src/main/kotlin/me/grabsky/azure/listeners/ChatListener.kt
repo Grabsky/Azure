@@ -5,10 +5,13 @@ import io.papermc.paper.event.player.AsyncChatEvent
 import me.grabsky.azure.configuration.AzureConfig
 import me.grabsky.azure.configuration.AzureLocale
 import me.grabsky.indigo.extensions.sendMessageOrIgnore
-import me.grabsky.indigo.utils.parseComponent
+import me.grabsky.indigo.extensions.style
+import me.grabsky.indigo.extensions.toPlainString
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
+import net.kyori.adventure.text.minimessage.tag.standard.StandardTags
 import net.luckperms.api.LuckPermsProvider
 import org.bukkit.command.ConsoleCommandSender
 import org.bukkit.entity.Player
@@ -16,18 +19,39 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import java.util.*
 
-val luckPerms = LuckPermsProvider.get()
-
-// TO-DO: Generate LP group resolvers dynamically
-class GameChatRenderer : ChatRenderer {
-    override fun render(source: Player, sourceDisplayName: Component, message: Component, viewer: Audience): Component {
-        if (viewer !is ConsoleCommandSender) {
-            return parseComponent(text = AzureConfig.CHAT_FORMAT_DEFAULT,
-                Placeholder.unparsed("playername", source.name),
-                // Placeholder.unparsed("group", luckPerms)
-            ).append(message)
+object GameChatRenderer : ChatRenderer {
+    private val luckPerms = LuckPermsProvider.get()
+    private val richMessageParser = MiniMessage.builder()
+        .editTags {
+            it.resolver(StandardTags.color())
+            it.resolver(StandardTags.decorations())
+            it.resolver(StandardTags.gradient())
+            it.resolver(StandardTags.rainbow())
         }
-        return Component.text("//")
+        .build()
+    private val consoleFormatParser = MiniMessage.builder()
+        .editTags { it.resolver(StandardTags.insertion()) }
+        .build()
+
+    override fun render(source: Player, sourceDisplayName: Component, message: Component, viewer: Audience): Component {
+        val group = luckPerms.userManager.getUser(source.uniqueId)?.primaryGroup ?: "default"
+        // PLAYERS
+        if (viewer !is ConsoleCommandSender) {
+            val chatFormat = AzureConfig.CHAT_FORMATS?.get(group) ?: AzureConfig.CHAT_FORMAT_FALLBACK!!
+            val finalMessage = if (source.hasPermission("azure.plugin.chat.richformat")) richMessageParser.deserialize(message.toPlainString()) else message.style(null)
+            // Parsing & returning the format
+            return MiniMessage.miniMessage().deserialize(chatFormat,
+                Placeholder.unparsed("player", source.name),
+                Placeholder.component("message", finalMessage)
+            )
+        }
+        // CONSOLE
+        return consoleFormatParser.deserialize(
+            AzureConfig.CHAT_FORMAT_CONSOLE!!,
+            Placeholder.unparsed("group", group.replaceFirstChar { it.uppercase() }),
+            Placeholder.unparsed("player", source.name),
+            Placeholder.unparsed("message", MiniMessage.miniMessage().stripTags(message.toPlainString()))
+        )
     }
 }
 
@@ -44,6 +68,8 @@ class ChatListener : Listener {
         }
         cooldowns[event.player.uniqueId] = System.currentTimeMillis()
         // Setting the renderer
-        // event.renderer(GameChatRenderer)
+        val time = System.nanoTime()
+        val c = GameChatRenderer.render(event.player, event.player.displayName(), event.message(), Audience.empty())
+        println("Operation took ${(System.nanoTime() - time) / 1000000f}ms")
     }
 }
