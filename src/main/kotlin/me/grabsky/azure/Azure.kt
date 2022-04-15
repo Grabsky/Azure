@@ -13,55 +13,48 @@ import me.grabsky.indigo.api.config.NotAnObjectException
 import me.grabsky.indigo.api.logger.ConsoleLogger
 import me.grabsky.libs.configurate.serialize.SerializationException
 import java.io.File
-import kotlin.system.measureTimeMillis
 
 object AzureProvider {
     internal lateinit var INS: Azure
 }
 
 class Azure : ServerPlugin() {
-    override lateinit var consoleLogger: ConsoleLogger
+    /* ServerPlugin */ override lateinit var consoleLogger: ConsoleLogger
 
     private lateinit var configManager: ConfigManager
     private lateinit var commandManager: CommandManager
 
     override fun onEnable() {
         super.onEnable()
-        val time = measureTimeMillis {
-            // Creating an instance of main class
-            AzureProvider.INS = this
-            // Setting up loggers
-            this.consoleLogger = ConsoleLogger(this)
-            // Setting up configuration files
-            this.configManager = ConfigManager(this)
-            this.reloadPluginConfiguration()
-            // Setting up CommandManager
-            this.commandManager = CommandManager(this)
-            // Registering commands
-            this.commandManager.registerCommands(
-                AzureCommand(this),
-                WorldsCommand(this),
-                EditorCommand(),
-                useBrigadier = true
-            )
-            // Registering events
-            this.server.pluginManager.registerEvents(ChatListener(), this)
-        }
+        // Creating an instance of main class
+        AzureProvider.INS = this
+        // Setting up loggers
+        this.consoleLogger = ConsoleLogger(this)
+        // Setting up configuration files
+        this.configManager = ConfigManager(this)
+        this.reloadPluginConfiguration()
+        // Setting up CommandManager
+        this.commandManager = CommandManager(this)
+        // Registering commands
+        this.commandManager.registerCommands(
+            AzureCommand(this),
+            WorldsCommand(this),
+            EditorCommand(),
+            useBrigadier = true
+        )
+        // Registering events
+        this.server.pluginManager.registerEvents(ChatListener(), this)
     }
 
     override fun onDisable() {
         super.onDisable()
-        val time = measureTimeMillis {
-            // Running disable logic
-        }
+        // DISABLE LOGIC
     }
 
     override fun onReload() {
         super.onDisable()
-        val time = measureTimeMillis {
-            // Running reload logic
-            this.reloadPluginConfiguration()
-        }
+        // Reloading plugin configuration
+        this.reloadPluginConfiguration()
     }
 
     // Reloads configuration files
@@ -86,6 +79,6 @@ class Azure : ServerPlugin() {
                 consoleLogger.error("  ${e.message}")
             }
         }
-        return errorOccurred
+        return !errorOccurred
     }
 }
