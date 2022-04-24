@@ -1,4 +1,4 @@
-val buildsDirectory = "${System.getenv("IDEA_WORKSPACE")}/builds"
+val buildsDirectory = "${System.getenv("DEVELOPMENT_DIR")}/builds"
 
 group = "me.grabsky"
 version = "1.0-SNAPSHOT"
@@ -6,8 +6,8 @@ description = "Azure"
 
 plugins {
     id("java-library")
-    id("org.jetbrains.kotlin.jvm") version "1.6.20"
-    id("io.papermc.paperweight.userdev") version "1.3.5"
+    id("org.jetbrains.kotlin.jvm") version "1.6.21"
+    id("io.papermc.paperweight.userdev") version "1.3.6"
 }
 
 repositories {
@@ -17,9 +17,9 @@ repositories {
 
 dependencies {
     // Kotlin (required)
-    compileOnly("org.jetbrains.kotlin", "kotlin-stdlib-jdk8", "1.6.20")
+    compileOnly("org.jetbrains.kotlin", "kotlin-stdlib-jdk8", "1.6.21")
     // Kotlin (optional)
-    compileOnly("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "1.6.0")
+    compileOnly("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "1.6.1")
     compileOnly("org.jetbrains.kotlinx", "kotlinx-serialization-core", "1.3.2")
     compileOnly("org.jetbrains.kotlinx", "kotlinx-serialization-json", "1.3.2")
     // Paper (mojang mapped)
