@@ -3,8 +3,8 @@ package me.grabsky.azure
 import me.grabsky.azure.commands.AzureCommand
 import me.grabsky.azure.commands.EditorCommand
 import me.grabsky.azure.commands.WorldsCommand
-import me.grabsky.azure.configuration.AzureConfig
-import me.grabsky.azure.configuration.AzureLocale
+import me.grabsky.azure.configuration.Config
+import me.grabsky.azure.configuration.Locale
 import me.grabsky.azure.listeners.ChatListener
 import me.grabsky.indigo.ServerPlugin
 import me.grabsky.indigo.api.commands.CommandManager
@@ -62,8 +62,8 @@ class Azure : ServerPlugin() {
         var errorOccurred = false
         // Creating a list of configurations available for this plugin
         val configurations = arrayOf(
-            AzureConfig::class to File(dataFolder, "config.conf"),
-            AzureLocale::class to File(dataFolder, "locale.conf"),
+            Config::class to File(dataFolder, "config.conf"),
+            Locale::class to File(dataFolder, "locale.conf"),
         )
         // Iterating over configurations and trying to load them
         configurations.forEach {

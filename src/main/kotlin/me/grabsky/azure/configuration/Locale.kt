@@ -3,7 +3,7 @@ package me.grabsky.azure.configuration
 import me.grabsky.indigo.api.config.annotations.ConfigPath
 import net.kyori.adventure.text.Component
 
-object AzureLocale {
+internal object Locale {
     // Chat
     @ConfigPath("chat.chat-cooldown")
     var CHAT_COOLDOWN: Component? = null

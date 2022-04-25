@@ -2,7 +2,7 @@ package me.grabsky.azure.configuration
 
 import me.grabsky.indigo.api.config.annotations.ConfigPath
 
-object AzureConfig {
+internal object Config {
     @ConfigPath("settings.chat.console-format")
     var CHAT_FORMAT_CONSOLE: String? = null
     @ConfigPath("settings.chat.fallback-format")

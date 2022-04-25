@@ -2,8 +2,8 @@ package me.grabsky.azure.listeners
 
 import io.papermc.paper.chat.ChatRenderer
 import io.papermc.paper.event.player.AsyncChatEvent
-import me.grabsky.azure.configuration.AzureConfig
-import me.grabsky.azure.configuration.AzureLocale
+import me.grabsky.azure.configuration.Config
+import me.grabsky.azure.configuration.Locale
 import me.grabsky.indigo.extensions.sendMessageOrIgnore
 import me.grabsky.indigo.extensions.style
 import me.grabsky.indigo.extensions.toPlainString
@@ -37,7 +37,7 @@ object GameChatRenderer : ChatRenderer {
         val group = luckPerms.userManager.getUser(source.uniqueId)?.primaryGroup ?: "default"
         // PLAYERS
         if (viewer !is ConsoleCommandSender) {
-            val chatFormat = AzureConfig.CHAT_FORMATS?.get(group) ?: AzureConfig.CHAT_FORMAT_FALLBACK!!
+            val chatFormat = Config.CHAT_FORMATS?.get(group) ?: Config.CHAT_FORMAT_FALLBACK!!
             val finalMessage = if (source.hasPermission("azure.plugin.chat.richformat")) richMessageParser.deserialize(message.toPlainString()) else message.style(null)
             // Parsing & returning the format
             return MiniMessage.miniMessage().deserialize(chatFormat,
@@ -47,7 +47,7 @@ object GameChatRenderer : ChatRenderer {
         }
         // CONSOLE
         return consoleFormatParser.deserialize(
-            AzureConfig.CHAT_FORMAT_CONSOLE!!,
+            Config.CHAT_FORMAT_CONSOLE!!,
             Placeholder.unparsed("group", group.replaceFirstChar { it.uppercase() }),
             Placeholder.unparsed("player", source.name),
             Placeholder.unparsed("message", MiniMessage.miniMessage().stripTags(message.toPlainString()))
@@ -63,7 +63,7 @@ class ChatListener : Listener {
         // Checking for cooldown
         if (cooldowns[event.player.uniqueId] != null && System.currentTimeMillis() - cooldowns[event.player.uniqueId]!! < 1000) {
             event.isCancelled = true
-            event.player.sendMessageOrIgnore(AzureLocale.CHAT_COOLDOWN)
+            event.player.sendMessageOrIgnore(Locale.CHAT_COOLDOWN)
             return
         }
         cooldowns[event.player.uniqueId] = System.currentTimeMillis()

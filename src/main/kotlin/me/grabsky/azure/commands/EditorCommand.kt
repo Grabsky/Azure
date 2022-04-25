@@ -1,6 +1,6 @@
 package me.grabsky.azure.commands
 
-import me.grabsky.azure.configuration.AzureLocale
+import me.grabsky.azure.configuration.Locale
 import me.grabsky.indigo.configuration.GlobalLocale
 import me.grabsky.indigo.extensions.clearEnchantments
 import me.grabsky.indigo.extensions.sendMessageOrIgnore
@@ -28,7 +28,7 @@ private val parser = MiniMessage.builder()
 
 private val COMPONENT_WITH_NO_ITALIC = Component.empty().decoration(TextDecoration.ITALIC, false)
 
-@Command("editor", "ed")
+@Command("editor")
 @CommandPermission("azure.command.editor")
 class EditorCommand {
 
@@ -43,7 +43,6 @@ class EditorCommand {
     // Editor => Name
     @Subcommand("name")
     @CommandPermission("azure.command.editor.name")
-    @Usage("[name]")
     fun onEditorName(sender: Player, @Optional name: String?) {
         // Ignoring if player has no item in hand
         if (sender.inventory.itemInMainHand.type == Material.AIR) {
@@ -54,11 +53,11 @@ class EditorCommand {
         sender.inventory.itemInMainHand.editMeta {
             if (name != null) {
                 it.displayName(COMPONENT_WITH_NO_ITALIC.append(parser.deserialize(name)))
-                sender.sendMessageOrIgnore(AzureLocale.EDITOR_ITEM_NAME_UPDATED)
+                sender.sendMessageOrIgnore(Locale.EDITOR_ITEM_NAME_UPDATED)
                 return@editMeta
             }
             it.displayName(null)
-            sender.sendMessageOrIgnore(AzureLocale.EDITOR_ITEM_NAME_RESET)
+            sender.sendMessageOrIgnore(Locale.EDITOR_ITEM_NAME_RESET)
             return@editMeta
         }
     }
@@ -87,7 +86,7 @@ class EditorCommand {
             sender.inventory.itemInMainHand.editMeta {
                 val parsedLine = COMPONENT_WITH_NO_ITALIC.append(parser.deserialize(text))
                 it.lore((it.lore() ?: arrayListOf<Component>()) + parsedLine)
-                sender.sendMessageOrIgnore(AzureLocale.EDITOR_ITEM_LORE_UPDATED)
+                sender.sendMessageOrIgnore(Locale.EDITOR_ITEM_LORE_UPDATED)
                 return@editMeta
             }
         }
@@ -109,7 +108,7 @@ class EditorCommand {
             if ((it.lore()?.size ?: 0) >= line) {
                 val parsedLine = COMPONENT_WITH_NO_ITALIC.append(parser.deserialize(text))
                 it.lore((it.lore() ?: arrayListOf<Component>()) + parsedLine)
-                sender.sendMessageOrIgnore(AzureLocale.EDITOR_ITEM_LORE_UPDATED)
+                sender.sendMessageOrIgnore(Locale.EDITOR_ITEM_LORE_UPDATED)
                 return@editMeta
             }
             sender.sendMessageOrIgnore(GlobalLocale.COMMAND_NUMBER_NOT_IN_RANGE, Placeholder.unparsed("input", line.toString()), Placeholder.unparsed("min", "1"), Placeholder.unparsed("max", it.lore()?.size.toString()))
@@ -132,7 +131,7 @@ class EditorCommand {
         sender.inventory.itemInMainHand.editMeta {
             if ((it.lore()?.size ?: 0) >= line) {
                 it.lore(it.lore()!!.filterIndexed { index, _ -> index == (line - 1) })
-                sender.sendMessageOrIgnore(AzureLocale.EDITOR_ITEM_LORE_UPDATED)
+                sender.sendMessageOrIgnore(Locale.EDITOR_ITEM_LORE_UPDATED)
                 return@editMeta
             }
             sender.sendMessageOrIgnore(GlobalLocale.COMMAND_NUMBER_NOT_IN_RANGE, Placeholder.unparsed("input", line.toString()), Placeholder.unparsed("min", "1"), Placeholder.unparsed("max", it.lore()?.size.toString()))
@@ -152,7 +151,7 @@ class EditorCommand {
         // Editing ItemMeta
         sender.inventory.itemInMainHand.editMeta {
             it.lore(null)
-            sender.sendMessageOrIgnore(AzureLocale.EDITOR_ITEM_LORE_RESET)
+            sender.sendMessageOrIgnore(Locale.EDITOR_ITEM_LORE_RESET)
             return@editMeta
         }
     }
@@ -179,7 +178,7 @@ class EditorCommand {
         // Editing ItemMeta
         sender.inventory.itemInMainHand.editMeta {
             it.addEnchant(enchantment, level, true)
-            sender.sendMessageOrIgnore(AzureLocale.EDITOR_ITEM_ENCHANT_ADDED, Placeholder.unparsed("enchantment", enchantment.key.asString()))
+            sender.sendMessageOrIgnore(Locale.EDITOR_ITEM_ENCHANT_ADDED, Placeholder.unparsed("enchantment", enchantment.key.asString()))
         }
     }
 
@@ -196,7 +195,7 @@ class EditorCommand {
         // Editing ItemMeta
         sender.inventory.itemInMainHand.editMeta {
             it.removeEnchant(enchantment)
-            sender.sendMessageOrIgnore(AzureLocale.EDITOR_ITEM_ENCHANT_REMOVED, Placeholder.unparsed("enchantment", enchantment.key.asString()))
+            sender.sendMessageOrIgnore(Locale.EDITOR_ITEM_ENCHANT_REMOVED, Placeholder.unparsed("enchantment", enchantment.key.asString()))
         }
     }
 
@@ -212,7 +211,7 @@ class EditorCommand {
         // Editing ItemMeta
         sender.inventory.itemInMainHand.editMeta {
             it.clearEnchantments()
-            sender.sendMessageOrIgnore(AzureLocale.EDITOR_ITEM_ENCHANT_RESET)
+            sender.sendMessageOrIgnore(Locale.EDITOR_ITEM_ENCHANT_RESET)
         }
     }
 }
