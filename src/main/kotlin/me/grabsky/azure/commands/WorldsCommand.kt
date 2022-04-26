@@ -51,7 +51,7 @@ class WorldsCommand(private val azure: Azure) {
     @Subcommand("create")
     @CommandPermission("azure.command.worlds.create")
     @Usage("<name> <type> <env> [seed] [-autoload]")
-    fun onWorldCreate(sender: CommandSender, worldName: String, worldType: WorldType?, environment: World.Environment?, @Optional seed: Long?, @Optional autoload: Boolean?) {
+    fun onWorldCreate(sender: CommandSender, worldName: String, worldType: WorldType?, environment: World.Environment?, @Optional seed: Long?, @Switch("autoload") autoload: Boolean?) {
         if (azure.server.worldContainer.list()?.contains(worldName) == false || File(azure.server.worldContainer, worldName).isDirectory) {
             // Configuring WorldCreated
             val worldCreator = WorldCreator(worldName)
@@ -73,7 +73,6 @@ class WorldsCommand(private val azure: Azure) {
     @Subcommand("load")
     @CommandPermission("azure.command.worlds.create")
     @Usage("<world>")
-    @AutoComplete("@allworlds")
     fun onWorldLoad(sender: CommandSender, worldName: String) {
         if (azure.server.worldContainer.list()?.contains(worldName) == true && File(azure.server.worldContainer, worldName).isDirectory) {
             // Loading the world
@@ -96,7 +95,7 @@ class WorldsCommand(private val azure: Azure) {
     @CommandPermission("azure.command.worlds.delete")
     @Usage("<world> [-confirm]")
     fun onWorldDelete(sender: CommandSender, world: World, @Optional @Switch("confirm") confirm: Boolean?) {
-        if (confirm != null && confirm) {
+        if (confirm == true) {
             azure.server.unloadWorld(world, false)
             val worldDir = File(azure.server.worldContainer, world.name)
             worldDir.walk().forEach(::println)

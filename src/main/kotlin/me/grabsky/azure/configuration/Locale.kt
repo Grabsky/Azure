@@ -45,4 +45,18 @@ internal object Locale {
     var EDITOR_ITEM_ENCHANT_REMOVED: String? = null
     @ConfigPath("commands.editor.enchant-reset")
     var EDITOR_ITEM_ENCHANT_RESET: Component? = null
+
+    // Commands => Teleport
+    @ConfigPath("commands.teleport.teleported-to-player")
+    var TELEPORT_TELEPORTED_TO_PLAYER: String? = null
+    @ConfigPath("commands.teleport.teleported-to-location")
+    var TELEPORT_TELEPORTED_TO_LOCATION: String? = null
+    @ConfigPath("commands.teleport.teleported-player-to-player")
+    var TELEPORT_TELEPORTED_PLAYER_TO_PLAYER: String? = null
+    @ConfigPath("commands.teleport.teleported-player-to-location")
+    var TELEPORT_TELEPORTED_PLAYER_TO_LOCATION: String? = null
+    @ConfigPath("commands.teleport.player-teleported-to-you")
+    var TELEPORT_PLAYER_TELEPORTED_TO_YOU: String? = null
+    @ConfigPath("commands.teleport.outside-world-border")
+    var TELEPORT_OUTSIDE_WORLD_BORDER: Component? = null
 }

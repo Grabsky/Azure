@@ -2,6 +2,7 @@ package me.grabsky.azure
 
 import me.grabsky.azure.commands.AzureCommand
 import me.grabsky.azure.commands.EditorCommand
+import me.grabsky.azure.commands.TeleportCommands
 import me.grabsky.azure.commands.WorldsCommand
 import me.grabsky.azure.configuration.Config
 import me.grabsky.azure.configuration.Locale
@@ -40,6 +41,7 @@ class Azure : ServerPlugin() {
             AzureCommand(this),
             WorldsCommand(this),
             EditorCommand(),
+            TeleportCommands(),
             useBrigadier = true
         )
         // Registering events
