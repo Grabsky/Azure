@@ -1,7 +1,7 @@
 package me.grabsky.azure.commands
 
 import me.grabsky.azure.Azure
-import me.grabsky.indigo.configuration.GlobalLocale
+import me.grabsky.indigo.configuration.ServerLocale
 import me.grabsky.indigo.extensions.sendMessageOrIgnore
 import me.grabsky.libs.lamp.annotation.Command
 import me.grabsky.libs.lamp.annotation.Default
@@ -17,18 +17,18 @@ class AzureCommand(private val azure: Azure) {
 
     @Default
     fun onDefault(sender: CommandSender, commandHelp: CommandHelp<Component>) {
-        sender.sendMessageOrIgnore(GlobalLocale.COMMAND_USAGE_DIVIDER)
+        sender.sendMessageOrIgnore(ServerLocale.COMMAND_USAGE_DIVIDER)
         commandHelp.forEach { sender.sendMessage(it) }
-        sender.sendMessageOrIgnore(GlobalLocale.COMMAND_USAGE_DIVIDER)
+        sender.sendMessageOrIgnore(ServerLocale.COMMAND_USAGE_DIVIDER)
     }
 
     @Subcommand("reload")
     @CommandPermission("azure.command.azure.reload")
     fun onReload(sender: CommandSender) {
-        if (azure.reloadPluginConfiguration()) {
-            sender.sendMessageOrIgnore(GlobalLocale.RELOAD_SUCCES)
+        if (azure.reloadPlugin()) {
+            sender.sendMessageOrIgnore(ServerLocale.RELOAD_SUCCES)
             return
         }
-        sender.sendMessageOrIgnore(GlobalLocale.RELOAD_FAIL)
+        sender.sendMessageOrIgnore(ServerLocale.RELOAD_FAIL)
     }
 }

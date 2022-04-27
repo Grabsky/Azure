@@ -4,8 +4,8 @@ import me.grabsky.azure.commands.AzureCommand
 import me.grabsky.azure.commands.EditorCommand
 import me.grabsky.azure.commands.TeleportCommands
 import me.grabsky.azure.commands.WorldsCommand
-import me.grabsky.azure.configuration.Config
 import me.grabsky.azure.configuration.Locale
+import me.grabsky.azure.configuration.Settings
 import me.grabsky.azure.listeners.ChatListener
 import me.grabsky.indigo.ServerPlugin
 import me.grabsky.indigo.api.commands.CommandManager
@@ -42,21 +42,14 @@ class Azure : ServerPlugin() {
             WorldsCommand(this),
             EditorCommand(),
             TeleportCommands(),
-            useBrigadier = true
         )
         // Registering events
         this.server.pluginManager.registerEvents(ChatListener(), this)
     }
 
-    override fun onDisable() {
-        super.onDisable()
-        // DISABLE LOGIC
-    }
-
-    override fun onReload() {
-        super.onDisable()
+    override fun reloadPlugin(): Boolean {
         // Reloading plugin configuration
-        this.reloadPluginConfiguration()
+        return this.reloadPluginConfiguration()
     }
 
     // Reloads configuration files
@@ -64,7 +57,7 @@ class Azure : ServerPlugin() {
         var errorOccurred = false
         // Creating a list of configurations available for this plugin
         val configurations = arrayOf(
-            Config::class to File(dataFolder, "config.conf"),
+            Settings::class to File(dataFolder, "settings.conf"),
             Locale::class to File(dataFolder, "locale.conf"),
         )
         // Iterating over configurations and trying to load them

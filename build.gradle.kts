@@ -25,8 +25,8 @@ dependencies {
     // Paper (mojang mapped)
     paperDevBundle("1.18.2-R0.1-SNAPSHOT")
     // Dependencies
-    compileOnly(files(buildsDirectory + File.separator + "Indigo.jar"))
     compileOnly("net.luckperms", "api", "5.4")
+    compileOnly(files(buildsDirectory + File.separator + "Indigo.jar"))
 }
 
 tasks {

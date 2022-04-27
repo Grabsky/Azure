@@ -1,7 +1,7 @@
 package me.grabsky.azure.commands
 
 import me.grabsky.azure.configuration.Locale
-import me.grabsky.indigo.configuration.GlobalLocale
+import me.grabsky.indigo.configuration.ServerLocale
 import me.grabsky.indigo.extensions.sendMessageOrIgnore
 import me.grabsky.indigo.utils.Placeholders
 import me.grabsky.libs.lamp.annotation.AutoComplete
@@ -49,7 +49,7 @@ class TeleportCommands {
                     )
                     return@thenAccept
                 }
-                sender.sendMessageOrIgnore(GlobalLocale.TELEPORT_ERROR)
+                sender.sendMessageOrIgnore(ServerLocale.TELEPORT_ERROR)
             }
             return
         }
@@ -67,7 +67,7 @@ class TeleportCommands {
             }
             return
         }
-        sender.sendMessageOrIgnore(GlobalLocale.COMMAND_MISSING_PERMISSIONS)
+        sender.sendMessageOrIgnore(ServerLocale.COMMAND_MISSING_PERMISSIONS)
         return
     }
 
@@ -99,7 +99,7 @@ class TeleportCommands {
                     }
                     return@thenAccept
                 }
-                sender.sendMessageOrIgnore(GlobalLocale.TELEPORT_ERROR)
+                sender.sendMessageOrIgnore(ServerLocale.TELEPORT_ERROR)
             }
             return
         }

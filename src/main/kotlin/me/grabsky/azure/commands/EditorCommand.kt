@@ -1,7 +1,7 @@
 package me.grabsky.azure.commands
 
 import me.grabsky.azure.configuration.Locale
-import me.grabsky.indigo.configuration.GlobalLocale
+import me.grabsky.indigo.configuration.ServerLocale
 import me.grabsky.indigo.extensions.clearEnchantments
 import me.grabsky.indigo.extensions.sendMessageOrIgnore
 import me.grabsky.libs.lamp.annotation.*
@@ -35,9 +35,9 @@ class EditorCommand {
     @Default
     @CommandPermission("azure.command.editor")
     fun onEditorHelp(sender: CommandSender, commandHelp: CommandHelp<Component>) {
-        sender.sendMessageOrIgnore(GlobalLocale.COMMAND_USAGE_DIVIDER)
+        sender.sendMessageOrIgnore(ServerLocale.COMMAND_USAGE_DIVIDER)
         commandHelp.forEach { sender.sendMessage(it) }
-        sender.sendMessageOrIgnore(GlobalLocale.COMMAND_USAGE_DIVIDER)
+        sender.sendMessageOrIgnore(ServerLocale.COMMAND_USAGE_DIVIDER)
     }
 
     // Editor => Name
@@ -46,7 +46,7 @@ class EditorCommand {
     fun onEditorName(sender: Player, @Optional name: String?) {
         // Ignoring if player has no item in hand
         if (sender.inventory.itemInMainHand.type == Material.AIR) {
-            sender.sendMessageOrIgnore(GlobalLocale.NO_ITEM_IN_HAND)
+            sender.sendMessageOrIgnore(ServerLocale.NO_ITEM_IN_HAND)
             return
         }
         // Editing ItemMeta
@@ -66,9 +66,9 @@ class EditorCommand {
     @Default @Subcommand("lore")
     @CommandPermission("azure.command.editor.lore")
     fun onEditorLoreHelp(sender: CommandSender, commandHelp: CommandHelp<Component>) {
-        sender.sendMessageOrIgnore(GlobalLocale.COMMAND_USAGE_DIVIDER)
+        sender.sendMessageOrIgnore(ServerLocale.COMMAND_USAGE_DIVIDER)
         commandHelp.forEach { sender.sendMessage(it) }
-        sender.sendMessageOrIgnore(GlobalLocale.COMMAND_USAGE_DIVIDER)
+        sender.sendMessageOrIgnore(ServerLocale.COMMAND_USAGE_DIVIDER)
     }
 
     // Editor => Lore => Add
@@ -78,7 +78,7 @@ class EditorCommand {
     fun onEditorLoreAdd(sender: Player, text: String) {
         // Ignoring if player has no item in hand
         if (sender.inventory.itemInMainHand.type == Material.AIR) {
-            sender.sendMessageOrIgnore(GlobalLocale.NO_ITEM_IN_HAND)
+            sender.sendMessageOrIgnore(ServerLocale.NO_ITEM_IN_HAND)
             return
         }
         // Editing ItemMeta
@@ -90,7 +90,7 @@ class EditorCommand {
                 return@editMeta
             }
         }
-        sender.sendMessageOrIgnore(GlobalLocale.NO_ITEM_IN_HAND)
+        sender.sendMessageOrIgnore(ServerLocale.NO_ITEM_IN_HAND)
     }
 
     // Editor => Lore => Set
@@ -100,7 +100,7 @@ class EditorCommand {
     fun onEditorLoreSet(sender: Player, @Range(min = 1.0) line: Int, @Optional text: String) {
         // Ignoring if player has no item in hand
         if (sender.inventory.itemInMainHand.type == Material.AIR) {
-            sender.sendMessageOrIgnore(GlobalLocale.NO_ITEM_IN_HAND)
+            sender.sendMessageOrIgnore(ServerLocale.NO_ITEM_IN_HAND)
             return
         }
         // Editing ItemMeta
@@ -111,7 +111,7 @@ class EditorCommand {
                 sender.sendMessageOrIgnore(Locale.EDITOR_ITEM_LORE_UPDATED)
                 return@editMeta
             }
-            sender.sendMessageOrIgnore(GlobalLocale.COMMAND_NUMBER_NOT_IN_RANGE, Placeholder.unparsed("input", line.toString()), Placeholder.unparsed("min", "1"), Placeholder.unparsed("max", it.lore()?.size.toString()))
+            sender.sendMessageOrIgnore(ServerLocale.COMMAND_NUMBER_NOT_IN_RANGE, Placeholder.unparsed("input", line.toString()), Placeholder.unparsed("min", "1"), Placeholder.unparsed("max", it.lore()?.size.toString()))
             return@editMeta
         }
         return
@@ -124,7 +124,7 @@ class EditorCommand {
     fun onEditorLoreRemove(sender: Player, line: Int) {
         // Ignoring if player has no item in hand
         if (sender.inventory.itemInMainHand.type == Material.AIR) {
-            sender.sendMessageOrIgnore(GlobalLocale.NO_ITEM_IN_HAND)
+            sender.sendMessageOrIgnore(ServerLocale.NO_ITEM_IN_HAND)
             return
         }
         // Editing ItemMeta
@@ -134,7 +134,7 @@ class EditorCommand {
                 sender.sendMessageOrIgnore(Locale.EDITOR_ITEM_LORE_UPDATED)
                 return@editMeta
             }
-            sender.sendMessageOrIgnore(GlobalLocale.COMMAND_NUMBER_NOT_IN_RANGE, Placeholder.unparsed("input", line.toString()), Placeholder.unparsed("min", "1"), Placeholder.unparsed("max", it.lore()?.size.toString()))
+            sender.sendMessageOrIgnore(ServerLocale.COMMAND_NUMBER_NOT_IN_RANGE, Placeholder.unparsed("input", line.toString()), Placeholder.unparsed("min", "1"), Placeholder.unparsed("max", it.lore()?.size.toString()))
             return@editMeta
         }
     }
@@ -145,7 +145,7 @@ class EditorCommand {
     fun onEditorLoreClear(sender: Player) {
         // Ignoring if player has no item in hand
         if (sender.inventory.itemInMainHand.type == Material.AIR) {
-            sender.sendMessageOrIgnore(GlobalLocale.NO_ITEM_IN_HAND)
+            sender.sendMessageOrIgnore(ServerLocale.NO_ITEM_IN_HAND)
             return
         }
         // Editing ItemMeta
@@ -160,9 +160,9 @@ class EditorCommand {
     @Default @Subcommand("enchant")
     @CommandPermission("azure.command.editor.enchant")
     fun onEditorEnchantHelp(sender: CommandSender, commandHelp: CommandHelp<Component>) {
-        sender.sendMessageOrIgnore(GlobalLocale.COMMAND_USAGE_DIVIDER)
+        sender.sendMessageOrIgnore(ServerLocale.COMMAND_USAGE_DIVIDER)
         commandHelp.forEach { sender.sendMessage(it) }
-        sender.sendMessageOrIgnore(GlobalLocale.COMMAND_USAGE_DIVIDER)
+        sender.sendMessageOrIgnore(ServerLocale.COMMAND_USAGE_DIVIDER)
     }
 
     // Editor => Enchant -> Add
@@ -172,7 +172,7 @@ class EditorCommand {
     fun onEditorEnchantAdd(sender: Player, enchantment: Enchantment, @Default("1") level: Int) {
         // Ignoring if player has no item in hand
         if (sender.inventory.itemInMainHand.type == Material.AIR) {
-            sender.sendMessageOrIgnore(GlobalLocale.NO_ITEM_IN_HAND)
+            sender.sendMessageOrIgnore(ServerLocale.NO_ITEM_IN_HAND)
             return
         }
         // Editing ItemMeta
@@ -189,7 +189,7 @@ class EditorCommand {
     fun onEditorEnchantRemove(sender: Player, enchantment: Enchantment) {
         // Ignoring if player has no item in hand
         if (sender.inventory.itemInMainHand.type == Material.AIR) {
-            sender.sendMessageOrIgnore(GlobalLocale.NO_ITEM_IN_HAND)
+            sender.sendMessageOrIgnore(ServerLocale.NO_ITEM_IN_HAND)
             return
         }
         // Editing ItemMeta
@@ -205,7 +205,7 @@ class EditorCommand {
     fun onEditorEnchantReset(sender: Player, commandHelp: CommandHelp<Component>) {
         // Ignoring if player has no item in hand
         if (sender.inventory.itemInMainHand.type == Material.AIR) {
-            sender.sendMessageOrIgnore(GlobalLocale.NO_ITEM_IN_HAND)
+            sender.sendMessageOrIgnore(ServerLocale.NO_ITEM_IN_HAND)
             return
         }
         // Editing ItemMeta

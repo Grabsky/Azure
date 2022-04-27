@@ -3,7 +3,7 @@ package me.grabsky.azure.commands
 import me.grabsky.azure.Azure
 import me.grabsky.azure.configuration.Locale
 import me.grabsky.indigo.api.utils.NamespacedKeys
-import me.grabsky.indigo.configuration.GlobalLocale
+import me.grabsky.indigo.configuration.ServerLocale
 import me.grabsky.indigo.extensions.sendMessageOrIgnore
 import me.grabsky.indigo.utils.DecimalFormats
 import me.grabsky.indigo.utils.Placeholders
@@ -28,9 +28,9 @@ class WorldsCommand(private val azure: Azure) {
 
     @Default
     fun onDefault(sender: CommandSender, commandHelp: CommandHelp<Component>) {
-        sender.sendMessageOrIgnore(GlobalLocale.COMMAND_USAGE_DIVIDER)
+        sender.sendMessageOrIgnore(ServerLocale.COMMAND_USAGE_DIVIDER)
         commandHelp.forEach { sender.sendMessage(it) }
-        sender.sendMessageOrIgnore(GlobalLocale.COMMAND_USAGE_DIVIDER)
+        sender.sendMessageOrIgnore(ServerLocale.COMMAND_USAGE_DIVIDER)
     }
 
     @Subcommand("spawn")
@@ -80,7 +80,7 @@ class WorldsCommand(private val azure: Azure) {
             sender.sendMessageOrIgnore(Locale.WORLD_LOADED, Placeholders.BADGE_SUCCESS, Placeholder.unparsed("world", worldName))
             return
         }
-        sender.sendMessageOrIgnore(text = GlobalLocale.COMMAND_INVALID_WORLD, Placeholders.BADGE_ERROR, Placeholder.unparsed("world", worldName))
+        sender.sendMessageOrIgnore(text = ServerLocale.COMMAND_INVALID_WORLD, Placeholders.BADGE_ERROR, Placeholder.unparsed("world", worldName))
     }
 
     @Subcommand("save")
