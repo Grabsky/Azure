@@ -4,6 +4,7 @@ import me.grabsky.azure.configuration.Locale
 import me.grabsky.indigo.configuration.ServerLocale
 import me.grabsky.indigo.extensions.clearEnchantments
 import me.grabsky.indigo.extensions.sendMessageOrIgnore
+import me.grabsky.indigo.utils.Placeholders
 import me.grabsky.libs.lamp.annotation.*
 import me.grabsky.libs.lamp.bukkit.annotation.CommandPermission
 import me.grabsky.libs.lamp.help.CommandHelp
@@ -134,7 +135,7 @@ class EditorCommand {
                 sender.sendMessageOrIgnore(Locale.EDITOR_ITEM_LORE_UPDATED)
                 return@editMeta
             }
-            sender.sendMessageOrIgnore(ServerLocale.COMMAND_NUMBER_NOT_IN_RANGE, Placeholder.unparsed("input", line.toString()), Placeholder.unparsed("min", "1"), Placeholder.unparsed("max", it.lore()?.size.toString()))
+            sender.sendMessageOrIgnore(ServerLocale.COMMAND_NUMBER_NOT_IN_RANGE, Placeholders.BADGES, Placeholder.unparsed("input", line.toString()), Placeholder.unparsed("min", "1"), Placeholder.unparsed("max", it.lore()?.size.toString()))
             return@editMeta
         }
     }
@@ -178,7 +179,7 @@ class EditorCommand {
         // Editing ItemMeta
         sender.inventory.itemInMainHand.editMeta {
             it.addEnchant(enchantment, level, true)
-            sender.sendMessageOrIgnore(Locale.EDITOR_ITEM_ENCHANT_ADDED, Placeholder.unparsed("enchantment", enchantment.key.asString()))
+            sender.sendMessageOrIgnore(Locale.EDITOR_ITEM_ENCHANT_ADDED, Placeholders.BADGES, Placeholder.unparsed("enchantment", enchantment.key.asString()))
         }
     }
 
@@ -195,7 +196,7 @@ class EditorCommand {
         // Editing ItemMeta
         sender.inventory.itemInMainHand.editMeta {
             it.removeEnchant(enchantment)
-            sender.sendMessageOrIgnore(Locale.EDITOR_ITEM_ENCHANT_REMOVED, Placeholder.unparsed("enchantment", enchantment.key.asString()))
+            sender.sendMessageOrIgnore(Locale.EDITOR_ITEM_ENCHANT_REMOVED, Placeholders.BADGES, Placeholder.unparsed("enchantment", enchantment.key.asString()))
         }
     }
 

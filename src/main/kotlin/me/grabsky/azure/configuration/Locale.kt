@@ -5,7 +5,7 @@ import net.kyori.adventure.text.Component
 
 internal object Locale {
     // Chat
-    @ConfigProperty("chat.chat-cooldown")
+    @ConfigProperty(path = ["chat", "chat-cooldown"])
     var CHAT_COOLDOWN: Component? = null
 
     // Commands => Worlds
@@ -59,4 +59,6 @@ internal object Locale {
     var TELEPORT_PLAYER_TELEPORTED_TO_YOU: String? = null
     @ConfigProperty(path = ["commands", "teleport", "outside-world-border"])
     var TELEPORT_OUTSIDE_WORLD_BORDER: Component? = null
+    @ConfigProperty(path = ["commands", "teleport", "targets-are-the-same"])
+    var TELEPORT_TARGETS_ARE_THE_SAME: Component? = null
 }

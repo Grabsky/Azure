@@ -38,7 +38,7 @@ class WorldsCommand(private val azure: Azure) {
     @Usage("[world]")
     fun onWorldSpawn(sender: Player, @Default("self") world: World) {
         sender.teleport(world.spawnLocation)
-        sender.sendMessageOrIgnore(Locale.WORLD_TELEPORTED, Placeholders.BADGE_SUCCESS, Placeholder.unparsed("world", world.name))
+        sender.sendMessageOrIgnore(Locale.WORLD_TELEPORTED, Placeholders.BADGES, Placeholder.unparsed("world", world.name))
     }
 
     @Subcommand("setspawn")
@@ -64,10 +64,10 @@ class WorldsCommand(private val azure: Azure) {
             // Creating a world
             val world = worldCreator.createWorld()
             // Sending a message
-            sender.sendMessageOrIgnore(text = Locale.WORLD_CREATED, Placeholders.BADGE_SUCCESS, Placeholder.unparsed("world", worldName), Placeholder.unparsed("seed", world?.seed.toString()))
+            sender.sendMessageOrIgnore(text = Locale.WORLD_CREATED, Placeholders.BADGES, Placeholder.unparsed("world", worldName), Placeholder.unparsed("seed", world?.seed.toString()))
             return
         }
-        sender.sendMessageOrIgnore(text = Locale.WORLD_ALREADY_EXISTS, Placeholders.BADGE_ERROR, Placeholder.unparsed("world", worldName))
+        sender.sendMessageOrIgnore(text = Locale.WORLD_ALREADY_EXISTS, Placeholders.BADGES, Placeholder.unparsed("world", worldName))
     }
 
     @Subcommand("load")
@@ -77,10 +77,10 @@ class WorldsCommand(private val azure: Azure) {
         if (azure.server.worldContainer.list()?.contains(worldName) == true && File(azure.server.worldContainer, worldName).isDirectory) {
             // Loading the world
             WorldCreator(worldName).createWorld()
-            sender.sendMessageOrIgnore(Locale.WORLD_LOADED, Placeholders.BADGE_SUCCESS, Placeholder.unparsed("world", worldName))
+            sender.sendMessageOrIgnore(Locale.WORLD_LOADED, Placeholders.BADGES, Placeholder.unparsed("world", worldName))
             return
         }
-        sender.sendMessageOrIgnore(text = ServerLocale.COMMAND_INVALID_WORLD, Placeholders.BADGE_ERROR, Placeholder.unparsed("world", worldName))
+        sender.sendMessageOrIgnore(text = ServerLocale.COMMAND_INVALID_WORLD, Placeholders.BADGES, Placeholder.unparsed("world", worldName))
     }
 
     @Subcommand("save")
@@ -88,7 +88,7 @@ class WorldsCommand(private val azure: Azure) {
     @Usage("<world>")
     fun onWorldSave(sender: CommandSender, world: World) {
         val saveOperationTime = measureTimeMillis { world.save() }
-        sender.sendMessageOrIgnore(text = Locale.WORLD_SAVED, Placeholders.BADGE_SUCCESS, Placeholder.unparsed("world", world.name), Placeholder.unparsed("time", DecimalFormats.TWO_DIGIT.format(saveOperationTime)))
+        sender.sendMessageOrIgnore(text = Locale.WORLD_SAVED, Placeholders.BADGES, Placeholder.unparsed("world", world.name), Placeholder.unparsed("time", DecimalFormats.TWO_DIGIT.format(saveOperationTime)))
     }
 
     @Subcommand("delete")
@@ -101,6 +101,6 @@ class WorldsCommand(private val azure: Azure) {
             worldDir.walk().forEach(::println)
             return
         }
-        sender.sendMessageOrIgnore(text = Locale.WORLD_DELETE_CONFIRM, Placeholders.BADGE_ERROR, Placeholder.unparsed("world", world.name))
+        sender.sendMessageOrIgnore(text = Locale.WORLD_DELETE_CONFIRM, Placeholders.BADGES, Placeholder.unparsed("world", world.name))
     }
 }
