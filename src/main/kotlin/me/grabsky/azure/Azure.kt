@@ -11,7 +11,6 @@ import me.grabsky.indigo.ServerPlugin
 import me.grabsky.indigo.api.commands.CommandManager
 import me.grabsky.indigo.api.config.ConfigManager
 import me.grabsky.indigo.api.config.NotAnObjectException
-import me.grabsky.indigo.api.logger.ConsoleLogger
 import me.grabsky.libs.configurate.serialize.SerializationException
 import java.io.File
 
@@ -20,8 +19,6 @@ object AzureProvider {
 }
 
 class Azure : ServerPlugin() {
-    /* ServerPlugin */ override lateinit var consoleLogger: ConsoleLogger
-
     private lateinit var configManager: ConfigManager
     private lateinit var commandManager: CommandManager
 
@@ -29,8 +26,6 @@ class Azure : ServerPlugin() {
         super.onEnable()
         // Creating an instance of main class
         AzureProvider.INS = this
-        // Setting up loggers
-        this.consoleLogger = ConsoleLogger(this)
         // Setting up configuration files
         this.configManager = ConfigManager(this)
         this.reloadPluginConfiguration()
