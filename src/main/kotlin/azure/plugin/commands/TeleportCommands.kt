@@ -1,5 +1,6 @@
-package me.grabsky.azure.commands
+package azure.plugin.commands
 
+import azure.plugin.configuration.Locale
 import indigo.framework.utils.Placeholders
 import indigo.libraries.lamp.annotation.AutoComplete
 import indigo.libraries.lamp.annotation.Command
@@ -9,7 +10,6 @@ import indigo.libraries.lamp.bukkit.annotation.CommandPermission
 import indigo.libraries.paperlib.PaperLib
 import indigo.plugin.configuration.ServerLocale
 import indigo.plugin.extensions.sendMessageOrIgnore
-import me.grabsky.azure.configuration.Locale
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.Location
 import org.bukkit.World
@@ -53,7 +53,8 @@ class TeleportCommands {
                         Placeholder.unparsed("world", world.name)
                     )
                     if (silent != true) {
-                        target.sendMessageOrIgnore(Locale.TELEPORT_TELEPORTED_TO_LOCATION,
+                        target.sendMessageOrIgnore(
+                            Locale.TELEPORT_TELEPORTED_TO_LOCATION,
                             Placeholders.BADGES,
                             Placeholder.unparsed("x", x.toString()),
                             Placeholder.unparsed("y", y.toString()),

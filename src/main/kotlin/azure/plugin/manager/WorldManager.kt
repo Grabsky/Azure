@@ -1,4 +1,4 @@
-package me.grabsky.azure.manager
+package azure.plugin.manager
 
 import indigo.framework.ServerPlugin
 import indigo.framework.storage.serializers.UUIDSerializer

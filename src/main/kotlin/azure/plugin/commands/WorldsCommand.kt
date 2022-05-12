@@ -1,5 +1,9 @@
-package me.grabsky.azure.commands
+package azure.plugin.commands
 
+import azure.plugin.Azure
+import azure.plugin.configuration.Locale
+import azure.plugin.manager.VanillaEnvironment
+import azure.plugin.manager.VanillaWorldType
 import indigo.framework.utils.DecimalFormats
 import indigo.framework.utils.NamespacedKeys
 import indigo.framework.utils.Placeholders
@@ -8,10 +12,6 @@ import indigo.libraries.lamp.bukkit.annotation.CommandPermission
 import indigo.libraries.lamp.help.CommandHelp
 import indigo.plugin.configuration.ServerLocale
 import indigo.plugin.extensions.sendMessageOrIgnore
-import me.grabsky.azure.Azure
-import me.grabsky.azure.configuration.Locale
-import me.grabsky.azure.manager.VanillaEnvironment
-import me.grabsky.azure.manager.VanillaWorldType
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.World

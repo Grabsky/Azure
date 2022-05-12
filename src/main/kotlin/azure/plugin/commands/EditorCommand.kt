@@ -1,5 +1,6 @@
-package me.grabsky.azure.commands
+package azure.plugin.commands
 
+import azure.plugin.configuration.Locale
 import indigo.framework.extensions.clearEnchantments
 import indigo.framework.utils.Placeholders
 import indigo.libraries.lamp.annotation.*
@@ -7,7 +8,6 @@ import indigo.libraries.lamp.bukkit.annotation.CommandPermission
 import indigo.libraries.lamp.help.CommandHelp
 import indigo.plugin.configuration.ServerLocale
 import indigo.plugin.extensions.sendMessageOrIgnore
-import me.grabsky.azure.configuration.Locale
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.minimessage.MiniMessage

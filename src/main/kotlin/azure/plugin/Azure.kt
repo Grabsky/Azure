@@ -1,18 +1,18 @@
-package me.grabsky.azure
+package azure.plugin
 
+import azure.plugin.commands.AzureCommand
+import azure.plugin.commands.EditorCommand
+import azure.plugin.commands.TeleportCommands
+import azure.plugin.commands.WorldsCommand
+import azure.plugin.configuration.Locale
+import azure.plugin.configuration.Settings
+import azure.plugin.listeners.ChatListener
+import azure.plugin.manager.WorldManager
 import indigo.framework.ServerPlugin
 import indigo.framework.commands.CommandManager
 import indigo.framework.config.ConfigManager
 import indigo.framework.config.NotAnObjectException
 import indigo.libraries.configurate.serialize.SerializationException
-import me.grabsky.azure.commands.AzureCommand
-import me.grabsky.azure.commands.EditorCommand
-import me.grabsky.azure.commands.TeleportCommands
-import me.grabsky.azure.commands.WorldsCommand
-import me.grabsky.azure.configuration.Locale
-import me.grabsky.azure.configuration.Settings
-import me.grabsky.azure.listeners.ChatListener
-import me.grabsky.azure.manager.WorldManager
 import java.io.File
 
 object AzureProvider {

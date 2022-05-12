@@ -1,6 +1,6 @@
 val buildsDirectory = "${System.getenv("DEVELOPMENT_DIR")}/builds"
 
-group = "me.grabsky"
+group = "azure"
 version = "1.0-SNAPSHOT"
 description = "Azure"
 

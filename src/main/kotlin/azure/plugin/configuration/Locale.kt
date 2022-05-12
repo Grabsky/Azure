@@ -1,4 +1,4 @@
-package me.grabsky.azure.configuration
+package azure.plugin.configuration
 
 import indigo.framework.config.ConfigProperty
 import net.kyori.adventure.text.Component
