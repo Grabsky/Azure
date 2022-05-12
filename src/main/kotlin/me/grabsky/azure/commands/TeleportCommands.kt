@@ -1,15 +1,15 @@
 package me.grabsky.azure.commands
 
+import indigo.framework.utils.Placeholders
+import indigo.libraries.lamp.annotation.AutoComplete
+import indigo.libraries.lamp.annotation.Command
+import indigo.libraries.lamp.annotation.Default
+import indigo.libraries.lamp.annotation.Switch
+import indigo.libraries.lamp.bukkit.annotation.CommandPermission
+import indigo.libraries.paperlib.PaperLib
+import indigo.plugin.configuration.ServerLocale
+import indigo.plugin.extensions.sendMessageOrIgnore
 import me.grabsky.azure.configuration.Locale
-import me.grabsky.indigo.configuration.ServerLocale
-import me.grabsky.indigo.extensions.sendMessageOrIgnore
-import me.grabsky.indigo.utils.Placeholders
-import me.grabsky.libs.lamp.annotation.AutoComplete
-import me.grabsky.libs.lamp.annotation.Command
-import me.grabsky.libs.lamp.annotation.Default
-import me.grabsky.libs.lamp.annotation.Switch
-import me.grabsky.libs.lamp.bukkit.annotation.CommandPermission
-import me.grabsky.libs.paperlib.PaperLib
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.Location
 import org.bukkit.World

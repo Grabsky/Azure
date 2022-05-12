@@ -1,12 +1,12 @@
 package me.grabsky.azure.listeners
 
+import indigo.plugin.extensions.sendMessageOrIgnore
+import indigo.plugin.extensions.style
+import indigo.plugin.extensions.toPlainString
 import io.papermc.paper.chat.ChatRenderer
 import io.papermc.paper.event.player.AsyncChatEvent
 import me.grabsky.azure.configuration.Locale
 import me.grabsky.azure.configuration.Settings
-import me.grabsky.indigo.extensions.sendMessageOrIgnore
-import me.grabsky.indigo.extensions.style
-import me.grabsky.indigo.extensions.toPlainString
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage

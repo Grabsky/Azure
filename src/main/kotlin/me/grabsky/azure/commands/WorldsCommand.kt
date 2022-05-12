@@ -1,20 +1,20 @@
 package me.grabsky.azure.commands
 
+import indigo.framework.utils.DecimalFormats
+import indigo.framework.utils.NamespacedKeys
+import indigo.framework.utils.Placeholders
+import indigo.libraries.lamp.annotation.*
+import indigo.libraries.lamp.bukkit.annotation.CommandPermission
+import indigo.libraries.lamp.help.CommandHelp
+import indigo.plugin.configuration.ServerLocale
+import indigo.plugin.extensions.sendMessageOrIgnore
 import me.grabsky.azure.Azure
 import me.grabsky.azure.configuration.Locale
-import me.grabsky.indigo.api.utils.NamespacedKeys
-import me.grabsky.indigo.configuration.ServerLocale
-import me.grabsky.indigo.extensions.sendMessageOrIgnore
-import me.grabsky.indigo.utils.DecimalFormats
-import me.grabsky.indigo.utils.Placeholders
-import me.grabsky.libs.lamp.annotation.*
-import me.grabsky.libs.lamp.bukkit.annotation.CommandPermission
-import me.grabsky.libs.lamp.help.CommandHelp
+import me.grabsky.azure.manager.VanillaEnvironment
+import me.grabsky.azure.manager.VanillaWorldType
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.World
-import org.bukkit.WorldCreator
-import org.bukkit.WorldType
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import java.io.File
@@ -51,18 +51,10 @@ class WorldsCommand(private val azure: Azure) {
     @Subcommand("create")
     @CommandPermission("azure.command.worlds.create")
     @Usage("<name> <type> <env> [seed] [-autoload]")
-    fun onWorldCreate(sender: CommandSender, worldName: String, worldType: WorldType?, environment: World.Environment?, @Optional seed: Long?, @Switch("autoload") autoload: Boolean?) {
-        if (azure.server.worldContainer.list()?.contains(worldName) == false || File(azure.server.worldContainer, worldName).isDirectory) {
-            // Configuring WorldCreated
-            val worldCreator = WorldCreator(worldName)
-                .type(worldType ?: WorldType.NORMAL)
-                .environment(environment ?: World.Environment.NORMAL)
-            // Applying seed if specified
-            if (seed != null) {
-                worldCreator.seed(seed)
-            }
-            // Creating a world
-            val world = worldCreator.createWorld()
+    fun onWorldCreate(sender: CommandSender, worldName: String, environment: VanillaEnvironment, type: VanillaWorldType, @Optional seed: Long?) {
+        if (File(azure.server.worldContainer, worldName).isDirectory == false) { // This checks if file exists as well
+            // Creating a world with specified parameters
+            val world = azure.worldManager.create(worldName, environment, type, seed)
             // Sending a message
             sender.sendMessageOrIgnore(text = Locale.WORLD_CREATED, Placeholders.BADGES, Placeholder.unparsed("world", worldName), Placeholder.unparsed("seed", world?.seed.toString()))
             return
@@ -74,13 +66,15 @@ class WorldsCommand(private val azure: Azure) {
     @CommandPermission("azure.command.worlds.create")
     @Usage("<world>")
     fun onWorldLoad(sender: CommandSender, worldName: String) {
-        if (azure.server.worldContainer.list()?.contains(worldName) == true && File(azure.server.worldContainer, worldName).isDirectory) {
-            // Loading the world
-            WorldCreator(worldName).createWorld()
-            sender.sendMessageOrIgnore(Locale.WORLD_LOADED, Placeholders.BADGES, Placeholder.unparsed("world", worldName))
-            return
-        }
-        sender.sendMessageOrIgnore(text = ServerLocale.COMMAND_INVALID_WORLD, Placeholders.BADGES, Placeholder.unparsed("world", worldName))
+        azure.worldManager.load(worldName)
+//        if (azure.server.worldContainer.list()?.contains(worldName) == true && File(azure.server.worldContainer, worldName).isDirectory) {
+//            // Loading the world
+//            WorldCreator(worldName)
+//                .createWorld()
+//            sender.sendMessageOrIgnore(Locale.WORLD_LOADED, Placeholders.BADGES, Placeholder.unparsed("world", worldName))
+//            return
+//        }
+//        sender.sendMessageOrIgnore(text = ServerLocale.COMMAND_INVALID_WORLD, Placeholders.BADGES, Placeholder.unparsed("world", worldName))
     }
 
     @Subcommand("save")

@@ -1,6 +1,7 @@
 package me.grabsky.azure.configuration
 
-import me.grabsky.indigo.api.config.ConfigProperty
+import indigo.framework.config.ConfigProperty
+
 
 internal object Settings {
     @ConfigProperty(path = ["settings", "chat", "console-format"])

@@ -7,6 +7,7 @@ description = "Azure"
 plugins {
     id("java-library")
     id("org.jetbrains.kotlin.jvm") version "1.6.21"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.6.21"
     id("io.papermc.paperweight.userdev") version "1.3.6"
 }
 
@@ -19,7 +20,6 @@ dependencies {
     // Kotlin (required)
     compileOnly("org.jetbrains.kotlin", "kotlin-stdlib-jdk8", "1.6.21")
     // Kotlin (optional)
-    compileOnly("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "1.6.1")
     compileOnly("org.jetbrains.kotlinx", "kotlinx-serialization-core", "1.3.2")
     compileOnly("org.jetbrains.kotlinx", "kotlinx-serialization-json", "1.3.2")
     // Paper (mojang mapped)

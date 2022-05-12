@@ -1,5 +1,10 @@
 package me.grabsky.azure
 
+import indigo.framework.ServerPlugin
+import indigo.framework.commands.CommandManager
+import indigo.framework.config.ConfigManager
+import indigo.framework.config.NotAnObjectException
+import indigo.libraries.configurate.serialize.SerializationException
 import me.grabsky.azure.commands.AzureCommand
 import me.grabsky.azure.commands.EditorCommand
 import me.grabsky.azure.commands.TeleportCommands
@@ -7,11 +12,7 @@ import me.grabsky.azure.commands.WorldsCommand
 import me.grabsky.azure.configuration.Locale
 import me.grabsky.azure.configuration.Settings
 import me.grabsky.azure.listeners.ChatListener
-import me.grabsky.indigo.ServerPlugin
-import me.grabsky.indigo.api.commands.CommandManager
-import me.grabsky.indigo.api.config.ConfigManager
-import me.grabsky.indigo.api.config.NotAnObjectException
-import me.grabsky.libs.configurate.serialize.SerializationException
+import me.grabsky.azure.manager.WorldManager
 import java.io.File
 
 object AzureProvider {
@@ -22,6 +23,8 @@ class Azure : ServerPlugin() {
     private lateinit var configManager: ConfigManager
     private lateinit var commandManager: CommandManager
 
+    lateinit var worldManager: WorldManager
+
     override fun onEnable() {
         super.onEnable()
         // Creating an instance of main class
@@ -29,6 +32,8 @@ class Azure : ServerPlugin() {
         // Setting up configuration files
         this.configManager = ConfigManager(this)
         this.reloadPluginConfiguration()
+        // Setting up WorldManager
+        this.worldManager = WorldManager(this)
         // Setting up CommandManager
         this.commandManager = CommandManager(this)
         // Registering commands

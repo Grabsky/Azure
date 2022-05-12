@@ -1,13 +1,13 @@
 package me.grabsky.azure.commands
 
+import indigo.libraries.lamp.annotation.Command
+import indigo.libraries.lamp.annotation.Default
+import indigo.libraries.lamp.annotation.Subcommand
+import indigo.libraries.lamp.bukkit.annotation.CommandPermission
+import indigo.libraries.lamp.help.CommandHelp
+import indigo.plugin.configuration.ServerLocale
+import indigo.plugin.extensions.sendMessageOrIgnore
 import me.grabsky.azure.Azure
-import me.grabsky.indigo.configuration.ServerLocale
-import me.grabsky.indigo.extensions.sendMessageOrIgnore
-import me.grabsky.libs.lamp.annotation.Command
-import me.grabsky.libs.lamp.annotation.Default
-import me.grabsky.libs.lamp.annotation.Subcommand
-import me.grabsky.libs.lamp.bukkit.annotation.CommandPermission
-import me.grabsky.libs.lamp.help.CommandHelp
 import net.kyori.adventure.text.Component
 import org.bukkit.command.CommandSender
 

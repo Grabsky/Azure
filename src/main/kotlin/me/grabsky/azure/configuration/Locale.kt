@@ -1,6 +1,6 @@
 package me.grabsky.azure.configuration
 
-import me.grabsky.indigo.api.config.ConfigProperty
+import indigo.framework.config.ConfigProperty
 import net.kyori.adventure.text.Component
 
 internal object Locale {
