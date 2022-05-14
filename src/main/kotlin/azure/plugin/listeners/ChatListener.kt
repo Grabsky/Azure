@@ -2,9 +2,9 @@ package azure.plugin.listeners
 
 import azure.plugin.configuration.Locale
 import azure.plugin.configuration.Settings
+import indigo.framework.extensions.style
+import indigo.framework.extensions.toPlainString
 import indigo.plugin.extensions.sendMessageOrIgnore
-import indigo.plugin.extensions.style
-import indigo.plugin.extensions.toPlainString
 import io.papermc.paper.chat.ChatRenderer
 import io.papermc.paper.event.player.AsyncChatEvent
 import net.kyori.adventure.audience.Audience
