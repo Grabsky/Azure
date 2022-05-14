@@ -11,11 +11,13 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
+// TO-DO: Move it somewhere... it's going to be used by more than one command.
 enum class Toggle(val boolean: Boolean) {
     ON(true),
     OFF(false)
 }
 
+// TO-DO: Proper permission handling
 @Command("invulnerable", "in")
 @CommandPermission("azure.command.invulnerable")
 class InvulnerableCommand {
@@ -25,6 +27,7 @@ class InvulnerableCommand {
     fun onDefault(sender: CommandSender, selectorOne: SingleEntitySelector<Player>, @Optional toggle: Toggle?, @Optional @Switch("s") silent: Boolean?) {
         // Getting player from selector
         val target = selectorOne.entity
+        // Throwing an exception if target != sender AND sender cannot use that command on players other than himself
         if (sender != target && sender.hasPermission("azure.command.invulnerable.others") == false) return // We should throw NoPermissionException here if possible
         // Updating mode
         target.isInvulnerable = toggle?.boolean ?: !target.isInvulnerable
@@ -39,8 +42,8 @@ class InvulnerableCommand {
     }
 
     private fun messageTarget(bool: Boolean): Component? {
-        if (bool == true) return Locale.INVULNERABLE_ON
-        return Locale.INVULNERABLE_OFF
+        if (bool == true) return Locale.INVULNERABLE_SELF_ON
+        return Locale.INVULNERABLE_SELF_OFF
     }
 
     private fun messageSender(bool: Boolean): String? {

@@ -63,13 +63,25 @@ internal object Locale {
     var TELEPORT_TARGETS_ARE_THE_SAME: Component? = null
 
     // Commands => Invulnerable
-    @ConfigProperty(path = ["commands", "invulnerable", "invulnerable-on"])
-    var INVULNERABLE_ON: Component? = null
-    @ConfigProperty(path = ["commands", "invulnerable", "invulnerable-off"])
-    var INVULNERABLE_OFF: Component? = null
+    @ConfigProperty(path = ["commands", "invulnerable", "invulnerable-self-on"])
+    var INVULNERABLE_SELF_ON: Component? = null
+    @ConfigProperty(path = ["commands", "invulnerable", "invulnerable-self-off"])
+    var INVULNERABLE_SELF_OFF: Component? = null
     @ConfigProperty(path = ["commands", "invulnerable", "invulnerable-others-on"])
     var INVULNERABLE_OTHERS_ON: String? = null
     @ConfigProperty(path = ["commands", "invulnerable", "invulnerable-others-off"])
     var INVULNERABLE_OTHERS_OFF: String? = null
+
+    // Commands => Feed
+    @ConfigProperty(path = ["commands", "feed", "feed-self"])
+    var FEED_SELF: Component? = null
+    @ConfigProperty(path = ["commands", "feed", "feed-others"])
+    var FEED_OTHERS: String? = null
+
+    // Commands => Heal
+    @ConfigProperty(path = ["commands", "heal", "heal-self"])
+    var HEAL_SELF: Component? = null
+    @ConfigProperty(path = ["commands", "heal", "heal-others"])
+    var HEAL_OTHERS: String? = null
 
 }
