@@ -1,9 +1,6 @@
 package azure.plugin
 
-import azure.plugin.commands.AzureCommand
-import azure.plugin.commands.EditorCommand
-import azure.plugin.commands.TeleportCommands
-import azure.plugin.commands.WorldsCommand
+import azure.plugin.commands.*
 import azure.plugin.configuration.Locale
 import azure.plugin.configuration.Settings
 import azure.plugin.listeners.ChatListener
@@ -42,6 +39,7 @@ class Azure : ServerPlugin() {
             WorldsCommand(this),
             EditorCommand(),
             TeleportCommands(),
+            InvulnerableCommand(),
         )
         // Registering events
         this.server.pluginManager.registerEvents(ChatListener(), this)

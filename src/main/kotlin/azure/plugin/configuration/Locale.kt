@@ -61,4 +61,15 @@ internal object Locale {
     var TELEPORT_OUTSIDE_WORLD_BORDER: Component? = null
     @ConfigProperty(path = ["commands", "teleport", "targets-are-the-same"])
     var TELEPORT_TARGETS_ARE_THE_SAME: Component? = null
+
+    // Commands => Invulnerable
+    @ConfigProperty(path = ["commands", "invulnerable", "invulnerable-on"])
+    var INVULNERABLE_ON: Component? = null
+    @ConfigProperty(path = ["commands", "invulnerable", "invulnerable-off"])
+    var INVULNERABLE_OFF: Component? = null
+    @ConfigProperty(path = ["commands", "invulnerable", "invulnerable-others-on"])
+    var INVULNERABLE_OTHERS_ON: String? = null
+    @ConfigProperty(path = ["commands", "invulnerable", "invulnerable-others-off"])
+    var INVULNERABLE_OTHERS_OFF: String? = null
+
 }

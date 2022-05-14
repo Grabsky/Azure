@@ -32,7 +32,7 @@ class TeleportCommands {
             if (sender != target && sender != destination) {
                 sender.sendMessageOrIgnore(Locale.TELEPORT_TELEPORTED_PLAYER_TO_PLAYER, Placeholders.BADGES, Placeholder.unparsed("target", target.name), Placeholder.unparsed("destination", destination.name))
             }
-            // Sending information messages if -s (silent) flag is not enabled
+            // Sending information messages if -s (silent) flag is not true
             if (silent != true) {
                 target.sendMessageOrIgnore(Locale.TELEPORT_TELEPORTED_TO_PLAYER, Placeholders.BADGES, Placeholder.unparsed("target", destination.name))
                 destination.sendMessageOrIgnore(Locale.TELEPORT_PLAYER_TELEPORTED_TO_YOU, Placeholders.BADGES, Placeholder.unparsed("target", target.name))
@@ -70,7 +70,7 @@ class TeleportCommands {
                             Placeholder.unparsed("world", world.name)
                         )
                     }
-                    // Sending information messages if -s (silent) flag is not enabled
+                    // Sending information messages if -s (silent) flag is not true
                     if (silent != true) {
                         target.sendMessageOrIgnore(
                             Locale.TELEPORT_TELEPORTED_TO_LOCATION,
