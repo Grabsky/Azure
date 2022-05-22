@@ -40,6 +40,8 @@ class Azure : ServerPlugin() {
             EditorCommand(),
             TeleportCommands(),
             InvulnerableCommand(),
+            HealCommand(),
+            FeedCommand(),
         )
         // Registering events
         this.server.pluginManager.registerEvents(ChatListener(), this)
