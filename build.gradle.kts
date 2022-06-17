@@ -2,7 +2,6 @@ val buildsDirectory = "${System.getenv("DEVELOPMENT_DIR")}/builds"
 
 group = "azure"
 version = "1.0-SNAPSHOT"
-description = "Azure"
 
 plugins {
     id("java-library")
@@ -12,17 +11,16 @@ plugins {
 }
 
 repositories {
-    maven { url = uri("https://jitpack.io") }
-    maven { url = uri("https://papermc.io/repo/repository/maven-public/") }
+    maven("https://jitpack.io")
+    maven("https://papermc.io/repo/repository/maven-public/")
 }
 
 dependencies {
-    // Kotlin (required)
+    // Kotlin
     compileOnly("org.jetbrains.kotlin", "kotlin-stdlib-jdk8", "1.7.0")
-    // Kotlin (optional)
     compileOnly("org.jetbrains.kotlinx", "kotlinx-serialization-core", "1.3.3")
     compileOnly("org.jetbrains.kotlinx", "kotlinx-serialization-json", "1.3.3")
-    // Paper (mojang mapped)
+    // Paper
     paperDevBundle("1.18.2-R0.1-SNAPSHOT")
     // Dependencies
     compileOnly("net.luckperms", "api", "5.4")
