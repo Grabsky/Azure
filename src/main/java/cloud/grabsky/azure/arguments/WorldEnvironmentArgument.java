@@ -1,0 +1,59 @@
+package cloud.grabsky.azure.arguments;
+
+import cloud.grabsky.commands.ArgumentQueue;
+import cloud.grabsky.commands.RootCommandContext;
+import cloud.grabsky.commands.component.ArgumentParser;
+import cloud.grabsky.commands.component.CompletionsProvider;
+import cloud.grabsky.commands.exception.ArgumentParseException;
+import cloud.grabsky.commands.exception.MissingInputException;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.World;
+
+import java.util.List;
+
+import static java.util.Arrays.stream;
+import static net.kyori.adventure.text.Component.text;
+
+public enum WorldEnvironmentArgument implements ArgumentParser<World.Environment>, CompletionsProvider {
+    /* SINGLETON */ INSTANCE;
+
+    private static final List<String> WORLD_ENVIRONMENTS = stream(World.Environment.values()).map((type) -> type.name().toLowerCase()).toList();
+
+    @Override
+    public List<String> provide(RootCommandContext context) {
+        return WORLD_ENVIRONMENTS;
+    }
+
+    @Override
+    public World.Environment parse(final RootCommandContext context, final ArgumentQueue queue) throws ArgumentParseException, MissingInputException {
+        final String value = queue.next(String.class).asRequired();
+        // ...
+        for (final World.Environment env : World.Environment.values()) {
+            if (env.toString().equalsIgnoreCase(value))
+                return env;
+        }
+        // ...
+        throw new WorldEnvironmentParseException(value);
+    }
+
+    /**
+     * {@link WorldEnvironmentParseException} is thrown when invalid value is provided for {@link World.Environment} argument type.
+     */
+    public static final class WorldEnvironmentParseException extends ArgumentParseException {
+
+        public WorldEnvironmentParseException(final String inputValue) {
+            super(inputValue);
+        }
+
+        public WorldEnvironmentParseException(final String inputValue, final Throwable cause) {
+            super(inputValue, cause);
+        }
+
+        @Override
+        public void accept(final RootCommandContext context) {
+            context.getExecutor().asCommandSender().sendMessage(text("Invalid World.Environment argument.", NamedTextColor.RED));
+        }
+
+    }
+
+}
