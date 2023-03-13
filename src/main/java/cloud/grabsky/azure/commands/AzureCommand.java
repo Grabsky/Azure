@@ -32,10 +32,10 @@ public final class AzureCommand extends RootCommand {
         // ...
         if (queue.next(String.class).asRequired().equalsIgnoreCase("reload") == true) {
             if (Azure.getInstance().reloadConfiguration() == true) {
-                sendMessage(sender, AzureLocale.AZURE_RELOAD_SUCCESS);
+                sendMessage(sender, AzureLocale.COMMAND_AZURE_RELOAD_SUCCESS);
                 return;
             }
-            sendMessage(sender, AzureLocale.AZURE_RELOAD_FAILURE);
+            sendMessage(sender, AzureLocale.COMMAND_AZURE_RELOAD_FAILURE);
         }
     }
 

@@ -1,0 +1,42 @@
+{
+    // Chat settings.
+    "chat_settings": {
+        // Chat cooldown in milliseconds. Set to 0 to disable.
+        "cooldown": 1000,
+
+        // Chat formats. Supports MiniMessage tags and some placeholders.
+        "formats": {
+            // Default chat format used as a fallback. Placeholders: [player, message]
+            "default": "\u7500 <player>: <message>",
+            // Console chat format. Placeholedrs: [signature_uuid, rank, player, message]
+            "console": "[<signature_uuid>] [<rank>] <player>: <message>",
+            // Chat format applied per LuckPerms' group. Placeholders: [player, message]
+            "extra": [
+                { "group": "admin", "format": "(Admin) <player>: <message>" }
+            ],
+        },
+        // Message tags.
+        "message_tags": {
+            // Default message tags used as a fallback.
+            "default": [],
+            // Message formatting applied per-permission. One player should have access to one group.
+            "extra": [
+                { "permission": "azure.plugin.chat.staff_decorations", "tags": ["color", "decorations", "gradient", "rainbow", "transition", "insertion"] }
+            ],
+        },
+        // Moderation features.
+        "moderation": {
+            // Message deletion. Messages can be deleted for 5 minutes after being sent. Sender must be online.
+            "message_deletion": {
+                "enabled": true,
+                "button_text": "×",
+                "button_hover_text": "<gray>Click to delete this message."
+            }
+        },
+        // Discord webhooks. Forwards chat messages to Discord server using configured webhook.
+        "discord_webhooks": {
+            "enabled": true,
+            "discord_webhook_url": ""
+        }
+    }
+}

@@ -3,3 +3,9 @@ version: '0.9.0-pre'
 api-version: '1.19'
 main: 'cloud.grabsky.azure.Azure'
 loader: 'cloud.grabsky.azure.AzurePluginLoader'
+dependencies:
+  - name: LuckPerms
+    required: true
+load-after:
+  - name: LuckPerms
+    bootstrap: false

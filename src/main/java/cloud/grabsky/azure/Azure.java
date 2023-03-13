@@ -4,12 +4,10 @@ import cloud.grabsky.azure.arguments.GameRuleArgument;
 import cloud.grabsky.azure.arguments.WorldEnvironmentArgument;
 import cloud.grabsky.azure.arguments.WorldTypeArgument;
 import cloud.grabsky.azure.chat.ChatManager;
-import cloud.grabsky.azure.commands.AzureCommand;
-import cloud.grabsky.azure.commands.DeleteCommand;
-import cloud.grabsky.azure.commands.GiveCommand;
-import cloud.grabsky.azure.commands.NickCommand;
-import cloud.grabsky.azure.commands.WorldCommand;
+import cloud.grabsky.azure.commands.*;
+import cloud.grabsky.azure.configuration.AzureConfig;
 import cloud.grabsky.azure.configuration.AzureLocale;
+import cloud.grabsky.azure.configuration.adapters.StandardTagResolverAdapter;
 import cloud.grabsky.bedrock.BedrockPlugin;
 import cloud.grabsky.commands.RootCommandManager;
 import cloud.grabsky.commands.exception.IncompatibleSenderException;
@@ -19,6 +17,9 @@ import cloud.grabsky.configuration.paper.PaperConfigurationMapper;
 import lombok.AccessLevel;
 import lombok.Getter;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
 import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.WorldType;
@@ -37,6 +38,9 @@ public final class Azure extends BedrockPlugin implements Listener {
     @Getter(AccessLevel.PUBLIC)
     private static Azure instance;
 
+    @Getter(AccessLevel.PUBLIC)
+    private LuckPerms luckPerms;
+
     @Getter(AccessLevel.PRIVATE)
     private ConfigurationMapper mapper;
 
@@ -49,13 +53,17 @@ public final class Azure extends BedrockPlugin implements Listener {
         // ...
         instance = this;
         // ...
-        this.mapper = PaperConfigurationMapper.create();
+        this.mapper = PaperConfigurationMapper.create(moshi -> {
+            moshi.add(TagResolver.class, StandardTagResolverAdapter.INSTANCE);
+        });
         // ...
         if (this.onReload() == false) {
             return; // Plugin should be disabled automatically whenever exception is thrown.
         }
         // ...
-        this.chat = new ChatManager();
+        this.luckPerms = LuckPermsProvider.get();
+        // ...
+        this.chat = new ChatManager(this);
         // ...
         final RootCommandManager commands = new RootCommandManager(this);
         // ...
@@ -98,8 +106,10 @@ public final class Azure extends BedrockPlugin implements Listener {
     public boolean onReload() throws ConfigurationMappingException {
         try {
             final File locale = ensureResourceExistence(this, new File(this.getDataFolder(), "locale.json"));
+            final File config = ensureResourceExistence(this, new File(this.getDataFolder(), "config.json"));
             // ...
             mapper.map(AzureLocale.class, locale);
+            mapper.map(AzureConfig.class, config);
             return true;
         } catch (final IOException exc) {
             throw new IllegalStateException(exc); // Re-throwing as runtime exception

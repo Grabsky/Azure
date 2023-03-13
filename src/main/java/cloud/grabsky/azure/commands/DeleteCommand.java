@@ -17,7 +17,7 @@ public final class DeleteCommand extends RootCommand {
     private final ChatManager chat;
 
     public DeleteCommand(final ChatManager chat) {
-        super("delete", null, "azure.command.delete", "/delete", null);
+        super("delete", null, "azure.command.delete", "/delete <player> <signature_uuid>", null);
         this.chat = chat;
     }
 

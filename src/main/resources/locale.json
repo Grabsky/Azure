@@ -1,13 +1,18 @@
 {
+    "chat": {
+        "on_cooldown": "<dark_gray>› <red>Musisz chwilę poczekać..."
+    },
     "commands": {
-        // azure reload
         "azure_reload_success": "<dark_gray>› <gray>Plugin <yellow>Azure <gray>został załadowany pomyślnie.",
         "azure_reload_failure": "<dark_gray>› <red>Wystąpił błąd podczas ładowania pluginu <yellow>Azure<red>.",
-        // give
+
+        "delete_usage": "<dark_gray>› <yellow>/delete <player> <signature_uuid>",
+        "delete_failure": "<dark_gray>› <red>Usuwanie wiadomości nie powiodło się.",
+
         "give_usage": "/give <player> <material> <amount> [--silent]",
         "give_sent": "<dark_gray>› <gray>Gracz <yellow><player><gray> otrzymał <yellow><amount>x <material><gray>.",
         "give_received": "<dark_gray>› <gray>Otrzymałeś <yellow><amount>x <material><gray>.",
-        // world, world help
+
         "world_help": [
             "",
             "<dark_gray>› <yellow>/world create <gray><name> <environment> <type>",
@@ -15,7 +20,6 @@
             "<dark_gray>› <yellow>/world delete <gray><name> [--confirm]",
             ""
         ],
-        // world info
         "world_info": [
             "",
             "<dark_gray>› <gray>Świat: <yellow><world_name> <dark_gray>/ <gray>Identyfikator: <yellow><world_key>",
@@ -23,10 +27,8 @@
             "<dark_gray>› <gray>Spawn: <yellow><spawn_x><gray>, <yellow><spawn_y><gray>, <yellow><spawn_z>",
             ""
         ],
-        // world teleport
         "world_teleport_usage": "/world teleport <target> <world>",
         "world_teleport": "<dark_gray>› <yellow><player><gray> został przeniesiony do świata <yellow><world><gray>.",
-        // world create
         "world_create_usage": "/world create <id> <env> <type>",
         "world_create_confirm": [
             "",
@@ -38,7 +40,6 @@
             ""
         ],
         "world_create_success": "<dark_gray>› <gray>Świat <yellow><world><gray> został utworzony.",
-        // world delete
         "world_delete_usage": "/world delete <world> [--confirm]",
         "world_delete_confirm": [
             "",
