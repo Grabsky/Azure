@@ -1,36 +1,36 @@
+// This JSON configuration file is lenient but keep an eye where you leave trailing commas as they tend to cause issues.
 {
     // Chat settings.
     "chat_settings": {
-        // Chat cooldown in milliseconds. Set to 0 to disable.
+        // Chat cooldown in milliseconds. Set to 0 to disable. Bypass: azure.plugin.chat.can_bypass_cooldown
         "cooldown": 1000,
-
         // Chat formats. Supports MiniMessage tags and some placeholders.
-        "formats": {
-            // Default chat format used as a fallback. Placeholders: [player, message]
-            "default": "\u7500 <player>: <message>",
-            // Console chat format. Placeholedrs: [signature_uuid, rank, player, message]
-            "console": "[<signature_uuid>] [<rank>] <player>: <message>",
-            // Chat format applied per LuckPerms' group. Placeholders: [player, message]
+        "chat_format": {
+            // Default chat format used as a fallback. Placeholders: [signature_uuid, player, displayname, group, prefix, suffix, message]
+            "default": "<player>: <message>",
+            // Console chat format. Placeholders: [player, displayname, group, prefix, suffix, message]
+            "console": "[<signature_uuid>] [<group>] <player>: <message>",
+            // Per-permission-group formats. Array order works as priority (higher index = more important). Only entry can be applied per player.
             "extra": [
+                { "group": "donator", "format": "(Donator) <player>: <message>" },
                 { "group": "admin", "format": "(Admin) <player>: <message>" }
             ],
-        },
-        // Message tags.
-        "message_tags": {
-            // Default message tags used as a fallback.
-            "default": [],
-            // Message formatting applied per-permission. One player should have access to one group.
-            "extra": [
-                { "permission": "azure.plugin.chat.staff_decorations", "tags": ["color", "decorations", "gradient", "rainbow", "transition", "insertion"] }
-            ],
+            // Tags allowed inside messages. Tags: [click, color, decorations, font, gradient, hover, insertion, keybind, newline, rainbow, reset, selector, transition, translatable]
+            "allowed_tags": {
+                // Default tags collection used as a fallback.
+                "default": [],
+                // Per-permission tags. Array order works as priority (higher index = more important). Only one entry can be applied per player.
+                "extra": [
+                    { "permission": "azure.plugin.chat.staff_allowed_tags", "tags": ["color", "decorations", "gradient", "rainbow", "reset"] }
+                ]
+            }
         },
         // Moderation features.
         "moderation": {
-            // Message deletion. Messages can be deleted for 5 minutes after being sent. Sender must be online.
+            // Message deletion. Messages can be deleted for 5 minutes after being sent.
             "message_deletion": {
                 "enabled": true,
-                "button_text": "×",
-                "button_hover_text": "<gray>Click to delete this message."
+                "button": { "position": "before", "text": "<gray>×", "hover": "<gray>Click to delete this message." }
             }
         },
         // Discord webhooks. Forwards chat messages to Discord server using configured webhook.

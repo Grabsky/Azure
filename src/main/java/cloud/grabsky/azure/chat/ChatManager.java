@@ -1,58 +1,63 @@
 package cloud.grabsky.azure.chat;
 
 import cloud.grabsky.azure.Azure;
-import cloud.grabsky.azure.chat.holder.FormatHolder;
-import cloud.grabsky.azure.chat.holder.TagsHolder;
 import cloud.grabsky.azure.configuration.AzureConfig;
+import cloud.grabsky.azure.configuration.AzureConfig.DeleteButton.Position;
+import cloud.grabsky.azure.configuration.AzureConfig.FormatHolder;
+import cloud.grabsky.azure.configuration.AzureConfig.TagsHolder;
 import cloud.grabsky.azure.configuration.AzureLocale;
-import cloud.grabsky.bedrock.BedrockScheduler;
 import cloud.grabsky.bedrock.util.Interval;
 import cloud.grabsky.bedrock.util.Interval.Unit;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import io.papermc.paper.event.player.AsyncChatDecorateEvent;
 import io.papermc.paper.event.player.AsyncChatEvent;
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.chat.SignedMessage;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import net.luckperms.api.model.user.User;
+import net.luckperms.api.cacheddata.CachedMetaData;
 import net.luckperms.api.model.user.UserManager;
+import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static cloud.grabsky.bedrock.components.SystemMessenger.sendMessage;
+import static cloud.grabsky.bedrock.helpers.Conditions.requirePresent;
 import static java.lang.System.currentTimeMillis;
 import static net.kyori.adventure.text.Component.empty;
+import static net.kyori.adventure.text.event.ClickEvent.runCommand;
+import static net.kyori.adventure.text.event.HoverEvent.showText;
 import static net.kyori.adventure.text.format.NamedTextColor.WHITE;
 
 public final class ChatManager implements Listener {
 
-    private final BedrockScheduler scheduler;
     private final UserManager luckPermsUserManager;
     private final Cache<UUID, SignedMessage.Signature> signatureCache;
     private final Map<UUID, Long> chatCooldowns;
 
     private static final MiniMessage EMPTY_MINIMESSAGE = MiniMessage.builder().tags(TagResolver.empty()).build();
+    private static final PlainTextComponentSerializer PLAIN_SERIALIZER = PlainTextComponentSerializer.plainText();
 
     private static final String CHAT_MODERATION_PERMISSION = "azure.plugin.chat.can_delete_messages";
     private static final String CHAT_COOLDOWN_BYPASS_PERMISSION = "azure.plugin.chat.can_bypass_cooldown";
 
+    public static List<FormatHolder> CHAT_FORMATS_REVERSED;
+    public static List<TagsHolder> CHAT_TAGS_REVERSED;
+
     public ChatManager(final Azure azure) {
-        this.scheduler = azure.getBedrockScheduler();
         this.luckPermsUserManager = azure.getLuckPerms().getUserManager();
         this.signatureCache = CacheBuilder.newBuilder()
                 .expireAfterWrite(5, TimeUnit.MINUTES)
@@ -63,11 +68,11 @@ public final class ChatManager implements Listener {
     /**
      * Requests deletion of a message associated with provided {@link UUID} (signatureUUID).
      */
-    public boolean deleteMessage(final Audience audience, final UUID signatureUUID) {
+    public boolean deleteMessage(final UUID signatureUUID) {
         final SignedMessage.Signature signature = signatureCache.getIfPresent(signatureUUID);
         // ...
         if (signature != null) {
-            audience.deleteMessage(signature);
+            Bukkit.getOnlinePlayers().forEach(player -> player.deleteMessage(signature));
             return true;
         }
         return false;
@@ -76,21 +81,16 @@ public final class ChatManager implements Listener {
     @EventHandler @SuppressWarnings({"UnstableApiUsage", "DataFlowIssue"})
     public void onChatDecorate(final AsyncChatDecorateEvent event) {
         // Skipping cancelled and non-player events
-        if (event.isCancelled() == true || event.player() == null) {
+        if (event.isCancelled() == true || event.player() == null)
             return;
-        }
-        final String message = PlainTextComponentSerializer.plainText().serialize(event.originalMessage());
+        // ...
+        final String message = PLAIN_SERIALIZER.serialize(event.originalMessage());
         // ...
         final ItemStack item = event.player().getInventory().getItemInMainHand();
         // ...
         final Component itemComponent = empty().color(WHITE).append(item.displayName()).hoverEvent(item.asHoverEvent());
         // Creating result Component using serializers player has access to
-        final TagResolver matchingResolvers = AzureConfig.CHAT_MESSAGE_TAGS_EXTRA
-                .stream()
-                .filter(holder -> event.player().hasPermission(holder.getPermission()) == true)
-                .map(TagsHolder::getTags)
-                .findFirst()
-                .orElse(AzureConfig.CHAT_MESSAGE_TAGS_DEFAULT);
+        final TagResolver matchingResolvers = this.findSuitableTagsCollection(event.player(), AzureConfig.CHAT_MESSAGE_TAGS_DEFAULT);
         // ...
         final Component result = EMPTY_MINIMESSAGE.deserialize(message, matchingResolvers, Placeholder.component("item", itemComponent));
         // Setting result, the rest is handled within AsyncChatEvent
@@ -99,68 +99,91 @@ public final class ChatManager implements Listener {
 
     @EventHandler @SuppressWarnings("DataFlowIssue")
     public void onChat(final AsyncChatEvent event) {
-        if (event.isCancelled() == false && event.signedMessage().signature() != null) {
-            final UUID sourceUUID = event.getPlayer().getUniqueId();
-            // Cooldown handling... if enabled and player does not have bypass permission
-            if (AzureConfig.CHAT_COOLDOWN > 0 && event.getPlayer().hasPermission(CHAT_COOLDOWN_BYPASS_PERMISSION) == false) {
-                if (Interval.between(currentTimeMillis(), chatCooldowns.getOrDefault(sourceUUID, 0L), Unit.MILLISECONDS).as(Unit.MILLISECONDS) < AzureConfig.CHAT_COOLDOWN) {
-                    event.setCancelled(true);
-                    sendMessage(event.getPlayer(), AzureLocale.CHAT_ON_COOLDOWN);
-                    return;
-                }
-                // ...setting cooldown
-                chatCooldowns.put(sourceUUID, currentTimeMillis());
+        // Cancelled events are not handled
+        if (event.isCancelled() == true)
+            return;
+        // Cooldown handling... if enabled and player does not have bypass permission
+        if (AzureConfig.CHAT_COOLDOWN > 0 && event.getPlayer().hasPermission(CHAT_COOLDOWN_BYPASS_PERMISSION) == false) {
+            if (Interval.between(currentTimeMillis(), chatCooldowns.getOrDefault(event.getPlayer().getUniqueId(), 0L), Unit.MILLISECONDS).as(Unit.MILLISECONDS) < AzureConfig.CHAT_COOLDOWN) {
+                event.setCancelled(true);
+                sendMessage(event.getPlayer(), AzureLocale.CHAT_ON_COOLDOWN);
+                return;
             }
-            final UUID signatureUUID = UUID.randomUUID();
-            // ...
+            // ...setting cooldown
+            chatCooldowns.put(event.getPlayer().getUniqueId(), currentTimeMillis());
+        }
+        // ...
+        final UUID signatureUUID = (event.signedMessage().signature() != null) ? UUID.randomUUID() : null;
+        // ...
+        if (signatureUUID != null) {
             signatureCache.put(signatureUUID, event.signedMessage().signature());
-            // ...
-            event.renderer((source, sourceDisplayName, message, viewer) -> {
-                // Getting the luckperms primary group
-                // TO-DO: Multi-group support
-                final User user = luckPermsUserManager.getUser(sourceUUID);
-                final String userPrimaryGroup = user.getPrimaryGroup();
-                // Console...
-                if (viewer instanceof ConsoleCommandSender) return MiniMessage.miniMessage().deserialize(
+        }
+        // Customizing renderer...
+        event.renderer((source, sourceDisplayName, message, viewer) -> {
+            // Getting the luckperms primary group
+            final CachedMetaData user = luckPermsUserManager.getUser(source.getUniqueId()).getCachedData().getMetaData();
+            // Console...
+            if (viewer instanceof ConsoleCommandSender) {
+                return MiniMessage.miniMessage().deserialize(
                         AzureConfig.CHAT_FORMATS_CONSOLE,
                         Placeholder.unparsed("signature_uuid", signatureUUID.toString()),
-                        Placeholder.unparsed("group", userPrimaryGroup),
-                        Placeholder.unparsed("player", event.getPlayer().getName()),
+                        Placeholder.unparsed("player", source.getName()),
+                        Placeholder.unparsed("group", requirePresent(user.getPrimaryGroup(), "")),
+                        Placeholder.parsed("prefix", requirePresent(user.getPrefix(), "")),
+                        Placeholder.parsed("suffix", requirePresent(user.getSuffix(), "")),
+                        Placeholder.component("displayname", sourceDisplayName),
                         Placeholder.component("message", event.message())
                 );
-                // Player...
-                if (viewer instanceof Player receiver) {
+            }
+            // Player...
+            if (viewer instanceof Player receiver) {
+                // ...
+                final String matchingChatFormat = this.findSuitableChatFormat(source, AzureConfig.CHAT_FORMATS_DEFAULT);
+                // ...
+                final Component formattedChat = MiniMessage.miniMessage().deserialize(
+                        matchingChatFormat,
+                        Placeholder.unparsed("player", source.getName()),
+                        Placeholder.unparsed("group", requirePresent(user.getPrimaryGroup(), "")),
+                        Placeholder.parsed("prefix", requirePresent(user.getPrefix(), "")),
+                        Placeholder.parsed("suffix", requirePresent(user.getSuffix(), "")),
+                        Placeholder.component("displayname", sourceDisplayName),
+                        Placeholder.component("message", event.message())
+                );
+                // Adding "DELETE MESSAGE" button for allowed viewers
+                if (AzureConfig.CHAT_MODERATION_MESSAGE_DELETION_ENABLED == true && receiver.hasPermission(CHAT_MODERATION_PERMISSION) == true && source.hasPermission(CHAT_MODERATION_PERMISSION) == false) {
+                    final Component button = AzureConfig.CHAT_MODERATION_MESSAGE_DELETION_BUTTON.getText()
+                            .clickEvent(runCommand("/delete " + signatureUUID))
+                            .hoverEvent(showText(AzureConfig.CHAT_MODERATION_MESSAGE_DELETION_BUTTON.getHover()));
                     // ...
-                    final String matchingChatFormat = AzureConfig.CHAT_FORMATS_EXTRA
-                            .stream()
-                            .filter(holder -> holder.getGroup().equals(userPrimaryGroup) == true)
-                            .map(FormatHolder::getFormat)
-                            .findFirst()
-                            .orElse(AzureConfig.CHAT_FORMATS_DEFAULT);
-                    // ...
-                    final Component formattedChat = MiniMessage.miniMessage().deserialize(
-                            matchingChatFormat,
-                            Placeholder.unparsed("group", userPrimaryGroup),
-                            Placeholder.unparsed("player", source.getName()),
-                            Placeholder.component("message", event.message())
-                    );
-                    // Adding "DELETE MESSAGE" button for allowed viewers
-                    if (AzureConfig.CHAT_MODERATION_MESSAGE_DELETION_ENABLED == true && receiver.hasPermission(CHAT_MODERATION_PERMISSION) == true /* && source.hasPermission(CHAT_MODERATION_PERMISSION) == false */) {
-                        final ClickEvent onClick = ClickEvent.runCommand("/delete " + source.getName() + " " + signatureUUID);
-                        final HoverEvent<Component> onHover = HoverEvent.showText(AzureConfig.CHAT_MODERATION_MESSAGE_DELETION_BUTTON_HOVER_TEXT);
-                        // ...
-                        return empty().append(AzureConfig.CHAT_MODERATION_MESSAGE_DELETION_BUTTON_TEXT.clickEvent(onClick).hoverEvent(onHover).appendSpace()).append(formattedChat);
-                    }
-                    return formattedChat;
+                    return (AzureConfig.CHAT_MODERATION_MESSAGE_DELETION_BUTTON.getPosition() == Position.BEFORE)
+                            ? empty().append(button).appendSpace().append(formattedChat)
+                            : empty().append(formattedChat).appendSpace().append(button);
                 }
-                // Anything else...
-                return message;
-            });
-        }
+                return formattedChat;
+            }
+            // Anything else...
+            return message;
+        });
         // Forwarding a webhook...
         if (AzureConfig.CHAT_DISCORD_WEBHOOK_ENABLED == true) {
             // TO-DO: ...
         }
+    }
+
+    private @NotNull TagResolver findSuitableTagsCollection(final @NotNull Player player, final @NotNull TagResolver def) {
+        return CHAT_TAGS_REVERSED.stream()
+                .filter(holder -> player.hasPermission(holder.getPermission()) == true)
+                .map(TagsHolder::getTags)
+                .findFirst()
+                .orElse(def);
+    }
+
+    private @NotNull String findSuitableChatFormat(final @NotNull Player player, final @NotNull String def) {
+        return CHAT_FORMATS_REVERSED.stream()
+                .filter(holder -> player.hasPermission("group." + holder.getGroup()) == true)
+                .map(FormatHolder::getFormat)
+                .findFirst()
+                .orElse(def);
     }
 
 }

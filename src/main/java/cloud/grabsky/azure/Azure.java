@@ -6,12 +6,14 @@ import cloud.grabsky.azure.arguments.WorldTypeArgument;
 import cloud.grabsky.azure.chat.ChatManager;
 import cloud.grabsky.azure.commands.*;
 import cloud.grabsky.azure.configuration.AzureConfig;
+import cloud.grabsky.azure.configuration.AzureConfig.DeleteButton;
 import cloud.grabsky.azure.configuration.AzureLocale;
 import cloud.grabsky.azure.configuration.adapters.StandardTagResolverAdapter;
 import cloud.grabsky.bedrock.BedrockPlugin;
 import cloud.grabsky.commands.RootCommandManager;
 import cloud.grabsky.commands.exception.IncompatibleSenderException;
 import cloud.grabsky.configuration.ConfigurationMapper;
+import cloud.grabsky.configuration.adapter.AbstractEnumJsonAdapter;
 import cloud.grabsky.configuration.exception.ConfigurationMappingException;
 import cloud.grabsky.configuration.paper.PaperConfigurationMapper;
 import lombok.AccessLevel;
@@ -55,6 +57,7 @@ public final class Azure extends BedrockPlugin implements Listener {
         // ...
         this.mapper = PaperConfigurationMapper.create(moshi -> {
             moshi.add(TagResolver.class, StandardTagResolverAdapter.INSTANCE);
+            moshi.add(DeleteButton.Position.class, new AbstractEnumJsonAdapter<>(DeleteButton.Position.class, false) { /* DEFAULT */ });
         });
         // ...
         if (this.onReload() == false) {
