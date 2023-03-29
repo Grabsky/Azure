@@ -1,6 +1,6 @@
 package cloud.grabsky.azure.commands;
 
-import cloud.grabsky.azure.configuration.AzureLocale;
+import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
@@ -27,7 +27,7 @@ public final class GiveCommand extends RootCommand {
 
     private static final ExceptionHandler.Factory SEND_USAGE_ON_MISSING_INPUT = (exception) -> {
         if (exception instanceof MissingInputException) return (_0, context) -> {
-            context.getExecutor().asCommandSender().sendMessage(AzureLocale.COMMAND_GIVE_USAGE);
+            context.getExecutor().asCommandSender().sendMessage(PluginLocale.COMMAND_GIVE_USAGE);
         };
         // DEFAULT HANDLER
         return null;
@@ -55,14 +55,14 @@ public final class GiveCommand extends RootCommand {
         // ...
         target.getInventory().addItem(new ItemStack(material, amount));
         // message
-        sendMessage(sender, AzureLocale.COMMAND_GIVE_SENDER,
+        sendMessage(sender, PluginLocale.COMMAND_GIVE_SENDER,
                 Placeholder.unparsed("player", target.getName()),
                 Placeholder.unparsed("amount", String.valueOf(amount)),
                 Placeholder.component("material", translatable(material.translationKey()))
         );
         // ...
         if (sender != target && containsIgnoreCase(flags, "--silent") == false) {
-            sendMessage(target, AzureLocale.COMMAND_GIVE_TARGET,
+            sendMessage(target, PluginLocale.COMMAND_GIVE_TARGET,
                     Placeholder.unparsed("amount", String.valueOf(amount)),
                     Placeholder.component("material", translatable(material.translationKey()))
             );

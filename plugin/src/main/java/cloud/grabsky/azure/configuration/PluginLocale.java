@@ -6,7 +6,7 @@ import cloud.grabsky.configuration.JsonPath;
 import cloud.grabsky.configuration.paper.adapter.StringComponentAdapter;
 import net.kyori.adventure.text.Component;
 
-public final class AzureLocale implements JsonConfiguration {
+public final class PluginLocale implements JsonConfiguration {
 
     // Chat
 

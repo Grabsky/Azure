@@ -1,14 +1,22 @@
 package cloud.grabsky.azure;
 
+import cloud.grabsky.azure.api.AzureAPI;
+import cloud.grabsky.azure.api.AzureProvider;
+import cloud.grabsky.azure.api.user.UserCache;
 import cloud.grabsky.azure.arguments.GameRuleArgument;
 import cloud.grabsky.azure.arguments.WorldEnvironmentArgument;
 import cloud.grabsky.azure.arguments.WorldTypeArgument;
 import cloud.grabsky.azure.chat.ChatManager;
-import cloud.grabsky.azure.commands.*;
-import cloud.grabsky.azure.configuration.AzureConfig;
-import cloud.grabsky.azure.configuration.AzureConfig.DeleteButton;
-import cloud.grabsky.azure.configuration.AzureLocale;
+import cloud.grabsky.azure.commands.AzureCommand;
+import cloud.grabsky.azure.commands.DeleteCommand;
+import cloud.grabsky.azure.commands.GiveCommand;
+import cloud.grabsky.azure.commands.NickCommand;
+import cloud.grabsky.azure.commands.WorldCommand;
+import cloud.grabsky.azure.configuration.PluginConfig;
+import cloud.grabsky.azure.configuration.PluginConfig.DeleteButton;
+import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.azure.configuration.adapters.StandardTagResolverAdapter;
+import cloud.grabsky.azure.user.AzureUserCache;
 import cloud.grabsky.bedrock.BedrockPlugin;
 import cloud.grabsky.commands.RootCommandManager;
 import cloud.grabsky.commands.exception.IncompatibleSenderException;
@@ -27,18 +35,21 @@ import org.bukkit.World;
 import org.bukkit.WorldType;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.function.Consumer;
 
 import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
 import static net.kyori.adventure.text.Component.text;
 
-public final class Azure extends BedrockPlugin implements Listener {
+public final class Azure extends BedrockPlugin implements AzureAPI {
 
     @Getter(AccessLevel.PUBLIC)
     private static Azure instance;
+
+    @Getter(AccessLevel.PUBLIC)
+    private UserCache userCache;
 
     @Getter(AccessLevel.PUBLIC)
     private LuckPerms luckPerms;
@@ -50,6 +61,11 @@ public final class Azure extends BedrockPlugin implements Listener {
     private ChatManager chat;
 
     @Override
+    public Consumer<RootCommandManager> getCommandManagerTemplate() {
+        throw new UnsupportedOperationException("NOT IMPLEMENTED");
+    }
+
+    @Override
     public void onEnable() {
         super.onEnable();
         // ...
@@ -59,10 +75,13 @@ public final class Azure extends BedrockPlugin implements Listener {
             moshi.add(TagResolver.class, StandardTagResolverAdapter.INSTANCE);
             moshi.add(DeleteButton.Position.class, new AbstractEnumJsonAdapter<>(DeleteButton.Position.class, false) { /* DEFAULT */ });
         });
-        // ...
+        // this#onReload throws ConfigurationMappingException which should stop the server in case of failure.
         if (this.onReload() == false) {
-            return; // Plugin should be disabled automatically whenever exception is thrown.
+            return;
         }
+        // ...
+        this.userCache = new AzureUserCache(this);
+        this.getServer().getPluginManager().registerEvents((AzureUserCache) userCache, this);
         // ...
         this.luckPerms = LuckPermsProvider.get();
         // ...
@@ -95,6 +114,8 @@ public final class Azure extends BedrockPlugin implements Listener {
         commands.registerCommand(new DeleteCommand(chat));
         // ........
         this.getServer().getPluginManager().registerEvents(chat, this);
+        // ...
+        AzureProvider.finalize(this);
     }
 
     public boolean reloadConfiguration() {
@@ -111,12 +132,12 @@ public final class Azure extends BedrockPlugin implements Listener {
             final File locale = ensureResourceExistence(this, new File(this.getDataFolder(), "locale.json"));
             final File config = ensureResourceExistence(this, new File(this.getDataFolder(), "config.json"));
             // ...
-            mapper.map(AzureLocale.class, locale);
-            mapper.map(AzureConfig.class, config);
+            mapper.map(PluginLocale.class, locale);
+            mapper.map(PluginConfig.class, config);
             return true;
         } catch (final IOException exc) {
             throw new IllegalStateException(exc); // Re-throwing as runtime exception
         }
     }
-
+    
 }

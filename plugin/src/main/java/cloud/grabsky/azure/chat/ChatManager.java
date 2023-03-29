@@ -1,11 +1,11 @@
 package cloud.grabsky.azure.chat;
 
 import cloud.grabsky.azure.Azure;
-import cloud.grabsky.azure.configuration.AzureConfig;
-import cloud.grabsky.azure.configuration.AzureConfig.DeleteButton.Position;
-import cloud.grabsky.azure.configuration.AzureConfig.FormatHolder;
-import cloud.grabsky.azure.configuration.AzureConfig.TagsHolder;
-import cloud.grabsky.azure.configuration.AzureLocale;
+import cloud.grabsky.azure.configuration.PluginConfig;
+import cloud.grabsky.azure.configuration.PluginConfig.DeleteButton.Position;
+import cloud.grabsky.azure.configuration.PluginConfig.FormatHolder;
+import cloud.grabsky.azure.configuration.PluginConfig.TagsHolder;
+import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.bedrock.util.Interval;
 import cloud.grabsky.bedrock.util.Interval.Unit;
 import com.google.common.cache.Cache;
@@ -90,7 +90,7 @@ public final class ChatManager implements Listener {
         // ...
         final Component itemComponent = empty().color(WHITE).append(item.displayName()).hoverEvent(item.asHoverEvent());
         // Creating result Component using serializers player has access to
-        final TagResolver matchingResolvers = this.findSuitableTagsCollection(event.player(), AzureConfig.CHAT_MESSAGE_TAGS_DEFAULT);
+        final TagResolver matchingResolvers = this.findSuitableTagsCollection(event.player(), PluginConfig.CHAT_MESSAGE_TAGS_DEFAULT);
         // ...
         final Component result = EMPTY_MINIMESSAGE.deserialize(message, matchingResolvers, Placeholder.component("item", itemComponent));
         // Setting result, the rest is handled within AsyncChatEvent
@@ -103,10 +103,10 @@ public final class ChatManager implements Listener {
         if (event.isCancelled() == true)
             return;
         // Cooldown handling... if enabled and player does not have bypass permission
-        if (AzureConfig.CHAT_COOLDOWN > 0 && event.getPlayer().hasPermission(CHAT_COOLDOWN_BYPASS_PERMISSION) == false) {
-            if (Interval.between(currentTimeMillis(), chatCooldowns.getOrDefault(event.getPlayer().getUniqueId(), 0L), Unit.MILLISECONDS).as(Unit.MILLISECONDS) < AzureConfig.CHAT_COOLDOWN) {
+        if (PluginConfig.CHAT_COOLDOWN > 0 && event.getPlayer().hasPermission(CHAT_COOLDOWN_BYPASS_PERMISSION) == false) {
+            if (Interval.between(currentTimeMillis(), chatCooldowns.getOrDefault(event.getPlayer().getUniqueId(), 0L), Unit.MILLISECONDS).as(Unit.MILLISECONDS) < PluginConfig.CHAT_COOLDOWN) {
                 event.setCancelled(true);
-                sendMessage(event.getPlayer(), AzureLocale.CHAT_ON_COOLDOWN);
+                sendMessage(event.getPlayer(), PluginLocale.CHAT_ON_COOLDOWN);
                 return;
             }
             // ...setting cooldown
@@ -125,7 +125,7 @@ public final class ChatManager implements Listener {
             // Console...
             if (viewer instanceof ConsoleCommandSender) {
                 return MiniMessage.miniMessage().deserialize(
-                        AzureConfig.CHAT_FORMATS_CONSOLE,
+                        PluginConfig.CHAT_FORMATS_CONSOLE,
                         Placeholder.unparsed("signature_uuid", signatureUUID.toString()),
                         Placeholder.unparsed("player", source.getName()),
                         Placeholder.unparsed("group", requirePresent(user.getPrimaryGroup(), "")),
@@ -138,7 +138,7 @@ public final class ChatManager implements Listener {
             // Player...
             if (viewer instanceof Player receiver) {
                 // ...
-                final String matchingChatFormat = this.findSuitableChatFormat(source, AzureConfig.CHAT_FORMATS_DEFAULT);
+                final String matchingChatFormat = this.findSuitableChatFormat(source, PluginConfig.CHAT_FORMATS_DEFAULT);
                 // ...
                 final Component formattedChat = MiniMessage.miniMessage().deserialize(
                         matchingChatFormat,
@@ -150,12 +150,12 @@ public final class ChatManager implements Listener {
                         Placeholder.component("message", event.message())
                 );
                 // Adding "DELETE MESSAGE" button for allowed viewers
-                if (AzureConfig.CHAT_MODERATION_MESSAGE_DELETION_ENABLED == true && receiver.hasPermission(CHAT_MODERATION_PERMISSION) == true && source.hasPermission(CHAT_MODERATION_PERMISSION) == false) {
-                    final Component button = AzureConfig.CHAT_MODERATION_MESSAGE_DELETION_BUTTON.getText()
+                if (PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_ENABLED == true && receiver.hasPermission(CHAT_MODERATION_PERMISSION) == true && source.hasPermission(CHAT_MODERATION_PERMISSION) == false) {
+                    final Component button = PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_BUTTON.getText()
                             .clickEvent(runCommand("/delete " + signatureUUID))
-                            .hoverEvent(showText(AzureConfig.CHAT_MODERATION_MESSAGE_DELETION_BUTTON.getHover()));
+                            .hoverEvent(showText(PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_BUTTON.getHover()));
                     // ...
-                    return (AzureConfig.CHAT_MODERATION_MESSAGE_DELETION_BUTTON.getPosition() == Position.BEFORE)
+                    return (PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_BUTTON.getPosition() == Position.BEFORE)
                             ? empty().append(button).appendSpace().append(formattedChat)
                             : empty().append(formattedChat).appendSpace().append(button);
                 }
@@ -165,7 +165,7 @@ public final class ChatManager implements Listener {
             return message;
         });
         // Forwarding a webhook...
-        if (AzureConfig.CHAT_DISCORD_WEBHOOK_ENABLED == true) {
+        if (PluginConfig.CHAT_DISCORD_WEBHOOK_ENABLED == true) {
             // TO-DO: ...
         }
     }

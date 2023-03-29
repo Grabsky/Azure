@@ -1,7 +1,7 @@
 package cloud.grabsky.azure.commands;
 
 import cloud.grabsky.azure.chat.ChatManager;
-import cloud.grabsky.azure.configuration.AzureLocale;
+import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
@@ -28,13 +28,13 @@ public final class DeleteCommand extends RootCommand {
         final UUID uuid = queue.next(UUID.class).asRequired(SEND_USAGE_ON_MISSING_INPUT);
         // Requests message deletion and send error message on failure
         if (chat.deleteMessage(uuid) == false) {
-            sendMessage(context.getExecutor().asCommandSender(), AzureLocale.COMMAND_DELETE_FAILURE);
+            sendMessage(context.getExecutor().asCommandSender(), PluginLocale.COMMAND_DELETE_FAILURE);
         }
     }
 
     private static final ExceptionHandler.Factory SEND_USAGE_ON_MISSING_INPUT = (exception) -> {
         if (exception instanceof MissingInputException) return (_0, context) -> {
-            sendMessage(context.getExecutor().asCommandSender(), AzureLocale.COMMAND_DELETE_USAGE);
+            sendMessage(context.getExecutor().asCommandSender(), PluginLocale.COMMAND_DELETE_USAGE);
         };
         return null;
     };

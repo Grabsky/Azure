@@ -1,6 +1,6 @@
 package cloud.grabsky.azure.commands;
 
-import cloud.grabsky.azure.configuration.AzureLocale;
+import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
@@ -18,6 +18,7 @@ import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -47,6 +48,7 @@ public final class WorldCommand extends RootCommand {
             case "create" -> switch (index) {
                 case 2 -> CompletionsProvider.of(World.Environment.class);
                 case 3 -> CompletionsProvider.of(WorldType.class);
+                case 4 -> CompletionsProvider.of(Stream.of(Bukkit.getPluginManager().getPlugins()).map(Plugin::getName).toList());
                 default -> CompletionsProvider.EMPTY;
             };
             case "delete" -> (index == 1)
@@ -82,23 +84,22 @@ public final class WorldCommand extends RootCommand {
         System.out.println(arguments.getCurrentArgumentIndex());
         // ...
         switch (arguments.nextString()) {
-            default -> sendMessage(sender, AzureLocale.COMMAND_WORLD_HELP);
+            default -> sendMessage(sender, PluginLocale.COMMAND_WORLD_HELP);
             // syntax: /world create <name> <environment> <type>
             case "create" -> {
-                System.out.println(arguments.getCurrentArgumentIndex());
                 final NamespacedKey key = arguments.next(NamespacedKey.class).asRequired();
-                System.out.println(arguments.getCurrentArgumentIndex());
                 final World.Environment environment = arguments.next(World.Environment.class).asRequired();
-                System.out.println(arguments.getCurrentArgumentIndex());
                 final WorldType type = arguments.next(WorldType.class).asRequired();
+                final String generator = arguments.next(String.class).asOptional(null);
                 // ...
                 if (Bukkit.getWorld(key) == null) {
                     final World world = Bukkit.createWorld(
                             new WorldCreator(key)
                                     .environment(environment)
                                     .type(type)
+                                    .generator(generator)
                     );
-                    sendMessage(sender, AzureLocale.COMMAND_WORLD_CREATE,
+                    sendMessage(sender, PluginLocale.COMMAND_WORLD_CREATE,
                             Placeholder.unparsed("world", world.key().asString())
                     );
                     return;
@@ -112,7 +113,7 @@ public final class WorldCommand extends RootCommand {
                 final World world = arguments.next(World.class).asRequired();
                 // ...
                 target.teleport(world.getSpawnLocation());
-                sendMessage(sender, AzureLocale.COMMAND_WORLD_TELEPORT,
+                sendMessage(sender, PluginLocale.COMMAND_WORLD_TELEPORT,
                         Placeholder.unparsed("player", target.getName()),
                         Placeholder.unparsed("world", world.key().asString())
                 );
@@ -132,7 +133,7 @@ public final class WorldCommand extends RootCommand {
                     Bukkit.unloadWorld(world, false);
                     // deleting world directory
                     if (deleteDirectory(world.getWorldFolder()) == true) {
-                        sendMessage(sender, AzureLocale.COMMAND_WORLD_DELETE,
+                        sendMessage(sender, PluginLocale.COMMAND_WORLD_DELETE,
                                 Placeholder.unparsed("world", world.key().asString())
                         );
                         return;
@@ -140,7 +141,7 @@ public final class WorldCommand extends RootCommand {
                     sender.sendMessage("failed to delete");
                     return;
                 }
-                sendMessage(sender, AzureLocale.COMMAND_WORLD_DELETE_CONFIRM,
+                sendMessage(sender, PluginLocale.COMMAND_WORLD_DELETE_CONFIRM,
                         Placeholder.unparsed("input", context.getInput().toString()),
                         Placeholder.unparsed("world", world.key().asString())
                 );
@@ -150,7 +151,7 @@ public final class WorldCommand extends RootCommand {
                 // ...
                 final Location spawnLoc = world.getSpawnLocation();
                 // ...
-                sendMessage(sender, AzureLocale.COMMAND_WORLD_INFO,
+                sendMessage(sender, PluginLocale.COMMAND_WORLD_INFO,
                         Placeholder.unparsed("world_name", world.getName()),
                         Placeholder.unparsed("world_key", world.getKey().asString()),
                         Placeholder.unparsed("world_environment", world.getEnvironment().name()),

@@ -1,0 +1,44 @@
+plugins {
+    id("maven-publish")
+}
+
+final Boolean isSnapshot = version.endsWith("-SNAPSHOT")
+final String hash7 = "git rev-parse --verify --short HEAD".execute().text.trim()
+
+publishing {
+    repositories {
+        maven {
+            url (isSnapshot == true ? "https://repo.grabsky.cloud/snapshots" : "https://repo.grabsky.cloud/releases")
+            credentials {
+                username = System.getenv("REPO_USERNAME")
+                password = System.getenv("REPO_SECRET")
+            }
+        }
+    }
+    publications {
+        maven(MavenPublication) {
+            version = (isSnapshot == true ? hash7 : version)
+            from components.java
+        }
+    }
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+javadoc {
+    (options as CoreJavadocOptions).addStringOption("Xdoclint:none", "-quiet")
+}
+
+repositories {
+    mavenLocal()
+    maven { url = "https://repo.grabsky.cloud/snapshots" }
+    maven { url = "https://papermc.io/repo/repository/maven-public/" }
+}
+
+dependencies {
+    compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
+    compileOnly("cloud.grabsky:commands:7743a41")
+}

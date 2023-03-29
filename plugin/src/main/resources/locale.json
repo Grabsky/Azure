@@ -1,3 +1,4 @@
+// This JSON configuration file is lenient but keep an eye where you leave trailing commas as they tend to cause issues.
 {
     "chat": {
         "on_cooldown": "<dark_gray>› <red>Musisz chwilę poczekać..."

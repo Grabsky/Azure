@@ -14,7 +14,7 @@ import java.util.List;
 
 import static cloud.grabsky.azure.util.Iterables.reversed;
 
-public final class AzureConfig implements JsonConfiguration {
+public final class PluginConfig implements JsonConfiguration {
 
     // Chat Settings
 
@@ -60,8 +60,8 @@ public final class AzureConfig implements JsonConfiguration {
 
     @Override
     public void onReload() {
-        ChatManager.CHAT_FORMATS_REVERSED = reversed(AzureConfig.CHAT_FORMATS_EXTRA);
-        ChatManager.CHAT_TAGS_REVERSED = reversed(AzureConfig.CHAT_MESSAGE_TAGS_EXTRA);
+        ChatManager.CHAT_FORMATS_REVERSED = reversed(PluginConfig.CHAT_FORMATS_EXTRA);
+        ChatManager.CHAT_TAGS_REVERSED = reversed(PluginConfig.CHAT_MESSAGE_TAGS_EXTRA);
     }
 
     /* SURROGATES */

@@ -2,7 +2,7 @@ package cloud.grabsky.azure.commands;
 
 
 import cloud.grabsky.azure.Azure;
-import cloud.grabsky.azure.configuration.AzureLocale;
+import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
@@ -32,10 +32,10 @@ public final class AzureCommand extends RootCommand {
         // ...
         if (queue.next(String.class).asRequired().equalsIgnoreCase("reload") == true) {
             if (Azure.getInstance().reloadConfiguration() == true) {
-                sendMessage(sender, AzureLocale.COMMAND_AZURE_RELOAD_SUCCESS);
+                sendMessage(sender, PluginLocale.COMMAND_AZURE_RELOAD_SUCCESS);
                 return;
             }
-            sendMessage(sender, AzureLocale.COMMAND_AZURE_RELOAD_FAILURE);
+            sendMessage(sender, PluginLocale.COMMAND_AZURE_RELOAD_FAILURE);
         }
     }
 

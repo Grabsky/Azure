@@ -8,7 +8,7 @@ import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.jetbrains.annotations.NotNull;
 
-public class AzurePluginLoader implements PluginLoader {
+public final class AzurePluginLoader implements PluginLoader {
 
     private static final RemoteRepository[] REPOSITORIES = {
             repository("https://repo.papermc.io/repository/maven-public/"),
@@ -31,7 +31,7 @@ public class AzurePluginLoader implements PluginLoader {
         for (final Dependency dependency : DEPENDENCIES)
             maven.addDependency(dependency);
         // ...
-        // builder.addLibrary(maven);
+        builder.addLibrary(maven);
     }
 
     private static RemoteRepository repository(final @NotNull String url) {

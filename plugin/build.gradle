@@ -1,0 +1,35 @@
+plugins {
+    id("com.github.johnrengelman.shadow") version "8.1.0"
+}
+
+final buildsDirectory = (System.getenv("JVM_WORKSPACE") ?: ".") + File.separator + "builds"
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url = "https://repo.grabsky.cloud/snapshots" }
+    maven { url = "https://papermc.io/repo/repository/maven-public/" }
+}
+
+dependencies {
+    api project(":azure-api")
+    // ...
+    compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
+    // ...
+    implementation("cloud.grabsky:bedrock:61f4fe8")
+    implementation("cloud.grabsky:commands:7743a41")
+    implementation("cloud.grabsky:configuration-paper:fc2b94c")
+    // ...
+    compileOnly("net.luckperms:api:5.4")
+}
+
+tasks.register("deploy", Copy) {
+    from shadowJar
+    into buildsDirectory
+    rename(shadowJar.archiveFileName.get(), "${rootProject.name}-${version}.jar")
+}
+
+tasks {
+    assemble { dependsOn(shadowJar) finalizedBy(deploy) }
+    processResources { filteringCharset "UTF-8" }
+}
