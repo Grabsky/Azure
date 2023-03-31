@@ -17,7 +17,7 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
     // ...
     implementation("cloud.grabsky:bedrock:a3da672")
-    implementation("cloud.grabsky:commands:2e0ea3e")
+    implementation("cloud.grabsky:commands:7de0ff9")
     implementation("cloud.grabsky:configuration-paper:fc2b94c")
     // ...
     compileOnly("net.luckperms:api:5.4")

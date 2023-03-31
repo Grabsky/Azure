@@ -22,7 +22,9 @@ public final class AzureCommand extends RootCommand {
     @Override
     public @NotNull CompletionsProvider onTabComplete(final @NotNull RootCommandContext context, int index) {
         return (index == 0)
-                ? CompletionsProvider.of("reload")
+                ? (context.getExecutor().asCommandSender().hasPermission(this.getPermission() + ".reload") == true)
+                        ? CompletionsProvider.of("reload")
+                        : CompletionsProvider.EMPTY
                 : CompletionsProvider.EMPTY;
     }
 
@@ -32,10 +34,10 @@ public final class AzureCommand extends RootCommand {
         // ...
         if (queue.next(String.class).asRequired().equalsIgnoreCase("reload") == true) {
             if (Azure.getInstance().reloadConfiguration() == true) {
-                sendMessage(sender, PluginLocale.COMMAND_AZURE_RELOAD_SUCCESS);
+                sendMessage(sender, PluginLocale.RELOAD_SUCCESS);
                 return;
             }
-            sendMessage(sender, PluginLocale.COMMAND_AZURE_RELOAD_FAILURE);
+            sendMessage(sender, PluginLocale.RELOAD_FAILURE);
         }
     }
 

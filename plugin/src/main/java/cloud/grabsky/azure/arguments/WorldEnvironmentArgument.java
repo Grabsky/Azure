@@ -11,13 +11,12 @@ import org.bukkit.World;
 
 import java.util.List;
 
-import static java.util.Arrays.stream;
 import static net.kyori.adventure.text.Component.text;
 
 public enum WorldEnvironmentArgument implements ArgumentParser<World.Environment>, CompletionsProvider {
     /* SINGLETON */ INSTANCE;
 
-    private static final List<String> WORLD_ENVIRONMENTS = stream(World.Environment.values()).map((type) -> type.name().toLowerCase()).toList();
+    private static final List<String> WORLD_ENVIRONMENTS = List.of("normal", "nether", "the_end");
 
     @Override
     public List<String> provide(RootCommandContext context) {

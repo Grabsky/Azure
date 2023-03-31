@@ -1,26 +1,31 @@
 // This JSON configuration file is lenient but keep an eye where you leave trailing commas as they tend to cause issues.
 {
+    "missing_permissions": "<dark_gray>› <red>Nie masz uprawnień aby to zrobić.",
+    "reload_success": "<dark_gray>› <gray>Plugin <yellow>Azure <gray>został załadowany pomyślnie.",
+    "reload_failure": "<dark_gray>› <red>Wystąpił błąd podczas ładowania pluginu <yellow>Azure<red>.",
+    // ...
     "chat": {
         "on_cooldown": "<dark_gray>› <red>Musisz chwilę poczekać..."
     },
+    // ...
     "commands": {
-        "azure_reload_success": "<dark_gray>› <gray>Plugin <yellow>Azure <gray>został załadowany pomyślnie.",
-        "azure_reload_failure": "<dark_gray>› <red>Wystąpił błąd podczas ładowania pluginu <yellow>Azure<red>.",
-
+        // Delete
         "delete_usage": "<dark_gray>› <yellow>/delete <player> <signature_uuid>",
         "delete_failure": "<dark_gray>› <red>Usuwanie wiadomości nie powiodło się.",
-
+        // Give
         "give_usage": "/give <player> <material> <amount> [--silent]",
         "give_sent": "<dark_gray>› <gray>Gracz <yellow><player><gray> otrzymał <yellow><amount>x <material><gray>.",
         "give_received": "<dark_gray>› <gray>Otrzymałeś <yellow><amount>x <material><gray>.",
-
+        // World > Help
         "world_help": [
             "",
-            "<dark_gray>› <yellow>/world create <gray><name> <environment> <type>",
-            "<dark_gray>› <yellow>/world teleport <gray><target> <name>",
-            "<dark_gray>› <yellow>/world delete <gray><name> [--confirm]",
+            "<dark_gray>› <yellow>/world create <gray><name> <environment> <type> <generator> [seed]",
+            "<dark_gray>› <yellow>/world gamerule <gray><world> <rule> [value]",
+            "<dark_gray>› <yellow>/world teleport <gray><target> <world>",
+            "<dark_gray>› <yellow>/world delete <gray><world> [--confirm]",
             ""
         ],
+        // World > Info
         "world_info": [
             "",
             "<dark_gray>› <gray>Świat: <yellow><world_name> <dark_gray>/ <gray>Identyfikator: <yellow><world_key>",
@@ -28,8 +33,13 @@
             "<dark_gray>› <gray>Spawn: <yellow><spawn_x><gray>, <yellow><spawn_y><gray>, <yellow><spawn_z>",
             ""
         ],
+        // World > Teleport
         "world_teleport_usage": "/world teleport <target> <world>",
         "world_teleport": "<dark_gray>› <yellow><player><gray> został przeniesiony do świata <yellow><world><gray>.",
+        // World > Load
+        "world_load_success": "",
+        "world_load_failure_not_found": "",
+        // World > Create
         "world_create_usage": "/world create <id> <env> <type>",
         "world_create_confirm": [
             "",
@@ -41,13 +51,20 @@
             ""
         ],
         "world_create_success": "<dark_gray>› <gray>Świat <yellow><world><gray> został utworzony.",
+        "world_create_failure_already_exists": "<dark_gray>› <red>Świat <yellow><world><red> już istnieje.",
+        // World > Gamerule
+        "world_gamerule_view": "<dark_gray>› <gray>Wartość zasady <yellow><rule><gray> to <yellow><value>",
+        "world_gamerule_set_success": "<dark_gray>› <gray>Ustawiono wartość zasady <yellow><rule><gray> na <yellow><value>",
+        "world_gamerule_set_failure": "<dark_gray>› <red>Wartość zasady <yellow><rule><red> nie została zaktualizowana.",
+        // World > Delete
         "world_delete_usage": "/world delete <world> [--confirm]",
         "world_delete_confirm": [
             "",
             "<dark_gray>› <gray>Czy na pewno chcesz usunąć świat <yellow><world><gray>?",
-            "<dark_gray>› <gray>Kliknij <yellow><b><u>tutaj</u></b><gray>, aby potwierdzić.",
+            "<dark_gray>› <gray>Użyj flagi <yellow>--confirm<gray>, aby potwierdzić.",
             ""
         ],
-        "world_delete_success": "<dark_gray>› <gray>Świat <yellow><world><gray> został usunięty."
+        "world_delete_success": "<dark_gray>› <gray>Świat <yellow><world><gray> został usunięty.",
+        "world_delete_failure": "<dark_gray>› <red>Świat <yellow><world><red> nie został usunięty."
     }
 }
