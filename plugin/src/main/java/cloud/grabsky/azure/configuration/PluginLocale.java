@@ -65,16 +65,30 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.world_create_failure_already_exists")
     public static String COMMAND_WORLD_CREATE_FAILURE_ALREADY_EXISTS;
 
+    @JsonPath("commands.world_create_failure_other")
+    public static String COMMAND_WORLD_CREATE_FAILURE_OTHER;
+
     // Commands > World > Gamerule
 
-    @JsonPath("commands.world_gamerule_view")
-    public static String COMMAND_WORLD_GAMERULE_VIEW;
+    @JsonPath("commands.world_gamerule_info")
+    public static String COMMAND_WORLD_GAMERULE_INFO;
 
     @JsonPath("commands.world_gamerule_set_success")
     public static String COMMAND_WORLD_GAMERULE_SUCCESS;
 
     @JsonPath("commands.world_gamerule_set_failure")
     public static String COMMAND_WORLD_GAMERULE_FAILURE;
+
+    // Commands > World > Load
+
+    @JsonPath("commands.world_load_success")
+    public static String COMMAND_WORLD_LOAD_SUCCESS;
+
+    @JsonPath("commands.world_load_failure_not_found")
+    public static String COMMAND_WORLD_LOAD_FAILURE_NOT_FOUND;
+
+    @JsonPath("commands.world_load_failure_other")
+    public static String COMMAND_WORLD_LOAD_FAILURE_OTHER;
 
     // Commands > World > Delete
 
@@ -87,5 +101,21 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.world_delete_confirm")
     @JsonAdapter(fromJson = StringComponentAdapter.class)
     public static String COMMAND_WORLD_DELETE_CONFIRM;
+
+    // Commands > World > Time
+
+    @JsonPath("commands.world_time_info")
+    public static String COMMAND_WORLD_TIME_INFO;
+
+    @JsonPath("commands.world_time_set_success")
+    public static String COMMAND_WORLD_TIME_SET_SUCCESS;
+
+    // Commands > World > Weather
+
+    @JsonPath("commands.world_weather_set_success")
+    public static String COMMAND_WORLD_WEATHER_SET_SUCCESS;
+
+    @JsonPath("commands.world_weather_set_failure_invalid_type")
+    public static String COMMAND_WORLD_WEATHER_SET_FAILURE_INVALID_TYPE;
 
 }

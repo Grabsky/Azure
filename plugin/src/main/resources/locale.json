@@ -19,26 +19,29 @@
         // World > Help
         "world_help": [
             "",
-            "<dark_gray>› <yellow>/world create <gray><name> <environment> <type> <generator> [seed]",
+            "<dark_gray>› <yellow>/world create <gray><name> <environment> <type> <generator> <seed> [-a]",
+            "<dark_gray>› <yellow>/world load <gray><world>",
             "<dark_gray>› <yellow>/world gamerule <gray><world> <rule> [value]",
             "<dark_gray>› <yellow>/world teleport <gray><target> <world>",
             "<dark_gray>› <yellow>/world delete <gray><world> [--confirm]",
+            "<dark_gray>› <yellow>/world info <world>",
             ""
         ],
         // World > Info
         "world_info": [
             "",
             "<dark_gray>› <gray>Świat: <yellow><world_name> <dark_gray>/ <gray>Identyfikator: <yellow><world_key>",
-            "<dark_gray>› <gray>Środowisko: <yellow><world_environment> <dark_gray>/ <gray>Liczba graczy: <yellow><world_online>",
-            "<dark_gray>› <gray>Spawn: <yellow><spawn_x><gray>, <yellow><spawn_y><gray>, <yellow><spawn_z>",
+            "<dark_gray>› <gray>Środowisko: <yellow><world_environment> <dark_gray>/ <gray>Seed: <yellow><world_seed>",
+            "<dark_gray>› <gray>Spawn: <yellow><spawn_x><gray>, <yellow><spawn_y><gray>, <yellow><spawn_z> <dark_gray>/ <gray>Liczba graczy: <yellow><world_online>",
             ""
         ],
         // World > Teleport
         "world_teleport_usage": "/world teleport <target> <world>",
         "world_teleport": "<dark_gray>› <yellow><player><gray> został przeniesiony do świata <yellow><world><gray>.",
         // World > Load
-        "world_load_success": "",
-        "world_load_failure_not_found": "",
+        "world_load_success": "<dark_gray>› <gray>Świat <yellow><world><gray> został załadowany.",
+        "world_load_failure_not_found": "<dark_gray>› <red>Świat <yellow><world><red> nie istnieje.",
+        "world_load_failure_other": "<dark_gray>› <red>Wystąpił błąd podczas ładowania świata <yellow><world><red>.",
         // World > Create
         "world_create_usage": "/world create <id> <env> <type>",
         "world_create_confirm": [
@@ -52,8 +55,9 @@
         ],
         "world_create_success": "<dark_gray>› <gray>Świat <yellow><world><gray> został utworzony.",
         "world_create_failure_already_exists": "<dark_gray>› <red>Świat <yellow><world><red> już istnieje.",
+        "world_create_failure_other": "<dark_gray>› <red>Wystąpił błąd podczas tworzenia świata <yellow><world><red>.",
         // World > Gamerule
-        "world_gamerule_view": "<dark_gray>› <gray>Wartość zasady <yellow><rule><gray> to <yellow><value>",
+        "world_gamerule_info": "<dark_gray>› <gray>Wartość zasady <yellow><rule><gray> to <yellow><value>",
         "world_gamerule_set_success": "<dark_gray>› <gray>Ustawiono wartość zasady <yellow><rule><gray> na <yellow><value>",
         "world_gamerule_set_failure": "<dark_gray>› <red>Wartość zasady <yellow><rule><red> nie została zaktualizowana.",
         // World > Delete
@@ -65,6 +69,12 @@
             ""
         ],
         "world_delete_success": "<dark_gray>› <gray>Świat <yellow><world><gray> został usunięty.",
-        "world_delete_failure": "<dark_gray>› <red>Świat <yellow><world><red> nie został usunięty."
+        "world_delete_failure": "<dark_gray>› <red>Świat <yellow><world><red> nie został usunięty.",
+        // World > Time
+        "world_time_info": "<dark_gray>› Czas w <yellow><world><gray> to <yellow><time><gray>.",
+        "world_time_set_success": "<dark_gray>› <gray>Czas w <yellow><world><gray> został ustawiony na <yellow><time><gray>.",
+        // World > Weather
+        "world_weather_set_success": "<dark_gray>› <gray>Pogoda w <yellow><world><gray> została ustawiona na <yellow><weather><gray>.",
+        "world_weather_set_failure_invalid_type": "<dark_gray>› <red>Nieprawidłowy typ pogody."
     }
 }

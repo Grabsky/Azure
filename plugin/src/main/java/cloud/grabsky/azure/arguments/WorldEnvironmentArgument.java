@@ -8,6 +8,7 @@ import cloud.grabsky.commands.exception.ArgumentParseException;
 import cloud.grabsky.commands.exception.MissingInputException;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.World;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -19,12 +20,12 @@ public enum WorldEnvironmentArgument implements ArgumentParser<World.Environment
     private static final List<String> WORLD_ENVIRONMENTS = List.of("normal", "nether", "the_end");
 
     @Override
-    public List<String> provide(RootCommandContext context) {
+    public @NotNull List<String> provide(RootCommandContext context) {
         return WORLD_ENVIRONMENTS;
     }
 
     @Override
-    public World.Environment parse(final RootCommandContext context, final ArgumentQueue queue) throws ArgumentParseException, MissingInputException {
+    public World.Environment parse(final @NotNull RootCommandContext context, final @NotNull ArgumentQueue queue) throws ArgumentParseException, MissingInputException {
         final String value = queue.next(String.class).asRequired();
         // ...
         for (final World.Environment env : World.Environment.values()) {

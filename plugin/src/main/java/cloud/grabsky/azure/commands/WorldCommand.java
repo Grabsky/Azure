@@ -1,5 +1,8 @@
 package cloud.grabsky.azure.commands;
 
+import cloud.grabsky.azure.Azure;
+import cloud.grabsky.azure.arguments.WorldTimeArgument;
+import cloud.grabsky.azure.arguments.WorldSeedArgument;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
@@ -13,7 +16,6 @@ import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
-import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -32,8 +34,11 @@ import static net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.unpa
 
 public final class WorldCommand extends RootCommand {
 
-    public WorldCommand() {
+    private final Azure plugin;
+
+    public WorldCommand(final Azure plugin) {
         super("world", null, "azure.command.world", "/world [args]", "Manage your worlds in-game.");
+        this.plugin = plugin;
     }
 
     @Override
@@ -42,7 +47,7 @@ public final class WorldCommand extends RootCommand {
         final RootCommandInput input = context.getInput();
         // ...
         if (index == 0) return CompletionsProvider.of(
-                Stream.of("create", "delete", "gamerule", "info", "teleport").filter(literal -> sender.hasPermission(this.getPermission() + "." + literal) == true).toList()
+                Stream.of("create", "delete", "gamerule", "info", "teleport", "load", "time", "weather").filter(literal -> sender.hasPermission(this.getPermission() + "." + literal) == true).toList()
         );
         // ...
         final String literal = input.at(1).toLowerCase();
@@ -54,11 +59,13 @@ public final class WorldCommand extends RootCommand {
                 case 2 -> CompletionsProvider.of(World.Environment.class);
                 case 3 -> CompletionsProvider.of(WorldType.class);
                 case 4 -> CompletionsProvider.of("natural");
-                case 5 -> (context.getExecutor().isPlayer() == true)
-                        ? CompletionsProvider.of(valueOf(context.getExecutor().asPlayer().getWorld().getSeed()))
-                        : CompletionsProvider.EMPTY;
+                case 5 -> WorldSeedArgument.INSTANCE;
+                case 6 -> CompletionsProvider.of("-a");
                 default -> CompletionsProvider.EMPTY;
             };
+            case "load" -> (index == 1)
+                    ? CompletionsProvider.of(Stream.of(plugin.getServer().getWorldContainer().listFiles()).filter(File::isDirectory).filter(dir -> new File(dir, "level.dat").exists() == true).map(File::getName).toList())
+                    : CompletionsProvider.EMPTY;
             case "delete" -> (index == 1)
                     ? CompletionsProvider.of(World.class)
                     : CompletionsProvider.of("--confirm");
@@ -81,6 +88,16 @@ public final class WorldCommand extends RootCommand {
                 case 2 -> CompletionsProvider.of(World.class);
                 default -> CompletionsProvider.EMPTY;
             };
+            case "time" -> switch (index) {
+                case 1 -> CompletionsProvider.of(World.class);
+                case 2 -> WorldTimeArgument.INSTANCE;
+                default -> CompletionsProvider.EMPTY;
+            };
+            case "weather" -> switch (index) {
+                case 1 -> CompletionsProvider.of(World.class);
+                case 2 -> CompletionsProvider.of("clear", "rain", "thunder");
+                default -> CompletionsProvider.EMPTY;
+            };
             // ...
             default -> CompletionsProvider.EMPTY;
         };
@@ -97,34 +114,37 @@ public final class WorldCommand extends RootCommand {
             case "delete" -> this.onWorldDelete(context, arguments);
             case "info" -> this.onWorldInfo(context, arguments);
             case "gamerule" -> this.onWorldGamerule(context, arguments);
+            case "load" -> this.onWorldLoad(context, arguments);
+            case "time" -> this.onWorldTime(context, arguments);
+            case "weather" -> this.onWorldWeather(context, arguments);
         }
     }
 
     private void onWorldCreate(final RootCommandContext context, final ArgumentQueue arguments) {
         final CommandSender sender = context.getExecutor().asCommandSender();
         // ...
-        if (sender.hasPermission(this.getPermission() + "." + "create") == true) {
+        if (sender.hasPermission(this.getPermission() + ".create") == true) {
             final NamespacedKey key = arguments.next(NamespacedKey.class).asRequired();
             final World.Environment environment = arguments.next(World.Environment.class).asRequired();
             final WorldType type = arguments.next(WorldType.class).asRequired();
             final String generator = arguments.next(String.class).asRequired();
-            final Long seed = arguments.next(Long.class).asOptional(null);
+            final Long seed = arguments.next(Long.class, WorldSeedArgument.INSTANCE).asOptional(null);
             // ...
-            if (new File(Bukkit.getWorldContainer(), key.getKey()).exists() == false && Bukkit.getWorld(key) == null) {
-                final WorldCreator creator = new WorldCreator(key);
+            final String[] flags = arguments.next(String.class, StringArgument.GREEDY).asOptional("").split(" ");
+            // ...
+            try {
+                final World world = plugin.getWorldManager().createWorld(key, environment, type, generator, seed, containsIgnoreCase(flags, "-a"));
                 // ...
-                creator.environment(environment);
-                creator.type(type);
-                creator.generator(generator);
-                if (seed != null)
-                    creator.seed(seed);
+                if (world != null)
+                    sendMessage(sender, PluginLocale.COMMAND_WORLD_CREATE_SUCCESS, unparsed("world", world.key().asString()));
                 // ...
-                final World world = Bukkit.createWorld(creator);
-                // ...
-                sendMessage(sender, PluginLocale.COMMAND_WORLD_CREATE_SUCCESS, unparsed("world", world.key().asString()));
                 return;
+            } catch (final IllegalStateException e) {
+                sendMessage(sender, PluginLocale.COMMAND_WORLD_CREATE_FAILURE_ALREADY_EXISTS, unparsed("world", key.asString()));
+            } catch (final IOException e) {
+                e.printStackTrace();
+                sendMessage(sender, PluginLocale.COMMAND_WORLD_CREATE_FAILURE_OTHER, unparsed("world", key.asString()));
             }
-            sendMessage(sender, PluginLocale.COMMAND_WORLD_CREATE_FAILURE_ALREADY_EXISTS, unparsed("world", key.asString()));
             return;
         }
         sendMessage(sender, PluginLocale.MISSING_PERMISSIONS);
@@ -133,7 +153,7 @@ public final class WorldCommand extends RootCommand {
     private void onWorldTeleport(final RootCommandContext context, final ArgumentQueue arguments) {
         final CommandSender sender = context.getExecutor().asCommandSender();
         // ...
-        if (sender.hasPermission(this.getPermission() + "." + "teleport") == true) {
+        if (sender.hasPermission(this.getPermission() + ".teleport") == true) {
             final Player target = arguments.next(Player.class).asRequired();
             final World world = arguments.next(World.class).asRequired();
             // ...
@@ -150,7 +170,7 @@ public final class WorldCommand extends RootCommand {
     private void onWorldDelete(final RootCommandContext context, final ArgumentQueue arguments) {
         final CommandSender sender = context.getExecutor().asCommandSender();
         // ...
-        if (sender.hasPermission(this.getPermission() + "." + "delete") == true) {
+        if (sender.hasPermission(this.getPermission() + ".delete") == true) {
             final World world = arguments.next(World.class).asRequired();
             final String[] flags = arguments.next(String.class, StringArgument.GREEDY).asOptional("").split(" ");
             // ...
@@ -181,7 +201,7 @@ public final class WorldCommand extends RootCommand {
     private void onWorldInfo(final RootCommandContext context, final ArgumentQueue arguments) {
         final CommandSender sender = context.getExecutor().asCommandSender();
         // ...
-        if (sender.hasPermission(this.getPermission() + "." + "info") == true) {
+        if (sender.hasPermission(this.getPermission() + ".info") == true) {
             final World world = arguments.next(World.class).asOptional(context.getExecutor().asPlayer().getWorld());
             // ...
             final Location spawnLoc = world.getSpawnLocation();
@@ -189,6 +209,7 @@ public final class WorldCommand extends RootCommand {
             sendMessage(sender, PluginLocale.COMMAND_WORLD_INFO,
                     unparsed("world_name", world.getName()),
                     unparsed("world_key", world.getKey().asString()),
+                    unparsed("world_seed", valueOf(world.getSeed())),
                     unparsed("world_environment", world.getEnvironment().name()),
                     unparsed("world_online", valueOf(world.getPlayerCount())),
                     unparsed("spawn_x", valueOf(spawnLoc.x())),
@@ -200,16 +221,37 @@ public final class WorldCommand extends RootCommand {
         sendMessage(sender, PluginLocale.MISSING_PERMISSIONS);
     }
 
+    private void onWorldLoad(final RootCommandContext context, final ArgumentQueue arguments) {
+        final CommandSender sender = context.getExecutor().asCommandSender();
+        // ...
+        if (sender.hasPermission(this.getPermission() + ".load") == true) {
+            final NamespacedKey key = arguments.next(NamespacedKey.class).asRequired();
+            // ...
+            try {
+                plugin.getWorldManager().loadWorld(key, true);
+                sendMessage(sender, PluginLocale.COMMAND_WORLD_LOAD_SUCCESS, unparsed("world", key.asString()));
+            } catch (final IllegalStateException e) {
+                sendMessage(sender, PluginLocale.COMMAND_WORLD_LOAD_FAILURE_NOT_FOUND, unparsed("world", key.asString()));
+            } catch (IOException e) {
+                e.printStackTrace();
+                sendMessage(sender, PluginLocale.COMMAND_WORLD_LOAD_FAILURE_OTHER, unparsed("world", key.asString()));
+            }
+            return;
+        }
+        sendMessage(sender, PluginLocale.MISSING_PERMISSIONS);
+    }
+
+    @SuppressWarnings("unchecked")
     private void onWorldGamerule(final RootCommandContext context, final ArgumentQueue arguments) {
         final CommandSender sender = context.getExecutor().asCommandSender();
         // ...
-        if (sender.hasPermission(this.getPermission() + "." + "gamerule") == true) {
+        if (sender.hasPermission(this.getPermission() + ".gamerule") == true) {
             final World world = arguments.next(World.class).asRequired();
             final GameRule<Object> gameRule = arguments.next(GameRule.class).asRequired();
             final Object value = arguments.next(gameRule.getType()).asOptional();
             // ...
             if (value == null) {
-                sendMessage(sender, PluginLocale.COMMAND_WORLD_GAMERULE_VIEW, unparsed("rule", gameRule.getName()), unparsed("value", world.getGameRuleValue(gameRule).toString()));
+                sendMessage(sender, PluginLocale.COMMAND_WORLD_GAMERULE_INFO, unparsed("rule", gameRule.getName()), unparsed("value", world.getGameRuleValue(gameRule).toString()));
                 return;
             }
             // ...
@@ -218,6 +260,54 @@ public final class WorldCommand extends RootCommand {
                 return;
             }
             sendMessage(sender, PluginLocale.COMMAND_WORLD_GAMERULE_FAILURE, unparsed("rule", gameRule.getName()));
+            return;
+        }
+        sendMessage(sender, PluginLocale.MISSING_PERMISSIONS);
+    }
+
+    private void onWorldTime(final RootCommandContext context, final ArgumentQueue arguments) {
+        final CommandSender sender = context.getExecutor().asCommandSender();
+        // ...
+        if (sender.hasPermission(this.getPermission() + ".time") == true) {
+            final World world = arguments.next(World.class).asRequired();
+            final Long time = arguments.next(Long.class, WorldTimeArgument.INSTANCE).asOptional(null);
+            // ...
+            if (time == null) {
+                sendMessage(sender, PluginLocale.COMMAND_WORLD_TIME_INFO, unparsed("world", world.key().asString()), unparsed("time", valueOf(world.getTime())));
+                return;
+            }
+            world.setTime(time);
+            sendMessage(sender, PluginLocale.COMMAND_WORLD_TIME_SET_SUCCESS, unparsed("world", world.key().asString()), unparsed("time", valueOf(time)));
+            return;
+        }
+        sendMessage(sender, PluginLocale.MISSING_PERMISSIONS);
+    }
+
+    private void onWorldWeather(final RootCommandContext context, final ArgumentQueue arguments) {
+        final CommandSender sender = context.getExecutor().asCommandSender();
+        // ...
+        if (sender.hasPermission(this.getPermission() + ".weather") == true) {
+            final World world = arguments.next(World.class).asRequired();
+            final String weather = arguments.next(String.class).asRequired();
+            // ...
+            switch (weather.toLowerCase()) {
+                case "clear" -> {
+                    world.setStorm(false);
+                    world.setThundering(false);
+                }
+                case "rain" -> {
+                    world.setStorm(true);
+                    world.setThundering(false);
+                }
+                case "thunder" -> {
+                    world.setStorm(true);
+                    world.setThundering(true);
+                }
+                default -> {
+                    sendMessage(sender, PluginLocale.COMMAND_WORLD_WEATHER_SET_FAILURE_INVALID_TYPE, unparsed("world", world.key().asString()), unparsed("weather", weather));
+                }
+            }
+            sendMessage(sender, PluginLocale.COMMAND_WORLD_WEATHER_SET_SUCCESS, unparsed("world", world.key().asString()), unparsed("weather", weather));
             return;
         }
         sendMessage(sender, PluginLocale.MISSING_PERMISSIONS);

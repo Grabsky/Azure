@@ -17,6 +17,7 @@ import cloud.grabsky.azure.configuration.PluginConfig.DeleteButton;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.azure.configuration.adapters.StandardTagResolverAdapter;
 import cloud.grabsky.azure.user.AzureUserCache;
+import cloud.grabsky.azure.world.WorldManager;
 import cloud.grabsky.bedrock.BedrockPlugin;
 import cloud.grabsky.commands.RootCommandManager;
 import cloud.grabsky.commands.exception.IncompatibleSenderException;
@@ -60,6 +61,9 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
     @Getter(AccessLevel.PUBLIC)
     private ChatManager chat;
 
+    @Getter(AccessLevel.PUBLIC)
+    private WorldManager worldManager;
+
     @Override
     public Consumer<RootCommandManager> getCommandManagerTemplate() {
         throw new UnsupportedOperationException("NOT IMPLEMENTED");
@@ -87,6 +91,14 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
         // ...
         this.chat = new ChatManager(this);
         // ...
+        this.worldManager = new WorldManager(this);
+        // Loading worlds with autoLoad == true
+        try {
+            this.worldManager.loadWorlds();
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
+        // ...
         final RootCommandManager commands = new RootCommandManager(this);
         // ...
         commands.setArgumentParser(WorldType.class, WorldTypeArgument.INSTANCE);
@@ -110,7 +122,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
         commands.registerCommand(AzureCommand.class);
         commands.registerCommand(NickCommand.class);
         commands.registerCommand(GiveCommand.class);
-        commands.registerCommand(WorldCommand.class);
+        commands.registerCommand(new WorldCommand(this));
         commands.registerCommand(new DeleteCommand(chat));
         // ........
         this.getServer().getPluginManager().registerEvents(chat, this);

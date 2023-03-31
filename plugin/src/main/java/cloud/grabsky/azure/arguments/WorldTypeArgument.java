@@ -8,6 +8,7 @@ import cloud.grabsky.commands.exception.ArgumentParseException;
 import cloud.grabsky.commands.exception.MissingInputException;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.WorldType;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -20,12 +21,12 @@ public enum WorldTypeArgument implements ArgumentParser<WorldType>, CompletionsP
     private static final List<String> WORLD_TYPES = stream(WorldType.values()).map((type) -> type.name().toLowerCase()).toList();
 
     @Override
-    public List<String> provide(final RootCommandContext context) {
+    public @NotNull List<String> provide(final @NotNull RootCommandContext context) {
         return WORLD_TYPES;
     }
 
     @Override
-    public WorldType parse(final RootCommandContext context, final ArgumentQueue queue) throws ArgumentParseException, MissingInputException {
+    public WorldType parse(final @NotNull RootCommandContext context, final @NotNull ArgumentQueue queue) throws ArgumentParseException, MissingInputException {
         final String value = queue.next(String.class).asRequired();
         // ...
         for (final WorldType type : WorldType.values()) {

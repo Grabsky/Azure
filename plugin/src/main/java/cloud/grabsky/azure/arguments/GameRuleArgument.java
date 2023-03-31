@@ -8,6 +8,7 @@ import cloud.grabsky.commands.exception.ArgumentParseException;
 import cloud.grabsky.commands.exception.MissingInputException;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameRule;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -21,12 +22,12 @@ public enum GameRuleArgument implements ArgumentParser<GameRule>, CompletionsPro
     private static final List<String> GAME_RULES = stream(GameRule.values()).map(GameRule::getName).toList();
 
     @Override
-    public List<String> provide(final RootCommandContext context) {
+    public @NotNull List<String> provide(final @NotNull RootCommandContext context) {
         return GAME_RULES;
     }
 
     @Override
-    public GameRule<?> parse(final RootCommandContext context, final ArgumentQueue queue) throws ArgumentParseException, MissingInputException {
+    public GameRule<?> parse(final @NotNull RootCommandContext context, final @NotNull ArgumentQueue queue) throws ArgumentParseException, MissingInputException {
         final String value = queue.next(String.class).asRequired();
         // ...
         for (final GameRule<?> gameRule : GameRule.values()) {

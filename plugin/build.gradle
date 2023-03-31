@@ -18,7 +18,7 @@ dependencies {
     // ...
     implementation("cloud.grabsky:bedrock:a3da672")
     implementation("cloud.grabsky:commands:7de0ff9")
-    implementation("cloud.grabsky:configuration-paper:fc2b94c")
+    implementation("cloud.grabsky:configuration-paper:741c63e")
     // ...
     compileOnly("net.luckperms:api:5.4")
 }
