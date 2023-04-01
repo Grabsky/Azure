@@ -10,7 +10,7 @@
     // ...
     "commands": {
         // Delete
-        "delete_usage": "<dark_gray>› <yellow>/delete <player> <signature_uuid>",
+        "delete_usage": "<dark_gray>› <yellow>/delete <signature_uuid>",
         "delete_failure": "<dark_gray>› <red>Usuwanie wiadomości nie powiodło się.",
         // Give
         "give_usage": "/give <player> <material> <amount> [--silent]",
@@ -19,12 +19,14 @@
         // World > Help
         "world_help": [
             "",
-            "<dark_gray>› <yellow>/world create <gray><name> <environment> <type> <generator> <seed> [-a]",
-            "<dark_gray>› <yellow>/world load <gray><world>",
-            "<dark_gray>› <yellow>/world gamerule <gray><world> <rule> [value]",
-            "<dark_gray>› <yellow>/world teleport <gray><target> <world>",
+            "<dark_gray>› <yellow>/world create <gray><name> <environment> <type> <gen> <seed> [-a]",
             "<dark_gray>› <yellow>/world delete <gray><world> [--confirm]",
+            "<dark_gray>› <yellow>/world gamerule <gray><world> <rule> [value]",
             "<dark_gray>› <yellow>/world info <world>",
+            "<dark_gray>› <yellow>/world load <gray><world>",
+            "<dark_gray>› <yellow>/world teleport <gray><target> <world>",
+            "<dark_gray>› <yellow>/world time <gray><world> [time]",
+            "<dark_gray>› <yellow>/world weather <gray><world> <weather>",
             ""
         ],
         // World > Info
@@ -43,7 +45,7 @@
         "world_load_failure_not_found": "<dark_gray>› <red>Świat <yellow><world><red> nie istnieje.",
         "world_load_failure_other": "<dark_gray>› <red>Wystąpił błąd podczas ładowania świata <yellow><world><red>.",
         // World > Create
-        "world_create_usage": "/world create <id> <env> <type>",
+        "world_create_usage": "/world create <id> <environment> <type> <generator> <seed> [-a]",
         "world_create_confirm": [
             "",
             "<dark_gray>› <gray>Czy na pewno chcesz stworzyć świat <yellow><world><gray>?",
@@ -57,9 +59,9 @@
         "world_create_failure_already_exists": "<dark_gray>› <red>Świat <yellow><world><red> już istnieje.",
         "world_create_failure_other": "<dark_gray>› <red>Wystąpił błąd podczas tworzenia świata <yellow><world><red>.",
         // World > Gamerule
-        "world_gamerule_info": "<dark_gray>› <gray>Wartość zasady <yellow><rule><gray> to <yellow><value>",
-        "world_gamerule_set_success": "<dark_gray>› <gray>Ustawiono wartość zasady <yellow><rule><gray> na <yellow><value>",
-        "world_gamerule_set_failure": "<dark_gray>› <red>Wartość zasady <yellow><rule><red> nie została zaktualizowana.",
+        "world_gamerule_info": "<dark_gray>› <gray>Wartość reguły <yellow><rule><gray> to <yellow><value>",
+        "world_gamerule_set_success": "<dark_gray>› <gray>Ustawiono wartość reguły <yellow><rule><gray> na <yellow><value>",
+        "world_gamerule_set_failure": "<dark_gray>› <red>Wartość reguły <yellow><rule><red> nie została zaktualizowana.",
         // World > Delete
         "world_delete_usage": "/world delete <world> [--confirm]",
         "world_delete_confirm": [
@@ -75,6 +77,10 @@
         "world_time_set_success": "<dark_gray>› <gray>Czas w <yellow><world><gray> został ustawiony na <yellow><time><gray>.",
         // World > Weather
         "world_weather_set_success": "<dark_gray>› <gray>Pogoda w <yellow><world><gray> została ustawiona na <yellow><weather><gray>.",
-        "world_weather_set_failure_invalid_type": "<dark_gray>› <red>Nieprawidłowy typ pogody."
+        "world_weather_set_failure_invalid_type": "<dark_gray>› <red>Nieprawidłowy typ pogody.",
+        // Speed
+        "speed_set_success_walk": "<dark_gray>› <gray>Ustawiono prędkość chodzenia dla <yellow><player><gray> na <yellow><speed><gray>.",
+        "speed_set_success_fly": "<dark_gray>› <gray>Ustawiono prędkość latania dla <yellow><player><gray> na <yellow><speed><gray>.",
+        "speed_set_failure_value_not_in_range": "<dark_gray>› <red>Prędkość musi być liczbą w zakresie od <yellow>0.0<red> do <yellow>1.0<red>."
     }
 }

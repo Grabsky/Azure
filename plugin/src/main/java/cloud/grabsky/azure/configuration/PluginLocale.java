@@ -74,10 +74,10 @@ public final class PluginLocale implements JsonConfiguration {
     public static String COMMAND_WORLD_GAMERULE_INFO;
 
     @JsonPath("commands.world_gamerule_set_success")
-    public static String COMMAND_WORLD_GAMERULE_SUCCESS;
+    public static String COMMAND_WORLD_GAMERULE_SET_SUCCESS;
 
     @JsonPath("commands.world_gamerule_set_failure")
-    public static String COMMAND_WORLD_GAMERULE_FAILURE;
+    public static String COMMAND_WORLD_GAMERULE_SET_FAILURE;
 
     // Commands > World > Load
 
@@ -117,5 +117,16 @@ public final class PluginLocale implements JsonConfiguration {
 
     @JsonPath("commands.world_weather_set_failure_invalid_type")
     public static String COMMAND_WORLD_WEATHER_SET_FAILURE_INVALID_TYPE;
+
+    // Commands > Speed
+
+    @JsonPath("commands.speed_set_success_walk")
+    public static String SPEED_SET_SUCCESS_WALK;
+
+    @JsonPath("commands.speed_set_success_fly")
+    public static String SPEED_SET_SUCCESS_FLY;
+
+    @JsonPath("commands.speed_set_failure_value_not_in_range")
+    public static String SPEED_SET_FAILURE_VALUE_NOT_IN_RANGE;
 
 }

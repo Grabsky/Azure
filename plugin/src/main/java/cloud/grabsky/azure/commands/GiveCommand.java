@@ -1,6 +1,7 @@
 package cloud.grabsky.azure.commands;
 
 import cloud.grabsky.azure.configuration.PluginLocale;
+import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
@@ -9,14 +10,12 @@ import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.component.ExceptionHandler;
 import cloud.grabsky.commands.exception.CommandLogicException;
 import cloud.grabsky.commands.exception.MissingInputException;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import static cloud.grabsky.bedrock.components.SystemMessenger.sendMessage;
 import static net.kyori.adventure.text.Component.translatable;
 
 public final class GiveCommand extends RootCommand {
@@ -55,17 +54,17 @@ public final class GiveCommand extends RootCommand {
         // ...
         target.getInventory().addItem(new ItemStack(material, amount));
         // message
-        sendMessage(sender, PluginLocale.COMMAND_GIVE_SENDER,
-                Placeholder.unparsed("player", target.getName()),
-                Placeholder.unparsed("amount", String.valueOf(amount)),
-                Placeholder.component("material", translatable(material.translationKey()))
-        );
+        Message.of(PluginLocale.COMMAND_GIVE_SENDER)
+                .placeholder("player", target)
+                .placeholder("amount", amount)
+                .placeholder("material", translatable(material.translationKey()))
+                .send(sender);
         // ...
         if (sender != target && containsIgnoreCase(flags, "--silent") == false) {
-            sendMessage(target, PluginLocale.COMMAND_GIVE_TARGET,
-                    Placeholder.unparsed("amount", String.valueOf(amount)),
-                    Placeholder.component("material", translatable(material.translationKey()))
-            );
+            Message.of(PluginLocale.COMMAND_GIVE_TARGET)
+                    .placeholder("amount", amount)
+                    .placeholder("material", translatable(material.translationKey()))
+                    .send(target);
         }
     }
 

@@ -1,8 +1,8 @@
 package cloud.grabsky.azure.commands;
 
-
 import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.configuration.PluginLocale;
+import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
@@ -10,8 +10,6 @@ import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.exception.CommandLogicException;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
-
-import static cloud.grabsky.bedrock.components.SystemMessenger.sendMessage;
 
 public final class AzureCommand extends RootCommand {
 
@@ -34,10 +32,10 @@ public final class AzureCommand extends RootCommand {
         // ...
         if (queue.next(String.class).asRequired().equalsIgnoreCase("reload") == true) {
             if (Azure.getInstance().reloadConfiguration() == true) {
-                sendMessage(sender, PluginLocale.RELOAD_SUCCESS);
+                Message.of(PluginLocale.RELOAD_SUCCESS).send(sender);
                 return;
             }
-            sendMessage(sender, PluginLocale.RELOAD_FAILURE);
+            Message.of(PluginLocale.RELOAD_FAILURE).send(sender);
         }
     }
 

@@ -10,7 +10,7 @@ import cloud.grabsky.azure.chat.ChatManager;
 import cloud.grabsky.azure.commands.AzureCommand;
 import cloud.grabsky.azure.commands.DeleteCommand;
 import cloud.grabsky.azure.commands.GiveCommand;
-import cloud.grabsky.azure.commands.NickCommand;
+import cloud.grabsky.azure.commands.SpeedCommand;
 import cloud.grabsky.azure.commands.WorldCommand;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.configuration.PluginConfig.DeleteButton;
@@ -120,8 +120,8 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
         });
         // registering commands
         commands.registerCommand(AzureCommand.class);
-        commands.registerCommand(NickCommand.class);
         commands.registerCommand(GiveCommand.class);
+        commands.registerCommand(SpeedCommand.class);
         commands.registerCommand(new WorldCommand(this));
         commands.registerCommand(new DeleteCommand(chat));
         // ........

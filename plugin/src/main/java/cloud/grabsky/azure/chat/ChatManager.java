@@ -6,6 +6,7 @@ import cloud.grabsky.azure.configuration.PluginConfig.DeleteButton.Position;
 import cloud.grabsky.azure.configuration.PluginConfig.FormatHolder;
 import cloud.grabsky.azure.configuration.PluginConfig.TagsHolder;
 import cloud.grabsky.azure.configuration.PluginLocale;
+import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.bedrock.util.Interval;
 import cloud.grabsky.bedrock.util.Interval.Unit;
 import com.google.common.cache.Cache;
@@ -14,6 +15,7 @@ import io.papermc.paper.event.player.AsyncChatDecorateEvent;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.chat.SignedMessage;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickCallback.Options;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -28,17 +30,17 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import static cloud.grabsky.bedrock.components.SystemMessenger.sendMessage;
 import static cloud.grabsky.bedrock.helpers.Conditions.requirePresent;
 import static java.lang.System.currentTimeMillis;
 import static net.kyori.adventure.text.Component.empty;
-import static net.kyori.adventure.text.event.ClickEvent.runCommand;
+import static net.kyori.adventure.text.event.ClickEvent.callback;
 import static net.kyori.adventure.text.event.HoverEvent.showText;
 import static net.kyori.adventure.text.format.NamedTextColor.WHITE;
 
@@ -106,7 +108,7 @@ public final class ChatManager implements Listener {
         if (PluginConfig.CHAT_COOLDOWN > 0 && event.getPlayer().hasPermission(CHAT_COOLDOWN_BYPASS_PERMISSION) == false) {
             if (Interval.between(currentTimeMillis(), chatCooldowns.getOrDefault(event.getPlayer().getUniqueId(), 0L), Unit.MILLISECONDS).as(Unit.MILLISECONDS) < PluginConfig.CHAT_COOLDOWN) {
                 event.setCancelled(true);
-                sendMessage(event.getPlayer(), PluginLocale.CHAT_ON_COOLDOWN);
+                Message.of(PluginLocale.CHAT_ON_COOLDOWN).send(event.getPlayer());
                 return;
             }
             // ...setting cooldown
@@ -152,7 +154,7 @@ public final class ChatManager implements Listener {
                 // Adding "DELETE MESSAGE" button for allowed viewers
                 if (PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_ENABLED == true && receiver.hasPermission(CHAT_MODERATION_PERMISSION) == true && source.hasPermission(CHAT_MODERATION_PERMISSION) == false) {
                     final Component button = PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_BUTTON.getText()
-                            .clickEvent(runCommand("/delete " + signatureUUID))
+                            .clickEvent(callback(audience -> this.deleteMessage(signatureUUID), Options.builder().uses(1).lifetime(Duration.ofMinutes(5)).build()))
                             .hoverEvent(showText(PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_BUTTON.getHover()));
                     // ...
                     return (PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_BUTTON.getPosition() == Position.BEFORE)
