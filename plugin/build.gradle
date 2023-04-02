@@ -2,7 +2,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "8.1.0"
 }
 
-final buildsDirectory = (System.getenv("JVM_WORKSPACE") ?: ".") + File.separator + "builds"
+final buildsDirectory = (System.getenv("JVM_BUILDS") ?: "." + File.separator + "builds")
 
 repositories {
     mavenLocal()
