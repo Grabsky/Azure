@@ -20,6 +20,7 @@ import org.bukkit.World;
 import org.bukkit.WorldType;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -153,6 +154,7 @@ public final class WorldCommand extends RootCommand {
         Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
     }
 
+    // TO-DO: Do not teleport on failure
     private void onWorldDelete(final RootCommandContext context, final ArgumentQueue arguments) {
         final CommandSender sender = context.getExecutor().asCommandSender();
         // ...
@@ -163,7 +165,7 @@ public final class WorldCommand extends RootCommand {
             if (containsIgnoreCase(flags, "--confirm") == true) {
                 // teleporting players away from the world
                 for (final Player player : world.getPlayers()) {
-                    player.teleport(Bukkit.getWorlds().get(0).getSpawnLocation());
+                    player.teleport(Bukkit.getWorlds().get(0).getSpawnLocation(), TeleportCause.PLUGIN);
                 }
                 // unloading the world (no save action is performed)
                 Bukkit.unloadWorld(world, false);
@@ -279,7 +281,7 @@ public final class WorldCommand extends RootCommand {
             final Player target = arguments.next(Player.class).asRequired();
             final World world = arguments.next(World.class).asRequired();
             // ...
-            target.teleportAsync(world.getSpawnLocation());
+            target.teleportAsync(world.getSpawnLocation(), TeleportCause.PLUGIN);
             Message.of(PluginLocale.COMMAND_WORLD_TELEPORT)
                     .placeholder("player", target)
                     .placeholder("world", world.key())

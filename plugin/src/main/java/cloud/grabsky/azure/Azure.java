@@ -20,29 +20,25 @@ import cloud.grabsky.azure.user.AzureUserCache;
 import cloud.grabsky.azure.world.WorldManager;
 import cloud.grabsky.bedrock.BedrockPlugin;
 import cloud.grabsky.commands.RootCommandManager;
-import cloud.grabsky.commands.exception.IncompatibleSenderException;
+import cloud.grabsky.configuration.ConfigurationHolder;
 import cloud.grabsky.configuration.ConfigurationMapper;
 import cloud.grabsky.configuration.adapter.AbstractEnumJsonAdapter;
 import cloud.grabsky.configuration.exception.ConfigurationMappingException;
 import cloud.grabsky.configuration.paper.PaperConfigurationMapper;
 import lombok.AccessLevel;
 import lombok.Getter;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.WorldType;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.function.Consumer;
 
 import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
-import static net.kyori.adventure.text.Component.text;
 
 public final class Azure extends BedrockPlugin implements AzureAPI {
 
@@ -66,7 +62,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
 
     @Override
     public Consumer<RootCommandManager> getCommandManagerTemplate() {
-        throw new UnsupportedOperationException("NOT IMPLEMENTED");
+        return new AzureCommandManager();
     }
 
     @Override
@@ -110,14 +106,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
         commands.setArgumentParser(GameRule.class, GameRuleArgument.INSTANCE);
         commands.setCompletionsProvider(GameRule.class, GameRuleArgument.INSTANCE);
         // overriding default exception handlers
-        commands.setExceptionHandler(IncompatibleSenderException.class, (exc, context) -> {
-            final String message = (exc.getExpectedType() == Player.class)
-                    ? "This command can only be executed by a player."
-                    : (exc.getExpectedType() == ConsoleCommandSender.class)
-                        ? "This command can only be executed by a console"
-                        : "You cannot execute that command.";
-            context.getExecutor().asCommandSender().sendMessage(text(message, NamedTextColor.RED));
-        });
+        commands.apply(new AzureCommandManager());
         // registering commands
         commands.registerCommand(AzureCommand.class);
         commands.registerCommand(GiveCommand.class);
@@ -133,19 +122,24 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
     public boolean reloadConfiguration() {
         try {
             return onReload();
-        } catch (final ConfigurationMappingException exc) {
+        } catch (final IllegalStateException | ConfigurationMappingException e) {
+            e.printStackTrace();
             return false;
         }
     }
 
     @Override
-    public boolean onReload() throws ConfigurationMappingException {
+    public boolean onReload() throws ConfigurationMappingException, IllegalStateException {
         try {
             final File locale = ensureResourceExistence(this, new File(this.getDataFolder(), "locale.json"));
+            final File localeCommands = ensureResourceExistence(this, new File(this.getDataFolder(), "locale_commands.json"));
             final File config = ensureResourceExistence(this, new File(this.getDataFolder(), "config.json"));
             // ...
-            mapper.map(PluginLocale.class, locale);
-            mapper.map(PluginConfig.class, config);
+            mapper.map(
+                    ConfigurationHolder.of(PluginLocale.class, locale),
+                    ConfigurationHolder.of(PluginLocale.Commands.class, localeCommands),
+                    ConfigurationHolder.of(PluginConfig.class, config)
+            );
             return true;
         } catch (final IOException exc) {
             throw new IllegalStateException(exc); // Re-throwing as runtime exception

@@ -5,6 +5,7 @@ import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
+import cloud.grabsky.commands.argument.IntegerArgument;
 import cloud.grabsky.commands.argument.StringArgument;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.component.ExceptionHandler;
@@ -49,7 +50,7 @@ public final class GiveCommand extends RootCommand {
         // arguments
         final var target = arguments.next(Player.class).asRequired(SEND_USAGE_ON_MISSING_INPUT);
         final var material = arguments.next(Material.class).asRequired(SEND_USAGE_ON_MISSING_INPUT);
-        final var amount = arguments.next(Integer.class).asRequired(SEND_USAGE_ON_MISSING_INPUT);
+        final var amount = arguments.next(Integer.class, IntegerArgument.ofRange(1, 64)).asRequired(SEND_USAGE_ON_MISSING_INPUT);
         final var flags = arguments.next(String.class, StringArgument.GREEDY).asOptional("").split(" ");
         // ...
         target.getInventory().addItem(new ItemStack(material, amount));
