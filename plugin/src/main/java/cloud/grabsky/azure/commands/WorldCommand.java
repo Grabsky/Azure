@@ -4,6 +4,7 @@ import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.arguments.WorldSeedArgument;
 import cloud.grabsky.azure.arguments.WorldTimeArgument;
 import cloud.grabsky.azure.configuration.PluginLocale;
+import cloud.grabsky.azure.world.WorldManager;
 import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
@@ -36,10 +37,12 @@ import static java.lang.String.format;
 public final class WorldCommand extends RootCommand {
 
     private final Azure plugin;
+    private final WorldManager worlds;
 
     public WorldCommand(final Azure plugin) {
-        super("world", null, "azure.command.world", "/world [args]", "Manage your worlds in-game.");
+        super("world", null, "azure.command.world", "/world", "Manage your worlds in-game.");
         this.plugin = plugin;
+        this.worlds = plugin.getWorldManager();
     }
 
     @Override
@@ -129,6 +132,7 @@ public final class WorldCommand extends RootCommand {
         }
     }
 
+    // TO-DO: Improve "importing" of "existing" world.
     private void onWorldCreate(final RootCommandContext context, final ArgumentQueue arguments) {
         final CommandSender sender = context.getExecutor().asCommandSender();
         // ...
@@ -138,27 +142,25 @@ public final class WorldCommand extends RootCommand {
             final WorldType type = arguments.next(WorldType.class).asRequired();
             final String generator = arguments.next(String.class).asRequired();
             final Long seed = arguments.next(Long.class, WorldSeedArgument.INSTANCE).asOptional(null);
-            // ...
             final String[] flags = arguments.next(String.class, StringArgument.GREEDY).asOptional("").split(" ");
             // ...
             try {
                 final World world = plugin.getWorldManager().createWorld(key, environment, type, generator, seed, containsIgnoreCase(flags, "-a"));
                 // ...
-                if (world != null)
-                    Message.of(PluginLocale.COMMAND_WORLD_CREATE_SUCCESS)
-                            .placeholder("world", world.key())
-                            .send(sender);
-                // ...
-                return;
+                if (world != null) {
+                    // Sending success message to command sender.
+                    Message.of(PluginLocale.COMMAND_WORLD_CREATE_SUCCESS).placeholder("world", world.key()).send(sender);
+                    return;
+                }
+                // Sending error message to command sender.
+                Message.of(PluginLocale.COMMAND_WORLD_CREATE_FAILURE_OTHER).placeholder("world", key).send(sender);
             } catch (final IllegalStateException e) {
-                Message.of(PluginLocale.COMMAND_WORLD_CREATE_FAILURE_ALREADY_EXISTS)
-                        .placeholder("world", key)
-                        .send(sender);
+                // Sending error message to command sender.
+                Message.of(PluginLocale.COMMAND_WORLD_CREATE_FAILURE_ALREADY_EXISTS).placeholder("world", key).send(sender);
             } catch (final IOException e) {
                 e.printStackTrace();
-                Message.of(PluginLocale.COMMAND_WORLD_CREATE_FAILURE_OTHER)
-                        .placeholder("world", key)
-                        .send(sender);
+                // Sending error message to command sender.
+                Message.of(PluginLocale.COMMAND_WORLD_CREATE_FAILURE_OTHER).placeholder("world", key).send(sender);
             }
             return;
         }
@@ -166,33 +168,39 @@ public final class WorldCommand extends RootCommand {
         Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
     }
 
-    // TO-DO: Do not teleport on failure
     private void onWorldDelete(final RootCommandContext context, final ArgumentQueue arguments) {
         final CommandSender sender = context.getExecutor().asCommandSender();
         // ...
         if (sender.hasPermission(this.getPermission() + ".delete") == true) {
             final World world = arguments.next(World.class).asRequired();
             final String[] flags = arguments.next(String.class, StringArgument.GREEDY).asOptional("").split(" ");
-            // ...
+            // Checking if --confirm flag is present.
             if (containsIgnoreCase(flags, "--confirm") == true) {
-                // teleporting players away from the world
-                for (final Player player : world.getPlayers()) {
-                    player.teleport(Bukkit.getWorlds().get(0).getSpawnLocation(), TeleportCause.PLUGIN);
-                }
-                // unloading the world (no save action is performed)
-                Bukkit.unloadWorld(world, false);
-                // deleting world directory
-                if (world != Bukkit.getWorlds().get(0) && deleteDirectory(world.getWorldFolder()) == true) {
-                    Message.of(PluginLocale.COMMAND_WORLD_DELETE_SUCCESS)
+                // Checking if specified world is NOT default/main/primary world on this server.
+                if (worlds.getPrimaryWorld().key().equals(world.getKey()) == false) {
+                    // Teleporting players away from the world that is about to be deleted.
+                    for (final Player player : world.getPlayers()) {
+                        player.teleport(worlds.getPrimaryWorld().getSpawnLocation(), TeleportCause.PLUGIN);
+                    }
+                    // unloading the world (no save action is performed)
+                    Bukkit.unloadWorld(world, false);
+                    // Deleting world directory...
+                    if (deleteDirectory(world.getWorldFolder()) == true) {
+                        // Sending success message to command sender.
+                        Message.of(PluginLocale.COMMAND_WORLD_DELETE_SUCCESS).placeholder("world", world.key()).send(sender);
+                        return;
+                    }
+                    // Sending error message to command sender.
+                    Message.of(PluginLocale.COMMAND_WORLD_DELETE_FAILURE_OTHER)
                             .placeholder("world", world.key())
                             .send(sender);
                     return;
                 }
-                Message.of(PluginLocale.COMMAND_WORLD_DELETE_FAILURE)
-                        .placeholder("world", world.key())
-                        .send(sender);
+                // Sending error message to command sender.
+                Message.of(PluginLocale.COMMAND_WORLD_DELETE_FAILURE_PRIMARY_WORLD).send(sender);
                 return;
             }
+            // Sending confirmation message to command sender.
             Message.of(PluginLocale.COMMAND_WORLD_DELETE_CONFIRM)
                     .placeholder("input", context.getInput())
                     .placeholder("world", world.key())
@@ -213,23 +221,21 @@ public final class WorldCommand extends RootCommand {
             final Object value = arguments.next(gameRule.getType()).asOptional();
             // ...
             if (value == null) {
+                // Sending message to command sender.
                 Message.of(PluginLocale.COMMAND_WORLD_GAMERULE_INFO)
                         .placeholder("rule", gameRule.getName())
                         .placeholder("value", world.getGameRuleValue(gameRule))
                         .send(sender);
-                return;
-            }
-            // ...
-            if (world.setGameRule(gameRule, value) == true) {
+            } else if (world.setGameRule(gameRule, value) == true) {
+                // Sending success message to command sender.
                 Message.of(PluginLocale.COMMAND_WORLD_GAMERULE_SET_SUCCESS)
                         .placeholder("rule", gameRule.getName())
                         .placeholder("value", value)
                         .send(sender);
                 return;
             }
-            Message.of(PluginLocale.COMMAND_WORLD_GAMERULE_SET_FAILURE)
-                    .placeholder("rule", gameRule.getName())
-                    .send(sender);
+            // Sending error message to command sender.
+            Message.of(PluginLocale.COMMAND_WORLD_GAMERULE_SET_FAILURE).placeholder("rule", gameRule.getName()).send(sender);
             return;
         }
         // Sending error message to command sender.
@@ -241,9 +247,9 @@ public final class WorldCommand extends RootCommand {
         // ...
         if (sender.hasPermission(this.getPermission() + ".info") == true) {
             final World world = arguments.next(World.class).asOptional(context.getExecutor().asPlayer().getWorld());
-            // ...
+            // Getting spawn location of specified world.
             final Location spawnLoc = world.getSpawnLocation();
-            // ...
+            // Sending message to command sender.
             Message.of(PluginLocale.COMMAND_WORLD_INFO)
                     .placeholder("world_name", world.getName())
                     .placeholder("world_key", world.getKey())
@@ -265,24 +271,18 @@ public final class WorldCommand extends RootCommand {
         // ...
         if (sender.hasPermission(this.getPermission() + ".load") == true) {
             final NamespacedKey key = arguments.next(NamespacedKey.class).asRequired();
-            // This have to be wrapped with a try...catch block in order to find out why the method failed.
             try {
+                // Trying to load the world...
                 plugin.getWorldManager().loadWorld(key, true);
-                // Sending message to command sender.
-                Message.of(PluginLocale.COMMAND_WORLD_LOAD_SUCCESS)
-                        .placeholder("world", key)
-                        .send(sender);
+                // Sending success message to command sender.
+                Message.of(PluginLocale.COMMAND_WORLD_LOAD_SUCCESS).placeholder("world", key).send(sender);
             } catch (final IllegalStateException e) {
                 // Sending error message to command sender.
-                Message.of(PluginLocale.COMMAND_WORLD_LOAD_FAILURE_NOT_FOUND)
-                        .placeholder("world", key)
-                        .send(sender);
+                Message.of(PluginLocale.COMMAND_WORLD_LOAD_FAILURE_NOT_FOUND).placeholder("world", key).send(sender);
             } catch (final IOException e) {
                 e.printStackTrace();
                 // Sending error message to command sender.
-                Message.of(PluginLocale.COMMAND_WORLD_LOAD_FAILURE_OTHER)
-                        .placeholder("world", key)
-                        .send(sender);
+                Message.of(PluginLocale.COMMAND_WORLD_LOAD_FAILURE_OTHER).placeholder("world", key).send(sender);
             }
             return;
         }
@@ -375,12 +375,14 @@ public final class WorldCommand extends RootCommand {
                     world.setThundering(true);
                 }
                 default -> {
+                    // Sending error message to command sender.
                     Message.of(PluginLocale.COMMAND_WORLD_WEATHER_SET_FAILURE_INVALID_TYPE)
                             .placeholder("world", world.key())
                             .placeholder("weather", weather)
                             .send(sender);
                 }
             }
+            // Sending success message to command sender.
             Message.of(PluginLocale.COMMAND_WORLD_WEATHER_SET_SUCCESS)
                     .placeholder("world", world.key())
                     .placeholder("weather", weather)

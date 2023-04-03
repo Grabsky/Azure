@@ -76,7 +76,8 @@
             ""
         ],
         "world_delete_success": "<dark_gray>› <gray>Świat <yellow><world><gray> został usunięty.",
-        "world_delete_failure": "<dark_gray>› <red>Świat <yellow><world><red> nie został usunięty.",
+        "world_delete_failure_primary_world": "<dark_gray>› <red>Podstawowy świat nie może zostać usunięty.",
+        "world_delete_failure_other": "<dark_gray>› <red>Świat <yellow><world><red> nie został usunięty.",
         // World > Spawnpoint
         "world_spawnpoint_set_success": "<dark_gray>› <gray>Pozycja spawnu ustawiona na <yellow><x><gray>, <yellow><y><gray>, <yellow><z><gray>.",
         // World > Time

@@ -5,7 +5,6 @@ import cloud.grabsky.configuration.paper.adapter.NamespacedKeyAdapter;
 import com.squareup.moshi.Moshi;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import okio.BufferedSink;
 import okio.BufferedSource;
 import org.bukkit.Bukkit;
@@ -24,16 +23,32 @@ import java.util.stream.Stream;
 import static okio.Okio.buffer;
 import static okio.Okio.sink;
 import static okio.Okio.source;
+import static org.bukkit.NamespacedKey.minecraft;
 
-@RequiredArgsConstructor(access = AccessLevel.PUBLIC)
-public class WorldManager {
+public final class WorldManager {
 
     @Getter(AccessLevel.PUBLIC)
-    private final Azure plugin;
+    private final @NotNull Azure plugin;
 
-    private final Moshi moshi = new Moshi.Builder()
-            .add(NamespacedKey.class, NamespacedKeyAdapter.INSTANCE)
-            .build();
+    @Getter(AccessLevel.PUBLIC)
+    private final @NotNull World primaryWorld;
+
+    private final Moshi moshi;
+
+    private static final NamespacedKey OVERWORLD = minecraft("overworld");
+
+    public WorldManager(final Azure plugin) {
+        this.plugin = plugin;
+        // Getting the default/main/primary world.
+        final @Nullable World primaryWorld = plugin.getServer().getWorld(OVERWORLD);
+        // Throwing an exception if no default/main/primary was found. (no clue if that can happen)
+        if (primaryWorld == null)
+            throw new IllegalStateException("Primary world does not exist. ");
+        // ...
+        this.primaryWorld = primaryWorld;
+        // Setting up Moshi...
+        this.moshi = new Moshi.Builder().add(NamespacedKey.class, NamespacedKeyAdapter.INSTANCE).build();
+    }
 
     public @Nullable World createWorld(
             final @NotNull NamespacedKey key,
@@ -110,7 +125,7 @@ public class WorldManager {
         final List<File> files = Stream.of(dirs).filter(File::isDirectory).filter(dir -> new File(dir, "azure-world.json").exists() == true).toList();
         // ...
         for (final File worldDir : files) {
-            final NamespacedKey key = NamespacedKey.minecraft(worldDir.getName());
+            final NamespacedKey key = minecraft(worldDir.getName());
             // ...
             this.loadWorld(key, false);
         }

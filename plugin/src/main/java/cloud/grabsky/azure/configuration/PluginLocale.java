@@ -100,8 +100,11 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.world_delete_success")
     public static String COMMAND_WORLD_DELETE_SUCCESS;
 
-    @JsonPath("commands.world_delete_failure")
-    public static String COMMAND_WORLD_DELETE_FAILURE;
+    @JsonPath("commands.world_delete_failure_other")
+    public static Component COMMAND_WORLD_DELETE_FAILURE_PRIMARY_WORLD;
+
+    @JsonPath("commands.world_delete_failure_other")
+    public static String COMMAND_WORLD_DELETE_FAILURE_OTHER;
 
     @JsonPath("commands.world_delete_confirm")
     @JsonAdapter(fromJson = StringComponentAdapter.class)
