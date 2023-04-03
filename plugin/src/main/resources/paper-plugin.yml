@@ -2,6 +2,7 @@ name: 'Azure'
 version: '0.9.0-pre'
 api-version: '1.19'
 main: 'cloud.grabsky.azure.Azure'
+load: POSTWORLD
 # loader: 'cloud.grabsky.azure.AzurePluginLoader'
 dependencies:
   - name: LuckPerms
