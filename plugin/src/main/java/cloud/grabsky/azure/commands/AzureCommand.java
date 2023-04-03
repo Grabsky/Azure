@@ -18,7 +18,7 @@ public final class AzureCommand extends RootCommand {
     }
 
     @Override
-    public @NotNull CompletionsProvider onTabComplete(final @NotNull RootCommandContext context, int index) {
+    public @NotNull CompletionsProvider onTabComplete(final @NotNull RootCommandContext context, final int index) {
         return (index == 0)
                 ? (context.getExecutor().asCommandSender().hasPermission(this.getPermission() + ".reload") == true)
                         ? CompletionsProvider.of("reload")
@@ -27,16 +27,24 @@ public final class AzureCommand extends RootCommand {
     }
 
     @Override
-    public void onCommand(final RootCommandContext context, final ArgumentQueue queue) throws CommandLogicException {
+    public void onCommand(final @NotNull RootCommandContext context, final @NotNull ArgumentQueue queue) throws CommandLogicException {
         final CommandSender sender = context.getExecutor().asCommandSender();
-        // ...
-        if (queue.next(String.class).asRequired().equalsIgnoreCase("reload") == true) {
+        if (queue.hasNext() == false) {
+            // Sending message to command sender.
+            Message.of(PluginLocale.COMMAND_AZURE_HELP).send(sender);
+            return;
+        } else if (queue.next(String.class).asRequired().equalsIgnoreCase("reload") == true && sender.hasPermission(this.getPermission() + ".reload") == true) {
             if (Azure.getInstance().reloadConfiguration() == true) {
+                // Sending success message to command sender.
                 Message.of(PluginLocale.RELOAD_SUCCESS).send(sender);
                 return;
             }
+            // Sending error message to command sender.
             Message.of(PluginLocale.RELOAD_FAILURE).send(sender);
+            return;
         }
+        // Sending error message to command sender.
+        Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
     }
 
 }

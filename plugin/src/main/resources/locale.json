@@ -9,6 +9,11 @@
     },
     // ...
     "commands": {
+        "azure_help": [
+            "",
+            "<dark_gray>› <yellow>/azure reload<dark_gray> - <gray>Przeładowuje plugin.",
+            ""
+        ],
         // Delete
         "delete_usage": "<dark_gray>› <yellow>/delete <signature_uuid>",
         "delete_failure": "<dark_gray>› <red>Usuwanie wiadomości nie powiodło się.",

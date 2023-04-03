@@ -22,6 +22,11 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("chat.on_cooldown")
     public static Component CHAT_ON_COOLDOWN;
 
+    // Commands > Azure
+
+    @JsonPath("commands.azure_help")
+    public static Component COMMAND_AZURE_HELP;
+
     // Commands > Delete
 
     @JsonPath("commands.delete_usage")
