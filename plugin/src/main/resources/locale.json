@@ -72,6 +72,8 @@
         ],
         "world_delete_success": "<dark_gray>› <gray>Świat <yellow><world><gray> został usunięty.",
         "world_delete_failure": "<dark_gray>› <red>Świat <yellow><world><red> nie został usunięty.",
+        // World > Spawnpoint
+        "world_spawnpoint_set_success": "<dark_gray>› <gray>Pozycja spawnu ustawiona na <yellow><x><gray>, <yellow><y><gray>, <yellow><z><gray>.",
         // World > Time
         "world_time_info": "<dark_gray>› Czas w <yellow><world><gray> to <yellow><time><gray>.",
         "world_time_set_success": "<dark_gray>› <gray>Czas w <yellow><world><gray> został ustawiony na <yellow><time><gray>.",
@@ -81,6 +83,6 @@
         // Speed
         "speed_set_success_walk": "<dark_gray>› <gray>Ustawiono prędkość chodzenia dla <yellow><player><gray> na <yellow><speed><gray>.",
         "speed_set_success_fly": "<dark_gray>› <gray>Ustawiono prędkość latania dla <yellow><player><gray> na <yellow><speed><gray>.",
-        "speed_set_failure_value_not_in_range": "<dark_gray>› <red>Prędkość musi być liczbą w zakresie od <yellow>0.0<red> do <yellow>1.0<red>."
+        "speed_set_failure_value_not_in_range": "<dark_gray>› <red>Prędkość musi być liczbą w zakresie od <yellow>0.0<red> do <yellow>1.0<red>.",
     }
 }

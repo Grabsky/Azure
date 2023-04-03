@@ -102,6 +102,11 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonAdapter(fromJson = StringComponentAdapter.class)
     public static String COMMAND_WORLD_DELETE_CONFIRM;
 
+    // Commands > World > Spawnpoint
+
+    @JsonPath("commands.world_spawnpoint_set_success")
+    public static String COMMAND_WORLD_SPAWNPOINT_SET_SUCCESS;
+
     // Commands > World > Time
 
     @JsonPath("commands.world_time_info")

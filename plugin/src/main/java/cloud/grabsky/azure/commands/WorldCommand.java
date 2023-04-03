@@ -12,6 +12,7 @@ import cloud.grabsky.commands.RootCommandInput;
 import cloud.grabsky.commands.argument.StringArgument;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.exception.CommandLogicException;
+import io.papermc.paper.math.Position;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
@@ -30,6 +31,8 @@ import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.stream.Stream;
 
+import static java.lang.String.format;
+
 public final class WorldCommand extends RootCommand {
 
     private final Azure plugin;
@@ -45,7 +48,7 @@ public final class WorldCommand extends RootCommand {
         final RootCommandInput input = context.getInput();
         // ...
         if (index == 0) return CompletionsProvider.of(
-                Stream.of("create", "delete", "gamerule", "info", "teleport", "load", "time", "weather").filter(literal -> sender.hasPermission(this.getPermission() + "." + literal) == true).toList()
+                Stream.of("create", "delete", "gamerule", "info", "load", "spawnpoint", "teleport", "time", "weather").filter(literal -> sender.hasPermission(this.getPermission() + "." + literal) == true).toList()
         );
         // ...
         final String literal = input.at(1).toLowerCase();
@@ -81,6 +84,13 @@ public final class WorldCommand extends RootCommand {
             case "load" -> (index == 1)
                     ? CompletionsProvider.of(Stream.of(plugin.getServer().getWorldContainer().listFiles()).filter(File::isDirectory).filter(dir -> new File(dir, "level.dat").exists() == true).map(File::getName).toList())
                     : CompletionsProvider.EMPTY;
+            case "spawnpoint" -> switch (index) {
+                case 1 -> CompletionsProvider.of(World.class);
+                case 2 -> CompletionsProvider.of("@x @y @z");
+                case 3 -> CompletionsProvider.of("@y @z");
+                case 4 -> CompletionsProvider.of("@z");
+                default -> CompletionsProvider.EMPTY;
+            };
             case "teleport" -> switch (index) {
                 case 1 -> CompletionsProvider.of(Player.class);
                 case 2 -> CompletionsProvider.of(World.class);
@@ -112,6 +122,7 @@ public final class WorldCommand extends RootCommand {
             case "gamerule" -> this.onWorldGamerule(context, arguments);
             case "info" -> this.onWorldInfo(context, arguments);
             case "load" -> this.onWorldLoad(context, arguments);
+            case "spawnpoint" -> this.onWorldSpawnPoint(context, arguments);
             case "teleport" -> this.onWorldTeleport(context, arguments);
             case "time" -> this.onWorldTime(context, arguments);
             case "weather" -> this.onWorldWeather(context, arguments);
@@ -151,6 +162,7 @@ public final class WorldCommand extends RootCommand {
             }
             return;
         }
+        // Sending error message to command sender.
         Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
     }
 
@@ -187,6 +199,7 @@ public final class WorldCommand extends RootCommand {
                     .send(sender);
             return;
         }
+        // Sending error message to command sender.
         Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
     }
 
@@ -219,6 +232,7 @@ public final class WorldCommand extends RootCommand {
                     .send(sender);
             return;
         }
+        // Sending error message to command sender.
         Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
     }
 
@@ -242,6 +256,7 @@ public final class WorldCommand extends RootCommand {
                     .send(sender);
             return;
         }
+        // Sending error message to command sender.
         Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
     }
 
@@ -271,6 +286,28 @@ public final class WorldCommand extends RootCommand {
             }
             return;
         }
+        // Sending error message to command sender.
+        Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
+    }
+
+    private void onWorldSpawnPoint(final RootCommandContext context, final ArgumentQueue arguments) {
+        final CommandSender sender = context.getExecutor().asCommandSender();
+        // ...
+        if (sender.hasPermission(this.getPermission() + ".spawnpoint") == true) {
+            final World world = arguments.next(World.class).asRequired();
+            final Position position = arguments.next(Position.class).asRequired();
+            final Location location = new Location(world, position.x(), position.y(), position.z());
+            // Updating spawn location.
+            world.setSpawnLocation(location);
+            // Sending message to command sender.
+            Message.of(PluginLocale.COMMAND_WORLD_SPAWNPOINT_SET_SUCCESS)
+                    .placeholder("x", format("%.2f", position.x()))
+                    .placeholder("y", format("%.2f", position.y()))
+                    .placeholder("z", format("%.2f", position.z()))
+                    .send(sender);
+            return;
+        }
+        // Sending error message to command sender.
         Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
     }
 
@@ -288,6 +325,7 @@ public final class WorldCommand extends RootCommand {
                     .send(sender);
             return;
         }
+        // Sending error message to command sender.
         Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
     }
 
@@ -312,6 +350,7 @@ public final class WorldCommand extends RootCommand {
                     .send(sender);
             return;
         }
+        // Sending error message to command sender.
         Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
     }
 
@@ -348,6 +387,7 @@ public final class WorldCommand extends RootCommand {
                     .send(sender);
             return;
         }
+        // Sending error message to command sender.
         Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
     }
 
