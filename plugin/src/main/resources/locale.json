@@ -82,7 +82,6 @@
         "world_weather_set_failure_invalid_type": "<dark_gray>› <red>Nieprawidłowy typ pogody.",
         // Speed
         "speed_set_success_walk": "<dark_gray>› <gray>Ustawiono prędkość chodzenia dla <yellow><player><gray> na <yellow><speed><gray>.",
-        "speed_set_success_fly": "<dark_gray>› <gray>Ustawiono prędkość latania dla <yellow><player><gray> na <yellow><speed><gray>.",
-        "speed_set_failure_value_not_in_range": "<dark_gray>› <red>Prędkość musi być liczbą w zakresie od <yellow>0.0<red> do <yellow>1.0<red>.",
+        "speed_set_success_fly": "<dark_gray>› <gray>Ustawiono prędkość latania dla <yellow><player><gray> na <yellow><speed><gray>."
     }
 }

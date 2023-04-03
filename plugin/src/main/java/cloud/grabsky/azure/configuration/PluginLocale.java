@@ -131,9 +131,6 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.speed_set_success_fly")
     public static String SPEED_SET_SUCCESS_FLY;
 
-    @JsonPath("commands.speed_set_failure_value_not_in_range")
-    public static String SPEED_SET_FAILURE_VALUE_NOT_IN_RANGE;
-
 
     public static final class Commands implements JsonConfiguration {
 
