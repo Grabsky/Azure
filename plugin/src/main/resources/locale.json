@@ -72,7 +72,7 @@
         "world_delete_confirm": [
             "",
             "<dark_gray>› <gray>Czy na pewno chcesz usunąć świat <yellow><world><gray>?",
-            "<dark_gray>› <gray>Użyj flagi <yellow>--confirm<gray>, aby potwierdzić.",
+            "<dark_gray>› <hover:show_text:'<red>Tej operacji nie można cofnąć.'><click:run_command:'<input> --confirm'><gold>Kliknij tutaj, aby potwierdzić.</click>",
             ""
         ],
         "world_delete_success": "<dark_gray>› <gray>Świat <yellow><world><gray> został usunięty.",

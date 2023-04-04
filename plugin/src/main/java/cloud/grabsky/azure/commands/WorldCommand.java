@@ -191,9 +191,7 @@ public final class WorldCommand extends RootCommand {
                         return;
                     }
                     // Sending error message to command sender.
-                    Message.of(PluginLocale.COMMAND_WORLD_DELETE_FAILURE_OTHER)
-                            .placeholder("world", world.key())
-                            .send(sender);
+                    Message.of(PluginLocale.COMMAND_WORLD_DELETE_FAILURE_OTHER).placeholder("world", world.key()).send(sender);
                     return;
                 }
                 // Sending error message to command sender.
@@ -202,7 +200,7 @@ public final class WorldCommand extends RootCommand {
             }
             // Sending confirmation message to command sender.
             Message.of(PluginLocale.COMMAND_WORLD_DELETE_CONFIRM)
-                    .placeholder("input", context.getInput())
+                    .replace("<input>", context.getInput().toString())
                     .placeholder("world", world.key())
                     .send(sender);
             return;
