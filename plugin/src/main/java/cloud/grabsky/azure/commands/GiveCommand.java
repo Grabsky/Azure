@@ -6,17 +6,18 @@ import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
 import cloud.grabsky.commands.argument.IntegerArgument;
-import cloud.grabsky.commands.argument.StringArgument;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.component.ExceptionHandler;
 import cloud.grabsky.commands.exception.CommandLogicException;
 import cloud.grabsky.commands.exception.MissingInputException;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
 
 public final class GiveCommand extends RootCommand {
@@ -51,20 +52,23 @@ public final class GiveCommand extends RootCommand {
         final var target = arguments.next(Player.class).asRequired(SEND_USAGE_ON_MISSING_INPUT);
         final var material = arguments.next(Material.class).asRequired(SEND_USAGE_ON_MISSING_INPUT);
         final var amount = arguments.next(Integer.class, IntegerArgument.ofRange(1, 64)).asRequired(SEND_USAGE_ON_MISSING_INPUT);
-        final var flags = arguments.next(String.class, StringArgument.GREEDY).asOptional("").split(" ");
+        final var isSilent = arguments.next(String.class).asOptional("--not-silent").equalsIgnoreCase("--silent");
         // ...
-        target.getInventory().addItem(new ItemStack(material, amount));
+        final ItemStack item = new ItemStack(material, amount);
+        final Component display = text(amount + "x ").append(translatable(item.translationKey()).hoverEvent(item.asHoverEvent()));
+        // ...
+        target.getInventory().addItem(item);
         // message
         Message.of(PluginLocale.COMMAND_GIVE_SENDER)
                 .placeholder("player", target)
                 .placeholder("amount", amount)
-                .placeholder("material", translatable(material.translationKey()))
+                .placeholder("item", display)
                 .send(sender);
         // ...
-        if (sender != target && containsIgnoreCase(flags, "--silent") == false) {
+        if (sender != target && isSilent == false) {
             Message.of(PluginLocale.COMMAND_GIVE_TARGET)
                     .placeholder("amount", amount)
-                    .placeholder("material", translatable(material.translationKey()))
+                    .placeholder("item", display)
                     .send(target);
         }
     }

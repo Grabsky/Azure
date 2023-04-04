@@ -19,8 +19,8 @@
         "delete_failure": "<dark_gray>› <red>Usuwanie wiadomości nie powiodło się.",
         // Give
         "give_usage": "/give <player> <material> <amount> [--silent]",
-        "give_sent": "<dark_gray>› <gray>Gracz <yellow><player><gray> otrzymał <yellow><amount>x <material><gray>.",
-        "give_received": "<dark_gray>› <gray>Otrzymałeś <yellow><amount>x <material><gray>.",
+        "give_sent": "<dark_gray>› <gray>Gracz <yellow><player><gray> otrzymał <yellow><item><gray>.",
+        "give_received": "<dark_gray>› <gray>Otrzymałeś <yellow><item><gray>.",
         // World > Help
         "world_help": [
             "",
