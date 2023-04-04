@@ -88,6 +88,20 @@
         "world_weather_set_failure_invalid_type": "<dark_gray>› <red>Nieprawidłowy typ pogody.",
         // Speed
         "speed_set_success_walk": "<dark_gray>› <gray>Ustawiono prędkość chodzenia dla <yellow><player><gray> na <yellow><speed><gray>.",
-        "speed_set_success_fly": "<dark_gray>› <gray>Ustawiono prędkość latania dla <yellow><player><gray> na <yellow><speed><gray>."
+        "speed_set_success_fly": "<dark_gray>› <gray>Ustawiono prędkość latania dla <yellow><player><gray> na <yellow><speed><gray>.",
+        // Pack
+        "pack_help": [
+            "",
+            "<dark_gray>› <yellow>/pack apply",
+            "<dark_gray>› <yellow>/pack notify<gray> [--confirm]",
+            ""
+        ],
+        "pack_notify_confirm":  "<badge_info> <gray>Aby potwierdzić, wpisz <gold>/pack notify --confirm<gray>.",
+        "pack_notify": [
+            "",
+            "<dark_gray>› <gray>Serwerowa paczka zasobów została zaktualizowana.",
+            "<dark_gray>› <hover:show_text:'<red>Przeloguj się jeśli napotkasz jakiś problem.'><click:run_command:/pack apply><gold>Kliknij tutaj, aby ją załadować.</click>",
+            ""
+        ]
     }
 }

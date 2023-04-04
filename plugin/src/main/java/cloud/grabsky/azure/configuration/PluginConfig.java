@@ -2,13 +2,16 @@ package cloud.grabsky.azure.configuration;
 
 import cloud.grabsky.azure.chat.ChatManager;
 import cloud.grabsky.configuration.JsonConfiguration;
+import cloud.grabsky.configuration.JsonNullable;
 import cloud.grabsky.configuration.JsonPath;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -55,6 +58,26 @@ public final class PluginConfig implements JsonConfiguration {
 
     @JsonPath("chat_settings.discord_webhooks.discord_webhook_url")
     public static String CHAT_DISCORD_WEBHOOK_URL;
+
+    // Resource Pack
+
+    @JsonPath("resource_pack.send_on_join")
+    public static boolean RESOURCE_PACK_SEND_ON_JOIN;
+
+    @JsonPath("resource_pack.is_required")
+    public static boolean RESOURCE_PACK_IS_REQUIRED;
+
+    @JsonPath("resource_pack.pack_url")
+    public static String RESOURCE_PACK_URL;
+
+    @JsonPath("resource_pack.pack_hash")
+    public static String RESOURCE_PACK_HASH;
+
+    @JsonPath("resource_pack.prompt_message")
+    public static Component RESOURCE_PACK_PROMPT_MESSAGE;
+
+    @JsonNullable @JsonPath("resource_pack.notification_sound")
+    public static @Nullable Sound RESOURCE_PACK_NOTIFICATION_SOUND;
 
     /* ON RELOAD */
 

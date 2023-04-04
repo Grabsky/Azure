@@ -139,6 +139,18 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.speed_set_success_fly")
     public static String COMMAND_SPEED_SET_SUCCESS_FLY;
 
+    // Commands > Pack
+
+    @JsonPath("commands.pack_help")
+    public static Component COMMAND_PACK_HELP;
+
+    @JsonPath("commands.pack_notify_confirm")
+    public static Component COMMAND_PACK_NOTIFY_CONFIRM;
+
+    @JsonPath("commands.pack_notify")
+    @JsonAdapter(fromJson = StringComponentAdapter.class)
+    public static String COMMAND_PACK_NOTIFY;
+
 
     public static final class Commands implements JsonConfiguration {
 

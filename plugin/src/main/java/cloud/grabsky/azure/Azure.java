@@ -10,12 +10,14 @@ import cloud.grabsky.azure.chat.ChatManager;
 import cloud.grabsky.azure.commands.AzureCommand;
 import cloud.grabsky.azure.commands.DeleteCommand;
 import cloud.grabsky.azure.commands.GiveCommand;
+import cloud.grabsky.azure.commands.PackCommand;
 import cloud.grabsky.azure.commands.SpeedCommand;
 import cloud.grabsky.azure.commands.WorldCommand;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.configuration.PluginConfig.DeleteButton;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.azure.configuration.adapters.StandardTagResolverAdapter;
+import cloud.grabsky.azure.listener.PlayerListener;
 import cloud.grabsky.azure.user.AzureUserCache;
 import cloud.grabsky.azure.world.WorldManager;
 import cloud.grabsky.bedrock.BedrockPlugin;
@@ -111,10 +113,12 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
         commands.registerCommand(AzureCommand.class);
         commands.registerCommand(GiveCommand.class);
         commands.registerCommand(SpeedCommand.class);
+        commands.registerCommand(PackCommand.class);
         commands.registerCommand(new WorldCommand(this));
         commands.registerCommand(new DeleteCommand(chat));
         // ........
         this.getServer().getPluginManager().registerEvents(chat, this);
+        this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         // ...
         AzureProvider.finalize(this);
     }
@@ -141,8 +145,8 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
                     ConfigurationHolder.of(PluginConfig.class, config)
             );
             return true;
-        } catch (final IOException exc) {
-            throw new IllegalStateException(exc); // Re-throwing as runtime exception
+        } catch (final IOException e) {
+            throw new IllegalStateException(e); // Re-throwing as runtime exception.
         }
     }
     
