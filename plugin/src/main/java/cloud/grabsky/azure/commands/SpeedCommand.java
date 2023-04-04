@@ -19,9 +19,7 @@ public final class SpeedCommand extends RootCommand {
 
     @Override
     public @NotNull CompletionsProvider onTabComplete(final @NotNull RootCommandContext context, final int index) throws CommandLogicException {
-        return (index == 0)
-                ? CompletionsProvider.of(Player.class)
-                : CompletionsProvider.EMPTY;
+        return (index == 0) ? CompletionsProvider.of(Player.class) : CompletionsProvider.EMPTY;
     }
 
     @Override
@@ -35,7 +33,7 @@ public final class SpeedCommand extends RootCommand {
             final float finalSpeed = (speed != null) ? speed : 0.1F; // default fly speed is 0.1F
             target.setFlySpeed(finalSpeed);
             // Sending message to command sender.
-            Message.of(PluginLocale.SPEED_SET_SUCCESS_FLY)
+            Message.of(PluginLocale.COMMAND_SPEED_SET_SUCCESS_FLY)
                     .placeholder("player", target)
                     .placeholder("speed", finalSpeed)
                     .send(sender);
@@ -45,7 +43,7 @@ public final class SpeedCommand extends RootCommand {
         final float finalSpeed = (speed != null) ? speed : 0.2F; // default walk speed is 0.2F
         target.setWalkSpeed(finalSpeed);
         // Sending message to command sender.
-        Message.of(PluginLocale.SPEED_SET_SUCCESS_WALK)
+        Message.of(PluginLocale.COMMAND_SPEED_SET_SUCCESS_WALK)
                 .placeholder("player", target)
                 .placeholder("speed", finalSpeed)
                 .send(sender);

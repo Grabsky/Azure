@@ -134,10 +134,10 @@ public final class PluginLocale implements JsonConfiguration {
     // Commands > Speed
 
     @JsonPath("commands.speed_set_success_walk")
-    public static String SPEED_SET_SUCCESS_WALK;
+    public static String COMMAND_SPEED_SET_SUCCESS_WALK;
 
     @JsonPath("commands.speed_set_success_fly")
-    public static String SPEED_SET_SUCCESS_FLY;
+    public static String COMMAND_SPEED_SET_SUCCESS_FLY;
 
 
     public static final class Commands implements JsonConfiguration {
