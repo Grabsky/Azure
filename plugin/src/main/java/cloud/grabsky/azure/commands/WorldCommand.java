@@ -10,9 +10,10 @@ import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
 import cloud.grabsky.commands.RootCommandInput;
-import cloud.grabsky.commands.argument.StringArgument;
 import cloud.grabsky.commands.component.CompletionsProvider;
+import cloud.grabsky.commands.component.ExceptionHandler;
 import cloud.grabsky.commands.exception.CommandLogicException;
+import cloud.grabsky.commands.exception.MissingInputException;
 import io.papermc.paper.math.Position;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
@@ -132,24 +133,31 @@ public final class WorldCommand extends RootCommand {
         }
     }
 
+    private static final ExceptionHandler.Factory WORLD_CREATE_USAGE = (exception) -> {
+        if (exception instanceof MissingInputException)
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_CREATE_USAGE).send(context.getExecutor().asCommandSender());
+        // Let other exceptions be handled internally.
+        return null;
+    };
+
     // TO-DO: Improve "importing" of "existing" world.
     private void onWorldCreate(final RootCommandContext context, final ArgumentQueue arguments) {
         final CommandSender sender = context.getExecutor().asCommandSender();
         // ...
         if (sender.hasPermission(this.getPermission() + ".create") == true) {
-            final NamespacedKey key = arguments.next(NamespacedKey.class).asRequired();
-            final World.Environment environment = arguments.next(World.Environment.class).asRequired();
-            final WorldType type = arguments.next(WorldType.class).asRequired();
-            final String generator = arguments.next(String.class).asRequired();
-            final Long seed = arguments.next(Long.class, WorldSeedArgument.INSTANCE).asOptional(null);
-            final String[] flags = arguments.next(String.class, StringArgument.GREEDY).asOptional("").split(" ");
+            final NamespacedKey key = arguments.next(NamespacedKey.class).asRequired(WORLD_CREATE_USAGE);
+            final World.Environment environment = arguments.next(World.Environment.class).asRequired(WORLD_CREATE_USAGE);
+            final WorldType type = arguments.next(WorldType.class).asRequired(WORLD_CREATE_USAGE);
+            final String generator = arguments.next(String.class).asRequired(WORLD_CREATE_USAGE);
+            final long seed = arguments.next(Long.class, WorldSeedArgument.INSTANCE).asRequired(WORLD_CREATE_USAGE);
+            final boolean isAutoLoad = arguments.next(String.class).asOptional("--no-auto-load").equalsIgnoreCase("-a");
             // ...
             try {
-                final World world = plugin.getWorldManager().createWorld(key, environment, type, generator, seed, containsIgnoreCase(flags, "-a"));
+                final World world = plugin.getWorldManager().createWorld(key, environment, type, generator, seed, isAutoLoad);
                 // ...
                 if (world != null) {
                     // Sending success message to command sender.
-                    Message.of(PluginLocale.COMMAND_WORLD_CREATE_SUCCESS).placeholder("world", world.key()).send(sender);
+                    Message.of(PluginLocale.COMMAND_WORLD_CREATE_SUCCESS).placeholder("world", world).send(sender);
                     return;
                 }
                 // Sending error message to command sender.
@@ -168,16 +176,23 @@ public final class WorldCommand extends RootCommand {
         Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
     }
 
+    private static final ExceptionHandler.Factory WORLD_DELETE_USAGE = (exception) -> {
+        if (exception instanceof MissingInputException)
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_DELETE_USAGE).send(context.getExecutor().asCommandSender());
+        // Let other exceptions be handled internally.
+        return null;
+    };
+
     private void onWorldDelete(final RootCommandContext context, final ArgumentQueue arguments) {
         final CommandSender sender = context.getExecutor().asCommandSender();
         // ...
         if (sender.hasPermission(this.getPermission() + ".delete") == true) {
-            final World world = arguments.next(World.class).asRequired();
-            final String[] flags = arguments.next(String.class, StringArgument.GREEDY).asOptional("").split(" ");
+            final World world = arguments.next(World.class).asRequired(WORLD_DELETE_USAGE);
+            final boolean isConfirm = arguments.next(String.class).asOptional("--no-confirm").equalsIgnoreCase("--confirm");
             // Checking if --confirm flag is present.
-            if (containsIgnoreCase(flags, "--confirm") == true) {
+            if (isConfirm == true) {
                 // Checking if specified world is NOT default/main/primary world on this server.
-                if (worlds.getPrimaryWorld().key().equals(world.getKey()) == false) {
+                if (worlds.getPrimaryWorld().key().equals(world.key()) == false) {
                     // Teleporting players away from the world that is about to be deleted.
                     for (final Player player : world.getPlayers()) {
                         player.teleport(worlds.getPrimaryWorld().getSpawnLocation(), TeleportCause.PLUGIN);
@@ -187,11 +202,11 @@ public final class WorldCommand extends RootCommand {
                     // Deleting world directory...
                     if (deleteDirectory(world.getWorldFolder()) == true) {
                         // Sending success message to command sender.
-                        Message.of(PluginLocale.COMMAND_WORLD_DELETE_SUCCESS).placeholder("world", world.key()).send(sender);
+                        Message.of(PluginLocale.COMMAND_WORLD_DELETE_SUCCESS).placeholder("world", world).send(sender);
                         return;
                     }
                     // Sending error message to command sender.
-                    Message.of(PluginLocale.COMMAND_WORLD_DELETE_FAILURE_OTHER).placeholder("world", world.key()).send(sender);
+                    Message.of(PluginLocale.COMMAND_WORLD_DELETE_FAILURE_OTHER).placeholder("world", world).send(sender);
                     return;
                 }
                 // Sending error message to command sender.
@@ -201,7 +216,7 @@ public final class WorldCommand extends RootCommand {
             // Sending confirmation message to command sender.
             Message.of(PluginLocale.COMMAND_WORLD_DELETE_CONFIRM)
                     .replace("<input>", context.getInput().toString())
-                    .placeholder("world", world.key())
+                    .placeholder("world", world)
                     .send(sender);
             return;
         }
@@ -209,13 +224,20 @@ public final class WorldCommand extends RootCommand {
         Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
     }
 
+    private static final ExceptionHandler.Factory WORLD_GAMERULE_USAGE = (exception) -> {
+        if (exception instanceof MissingInputException)
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_GAMERULE_USAGE).send(context.getExecutor().asCommandSender());
+        // Let other exceptions be handled internally.
+        return null;
+    };
+
     @SuppressWarnings("unchecked")
     private void onWorldGamerule(final RootCommandContext context, final ArgumentQueue arguments) {
         final CommandSender sender = context.getExecutor().asCommandSender();
         // ...
         if (sender.hasPermission(this.getPermission() + ".gamerule") == true) {
-            final World world = arguments.next(World.class).asRequired();
-            final GameRule<Object> gameRule = arguments.next(GameRule.class).asRequired();
+            final World world = arguments.next(World.class).asRequired(WORLD_GAMERULE_USAGE);
+            final GameRule<Object> gameRule = arguments.next(GameRule.class).asRequired(WORLD_GAMERULE_USAGE);
             final Object value = arguments.next(gameRule.getType()).asOptional();
             // ...
             if (value == null) {
@@ -250,7 +272,7 @@ public final class WorldCommand extends RootCommand {
             // Sending message to command sender.
             Message.of(PluginLocale.COMMAND_WORLD_INFO)
                     .placeholder("world_name", world.getName())
-                    .placeholder("world_key", world.getKey())
+                    .placeholder("world_key", world.key())
                     .placeholder("world_seed", world.getSeed())
                     .placeholder("world_environment", world.getEnvironment().name())
                     .placeholder("world_online", world.getPlayerCount())
@@ -264,11 +286,18 @@ public final class WorldCommand extends RootCommand {
         Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
     }
 
+    private static final ExceptionHandler.Factory WORLD_LOAD_USAGE = (exception) -> {
+        if (exception instanceof MissingInputException)
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_LOAD_USAGE).send(context.getExecutor().asCommandSender());
+        // Let other exceptions be handled internally.
+        return null;
+    };
+
     private void onWorldLoad(final RootCommandContext context, final ArgumentQueue arguments) {
         final CommandSender sender = context.getExecutor().asCommandSender();
         // ...
         if (sender.hasPermission(this.getPermission() + ".load") == true) {
-            final NamespacedKey key = arguments.next(NamespacedKey.class).asRequired();
+            final NamespacedKey key = arguments.next(NamespacedKey.class).asRequired(WORLD_LOAD_USAGE);
             try {
                 // Trying to load the world...
                 plugin.getWorldManager().loadWorld(key, true);
@@ -288,12 +317,20 @@ public final class WorldCommand extends RootCommand {
         Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
     }
 
+    private static final ExceptionHandler.Factory WORLD_SPAWNPOINT_USAGE = (exception) -> {
+        if (exception instanceof MissingInputException)
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_SPAWNPOINT_USAGE).send(context.getExecutor().asCommandSender());
+        // Let other exceptions be handled internally.
+        return null;
+    };
+
     private void onWorldSpawnPoint(final RootCommandContext context, final ArgumentQueue arguments) {
         final CommandSender sender = context.getExecutor().asCommandSender();
         // ...
         if (sender.hasPermission(this.getPermission() + ".spawnpoint") == true) {
-            final World world = arguments.next(World.class).asRequired();
-            final Position position = arguments.next(Position.class).asRequired();
+            final World world = arguments.next(World.class).asRequired(WORLD_SPAWNPOINT_USAGE);
+            final Position position = arguments.next(Position.class).asRequired(WORLD_SPAWNPOINT_USAGE);
+            // Creating location from specified position.
             final Location location = new Location(world, position.x(), position.y(), position.z());
             // Updating spawn location.
             world.setSpawnLocation(location);
@@ -309,17 +346,24 @@ public final class WorldCommand extends RootCommand {
         Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
     }
 
+    private static final ExceptionHandler.Factory WORLD_TELEPORT_USAGE = (exception) -> {
+        if (exception instanceof MissingInputException)
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_TELEPORT_USAGE).send(context.getExecutor().asCommandSender());
+        // Let other exceptions be handled internally.
+        return null;
+    };
+
     private void onWorldTeleport(final RootCommandContext context, final ArgumentQueue arguments) {
         final CommandSender sender = context.getExecutor().asCommandSender();
         // ...
         if (sender.hasPermission(this.getPermission() + ".teleport") == true) {
-            final Player target = arguments.next(Player.class).asRequired();
-            final World world = arguments.next(World.class).asRequired();
+            final Player target = arguments.next(Player.class).asRequired(WORLD_TELEPORT_USAGE);
+            final World world = arguments.next(World.class).asRequired(WORLD_TELEPORT_USAGE);
             // ...
             target.teleportAsync(world.getSpawnLocation(), TeleportCause.PLUGIN);
-            Message.of(PluginLocale.COMMAND_WORLD_TELEPORT)
+            Message.of(PluginLocale.COMMAND_WORLD_TELEPORT_SUCCESS)
                     .placeholder("player", target)
-                    .placeholder("world", world.key())
+                    .placeholder("world", world)
                     .send(sender);
             return;
         }
@@ -327,23 +371,30 @@ public final class WorldCommand extends RootCommand {
         Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
     }
 
+    private static final ExceptionHandler.Factory WORLD_TIME_USAGE = (exception) -> {
+        if (exception instanceof MissingInputException)
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_TIME_USAGE).send(context.getExecutor().asCommandSender());
+        // Let other exceptions be handled internally.
+        return null;
+    };
+
     private void onWorldTime(final RootCommandContext context, final ArgumentQueue arguments) {
         final CommandSender sender = context.getExecutor().asCommandSender();
         // ...
         if (sender.hasPermission(this.getPermission() + ".time") == true) {
-            final World world = arguments.next(World.class).asRequired();
+            final World world = arguments.next(World.class).asRequired(WORLD_TIME_USAGE);
             final Long time = arguments.next(Long.class, WorldTimeArgument.INSTANCE).asOptional(null);
             // ...
             if (time == null) {
                 Message.of(PluginLocale.COMMAND_WORLD_TIME_INFO)
-                        .placeholder("world", world.key())
+                        .placeholder("world", world)
                         .placeholder("time", world.getTime())
                         .send(sender);
                 return;
             }
             world.setTime(time);
             Message.of(PluginLocale.COMMAND_WORLD_TIME_SET_SUCCESS)
-                    .placeholder("world", world.key())
+                    .placeholder("world", world)
                     .placeholder("time", world.getTime())
                     .send(sender);
             return;
@@ -352,12 +403,19 @@ public final class WorldCommand extends RootCommand {
         Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
     }
 
+    private static final ExceptionHandler.Factory WORLD_WEATHER_USAGE = (exception) -> {
+        if (exception instanceof MissingInputException)
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_WEATHER_USAGE).send(context.getExecutor().asCommandSender());
+        // Let other exceptions be handled internally.
+        return null;
+    };
+
     private void onWorldWeather(final RootCommandContext context, final ArgumentQueue arguments) {
         final CommandSender sender = context.getExecutor().asCommandSender();
         // ...
         if (sender.hasPermission(this.getPermission() + ".weather") == true) {
-            final World world = arguments.next(World.class).asRequired();
-            final String weather = arguments.next(String.class).asRequired();
+            final World world = arguments.next(World.class).asRequired(WORLD_WEATHER_USAGE);
+            final String weather = arguments.next(String.class).asRequired(WORLD_WEATHER_USAGE);
             // ...
             switch (weather.toLowerCase()) {
                 case "clear" -> {
@@ -374,29 +432,18 @@ public final class WorldCommand extends RootCommand {
                 }
                 default -> {
                     // Sending error message to command sender.
-                    Message.of(PluginLocale.COMMAND_WORLD_WEATHER_SET_FAILURE_INVALID_TYPE)
-                            .placeholder("world", world.key())
-                            .placeholder("weather", weather)
-                            .send(sender);
+                    Message.of(PluginLocale.COMMAND_WORLD_WEATHER_SET_FAILURE_INVALID_TYPE).placeholder("input", weather).send(sender);
                 }
             }
             // Sending success message to command sender.
             Message.of(PluginLocale.COMMAND_WORLD_WEATHER_SET_SUCCESS)
-                    .placeholder("world", world.key())
+                    .placeholder("world", world)
                     .placeholder("weather", weather)
                     .send(sender);
             return;
         }
         // Sending error message to command sender.
         Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
-    }
-
-    private static boolean containsIgnoreCase(final String[] arr, final String search) {
-        for (final String element : arr) {
-            if (search.equalsIgnoreCase(element) == true)
-                return true;
-        }
-        return false;
     }
 
     private static boolean deleteDirectory(final File file) {

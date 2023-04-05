@@ -1,8 +1,7 @@
-// This JSON configuration file is lenient but keep an eye where you leave trailing commas as they tend to cause issues.
 {
     "missing_permissions": "<dark_gray>› <red>Nie masz uprawnień aby to zrobić.",
-    "reload_success": "<dark_gray>› <gray>Plugin <yellow>Azure <gray>został załadowany pomyślnie.",
-    "reload_failure": "<dark_gray>› <red>Wystąpił błąd podczas ładowania pluginu <yellow>Azure<red>.",
+    "reload_success": "<dark_gray>› <gray>Plugin <gold>Azure <gray>został załadowany pomyślnie.",
+    "reload_failure": "<dark_gray>› <red>Wystąpił błąd podczas ładowania pluginu <gold>Azure<red>.",
     // ...
     "chat": {
         "on_cooldown": "<dark_gray>› <red>Musisz chwilę poczekać..."
@@ -11,93 +10,104 @@
     "commands": {
         "azure_help": [
             "",
-            "<dark_gray>› <yellow>/azure reload<dark_gray> - <gray>Przeładowuje plugin.",
+            "<dark_gray>› <gold>/azure reload<dark_gray> - <gray>Przeładowuje plugin.",
             ""
         ],
         // Delete
-        "delete_usage": "<dark_gray>› <yellow>/delete <signature_uuid>",
+        "delete_usage": "<dark_gray>› <gold>/delete <white>(signature_uuid)",
         "delete_failure": "<dark_gray>› <red>Usuwanie wiadomości nie powiodło się.",
         // Give
-        "give_usage": "/give <player> <material> <amount> [--silent]",
-        "give_sent": "<dark_gray>› <gray>Gracz <yellow><player><gray> otrzymał <yellow><item><gray>.",
-        "give_received": "<dark_gray>› <gray>Otrzymałeś <yellow><item><gray>.",
+        "give_usage": "<dark_gray>› <gray>Użycie: <gold>/give <white>(player) (material) (amount) <gray>(--silent)",
+        "give_sent": "<dark_gray>› <gray>Gracz <gold><player><gray> otrzymał <gold><item><gray>.",
+        "give_received": "<dark_gray>› <gray>Otrzymałeś <gold><item><gray>.",
         // World > Help
         "world_help": [
             "",
-            "<dark_gray>› <yellow>/world create <gray><name> <environment> <type> <gen> <seed> [-a]",
-            "<dark_gray>› <yellow>/world delete <gray><world> [--confirm]",
-            "<dark_gray>› <yellow>/world gamerule <gray><world> <rule> [value]",
-            "<dark_gray>› <yellow>/world info <world>",
-            "<dark_gray>› <yellow>/world load <gray><world>",
-            "<dark_gray>› <yellow>/world teleport <gray><target> <world>",
-            "<dark_gray>› <yellow>/world time <gray><world> [time]",
-            "<dark_gray>› <yellow>/world weather <gray><world> <weather>",
+            "<dark_gray>› <gold>/world create <white>(name) (env) (type) (gen) (seed) <gray>(-a)",
+            "<dark_gray>› <gold>/world delete <white>(world) <gray>(--confirm)",
+            "<dark_gray>› <gold>/world gamerule <white>(world) (rule) <gray>(value)",
+            "<dark_gray>› <gold>/world info <gray>(world)",
+            "<dark_gray>› <gold>/world load <white>(world)",
+            "<dark_gray>› <gold>/world teleport <white>(player) (world)",
+            "<dark_gray>› <gold>/world time <white>(world) <gray>(time)",
+            "<dark_gray>› <gold>/world weather <white>(world) (weather)",
             ""
         ],
+        // World > Create
+        "world_create_usage": "<dark_gray>› <gray>Użycie: <gold>/world create <white>(name) (env) (type) (gen) (seed) <gray>(-a)",
+        "world_create_confirm": [
+            "",
+            "<dark_gray>› <gray>Czy na pewno chcesz stworzyć świat <gold><world><gray>?",
+            "<dark_gray>› <gray>Środowisko: <gold><world_environment>",
+            "<dark_gray>› <gray>Typ: <gold><world_type>",
+            "",
+            "<dark_gray>› <gray>Kliknij <gold><b><u>tutaj</u></b><gray>, aby potwierdzić.",
+            ""
+        ],
+        "world_create_success": "<dark_gray>› <gray>Świat <gold><world><gray> został utworzony.",
+        "world_create_failure_already_exists": "<dark_gray>› <red>Świat <gold><world><red> już istnieje.",
+        "world_create_failure_other": "<dark_gray>› <red>Wystąpił błąd podczas tworzenia świata <gold><world><red>.",
+        // World > Delete
+        "world_delete_usage": "<dark_gray>› <gray>Użycie: <gold>/world delete <white>(world) <gray>(--confirm)",
+        "world_delete_confirm": [
+            "",
+            "<dark_gray>› <gray>Czy na pewno chcesz usunąć świat <gold><world><gray>?",
+            "<dark_gray>› <hover:show_text:'<red>Tej operacji nie można cofnąć.'><click:run_command:'/<input> --confirm'><gold>Kliknij tutaj, aby potwierdzić.</click>",
+            ""
+        ],
+        "world_delete_success": "<dark_gray>› <gray>Świat <gold><world><gray> został usunięty.",
+        "world_delete_failure_primary_world": "<dark_gray>› <red>Podstawowy świat nie może zostać usunięty.",
+        "world_delete_failure_other": "<dark_gray>› <red>Świat <gold><world><red> nie został usunięty.",
+        // World > Gamerule
+        "world_gamerule_usage": "<dark_gray>› <gray>Użycie: <gold>/world gamerule <white>(world) (rule) <gray>(value)",
+        "world_gamerule_info": "<dark_gray>› <gray>Wartość reguły <gold><rule><gray> to <gold><value>",
+        "world_gamerule_set_success": "<dark_gray>› <gray>Ustawiono wartość reguły <gold><rule><gray> na <gold><value>",
+        "world_gamerule_set_failure": "<dark_gray>› <red>Wartość reguły <gold><rule><red> nie została zaktualizowana.",
         // World > Info
         "world_info": [
             "",
-            "<dark_gray>› <gray>Świat: <yellow><world_name> <dark_gray>/ <gray>Identyfikator: <yellow><world_key>",
-            "<dark_gray>› <gray>Środowisko: <yellow><world_environment> <dark_gray>/ <gray>Seed: <yellow><world_seed>",
-            "<dark_gray>› <gray>Spawn: <yellow><spawn_x><gray>, <yellow><spawn_y><gray>, <yellow><spawn_z> <dark_gray>/ <gray>Liczba graczy: <yellow><world_online>",
+            "<dark_gray>› <gray>Świat: <gold><world_name> <dark_gray>/ <gray>Identyfikator: <gold><world_key>",
+            "<dark_gray>› <gray>Środowisko: <gold><world_environment> <dark_gray>/ <gray>Seed: <gold><world_seed>",
+            "<dark_gray>› <gray>Spawn: <gold><spawn_x><gray>, <gold><spawn_y><gray>, <gold><spawn_z> <dark_gray>/ <gray>Liczba graczy: <gold><world_online>",
             ""
         ],
-        // World > Teleport
-        "world_teleport_usage": "/world teleport <target> <world>",
-        "world_teleport": "<dark_gray>› <yellow><player><gray> został przeniesiony do świata <yellow><world><gray>.",
         // World > Load
-        "world_load_success": "<dark_gray>› <gray>Świat <yellow><world><gray> został załadowany.",
-        "world_load_failure_not_found": "<dark_gray>› <red>Świat <yellow><world><red> nie istnieje.",
-        "world_load_failure_other": "<dark_gray>› <red>Wystąpił błąd podczas ładowania świata <yellow><world><red>.",
-        // World > Create
-        "world_create_usage": "/world create <id> <environment> <type> <generator> <seed> [-a]",
-        "world_create_confirm": [
-            "",
-            "<dark_gray>› <gray>Czy na pewno chcesz stworzyć świat <yellow><world><gray>?",
-            "<dark_gray>› <gray>Środowisko: <yellow><world_environment>",
-            "<dark_gray>› <gray>Typ: <yellow><world_type>",
-            "",
-            "<dark_gray>› <gray>Kliknij <yellow><b><u>tutaj</u></b><gray>, aby potwierdzić.",
-            ""
-        ],
-        "world_create_success": "<dark_gray>› <gray>Świat <yellow><world><gray> został utworzony.",
-        "world_create_failure_already_exists": "<dark_gray>› <red>Świat <yellow><world><red> już istnieje.",
-        "world_create_failure_other": "<dark_gray>› <red>Wystąpił błąd podczas tworzenia świata <yellow><world><red>.",
-        // World > Gamerule
-        "world_gamerule_info": "<dark_gray>› <gray>Wartość reguły <yellow><rule><gray> to <yellow><value>",
-        "world_gamerule_set_success": "<dark_gray>› <gray>Ustawiono wartość reguły <yellow><rule><gray> na <yellow><value>",
-        "world_gamerule_set_failure": "<dark_gray>› <red>Wartość reguły <yellow><rule><red> nie została zaktualizowana.",
-        // World > Delete
-        "world_delete_usage": "/world delete <world> [--confirm]",
-        "world_delete_confirm": [
-            "",
-            "<dark_gray>› <gray>Czy na pewno chcesz usunąć świat <yellow><world><gray>?",
-            "<dark_gray>› <hover:show_text:'<red>Tej operacji nie można cofnąć.'><click:run_command:'<input> --confirm'><gold>Kliknij tutaj, aby potwierdzić.</click>",
-            ""
-        ],
-        "world_delete_success": "<dark_gray>› <gray>Świat <yellow><world><gray> został usunięty.",
-        "world_delete_failure_primary_world": "<dark_gray>› <red>Podstawowy świat nie może zostać usunięty.",
-        "world_delete_failure_other": "<dark_gray>› <red>Świat <yellow><world><red> nie został usunięty.",
+        "world_load_usage": "<dark_gray>› <gray>Użycie: <gold>/world load <white>(world)",
+        "world_load_success": "<dark_gray>› <gray>Świat <gold><world><gray> został załadowany.",
+        "world_load_failure_not_found": "<dark_gray>› <red>Świat <gold><world><red> nie istnieje.",
+        "world_load_failure_other": "<dark_gray>› <red>Wystąpił błąd podczas ładowania świata <gold><world><red>.",
         // World > Spawnpoint
-        "world_spawnpoint_set_success": "<dark_gray>› <gray>Pozycja spawnu ustawiona na <yellow><x><gray>, <yellow><y><gray>, <yellow><z><gray>.",
+        "world_spawnpoint_usage": "<dark_gray>› <gray>Użycie: <gold>/world spawnpoint <white>(world) (x) (y) (z)",
+        "world_spawnpoint_set_success": "<dark_gray>› <gray>Pozycja spawnu ustawiona na <gold><x><gray>, <gold><y><gray>, <gold><z><gray>.",
+        // World > Teleport
+        "world_teleport_usage": "<dark_gray>› <gray>Użycie: <gold>/world teleport <white>(player) (world)",
+        "world_teleport_success": "<dark_gray>› <gold><player><gray> został przeniesiony do świata <gold><world><gray>.",
         // World > Time
-        "world_time_info": "<dark_gray>› Czas w <yellow><world><gray> to <yellow><time><gray>.",
-        "world_time_set_success": "<dark_gray>› <gray>Czas w <yellow><world><gray> został ustawiony na <yellow><time><gray>.",
+        "world_time_usage": "<dark_gray>› <gray>Użycie: <gold>/world time <white>(world) <gray>(time)",
+        "world_time_info": "<dark_gray>› <gray>Czas w <gold><world><gray> to <gold><time><gray>.",
+        "world_time_set_success": "<dark_gray>› <gray>Czas w <gold><world><gray> został ustawiony na <gold><time><gray>.",
         // World > Weather
-        "world_weather_set_success": "<dark_gray>› <gray>Pogoda w <yellow><world><gray> została ustawiona na <yellow><weather><gray>.",
-        "world_weather_set_failure_invalid_type": "<dark_gray>› <red>Nieprawidłowy typ pogody.",
+        "world_weather_usage": "<dark_gray>› <gray>Użycie: <gold>/world weather <white>(world) (weather)",
+        "world_weather_set_success": "<dark_gray>› <gray>Pogoda w <gold><world><gray> została ustawiona na <gold><weather><gray>.",
+        "world_weather_set_failure_invalid_type": "<dark_gray>› <red>Argument <gold><input> <red> nie jest prawidłowym typem pogody.",
         // Speed
-        "speed_set_success_walk": "<dark_gray>› <gray>Ustawiono prędkość chodzenia dla <yellow><player><gray> na <yellow><speed><gray>.",
-        "speed_set_success_fly": "<dark_gray>› <gray>Ustawiono prędkość latania dla <yellow><player><gray> na <yellow><speed><gray>.",
+        "speed_usage": "<dark_gray>› <gray>Użycie: <gold>/speed <white>(player) <gray>(speed)",
+        "speed_set_success_walk": "<dark_gray>› <gray>Ustawiono prędkość chodzenia dla <gold><player><gray> na <gold><speed><gray>.",
+        "speed_set_success_fly": "<dark_gray>› <gray>Ustawiono prędkość latania dla <gold><player><gray> na <gold><speed><gray>.",
         // Pack
         "pack_help": [
             "",
-            "<dark_gray>› <yellow>/pack apply",
-            "<dark_gray>› <yellow>/pack notify<gray> [--confirm]",
+            "<dark_gray>› <gold>/pack apply",
+            "<dark_gray>› <gold>/pack notify<gray> (--confirm)",
             ""
         ],
-        "pack_notify_confirm":  "<badge_info> <gray>Aby potwierdzić, wpisz <gold>/pack notify --confirm<gray>.",
-        "pack_notify": [
+        "pack_notify_confirm": [
+            "",
+            "<dark_gray>› <gray>Czy na pewno chcesz powiadomić o aktualizacji paczki?",
+            "<dark_gray>› <hover:show_text:'<red>Wszyscy gracze na serwerze otrzymają powiadomienie.'><click:run_command:'/<input> --confirm'><gold>Kliknij tutaj, aby potwierdzić.</click>",
+            ""
+        ],
+        "pack_notification": [
             "",
             "<dark_gray>› <gray>Serwerowa paczka zasobów została zaktualizowana.",
             "<dark_gray>› <hover:show_text:'<red>Przeloguj się jeśli napotkasz jakiś problem.'><click:run_command:/pack apply><gold>Kliknij tutaj, aby ją załadować.</click>",

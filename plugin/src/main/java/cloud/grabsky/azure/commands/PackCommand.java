@@ -54,11 +54,11 @@ public final class PackCommand extends RootCommand {
                             if (PluginConfig.RESOURCE_PACK_NOTIFICATION_SOUND != null)
                                 it.playSound(PluginConfig.RESOURCE_PACK_NOTIFICATION_SOUND);
                             // Sending notification message.
-                            Message.of(PluginLocale.COMMAND_PACK_NOTIFY).send(it);
+                            Message.of(PluginLocale.COMMAND_PACK_NOTIFICATION).send(it);
                         });
                         return;
                     }
-                    Message.of(PluginLocale.COMMAND_PACK_NOTIFY_CONFIRM).send(sender);
+                    Message.of(PluginLocale.COMMAND_PACK_NOTIFY_CONFIRM).replace("<input>", context.getInput().toString()).send(sender);
                     return;
                 }
                 Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);

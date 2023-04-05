@@ -26,11 +26,10 @@ public final class GiveCommand extends RootCommand {
         super("give", null, "azure.command.give", "/give <player> <material> <amount>", "Gives an item.");
     }
 
-    private static final ExceptionHandler.Factory SEND_USAGE_ON_MISSING_INPUT = (exception) -> {
-        if (exception instanceof MissingInputException) return (_0, context) -> {
-            context.getExecutor().asCommandSender().sendMessage(PluginLocale.COMMAND_GIVE_USAGE);
-        };
-        // DEFAULT HANDLER
+    private static final ExceptionHandler.Factory GIVE_USAGE = (exception) -> {
+        if (exception instanceof MissingInputException)
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_GIVE_USAGE).send(context.getExecutor().asCommandSender());
+        // Let other exceptions be handled internally.
         return null;
     };
 
@@ -49,9 +48,9 @@ public final class GiveCommand extends RootCommand {
     public void onCommand(final RootCommandContext context, final ArgumentQueue arguments) throws CommandLogicException {
         final CommandSender sender = context.getExecutor().asCommandSender();
         // arguments
-        final var target = arguments.next(Player.class).asRequired(SEND_USAGE_ON_MISSING_INPUT);
-        final var material = arguments.next(Material.class).asRequired(SEND_USAGE_ON_MISSING_INPUT);
-        final var amount = arguments.next(Integer.class, IntegerArgument.ofRange(1, 64)).asRequired(SEND_USAGE_ON_MISSING_INPUT);
+        final var target = arguments.next(Player.class).asRequired(GIVE_USAGE);
+        final var material = arguments.next(Material.class).asRequired(GIVE_USAGE);
+        final var amount = arguments.next(Integer.class, IntegerArgument.ofRange(1, 64)).asRequired(GIVE_USAGE);
         final var isSilent = arguments.next(String.class).asOptional("--not-silent").equalsIgnoreCase("--silent");
         // ...
         final ItemStack item = new ItemStack(material, amount);
@@ -71,14 +70,6 @@ public final class GiveCommand extends RootCommand {
                     .placeholder("item", display)
                     .send(target);
         }
-    }
-
-    private static boolean containsIgnoreCase(final String[] arr, final String search) {
-        for (final String element : arr) {
-            if (search.equalsIgnoreCase(element) == true)
-                return true;
-        }
-        return false;
     }
 
 }

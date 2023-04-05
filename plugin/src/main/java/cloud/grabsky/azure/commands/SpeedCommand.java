@@ -7,7 +7,9 @@ import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
 import cloud.grabsky.commands.argument.FloatArgument;
 import cloud.grabsky.commands.component.CompletionsProvider;
+import cloud.grabsky.commands.component.ExceptionHandler;
 import cloud.grabsky.commands.exception.CommandLogicException;
+import cloud.grabsky.commands.exception.MissingInputException;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,6 +18,13 @@ public final class SpeedCommand extends RootCommand {
     public SpeedCommand() {
         super("speed", null, "azure.command.speed", "/speed <player> [speed]", "Modify in-game movement speed.");
     }
+
+    private static final ExceptionHandler.Factory SPEED_USAGE = (exception) -> {
+        if (exception instanceof MissingInputException)
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_SPEED_USAGE).send(context.getExecutor().asCommandSender());
+        // Let other exceptions be handled internally.
+        return null;
+    };
 
     @Override
     public @NotNull CompletionsProvider onTabComplete(final @NotNull RootCommandContext context, final int index) throws CommandLogicException {
@@ -26,7 +35,7 @@ public final class SpeedCommand extends RootCommand {
     public void onCommand(final @NotNull RootCommandContext context, final @NotNull ArgumentQueue arguments) throws CommandLogicException {
         final Player sender = context.getExecutor().asPlayer();
         // ...
-        final Player target = arguments.next(Player.class).asRequired();
+        final Player target = arguments.next(Player.class).asRequired(SPEED_USAGE);
         final Float speed = arguments.next(Float.class, FloatArgument.ofRange(0.0F, 1.0F)).asOptional();
         // Handling FLY SPEED.
         if (target.isFlying() == true) {

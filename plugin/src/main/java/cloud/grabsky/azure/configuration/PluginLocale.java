@@ -51,18 +51,10 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.world_help")
     public static Component COMMAND_WORLD_HELP;
 
-    // Commands > World > Info
-
-    @JsonPath("commands.world_info")
-    @JsonAdapter(fromJson = StringComponentAdapter.class)
-    public static String COMMAND_WORLD_INFO;
-
-    // Commands > World > Teleport
-
-    @JsonPath("commands.world_teleport")
-    public static String COMMAND_WORLD_TELEPORT;
-
     // Commands > World > Create
+
+    @JsonPath("commands.world_create_usage")
+    public static String COMMAND_WORLD_CREATE_USAGE;
 
     @JsonPath("commands.world_create_success")
     public static String COMMAND_WORLD_CREATE_SUCCESS;
@@ -73,29 +65,10 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.world_create_failure_other")
     public static String COMMAND_WORLD_CREATE_FAILURE_OTHER;
 
-    // Commands > World > Gamerule
-
-    @JsonPath("commands.world_gamerule_info")
-    public static String COMMAND_WORLD_GAMERULE_INFO;
-
-    @JsonPath("commands.world_gamerule_set_success")
-    public static String COMMAND_WORLD_GAMERULE_SET_SUCCESS;
-
-    @JsonPath("commands.world_gamerule_set_failure")
-    public static String COMMAND_WORLD_GAMERULE_SET_FAILURE;
-
-    // Commands > World > Load
-
-    @JsonPath("commands.world_load_success")
-    public static String COMMAND_WORLD_LOAD_SUCCESS;
-
-    @JsonPath("commands.world_load_failure_not_found")
-    public static String COMMAND_WORLD_LOAD_FAILURE_NOT_FOUND;
-
-    @JsonPath("commands.world_load_failure_other")
-    public static String COMMAND_WORLD_LOAD_FAILURE_OTHER;
-
     // Commands > World > Delete
+
+    @JsonPath("commands.world_delete_usage")
+    public static String COMMAND_WORLD_DELETE_USAGE;
 
     @JsonPath("commands.world_delete_success")
     public static String COMMAND_WORLD_DELETE_SUCCESS;
@@ -110,12 +83,60 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonAdapter(fromJson = StringComponentAdapter.class)
     public static String COMMAND_WORLD_DELETE_CONFIRM;
 
+    // Commands > World > Gamerule
+
+    @JsonPath("commands.world_gamerule_usage")
+    public static String COMMAND_WORLD_GAMERULE_USAGE;
+
+    @JsonPath("commands.world_gamerule_info")
+    public static String COMMAND_WORLD_GAMERULE_INFO;
+
+    @JsonPath("commands.world_gamerule_set_success")
+    public static String COMMAND_WORLD_GAMERULE_SET_SUCCESS;
+
+    @JsonPath("commands.world_gamerule_set_failure")
+    public static String COMMAND_WORLD_GAMERULE_SET_FAILURE;
+
+    // Commands > World > Info
+
+    @JsonPath("commands.world_info")
+    @JsonAdapter(fromJson = StringComponentAdapter.class)
+    public static String COMMAND_WORLD_INFO;
+
+    // Commands > World > Load
+
+    @JsonPath("commands.world_load_usage")
+    public static String COMMAND_WORLD_LOAD_USAGE;
+
+    @JsonPath("commands.world_load_success")
+    public static String COMMAND_WORLD_LOAD_SUCCESS;
+
+    @JsonPath("commands.world_load_failure_not_found")
+    public static String COMMAND_WORLD_LOAD_FAILURE_NOT_FOUND;
+
+    @JsonPath("commands.world_load_failure_other")
+    public static String COMMAND_WORLD_LOAD_FAILURE_OTHER;
+
     // Commands > World > Spawnpoint
+
+    @JsonPath("commands.world_spawnpoint_usage")
+    public static String COMMAND_WORLD_SPAWNPOINT_USAGE;
 
     @JsonPath("commands.world_spawnpoint_set_success")
     public static String COMMAND_WORLD_SPAWNPOINT_SET_SUCCESS;
 
+    // Commands > World > Teleport
+
+    @JsonPath("commands.world_teleport_usage")
+    public static String COMMAND_WORLD_TELEPORT_USAGE;
+
+    @JsonPath("commands.world_teleport_success")
+    public static String COMMAND_WORLD_TELEPORT_SUCCESS;
+
     // Commands > World > Time
+
+    @JsonPath("commands.world_time_usage")
+    public static String COMMAND_WORLD_TIME_USAGE;
 
     @JsonPath("commands.world_time_info")
     public static String COMMAND_WORLD_TIME_INFO;
@@ -125,6 +146,9 @@ public final class PluginLocale implements JsonConfiguration {
 
     // Commands > World > Weather
 
+    @JsonPath("commands.world_weather_usage")
+    public static String COMMAND_WORLD_WEATHER_USAGE;
+
     @JsonPath("commands.world_weather_set_success")
     public static String COMMAND_WORLD_WEATHER_SET_SUCCESS;
 
@@ -132,6 +156,9 @@ public final class PluginLocale implements JsonConfiguration {
     public static String COMMAND_WORLD_WEATHER_SET_FAILURE_INVALID_TYPE;
 
     // Commands > Speed
+
+    @JsonPath("commands.speed_usage")
+    public static String COMMAND_SPEED_USAGE;
 
     @JsonPath("commands.speed_set_success_walk")
     public static String COMMAND_SPEED_SET_SUCCESS_WALK;
@@ -145,11 +172,11 @@ public final class PluginLocale implements JsonConfiguration {
     public static Component COMMAND_PACK_HELP;
 
     @JsonPath("commands.pack_notify_confirm")
-    public static Component COMMAND_PACK_NOTIFY_CONFIRM;
-
-    @JsonPath("commands.pack_notify")
     @JsonAdapter(fromJson = StringComponentAdapter.class)
-    public static String COMMAND_PACK_NOTIFY;
+    public static String COMMAND_PACK_NOTIFY_CONFIRM;
+
+    @JsonPath("commands.pack_notification")
+    public static Component COMMAND_PACK_NOTIFICATION;
 
 
     public static final class Commands implements JsonConfiguration {
