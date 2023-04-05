@@ -45,6 +45,10 @@ public class AzureUserCache implements UserCache, Listener {
 
     @Internal
     public void loadCache() {
+        // Creating cache directory if does not exist.
+        if (cacheDirectory.exists() == false)
+            cacheDirectory.mkdirs();
+        // ...
         if (cacheDirectory.isDirectory() == false)
             throw new IllegalStateException(cacheDirectory.getPath() + " is not a directory.");
         // ...
