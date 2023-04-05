@@ -235,7 +235,7 @@ public final class PluginLocale implements JsonConfiguration {
         @JsonPath("invalid_player")
         public static String INVALID_PLAYER;
 
-        @JsonPath("invalid_double")
+        @JsonPath("invalid_offline_player")
         public static String INVALID_OFFLINE_PLAYER;
 
         @JsonPath("invalid_world")
