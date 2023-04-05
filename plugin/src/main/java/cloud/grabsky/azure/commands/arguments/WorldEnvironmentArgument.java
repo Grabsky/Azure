@@ -1,4 +1,4 @@
-package cloud.grabsky.azure.arguments;
+package cloud.grabsky.azure.commands.arguments;
 
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommandContext;

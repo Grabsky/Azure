@@ -1,8 +1,8 @@
 package cloud.grabsky.azure.commands;
 
 import cloud.grabsky.azure.Azure;
-import cloud.grabsky.azure.arguments.WorldSeedArgument;
-import cloud.grabsky.azure.arguments.WorldTimeArgument;
+import cloud.grabsky.azure.commands.arguments.WorldSeedArgument;
+import cloud.grabsky.azure.commands.arguments.WorldTimeArgument;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.azure.world.WorldManager;
 import cloud.grabsky.bedrock.components.Message;

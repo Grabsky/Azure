@@ -13,6 +13,7 @@ subprojects { subproject ->
 
     repositories {
         mavenCentral()
+        maven { url = "https://papermc.io/repo/repository/maven-public/" }
     }
 
     dependencies {
@@ -21,6 +22,8 @@ subprojects { subproject ->
         // lombok
         compileOnly("org.projectlombok:lombok:1.18.26")
         annotationProcessor("org.projectlombok:lombok:1.18.26")
+        // paper api
+        compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
     }
 
 }

@@ -6,18 +6,14 @@ final buildsDirectory = (System.getenv("JVM_BUILDS") ?: "." + File.separator + "
 
 repositories {
     mavenLocal()
-    mavenCentral()
     maven { url = "https://repo.grabsky.cloud/snapshots" }
-    maven { url = "https://papermc.io/repo/repository/maven-public/" }
 }
 
 dependencies {
     api project(":azure-api")
     // ...
-    compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
-    // ...
     implementation("cloud.grabsky:bedrock:5389ebb")
-    implementation("cloud.grabsky:commands:a56b50d")
+    implementation("cloud.grabsky:commands:5f2bb7b")
     implementation("cloud.grabsky:configuration-paper:741c63e")
     // ...
     compileOnly("net.luckperms:api:5.4")

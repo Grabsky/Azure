@@ -31,14 +31,3 @@ java {
 javadoc {
     (options as CoreJavadocOptions).addStringOption("Xdoclint:none", "-quiet")
 }
-
-repositories {
-    mavenLocal()
-    maven { url = "https://repo.grabsky.cloud/snapshots" }
-    maven { url = "https://papermc.io/repo/repository/maven-public/" }
-}
-
-dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
-    compileOnly("cloud.grabsky:commands:7743a41")
-}

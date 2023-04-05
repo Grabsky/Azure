@@ -1,4 +1,4 @@
-package cloud.grabsky.azure;
+package cloud.grabsky.azure.commands.templates;
 
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.bedrock.components.Message;
@@ -25,7 +25,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
-public final class AzureCommandManager implements Consumer<RootCommandManager> {
+public enum CommandExceptionTemplate implements Consumer<RootCommandManager> {
+    /* SINGLETON */ INSTANCE;
 
     @Override
     public void accept(final @NotNull RootCommandManager manager) {
