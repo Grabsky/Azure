@@ -54,7 +54,7 @@ public final class PluginLocale implements JsonConfiguration {
     // Commands > World > Create
 
     @JsonPath("commands.world_create_usage")
-    public static String COMMAND_WORLD_CREATE_USAGE;
+    public static Component COMMAND_WORLD_CREATE_USAGE;
 
     @JsonPath("commands.world_create_success")
     public static String COMMAND_WORLD_CREATE_SUCCESS;
@@ -68,7 +68,7 @@ public final class PluginLocale implements JsonConfiguration {
     // Commands > World > Delete
 
     @JsonPath("commands.world_delete_usage")
-    public static String COMMAND_WORLD_DELETE_USAGE;
+    public static Component COMMAND_WORLD_DELETE_USAGE;
 
     @JsonPath("commands.world_delete_success")
     public static String COMMAND_WORLD_DELETE_SUCCESS;
@@ -86,7 +86,7 @@ public final class PluginLocale implements JsonConfiguration {
     // Commands > World > Gamerule
 
     @JsonPath("commands.world_gamerule_usage")
-    public static String COMMAND_WORLD_GAMERULE_USAGE;
+    public static Component COMMAND_WORLD_GAMERULE_USAGE;
 
     @JsonPath("commands.world_gamerule_info")
     public static String COMMAND_WORLD_GAMERULE_INFO;
@@ -106,7 +106,7 @@ public final class PluginLocale implements JsonConfiguration {
     // Commands > World > Load
 
     @JsonPath("commands.world_load_usage")
-    public static String COMMAND_WORLD_LOAD_USAGE;
+    public static Component COMMAND_WORLD_LOAD_USAGE;
 
     @JsonPath("commands.world_load_success")
     public static String COMMAND_WORLD_LOAD_SUCCESS;
@@ -120,7 +120,7 @@ public final class PluginLocale implements JsonConfiguration {
     // Commands > World > Spawnpoint
 
     @JsonPath("commands.world_spawnpoint_usage")
-    public static String COMMAND_WORLD_SPAWNPOINT_USAGE;
+    public static Component COMMAND_WORLD_SPAWNPOINT_USAGE;
 
     @JsonPath("commands.world_spawnpoint_set_success")
     public static String COMMAND_WORLD_SPAWNPOINT_SET_SUCCESS;
@@ -128,7 +128,7 @@ public final class PluginLocale implements JsonConfiguration {
     // Commands > World > Teleport
 
     @JsonPath("commands.world_teleport_usage")
-    public static String COMMAND_WORLD_TELEPORT_USAGE;
+    public static Component COMMAND_WORLD_TELEPORT_USAGE;
 
     @JsonPath("commands.world_teleport_success")
     public static String COMMAND_WORLD_TELEPORT_SUCCESS;
@@ -136,7 +136,7 @@ public final class PluginLocale implements JsonConfiguration {
     // Commands > World > Time
 
     @JsonPath("commands.world_time_usage")
-    public static String COMMAND_WORLD_TIME_USAGE;
+    public static Component COMMAND_WORLD_TIME_USAGE;
 
     @JsonPath("commands.world_time_info")
     public static String COMMAND_WORLD_TIME_INFO;
@@ -147,7 +147,7 @@ public final class PluginLocale implements JsonConfiguration {
     // Commands > World > Weather
 
     @JsonPath("commands.world_weather_usage")
-    public static String COMMAND_WORLD_WEATHER_USAGE;
+    public static Component COMMAND_WORLD_WEATHER_USAGE;
 
     @JsonPath("commands.world_weather_set_success")
     public static String COMMAND_WORLD_WEATHER_SET_SUCCESS;
@@ -158,7 +158,7 @@ public final class PluginLocale implements JsonConfiguration {
     // Commands > Speed
 
     @JsonPath("commands.speed_usage")
-    public static String COMMAND_SPEED_USAGE;
+    public static Component COMMAND_SPEED_USAGE;
 
     @JsonPath("commands.speed_set_success_walk")
     public static String COMMAND_SPEED_SET_SUCCESS_WALK;
@@ -177,6 +177,20 @@ public final class PluginLocale implements JsonConfiguration {
 
     @JsonPath("commands.pack_notification")
     public static Component COMMAND_PACK_NOTIFICATION;
+
+    // Commands > Gamemode
+
+    @JsonPath("commands.gamemode_usage")
+    public static Component COMMAND_GAMEMODE_USAGE;
+
+    @JsonPath("commands.gamemode_info")
+    public static String COMMAND_GAMEMODE_INFO;
+
+    @JsonPath("commands.gamemode_set_success_sender")
+    public static String COMMAND_GAMEMODE_SET_SUCCESS_SENDER;
+
+    @JsonPath("commands.gamemode_set_success_target")
+    public static String COMMAND_GAMEMODE_SET_SUCCESS_TARGET;
 
 
     public static final class Commands implements JsonConfiguration {
@@ -255,6 +269,20 @@ public final class PluginLocale implements JsonConfiguration {
 
         @JsonPath("invalid_position")
         public static String INVALID_POSITION;
+
+        /* CUSTOM */
+
+        @JsonPath("invalid_gamemode")
+        public static String INVALID_GAMEMODE;
+
+        @JsonPath("invalid_gamerule")
+        public static String INVALID_GAMERULE;
+
+        @JsonPath("invalid_world_environment")
+        public static String INVALID_WORLD_ENVIRONMENT;
+
+        @JsonPath("invalid_world_type")
+        public static String INVALID_WORLD_TYPE;
 
     }
 

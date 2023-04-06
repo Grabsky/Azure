@@ -8,35 +8,35 @@ import cloud.grabsky.commands.component.ArgumentParser;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.exception.ArgumentParseException;
 import cloud.grabsky.commands.exception.MissingInputException;
-import org.bukkit.WorldType;
+import org.bukkit.GameMode;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public enum WorldTypeArgument implements ArgumentParser<WorldType>, CompletionsProvider {
+public enum GameModeArgument implements ArgumentParser<GameMode>, CompletionsProvider {
     /* SINGLETON */ INSTANCE;
 
-    private static final List<String> WORLD_TYPES = List.of("amplified", "default", "flat", "largebiomes");
+    private static final List<String> GAME_MODES = List.of("adventure", "creative", "survival", "spectator");
 
     @Override
     public @NotNull List<String> provide(final @NotNull RootCommandContext context) {
-        return WORLD_TYPES;
+        return GAME_MODES;
     }
 
     @Override
-    public WorldType parse(final @NotNull RootCommandContext context, final @NotNull ArgumentQueue queue) throws ArgumentParseException, MissingInputException {
+    public GameMode parse(final @NotNull RootCommandContext context, final @NotNull ArgumentQueue queue) throws ArgumentParseException, MissingInputException {
         final String value = queue.next(String.class).asRequired();
         // ...
-        for (final WorldType type : WorldType.values()) {
-            if (type.toString().equalsIgnoreCase(value) == true)
-                return type;
+        for (final GameMode mode : GameMode.values()) {
+            if (mode.toString().equalsIgnoreCase(value) == true)
+                return mode;
         }
         // ...
-        throw new WorldTypeArgument.Exception(value);
+        throw new GameModeArgument.Exception(value);
     }
 
     /**
-     * {@link Exception} is thrown when invalid value is provided for {@link WorldType} argument type.
+     * {@link Exception} is thrown when invalid value is provided for {@link GameMode} argument type.
      */
     public static final class Exception extends ArgumentParseException {
 
@@ -50,7 +50,7 @@ public enum WorldTypeArgument implements ArgumentParser<WorldType>, CompletionsP
 
         @Override
         public void accept(final RootCommandContext context) {
-            Message.of(PluginLocale.Commands.INVALID_WORLD_TYPE).placeholder("input", this.inputValue).send(context.getExecutor().asCommandSender());
+            Message.of(PluginLocale.Commands.INVALID_GAMEMODE).placeholder("input", this.inputValue).send(context.getExecutor().asCommandSender());
         }
 
     }

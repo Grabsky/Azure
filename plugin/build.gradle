@@ -13,7 +13,7 @@ dependencies {
     api project(":azure-api")
     // ...
     implementation("cloud.grabsky:bedrock:5389ebb")
-    implementation("cloud.grabsky:commands:5f2bb7b")
+    implementation("cloud.grabsky:commands:9acba9e")
     implementation("cloud.grabsky:configuration-paper:741c63e")
     // ...
     compileOnly("net.luckperms:api:5.4")

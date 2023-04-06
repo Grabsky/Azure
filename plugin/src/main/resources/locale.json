@@ -94,6 +94,11 @@
         "speed_usage": "<dark_gray>› <gray>Użycie: <gold>/speed <white>(player) <gray>(speed)",
         "speed_set_success_walk": "<dark_gray>› <gray>Ustawiono prędkość chodzenia dla <gold><player><gray> na <gold><speed><gray>.",
         "speed_set_success_fly": "<dark_gray>› <gray>Ustawiono prędkość latania dla <gold><player><gray> na <gold><speed><gray>.",
+        // Gamemode
+        "gamemode_usage": "<dark_gray>› <gray>Użycie: <gold>/gamemode <white>(player) <gray>(gamemode)",
+        "gamemode_info": "<dark_gray>› <gray>Tryb gry gracza <gold><player><gray> to <gold><mode><gray>.",
+        "gamemode_set_success_sender": "<dark_gray>› <gray>Ustawiono tryb <gold><player><gray> na <gold><mode><gray>.",
+        "gamemode_set_success_target": "<dark_gray>› <gray>Twój tryb został ustawiony na <gold><mode><gray>.",
         // Pack
         "pack_help": [
             "",

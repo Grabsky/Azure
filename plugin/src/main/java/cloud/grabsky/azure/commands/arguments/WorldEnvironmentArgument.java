@@ -1,18 +1,17 @@
 package cloud.grabsky.azure.commands.arguments;
 
+import cloud.grabsky.azure.configuration.PluginLocale;
+import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommandContext;
 import cloud.grabsky.commands.component.ArgumentParser;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.exception.ArgumentParseException;
 import cloud.grabsky.commands.exception.MissingInputException;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-
-import static net.kyori.adventure.text.Component.text;
 
 public enum WorldEnvironmentArgument implements ArgumentParser<World.Environment>, CompletionsProvider {
     /* SINGLETON */ INSTANCE;
@@ -20,7 +19,7 @@ public enum WorldEnvironmentArgument implements ArgumentParser<World.Environment
     private static final List<String> WORLD_ENVIRONMENTS = List.of("normal", "nether", "the_end");
 
     @Override
-    public @NotNull List<String> provide(RootCommandContext context) {
+    public @NotNull List<String> provide(final @NotNull RootCommandContext context) {
         return WORLD_ENVIRONMENTS;
     }
 
@@ -33,25 +32,25 @@ public enum WorldEnvironmentArgument implements ArgumentParser<World.Environment
                 return env;
         }
         // ...
-        throw new WorldEnvironmentParseException(value);
+        throw new WorldEnvironmentArgument.Exception(value);
     }
 
     /**
-     * {@link WorldEnvironmentParseException} is thrown when invalid value is provided for {@link World.Environment} argument type.
+     * {@link Exception} is thrown when invalid value is provided for {@link World.Environment} argument type.
      */
-    public static final class WorldEnvironmentParseException extends ArgumentParseException {
+    public static final class Exception extends ArgumentParseException {
 
-        public WorldEnvironmentParseException(final String inputValue) {
+        public Exception(final String inputValue) {
             super(inputValue);
         }
 
-        public WorldEnvironmentParseException(final String inputValue, final Throwable cause) {
+        public Exception(final String inputValue, final Throwable cause) {
             super(inputValue, cause);
         }
 
         @Override
         public void accept(final RootCommandContext context) {
-            context.getExecutor().asCommandSender().sendMessage(text("Invalid World.Environment argument.", NamedTextColor.RED));
+            Message.of(PluginLocale.Commands.INVALID_WORLD_ENVIRONMENT).placeholder("input", this.inputValue).send(context.getExecutor().asCommandSender());
         }
 
     }
