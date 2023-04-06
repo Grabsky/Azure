@@ -10,6 +10,7 @@ import cloud.grabsky.azure.commands.GameModeCommand;
 import cloud.grabsky.azure.commands.GiveCommand;
 import cloud.grabsky.azure.commands.PackCommand;
 import cloud.grabsky.azure.commands.SpeedCommand;
+import cloud.grabsky.azure.commands.TeleportCommand;
 import cloud.grabsky.azure.commands.WorldCommand;
 import cloud.grabsky.azure.commands.templates.CommandArgumentTemplate;
 import cloud.grabsky.azure.commands.templates.CommandExceptionTemplate;
@@ -98,6 +99,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
                 .registerCommand(SpeedCommand.class)
                 .registerCommand(PackCommand.class)
                 .registerCommand(GameModeCommand.class)
+                .registerCommand(TeleportCommand.class)
                 .registerCommand(new WorldCommand(this))
                 .registerCommand(new DeleteCommand(chatManager));
         // Registering events...

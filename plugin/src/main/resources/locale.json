@@ -16,10 +16,46 @@
         // Delete
         "delete_usage": "<dark_gray>› <gold>/delete <white>(signature_uuid)",
         "delete_failure": "<dark_gray>› <red>Usuwanie wiadomości nie powiodło się.",
+        // Gamemode
+        "gamemode_usage": "<dark_gray>› <gray>Użycie: <gold>/gamemode <white>(player) <gray>(gamemode)",
+        "gamemode_info": "<dark_gray>› <gray>Tryb gry gracza <gold><player><gray> to <gold><mode><gray>.",
+        "gamemode_set_success_sender": "<dark_gray>› <gray>Ustawiono tryb <gold><player><gray> na <gold><mode><gray>.",
+        "gamemode_set_success_target": "<dark_gray>› <gray>Twój tryb został ustawiony na <gold><mode><gray>.",
         // Give
         "give_usage": "<dark_gray>› <gray>Użycie: <gold>/give <white>(player) (material) (amount) <gray>(--silent)",
         "give_sent": "<dark_gray>› <gray>Gracz <gold><player><gray> otrzymał <gold><item><gray>.",
         "give_received": "<dark_gray>› <gray>Otrzymałeś <gold><item><gray>.",
+        // Pack
+        "pack_help": [
+            "",
+            "<dark_gray>› <gold>/pack apply",
+            "<dark_gray>› <gold>/pack notify<gray> (--confirm)",
+            ""
+        ],
+        "pack_notify_confirm": [
+            "",
+            "<dark_gray>› <gray>Czy na pewno chcesz powiadomić o aktualizacji paczki?",
+            "<dark_gray>› <hover:show_text:'<red>Wszyscy gracze na serwerze otrzymają powiadomienie.'><click:run_command:'/<input> --confirm'><gold>Kliknij tutaj, aby potwierdzić.</click>",
+            ""
+        ],
+        "pack_notification": [
+            "",
+            "<dark_gray>› <gray>Serwerowa paczka zasobów została zaktualizowana.",
+            "<dark_gray>› <hover:show_text:'<red>Przeloguj się jeśli napotkasz jakiś problem.'><click:run_command:/pack apply><gold>Kliknij tutaj, aby ją załadować.</click>",
+            ""
+        ],
+        // Speed
+        "speed_usage": "<dark_gray>› <gray>Użycie: <gold>/speed <white>(player) <gray>(speed)",
+        "speed_set_success_walk": "<dark_gray>› <gray>Ustawiono prędkość chodzenia dla <gold><player><gray> na <gold><speed><gray>.",
+        "speed_set_success_fly": "<dark_gray>› <gray>Ustawiono prędkość latania dla <gold><player><gray> na <gold><speed><gray>.",
+        // Teleport
+        "teleport_usage": "<dark_gray>› <gray>Użycie: <gold>/teleport <white>(target) (destination) <gray>(--silent)",
+        "teleport_player_success_sender": "<dark_gray>› <gold><target><gray> został przeniesiony do <gold><destination><gray>.",
+        "teleport_player_success_target": "<dark_gray>› <gray>Zostałeś przeniesiony do <gold><destination><gray>.",
+        "teleport_player_success_destination": "<dark_gray>› <gold><target><gray> został do Ciebie przeniesiony.",
+        "teleport_position_success_sender": "<dark_gray>› <gold><target><gray> został przeniesiony na <gold><x><gray>, <gold><y><gray>, <gold><z><gray>.",
+        "teleport_position_success_target": "<dark_gray>› <gray>Zostałeś przeniesiony na <gold><x><gray>, <gold><y><gray>, <gold><z><gray>.",
+        "teleport_player_failure_targets_are_the_same": "<dark_gray>› <red>Gracze muszą się od siebie różnić.",
         // World > Help
         "world_help": [
             "",
@@ -89,34 +125,6 @@
         // World > Weather
         "world_weather_usage": "<dark_gray>› <gray>Użycie: <gold>/world weather <white>(world) (weather)",
         "world_weather_set_success": "<dark_gray>› <gray>Pogoda w <gold><world><gray> została ustawiona na <gold><weather><gray>.",
-        "world_weather_set_failure_invalid_type": "<dark_gray>› <red>Argument <gold><input> <red> nie jest prawidłowym typem pogody.",
-        // Speed
-        "speed_usage": "<dark_gray>› <gray>Użycie: <gold>/speed <white>(player) <gray>(speed)",
-        "speed_set_success_walk": "<dark_gray>› <gray>Ustawiono prędkość chodzenia dla <gold><player><gray> na <gold><speed><gray>.",
-        "speed_set_success_fly": "<dark_gray>› <gray>Ustawiono prędkość latania dla <gold><player><gray> na <gold><speed><gray>.",
-        // Gamemode
-        "gamemode_usage": "<dark_gray>› <gray>Użycie: <gold>/gamemode <white>(player) <gray>(gamemode)",
-        "gamemode_info": "<dark_gray>› <gray>Tryb gry gracza <gold><player><gray> to <gold><mode><gray>.",
-        "gamemode_set_success_sender": "<dark_gray>› <gray>Ustawiono tryb <gold><player><gray> na <gold><mode><gray>.",
-        "gamemode_set_success_target": "<dark_gray>› <gray>Twój tryb został ustawiony na <gold><mode><gray>.",
-        // Pack
-        "pack_help": [
-            "",
-            "<dark_gray>› <gold>/pack apply",
-            "<dark_gray>› <gold>/pack notify<gray> (--confirm)",
-            ""
-        ],
-        "pack_notify_confirm": [
-            "",
-            "<dark_gray>› <gray>Czy na pewno chcesz powiadomić o aktualizacji paczki?",
-            "<dark_gray>› <hover:show_text:'<red>Wszyscy gracze na serwerze otrzymają powiadomienie.'><click:run_command:'/<input> --confirm'><gold>Kliknij tutaj, aby potwierdzić.</click>",
-            ""
-        ],
-        "pack_notification": [
-            "",
-            "<dark_gray>› <gray>Serwerowa paczka zasobów została zaktualizowana.",
-            "<dark_gray>› <hover:show_text:'<red>Przeloguj się jeśli napotkasz jakiś problem.'><click:run_command:/pack apply><gold>Kliknij tutaj, aby ją załadować.</click>",
-            ""
-        ]
+        "world_weather_set_failure_invalid_type": "<dark_gray>› <red>Argument <gold><input> <red> nie jest prawidłowym typem pogody."
     }
 }

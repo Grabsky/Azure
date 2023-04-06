@@ -35,6 +35,20 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.delete_failure")
     public static Component COMMAND_DELETE_FAILURE;
 
+    // Commands > Gamemode
+
+    @JsonPath("commands.gamemode_usage")
+    public static Component COMMAND_GAMEMODE_USAGE;
+
+    @JsonPath("commands.gamemode_info")
+    public static String COMMAND_GAMEMODE_INFO;
+
+    @JsonPath("commands.gamemode_set_success_sender")
+    public static String COMMAND_GAMEMODE_SET_SUCCESS_SENDER;
+
+    @JsonPath("commands.gamemode_set_success_target")
+    public static String COMMAND_GAMEMODE_SET_SUCCESS_TARGET;
+
     // Commands > Give
 
     @JsonPath("commands.give_usage")
@@ -45,6 +59,52 @@ public final class PluginLocale implements JsonConfiguration {
 
     @JsonPath("commands.give_received")
     public static String COMMAND_GIVE_TARGET;
+
+    // Commands > Pack
+
+    @JsonPath("commands.pack_help")
+    public static Component COMMAND_PACK_HELP;
+
+    @JsonPath("commands.pack_notify_confirm")
+    @JsonAdapter(fromJson = StringComponentAdapter.class)
+    public static String COMMAND_PACK_NOTIFY_CONFIRM;
+
+    @JsonPath("commands.pack_notification")
+    public static Component COMMAND_PACK_NOTIFICATION;
+
+    // Commands > Speed
+
+    @JsonPath("commands.speed_usage")
+    public static Component COMMAND_SPEED_USAGE;
+
+    @JsonPath("commands.speed_set_success_walk")
+    public static String COMMAND_SPEED_SET_SUCCESS_WALK;
+
+    @JsonPath("commands.speed_set_success_fly")
+    public static String COMMAND_SPEED_SET_SUCCESS_FLY;
+
+    // Commands > Teleport
+
+    @JsonPath("commands.teleport_usage")
+    public static Component COMMAND_TELEPORT_USAGE;
+
+    @JsonPath("commands.teleport_player_success_sender")
+    public static String COMMAND_TELEPORT_PLAYER_SUCCESS_SENDER;
+
+    @JsonPath("commands.teleport_player_success_target")
+    public static String COMMAND_TELEPORT_PLAYER_SUCCESS_TARGET;
+
+    @JsonPath("commands.teleport_player_success_destination")
+    public static String COMMAND_TELEPORT_PLAYER_SUCCESS_DESTINATION;
+
+    @JsonPath("commands.teleport_position_success_sender")
+    public static String COMMAND_TELEPORT_POSITION_SUCCESS_SENDER;
+
+    @JsonPath("commands.teleport_position_success_target")
+    public static String COMMAND_TELEPORT_POSITION_SUCCESS_TARGET;
+
+    @JsonPath("commands.teleport_player_failure_targets_are_the_same")
+    public static Component TELEPORT_PLAYER_FAILURE_TARGETS_ARE_THE_SAME;
 
     // Commands > World
 
@@ -154,43 +214,6 @@ public final class PluginLocale implements JsonConfiguration {
 
     @JsonPath("commands.world_weather_set_failure_invalid_type")
     public static String COMMAND_WORLD_WEATHER_SET_FAILURE_INVALID_TYPE;
-
-    // Commands > Speed
-
-    @JsonPath("commands.speed_usage")
-    public static Component COMMAND_SPEED_USAGE;
-
-    @JsonPath("commands.speed_set_success_walk")
-    public static String COMMAND_SPEED_SET_SUCCESS_WALK;
-
-    @JsonPath("commands.speed_set_success_fly")
-    public static String COMMAND_SPEED_SET_SUCCESS_FLY;
-
-    // Commands > Pack
-
-    @JsonPath("commands.pack_help")
-    public static Component COMMAND_PACK_HELP;
-
-    @JsonPath("commands.pack_notify_confirm")
-    @JsonAdapter(fromJson = StringComponentAdapter.class)
-    public static String COMMAND_PACK_NOTIFY_CONFIRM;
-
-    @JsonPath("commands.pack_notification")
-    public static Component COMMAND_PACK_NOTIFICATION;
-
-    // Commands > Gamemode
-
-    @JsonPath("commands.gamemode_usage")
-    public static Component COMMAND_GAMEMODE_USAGE;
-
-    @JsonPath("commands.gamemode_info")
-    public static String COMMAND_GAMEMODE_INFO;
-
-    @JsonPath("commands.gamemode_set_success_sender")
-    public static String COMMAND_GAMEMODE_SET_SUCCESS_SENDER;
-
-    @JsonPath("commands.gamemode_set_success_target")
-    public static String COMMAND_GAMEMODE_SET_SUCCESS_TARGET;
 
 
     public static final class Commands implements JsonConfiguration {
