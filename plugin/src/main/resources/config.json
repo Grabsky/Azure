@@ -1,4 +1,3 @@
-// This JSON configuration file is lenient but keep an eye where you leave trailing commas as they tend to cause issues.
 {
     // Chat settings.
     "chat_settings": {
@@ -39,9 +38,33 @@
             "discord_webhook_url": ""
         }
     },
+    // ...
+    "commands_settings": {
+        // Commands to be unregistered once the server is fully started.
+        // NOTE: Changes made here are applied on the next server start. This usually does not resolve any command conflicts.
+        "auto_unregister": [
+            { "node": "worldguard:heal", "match_references": true },
+            { "node": "worldguard:slay", "match_references": true },
+            { "node": "worldguard:locate", "match_references": true }
+        ],
+        // Blacklisted commands cannot be executed and are removed from completions.
+        "blacklisted_commands": [
+            { "node": "bukkit:about", "match_references": true },
+            { "node": "plugins", "match_references": false }
+        ],
+        // Per-permission-group command whitelist. Whitelist applies to already blacklisted commands.
+        "per_group_whitelist": [
+            {
+                "group": "owner", "whitelisted_commands": [
+                    { "node": "bukkit:about", "match_references": true }
+                ]
+            }
+        ]
+    },
+    // Server resource pack settings.
     "resource_pack": {
         // Whether resource pack should be send when player joins the server.
-        "send_on_join": true,
+        "send_on_join": false,
         // Marks the resource pack as forced. Player won't be able to join the server without accepting it.
         "is_required": true,
         // Direct downlod URL of the resource pack.

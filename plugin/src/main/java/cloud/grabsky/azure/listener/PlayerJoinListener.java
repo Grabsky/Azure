@@ -9,7 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
-public final class PlayerListener implements Listener {
+public final class PlayerJoinListener implements Listener {
 
     private final Azure plugin;
 

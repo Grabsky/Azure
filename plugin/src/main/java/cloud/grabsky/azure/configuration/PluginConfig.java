@@ -1,9 +1,11 @@
 package cloud.grabsky.azure.configuration;
 
 import cloud.grabsky.azure.chat.ChatManager;
+import cloud.grabsky.azure.listener.CommandFilterListener;
 import cloud.grabsky.configuration.JsonConfiguration;
 import cloud.grabsky.configuration.JsonNullable;
 import cloud.grabsky.configuration.JsonPath;
+import com.squareup.moshi.Json;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,11 +13,17 @@ import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandMap;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static cloud.grabsky.azure.util.Iterables.reversed;
+import static java.lang.System.out;
 
 public final class PluginConfig implements JsonConfiguration {
 
@@ -59,6 +67,14 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("chat_settings.discord_webhooks.discord_webhook_url")
     public static String CHAT_DISCORD_WEBHOOK_URL;
 
+    // Commands Settings
+
+    @JsonPath("commands_settings.auto_unregister")
+    public static Set<CommandNode> AUTO_UNREGISTER;
+
+    @JsonPath("commands_settings.blacklisted_commands")
+    public static Set<CommandNode> BLACKLISTED_COMMANDS;
+
     // Resource Pack
 
     @JsonPath("resource_pack.send_on_join")
@@ -79,12 +95,32 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonNullable @JsonPath("resource_pack.notification_sound")
     public static @Nullable Sound RESOURCE_PACK_NOTIFICATION_SOUND;
 
+
     /* ON RELOAD */
 
     @Override
     public void onReload() {
         ChatManager.CHAT_FORMATS_REVERSED = reversed(PluginConfig.CHAT_FORMATS_EXTRA);
         ChatManager.CHAT_TAGS_REVERSED = reversed(PluginConfig.CHAT_MESSAGE_TAGS_EXTRA);
+        // ...
+        final CommandMap map = Bukkit.getServer().getCommandMap();
+        // ...
+        out.println("BEFORE: ");
+        BLACKLISTED_COMMANDS.forEach(out::println);
+        CommandFilterListener.BLACKLISTED_COMMANDS = BLACKLISTED_COMMANDS.stream()
+                .<String>mapMulti((it, consumer) -> {
+                    if (it.matchReferences == true) {
+                        final @Nullable Command command = map.getCommand(it.node);
+                        // ...
+                        map.getKnownCommands().forEach((key, knownCommand) -> {
+                            if (command == knownCommand)
+                                consumer.accept(key);
+                        });
+                    } else consumer.accept(it.node);
+                })
+                .collect(Collectors.toSet());
+        out.println("AFTER: ");
+        BLACKLISTED_COMMANDS.forEach(out::println);
     }
 
     /* SURROGATES */
@@ -127,6 +163,32 @@ public final class PluginConfig implements JsonConfiguration {
 
         @Getter(AccessLevel.PUBLIC)
         private final Component hover;
+
+    }
+
+    // Moshi should be able to create instance of the object despite the constructor being private.
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class CommandNode {
+
+        @Getter(AccessLevel.PUBLIC)
+        private final String node;
+
+        @Json(name = "match_references")
+        @Getter(AccessLevel.PUBLIC)
+        private final Boolean matchReferences;
+
+    }
+
+    // Moshi should be able to create instance of the object despite the constructor being private.
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class GroupCommandWhitelist {
+
+        @Getter(AccessLevel.PUBLIC)
+        private final String group;
+
+        @Json(name = "whitelisted_commands")
+        @Getter(AccessLevel.PUBLIC)
+        private final Set<CommandNode> whitelistedCommands;
 
     }
 
