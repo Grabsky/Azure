@@ -18,8 +18,7 @@ import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.configuration.PluginConfig.DeleteButton;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.azure.configuration.adapters.StandardTagResolverAdapter;
-import cloud.grabsky.azure.listener.CommandFilterListener;
-import cloud.grabsky.azure.listener.PlayerJoinListener;
+import cloud.grabsky.azure.listener.PlayerListener;
 import cloud.grabsky.azure.user.AzureUserCache;
 import cloud.grabsky.azure.world.WorldManager;
 import cloud.grabsky.bedrock.BedrockPlugin;
@@ -34,20 +33,13 @@ import lombok.Getter;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandMap;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.server.ServerLoadEvent;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 
 import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
 
-public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
+public final class Azure extends BedrockPlugin implements AzureAPI {
 
     @Getter(AccessLevel.PUBLIC)
     private static Azure instance;
@@ -112,39 +104,9 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                 .registerCommand(new DeleteCommand(chatManager));
         // Registering events...
         this.getServer().getPluginManager().registerEvents(chatManager, this);
-        this.getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
-        this.getServer().getPluginManager().registerEvents(CommandFilterListener.INSTANCE, this);
-        this.getServer().getPluginManager().registerEvents(this, this);
+        this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         // Finalizing... (exposing instance to the API)
         AzureProvider.finalize(this);
-    }
-
-    @EventHandler
-    public void onServerLoad(final ServerLoadEvent event) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        final CommandMap map = this.getServer().getCommandMap();
-        // ...
-        map.getKnownCommands().keySet().stream().sorted().forEach(key -> {
-            //System.out.println(key + " : " + map.getKnownCommands().get(key).getName());
-        });
-        // ...
-        PluginConfig.AUTO_UNREGISTER.forEach((it) -> {
-            final @Nullable Command command = map.getCommand(it.getNode());
-            if (command != null) {
-                if (it.getMatchReferences() == false) {
-                    map.getKnownCommands().remove(it.getNode(), command);
-                    return;
-                }
-                // Removing all references...
-                map.getKnownCommands().values().removeIf((knownCommand) -> {
-                    if (knownCommand == command) {
-                        // System.out.println(command.getName());
-                        return true;
-                    }
-                    return false;
-                });
-            }
-        });
-        this.getServer().getClass().getMethod("syncCommands").invoke(this.getServer());
     }
 
     public boolean reloadConfiguration() {

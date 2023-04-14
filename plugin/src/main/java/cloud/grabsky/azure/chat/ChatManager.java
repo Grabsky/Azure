@@ -61,7 +61,9 @@ public final class ChatManager implements Listener {
 
     public ChatManager(final Azure azure) {
         this.luckPermsUserManager = azure.getLuckPerms().getUserManager();
-        this.signatureCache = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES).build();
+        this.signatureCache = CacheBuilder.newBuilder()
+                .expireAfterWrite(5, TimeUnit.MINUTES)
+                .build();
         this.chatCooldowns = new HashMap<>();
     }
 
