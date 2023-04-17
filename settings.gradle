@@ -4,3 +4,4 @@ include("api")
 include("plugin")
 
 project(":api").name = "azure-api"
+project(":plugin").name = "azure-plugin"

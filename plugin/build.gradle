@@ -1,8 +1,9 @@
 plugins {
-    id("com.github.johnrengelman.shadow") version "8.1.0"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
-final buildsDirectory = (System.getenv("JVM_BUILDS") ?: "." + File.separator + "builds")
+final buildsDirectory = (System.getenv("JVM_BUILDS") ?: null)
+final pluginsDirectory = (System.getenv("PLUGINS_DIR") ?: null)
 
 repositories {
     mavenLocal()
@@ -14,18 +15,26 @@ dependencies {
     // ...
     implementation("cloud.grabsky:bedrock:5389ebb")
     implementation("cloud.grabsky:commands:14366de")
-    implementation("cloud.grabsky:configuration-paper:741c63e")
+    implementation("cloud.grabsky:configuration-paper:1ccfb9c")
     // ...
     compileOnly("net.luckperms:api:5.4")
 }
 
-tasks.register("deploy", Copy) {
-    from shadowJar
-    into buildsDirectory
-    rename(shadowJar.archiveFileName.get(), "${rootProject.name}-${version}.jar")
+tasks {
+    shadowJar { archiveFileName = "${rootProject.name}-${project.version}.jar" }
 }
 
-tasks {
-    assemble { dependsOn(shadowJar) finalizedBy(deploy) }
-    processResources { filteringCharset "UTF-8" }
+tasks.register("deploy") {
+    dependsOn(shadowJar)
+    doLast {
+        // Copying to the builds directory specified by 'JVM_BUILDS' environment variable.
+        if (buildsDirectory != null)
+            copy { from(shadowJar) into(buildsDirectory) }
+        // Copying to the plugins directory specified by 'PLUGINS_DIR' environment variable.
+        if (pluginsDirectory != null)
+            copy { from(shadowJar) into(pluginsDirectory) }
+    }
 }
+
+
+
