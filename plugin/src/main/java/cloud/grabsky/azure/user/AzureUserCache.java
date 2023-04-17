@@ -138,7 +138,7 @@ public class AzureUserCache implements UserCache, Listener {
         final Player player = event.getPlayer();
         // ...
         internalUserMap.compute(player.getUniqueId(), (uuid, existingUser) -> {
-            final User user = new AzureUser(player.getName(), uuid, readTextures(player.getPlayerProfile()));
+            final User user = new AzureUser(player.getName(), uuid, readProperty(player.getPlayerProfile(), "textures"));
             // ...
             if (existingUser == null || user.equals(existingUser) == false)
                 plugin.getBedrockScheduler().runAsync(1L, (task) -> this.saveUser(user));
@@ -147,11 +147,14 @@ public class AzureUserCache implements UserCache, Listener {
         });
     }
 
-    private static @Nullable String readTextures(final @NotNull PlayerProfile profile) {
+    /**
+     * Returns {@link String} value of specified property, or {@code null}.
+     */
+    private static @Nullable String readProperty(final @NotNull PlayerProfile profile, final @NotNull String propertyName) {
         for (final ProfileProperty property : profile.getProperties())
-            if (property.getName().equals("textures") == true)
+            if (property.getName().equals(propertyName) == true)
                 return property.getValue();
-        // ...
+        // Returning 'null' in case property was not found.
         return null;
     }
 
