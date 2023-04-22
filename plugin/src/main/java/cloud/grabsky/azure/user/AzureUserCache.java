@@ -22,12 +22,14 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static okio.Okio.buffer;
 import static okio.Okio.sink;
 import static okio.Okio.source;
 
-public class AzureUserCache implements UserCache, Listener {
+@Internal
+public final class AzureUserCache implements UserCache, Listener {
 
     private final BedrockPlugin plugin;
     private final Moshi moshi;
@@ -43,7 +45,6 @@ public class AzureUserCache implements UserCache, Listener {
         this.loadCache();
     }
 
-    @Internal
     public void loadCache() {
         // Creating cache directory if does not exist.
         if (cacheDirectory.exists() == false)
@@ -68,7 +69,6 @@ public class AzureUserCache implements UserCache, Listener {
         plugin.getLogger().info(count + " users were loaded from cache.");
     }
 
-    @Internal
     public @Nullable User loadUser(final @NotNull File file) {
         try (final JsonReader reader = JsonReader.of(buffer(source(file)))) {
             // ...
@@ -84,8 +84,7 @@ public class AzureUserCache implements UserCache, Listener {
         }
     }
 
-    @Internal
-    public void saveUser(final @NotNull User user) {
+    public CompletableFuture<Boolean> save(final @NotNull User user) {
         // Creating directory in case it does not exist.
         if (cacheDirectory.exists() == false)
             cacheDirectory.mkdirs();
@@ -95,13 +94,17 @@ public class AzureUserCache implements UserCache, Listener {
         // ...
         final File file = new File(cacheDirectory, user.getUniqueId() + ".json");
         // ...
-        try (final JsonWriter writer = JsonWriter.of(buffer(sink(file)))) {
-            // Writing data to the file
-            moshi.adapter(AzureUser.class).toJson(writer, (AzureUser) user);
-            // ...
-        } catch (final IOException e) {
-            e.printStackTrace();
-        }
+        return CompletableFuture.supplyAsync(() -> {
+            try (final JsonWriter writer = JsonWriter.of(buffer(sink(file)))) {
+                // Writing data to the file
+                moshi.adapter(AzureUser.class).toJson(writer, (AzureUser) user);
+                // ...
+                return true;
+            } catch (final IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+        });
     }
 
     @Override
@@ -132,7 +135,6 @@ public class AzureUserCache implements UserCache, Listener {
         return false;
     }
 
-
     @EventHandler
     public void onUserJoin(final PlayerJoinEvent event) {
         final Player player = event.getPlayer();
@@ -141,7 +143,10 @@ public class AzureUserCache implements UserCache, Listener {
             final User user = new AzureUser(player.getName(), uuid, readProperty(player.getPlayerProfile(), "textures"));
             // ...
             if (existingUser == null || user.equals(existingUser) == false)
-                plugin.getBedrockScheduler().runAsync(1L, (task) -> this.saveUser(user));
+                this.save(user).thenAccept(isSuccess -> {
+                   if (isSuccess == false)
+                       plugin.getLogger().warning("Could not load " + uuid + ".json");
+                });
             // ...
             return user;
         });

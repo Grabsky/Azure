@@ -26,4 +26,5 @@ public final class AzureUser implements User {
                 && uniqueId.equals(otherUser.uniqueId)
                 && textures.equals(otherUser.textures);
     }
+
 }
