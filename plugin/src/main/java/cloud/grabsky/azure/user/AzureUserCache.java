@@ -36,7 +36,7 @@ public final class AzureUserCache implements UserCache, Listener {
     private final File cacheDirectory;
     private final Map<UUID, User> internalUserMap;
 
-    public AzureUserCache(final BedrockPlugin plugin) {
+    public AzureUserCache(final @NotNull BedrockPlugin plugin) {
         this.plugin = plugin;
         this.moshi = new Moshi.Builder().add(UUID.class, UUIDAdapter.INSTANCE).build();
         this.cacheDirectory = new File(plugin.getDataFolder(), "usercache");
@@ -45,13 +45,9 @@ public final class AzureUserCache implements UserCache, Listener {
         this.loadCache();
     }
 
-    public void loadCache() {
+    public void loadCache() throws IllegalStateException {
         // Creating cache directory if does not exist.
-        if (cacheDirectory.exists() == false)
-            cacheDirectory.mkdirs();
-        // ...
-        if (cacheDirectory.isDirectory() == false)
-            throw new IllegalStateException(cacheDirectory.getPath() + " is not a directory.");
+        ensureCacheDirectoryExists();
         // ...
         final File[] files = cacheDirectory.listFiles();
         // ...
@@ -84,13 +80,9 @@ public final class AzureUserCache implements UserCache, Listener {
         }
     }
 
-    public CompletableFuture<Boolean> save(final @NotNull User user) {
+    public @NotNull CompletableFuture<Boolean> save(final @NotNull User user) throws IllegalStateException {
         // Creating directory in case it does not exist.
-        if (cacheDirectory.exists() == false)
-            cacheDirectory.mkdirs();
-        // Throwing an exception in case file is not a directory.
-        if (cacheDirectory.isDirectory() == false)
-            throw new IllegalStateException(cacheDirectory.getPath() + " is not a directory.");
+        ensureCacheDirectoryExists();
         // ...
         final File file = new File(cacheDirectory, user.getUniqueId() + ".json");
         // ...
@@ -136,7 +128,7 @@ public final class AzureUserCache implements UserCache, Listener {
     }
 
     @EventHandler
-    public void onUserJoin(final PlayerJoinEvent event) {
+    public void onUserJoin(final @NotNull PlayerJoinEvent event) {
         final Player player = event.getPlayer();
         // ...
         internalUserMap.compute(player.getUniqueId(), (uuid, existingUser) -> {
@@ -150,6 +142,15 @@ public final class AzureUserCache implements UserCache, Listener {
             // ...
             return user;
         });
+    }
+
+    private void ensureCacheDirectoryExists() throws IllegalStateException {
+        // Creating directory in case it does not exist.
+        if (cacheDirectory.exists() == false)
+            cacheDirectory.mkdirs();
+        // Throwing an exception in case file is not a directory.
+        if (cacheDirectory.isDirectory() == false)
+            throw new IllegalStateException(cacheDirectory.getPath() + " is not a directory.");
     }
 
     /**
