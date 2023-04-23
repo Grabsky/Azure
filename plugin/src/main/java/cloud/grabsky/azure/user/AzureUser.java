@@ -4,6 +4,8 @@ import cloud.grabsky.azure.api.user.User;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -11,16 +13,16 @@ import java.util.UUID;
 public final class AzureUser implements User {
 
     @Getter(AccessLevel.PUBLIC)
-    private final String name;
+    private final @NotNull String name;
 
     @Getter(AccessLevel.PUBLIC)
-    private final UUID uniqueId;
+    private final @NotNull UUID uniqueId;
 
     @Getter(AccessLevel.PUBLIC)
-    private final String textures;
+    private final @NotNull String textures;
 
     @Override
-    public boolean equals(final Object other) {
+    public boolean equals(final @Nullable Object other) {
         return other instanceof AzureUser otherUser
                 && name.equals(otherUser.name)
                 && uniqueId.equals(otherUser.uniqueId)
