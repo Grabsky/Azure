@@ -4,25 +4,24 @@ import cloud.grabsky.azure.api.user.User;
 import cloud.grabsky.azure.api.user.UserCache;
 import cloud.grabsky.azure.configuration.adapters.UUIDAdapter;
 import cloud.grabsky.bedrock.BedrockPlugin;
-import cloud.grabsky.bedrock.helpers.ItemBuilder;
-import com.destroystokyo.paper.profile.PlayerProfile;
-import com.destroystokyo.paper.profile.ProfileProperty;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.JsonReader;
 import com.squareup.moshi.JsonWriter;
 import com.squareup.moshi.Moshi;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Base64;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -35,77 +34,91 @@ import static okio.Okio.source;
 public final class AzureUserCache implements UserCache, Listener {
 
     private final BedrockPlugin plugin;
-    private final Moshi moshi;
     private final File cacheDirectory;
     private final Map<UUID, AzureUser> internalUserMap;
 
+    private final JsonAdapter<AzureUser> adapter;
+
     public AzureUserCache(final @NotNull BedrockPlugin plugin) {
         this.plugin = plugin;
-        this.moshi = new Moshi.Builder().add(UUID.class, UUIDAdapter.INSTANCE).build();
         this.cacheDirectory = new File(plugin.getDataFolder(), "usercache");
         this.internalUserMap = new HashMap<>();
-        // ...
-        this.loadCache();
+        // Creating moshi instance and adding necessary adapters.
+        this.adapter = new Moshi.Builder().add(UUID.class, UUIDAdapter.INSTANCE).build().adapter(AzureUser.class).indent("  ");
+        // Caching users.
+        this.cacheUsers();
     }
 
-    public void loadCache() throws IllegalStateException {
+    public void cacheUsers() throws IllegalStateException {
         // Creating cache directory if does not exist.
         ensureCacheDirectoryExists();
-        // ...
+        // Getting list of the files within the cache directory. Non-recursive.
         final File[] files = cacheDirectory.listFiles();
         // ...
-        if (files == null) {
-            plugin.getLogger().info("No users were loaded from cache: " + cacheDirectory.getPath() + " is empty.");
-            return;
-        }
-        int count = 0;
-        // ...
-        for (final File file : files)
-            if (file.getName().endsWith(".json") == true)
+        int totalUsers = 0;
+        int loadedUsers = 0;
+        // Iterating over each file...
+        for (final File file : (files != null) ? files : new File[0]) {
+            // Skipping non-JSON files.
+            if (file.getName().endsWith(".json") == true) {
                 try {
-                    if (this.loadUser(file) != null)
-                        count++;
+                    // Increasing number of total users.
+                    totalUsers++;
+                    // Loading the user from the file.
+                    final AzureUser user = this.readUser(file);
+                    // Adding to the cache.
+                    internalUserMap.put(user.getUniqueId(), user);
+                    // Increasing number of loaded users.
+                    loadedUsers++;
                 } catch (final IOException | IllegalStateException e) {
-                    // TO-DO: Log to the console.
+                    plugin.getLogger().warning("User cannot be loaded. (FILE = " + file.getPath() + ")");
+                    e.printStackTrace();
                 }
-        // ...
-        plugin.getLogger().info(count + " users were loaded from cache.");
+            }
+        }
+        // Printing "summary" message to the console.
+        plugin.getLogger().info("Succesfully loaded " + loadedUsers + " out of " + totalUsers + " users total.");
     }
 
-    public @Nullable User loadUser(final @NotNull File file) throws IOException, IllegalStateException {
+    public @NotNull AzureUser readUser(final @NotNull File file) throws IOException, IllegalStateException {
+        // Creating a JsonReader from provided file.
         final JsonReader reader = JsonReader.of(buffer(source(file)));
-        // ...
-        final AzureUser user = moshi.adapter(AzureUser.class).fromJson(reader);
-        // ...
+        // Reading the JSON file.
+        final AzureUser user = adapter.fromJson(reader);
+        // Closing the reader.
         reader.close();
-        // ...
+        // Throwing exception in case User ended up to be null. Unlikely to happen, but possible.
         if (user == null)
-            throw new IllegalArgumentException("Deserialization of " + file.getPath() + " failed." );
-        // ...
-        internalUserMap.put(user.getUniqueId(), user);
-        // ...
+            throw new IllegalArgumentException("Deserialization of " + file.getPath() + " failed: " + null);
+        // Returning the value.
         return user;
-}
+    }
 
-    public @NotNull CompletableFuture<Boolean> save(final @NotNull User user) throws IllegalStateException {
+    public @NotNull CompletableFuture<Boolean> saveUser(final @NotNull User user) throws IllegalStateException {
         // Creating directory in case it does not exist.
         ensureCacheDirectoryExists();
         // ...
         final File file = new File(cacheDirectory, user.getUniqueId() + ".json");
-        // ...
-        final JsonAdapter<AzureUser> adapter = moshi.adapter(AzureUser.class).indent("  ");
-        // ...
+        // Returning CompletableFuture which saves the file asynchronously.
         return CompletableFuture.supplyAsync(() -> {
             try (final JsonWriter writer = JsonWriter.of(buffer(sink(file)))) {
-                // Writing data to the file
+                // Writing data to the file.
                 adapter.toJson(writer, (AzureUser) user);
-                // ...
+                // Returning 'true' assuming data was written.
                 return true;
             } catch (final IOException e) {
                 e.printStackTrace();
                 return false;
             }
+        }).exceptionally(thr -> {
+            thr.printStackTrace();
+            return false;
         });
+    }
+
+    @Override
+    public @NotNull @Unmodifiable Collection<User> getUsers() {
+        return Collections.unmodifiableCollection(internalUserMap.values());
     }
 
     @Override
@@ -118,7 +131,7 @@ public final class AzureUserCache implements UserCache, Listener {
         for (final User user : internalUserMap.values())
             if (user.getName().equals(name) == true)
                 return user;
-        // ...
+        // No user found. Returning null.
         return null;
     }
 
@@ -132,46 +145,40 @@ public final class AzureUserCache implements UserCache, Listener {
         for (final User user : internalUserMap.values())
             if (user.getName().equals(name) == true)
                 return true;
-        // ...
+        // No user found. Returning false.
         return false;
     }
 
     @EventHandler
     public void onUserJoin(final @NotNull PlayerJoinEvent event) {
         final Player player = event.getPlayer();
-        // ...
+        // Updating cache with up-to-date data...
         internalUserMap.compute(player.getUniqueId(), (uuid, existingUser) -> {
             final @Nullable URL skin = player.getPlayerProfile().getTextures().getSkin();
-            // ...
+            // Creating instance of AzureUser containing player information.
             final AzureUser user = new AzureUser(player.getName(), uuid, (skin != null) ? encodeTextures(skin) : "");
-            // ...
+            // Saving to the file in case no information was previously cached or "new" instance is different than cached one.
             if (existingUser == null || user.equals(existingUser) == false)
-                this.save(user).thenAccept((isSuccess) -> {
-                    player.getInventory().addItem(new ItemBuilder(Material.PLAYER_HEAD, 1).setSkullTexture(user.getTextures()).build());
-                });
-            // ...
+                this.saveUser(user);
+            // Returning the "new" instance, replacing the previous one.
             return user;
         });
     }
 
+    /**
+     * Ensures that cache directory exists. In case file is not a directory - it gets deleted and a directory is created in its place.
+     */
     private void ensureCacheDirectoryExists() throws IllegalStateException {
         // Creating directory in case it does not exist.
         if (cacheDirectory.exists() == false)
             cacheDirectory.mkdirs();
-        // Throwing an exception in case file is not a directory.
-        if (cacheDirectory.isDirectory() == false)
-            throw new IllegalStateException(cacheDirectory.getPath() + " is not a directory.");
-    }
-
-    /**
-     * Returns {@link String} value of specified property, or {@code null}.
-     */
-    private static @Nullable String readProperty(final @NotNull PlayerProfile profile, final @NotNull String propertyName) {
-        for (final ProfileProperty property : profile.getProperties())
-            if (property.getName().equals(propertyName) == true)
-                return property.getValue();
-        // Returning 'null' in case property was not found.
-        return null;
+        // Deleting and re-creating in case file is not a directory.
+        if (cacheDirectory.isDirectory() == false) {
+            if (cacheDirectory.delete() == false)
+                throw new IllegalStateException("File " + cacheDirectory.getPath() + " is not a directory and could not be deleted. Please delete or rename it manually.");
+            // Calling (self) after deleting non-directory file. This should not lead to inifnite recursion.
+            ensureCacheDirectoryExists();
+        }
     }
 
     /**
