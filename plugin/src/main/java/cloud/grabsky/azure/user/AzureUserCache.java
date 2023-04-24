@@ -43,7 +43,7 @@ public final class AzureUserCache implements UserCache, Listener {
         this.plugin = plugin;
         this.cacheDirectory = new File(plugin.getDataFolder(), "usercache");
         this.internalUserMap = new HashMap<>();
-        // Creating moshi instance and adding necessary adapters.
+        // ...
         this.adapter = new Moshi.Builder().add(UUID.class, UUIDAdapter.INSTANCE).build().adapter(AzureUser.class).indent("  ");
         // Caching users.
         this.cacheUsers();
@@ -77,7 +77,7 @@ public final class AzureUserCache implements UserCache, Listener {
             }
         }
         // Printing "summary" message to the console.
-        plugin.getLogger().info("Succesfully loaded " + loadedUsers + " out of " + totalUsers + " users total.");
+        plugin.getLogger().info("Succesfully loaded " + loadedUsers + " out of " + totalUsers + " user(s) total.");
     }
 
     public @NotNull AzureUser readUser(final @NotNull File file) throws IOException, IllegalStateException {
@@ -87,7 +87,7 @@ public final class AzureUserCache implements UserCache, Listener {
         final AzureUser user = adapter.fromJson(reader);
         // Closing the reader.
         reader.close();
-        // Throwing exception in case User ended up to be null. Unlikely to happen, but possible.
+        // Throwing exception in case User ended up being null. Unlikely to happen, but possible.
         if (user == null)
             throw new IllegalArgumentException("Deserialization of " + file.getPath() + " failed: " + null);
         // Returning the value.
@@ -160,7 +160,7 @@ public final class AzureUserCache implements UserCache, Listener {
             // Saving to the file in case no information was previously cached or "new" instance is different than cached one.
             if (existingUser == null || user.equals(existingUser) == false)
                 this.saveUser(user);
-            // Returning the "new" instance, replacing the previous one.
+            // Returning "new" instance, replacing the previous one.
             return user;
         });
     }
