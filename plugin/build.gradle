@@ -13,8 +13,8 @@ repositories {
 dependencies {
     api project(":azure-api")
     // ...
-    implementation("cloud.grabsky:bedrock:5389ebb")
-    implementation("cloud.grabsky:commands:14366de")
+    implementation("cloud.grabsky:bedrock:607fb50")
+    implementation("cloud.grabsky:commands:56c8458")
     implementation("cloud.grabsky:configuration-paper:1ccfb9c")
     // ...
     compileOnly("net.luckperms:api:5.4")
