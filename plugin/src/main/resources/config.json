@@ -53,7 +53,9 @@
         // Sound played when player is notified
         "notification_sound": { "key": "minecraft:block.note_block.bell", "source": "master", "volume": 1, "pitch": 0.5 }
     },
+    // Vanish settings. Hidden players are not removed from server list status. Consider setting 'hide-online-players' to 'true'. (server.properties)
     "vanish": {
+        // BossBar to be displayed for vanished players. Can be null.
         "bossbar": {
             // Overlays: [PROGRESS, NOTCHED_6, NOTCHED_10, NOTCHED_12, NOTCHED_20]
             "overlay": "PROGRESS",
