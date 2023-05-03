@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 public final class VanishCommand extends RootCommand {
 
     public VanishCommand() {
-        super("vanish", new String[]{"v"}, "azure.command.vanish", "/vanish (target) (true/false)", "Modify in-game visibility.");
+        super("vanish", null, "azure.command.vanish", "/vanish (target) (true/false)", "Modify in-game visibility.");
     }
 
     @Override

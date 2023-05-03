@@ -22,7 +22,7 @@ import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 public final class TeleportCommand extends RootCommand {
 
     public TeleportCommand() {
-        super("teleport", new String[]{"tp"}, "azure.command.teleport", "/teleport (target) (destination) (--silent)", "...");
+        super("teleport", null, "azure.command.teleport", "/teleport (target) (destination) (--silent)", "...");
     }
 
     private static final ExceptionHandler.Factory TELEPORT_USAGE = (exception) -> {
