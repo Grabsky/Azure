@@ -52,5 +52,15 @@
         "prompt_message": "<red>Aby grać na naszym serwerze, musisz zaakceptować paczkę zasobów.",
         // Sound played when player is notified
         "notification_sound": { "key": "minecraft:block.note_block.bell", "source": "master", "volume": 1, "pitch": 0.5 }
+    },
+    "vanish": {
+        "bossbar": {
+            // Overlays: [PROGRESS, NOTCHED_6, NOTCHED_10, NOTCHED_12, NOTCHED_20]
+            "overlay": "PROGRESS",
+            // Colors: [BLUE, GREEN, PINK, PURPLE, RED, WHITE, YELLOW]
+            "color": "YELLOW",
+            // Text displayed above the BossBar.
+            "text": "<white>Jesteś <yellow>niewidzialny<white>. Użyj <yellow>/vanish<white>, aby się ujawnić."
+        }
     }
 }

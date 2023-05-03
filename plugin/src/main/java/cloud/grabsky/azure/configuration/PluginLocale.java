@@ -215,6 +215,21 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.world_weather_set_failure_invalid_type")
     public static String COMMAND_WORLD_WEATHER_SET_FAILURE_INVALID_TYPE;
 
+    // Commands > Vanish
+
+    @JsonPath("commands.vanish_success_state_on")
+    public static Component VANISH_SUCCESS_STATE_ON;
+
+    @JsonPath("commands.vanish_success_state_off")
+    public static Component VANISH_SUCCESS_STATE_OFF;
+
+    @JsonPath("commands.vanish_success_state_on_target")
+    public static String VANISH_SUCCESS_STATE_ON_TARGET;
+
+    @JsonPath("commands.vanish_success_state_off_target")
+    public static String VANISH_SUCCESS_STATE_OFF_TARGET;
+
+
 
     public static final class Commands implements JsonConfiguration {
 

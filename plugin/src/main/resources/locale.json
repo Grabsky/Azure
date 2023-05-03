@@ -125,6 +125,11 @@
         // World > Weather
         "world_weather_usage": "<dark_gray>› <gray>Użycie: <gold>/world weather <white>(world) (weather)",
         "world_weather_set_success": "<dark_gray>› <gray>Pogoda w <gold><world><gray> została ustawiona na <gold><weather><gray>.",
-        "world_weather_set_failure_invalid_type": "<dark_gray>› <red>Argument <gold><input> <red> nie jest prawidłowym typem pogody."
+        "world_weather_set_failure_invalid_type": "<dark_gray>› <red>Argument <gold><input> <red> nie jest prawidłowym typem pogody.",
+        // Vanish
+        "vanish_success_state_on": "<dark_gray>› <gray>Stałeś się ukryty dla innych graczy.",
+        "vanish_success_state_off": "<dark_gray>› <gray>Stałeś się widoczny dla innych graczy.",
+        "vanish_success_state_on_target": "<dark_gray>› <gray><gold><target><gray> stał się niewidoczny dla innych graczy.",
+        "vanish_success_state_off_target": "<dark_gray>› <gray><gold><target><gray> stał się widoczny dla innych graczy."
     }
 }

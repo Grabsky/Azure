@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -78,6 +79,11 @@ public final class PluginConfig implements JsonConfiguration {
 
     @JsonNullable @JsonPath("resource_pack.notification_sound")
     public static @Nullable Sound RESOURCE_PACK_NOTIFICATION_SOUND;
+
+    // Vanish
+
+    @JsonNullable @JsonPath("vanish.bossbar")
+    public static BossBar VANISH_BOSS_BAR;
 
     /* ON RELOAD */
 

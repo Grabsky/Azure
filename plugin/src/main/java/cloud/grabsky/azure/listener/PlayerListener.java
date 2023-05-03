@@ -1,10 +1,10 @@
 package cloud.grabsky.azure.listener;
 
 import cloud.grabsky.azure.Azure;
+import cloud.grabsky.azure.Azure.Keys;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,8 +21,6 @@ public final class PlayerListener implements Listener {
 
     private final Azure plugin;
 
-    private static final NamespacedKey IS_VANISHED = new NamespacedKey("azure", "is_vanished");
-
     @EventHandler
     public void onPlayerJoin(final @NotNull PlayerJoinEvent event) {
         final Player player = event.getPlayer();
@@ -36,20 +34,25 @@ public final class PlayerListener implements Listener {
             ));
         }
         // ...
-        if (event.getPlayer().getPersistentDataContainer().getOrDefault(IS_VANISHED, PersistentDataType.BYTE, (byte) 0) == (byte) 1)
+        if (player.getPersistentDataContainer().getOrDefault(Keys.IS_VANISHED, PersistentDataType.BYTE, (byte) 0) == (byte) 1) {
+            // Hiding join message.
             event.joinMessage(empty());
+            // Showing BossBar.
+            player.showBossBar(PluginConfig.VANISH_BOSS_BAR);
+        }
         // TO-DO: Hide vanished players...
     }
 
     @EventHandler
     public void onPlayerQuit(final @NotNull PlayerQuitEvent event) {
-        if (event.getPlayer().getPersistentDataContainer().getOrDefault(IS_VANISHED, PersistentDataType.BYTE, (byte) 0) == (byte) 1)
+        if (event.getPlayer().getPersistentDataContainer().getOrDefault(Keys.IS_VANISHED, PersistentDataType.BYTE, (byte) 0) == (byte) 1)
+            // Hiding quit message.
             event.quitMessage(empty());
     }
 
     @EventHandler
     public void onGameModeChange(final @NotNull PlayerGameModeChangeEvent event) {
-        if (event.getPlayer().getPersistentDataContainer().getOrDefault(IS_VANISHED, PersistentDataType.BYTE, (byte) 0) == (byte) 1) {
+        if (event.getPlayer().getPersistentDataContainer().getOrDefault(Keys.IS_VANISHED, PersistentDataType.BYTE, (byte) 0) == (byte) 1) {
             event.setCancelled(true);
             event.cancelMessage(empty());
         }

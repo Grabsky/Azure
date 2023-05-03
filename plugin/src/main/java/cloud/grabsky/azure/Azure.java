@@ -11,12 +11,14 @@ import cloud.grabsky.azure.commands.GiveCommand;
 import cloud.grabsky.azure.commands.PackCommand;
 import cloud.grabsky.azure.commands.SpeedCommand;
 import cloud.grabsky.azure.commands.TeleportCommand;
+import cloud.grabsky.azure.commands.VanishCommand;
 import cloud.grabsky.azure.commands.WorldCommand;
 import cloud.grabsky.azure.commands.templates.CommandArgumentTemplate;
 import cloud.grabsky.azure.commands.templates.CommandExceptionTemplate;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.configuration.PluginConfig.DeleteButton;
 import cloud.grabsky.azure.configuration.PluginLocale;
+import cloud.grabsky.azure.configuration.adapters.BossBarAdapterFactory;
 import cloud.grabsky.azure.configuration.adapters.StandardTagResolverAdapter;
 import cloud.grabsky.azure.listener.PlayerListener;
 import cloud.grabsky.azure.user.AzureUserCache;
@@ -33,6 +35,7 @@ import lombok.Getter;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
+import org.bukkit.NamespacedKey;
 
 import java.io.File;
 import java.io.IOException;
@@ -70,6 +73,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
         this.mapper = PaperConfigurationMapper.create(moshi -> {
             moshi.add(TagResolver.class, StandardTagResolverAdapter.INSTANCE);
             moshi.add(DeleteButton.Position.class, new AbstractEnumJsonAdapter<>(DeleteButton.Position.class, false) { /* DEFAULT */ });
+            moshi.add(BossBarAdapterFactory.INSTANCE);
         });
         // this#onReload throws ConfigurationMappingException which should stop the server in case of failure.
         if (this.onReload() == false) {
@@ -101,7 +105,8 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
                 .registerCommand(GameModeCommand.class)
                 .registerCommand(TeleportCommand.class)
                 .registerCommand(new WorldCommand(this))
-                .registerCommand(new DeleteCommand(chatManager));
+                .registerCommand(new DeleteCommand(chatManager))
+                .registerCommand(VanishCommand.class);
         // Registering events...
         this.getServer().getPluginManager().registerEvents(chatManager, this);
         this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
@@ -135,5 +140,14 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
             throw new IllegalStateException(e); // Re-throwing as runtime exception.
         }
     }
-    
+
+
+    /**
+     * Some {@link NamespacedKey} instances used within the {@link Azure} plugin are defined here.
+     */
+    public static final class Keys {
+
+        public static final NamespacedKey IS_VANISHED = new NamespacedKey("azure", "is_vanished");
+
+    }
 }
