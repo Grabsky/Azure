@@ -7,6 +7,7 @@ final pluginsDirectory = (System.getenv("PLUGINS_DIR") ?: null)
 
 repositories {
     mavenLocal()
+    maven { url = "https://repo.grabsky.cloud/releases" }
     maven { url = "https://repo.grabsky.cloud/snapshots" }
 }
 
@@ -14,7 +15,7 @@ dependencies {
     api project(":azure-api")
     // ...
     implementation("cloud.grabsky:bedrock:607fb50")
-    implementation("cloud.grabsky:commands:56c8458")
+    implementation("cloud.grabsky:commands:1.0")
     implementation("cloud.grabsky:configuration-paper:1ccfb9c")
     // ...
     compileOnly("net.luckperms:api:5.4")
