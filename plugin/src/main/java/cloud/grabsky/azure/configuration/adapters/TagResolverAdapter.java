@@ -6,6 +6,9 @@ import com.squareup.moshi.JsonReader;
 import com.squareup.moshi.JsonWriter;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 import org.jetbrains.annotations.NotNull;
@@ -14,9 +17,9 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class StandardTagResolverAdapter extends JsonAdapter<TagResolver> {
+public final class TagResolverAdapter extends JsonAdapter<TagResolver> {
 
-    public static final StandardTagResolverAdapter INSTANCE = new StandardTagResolverAdapter();
+    public static final TagResolverAdapter INSTANCE = new TagResolverAdapter();
 
     @Override
     public TagResolver fromJson(final @NotNull JsonReader in) throws IOException {
@@ -40,6 +43,8 @@ public final class StandardTagResolverAdapter extends JsonAdapter<TagResolver> {
                 case "selector" -> builder.resolver(StandardTags.selector());
                 case "transition" -> builder.resolver(StandardTags.transition());
                 case "translatable" -> builder.resolver(StandardTags.translatable());
+                // Custom tags.
+                case "item" -> builder.resolver(Placeholder.component("item", Component.empty())); // NOTE: Dummy placeholder.
                 default -> throw new JsonDataException("Expected " + TagResolver.class.getName() + " at " + in.getPath() + " but found: " + nextString);
             }
         }

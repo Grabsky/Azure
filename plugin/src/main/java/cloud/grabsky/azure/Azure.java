@@ -19,7 +19,7 @@ import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.configuration.PluginConfig.DeleteButton;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.azure.configuration.adapters.BossBarAdapterFactory;
-import cloud.grabsky.azure.configuration.adapters.StandardTagResolverAdapter;
+import cloud.grabsky.azure.configuration.adapters.TagResolverAdapter;
 import cloud.grabsky.azure.listener.PlayerListener;
 import cloud.grabsky.azure.user.AzureUserCache;
 import cloud.grabsky.azure.world.WorldManager;
@@ -71,7 +71,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
         instance = this;
         // ...
         this.mapper = PaperConfigurationMapper.create(moshi -> {
-            moshi.add(TagResolver.class, StandardTagResolverAdapter.INSTANCE);
+            moshi.add(TagResolver.class, TagResolverAdapter.INSTANCE);
             moshi.add(DeleteButton.Position.class, new AbstractEnumJsonAdapter<>(DeleteButton.Position.class, false) { /* DEFAULT */ });
             moshi.add(BossBarAdapterFactory.INSTANCE);
         });

@@ -324,6 +324,7 @@ public final class WorldCommand extends RootCommand {
         return null;
     };
 
+    @SuppressWarnings("UnstableApiUsage")
     private void onWorldSpawnPoint(final RootCommandContext context, final ArgumentQueue arguments) {
         final CommandSender sender = context.getExecutor().asCommandSender();
         // ...

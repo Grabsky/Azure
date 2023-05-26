@@ -62,7 +62,7 @@ public final class ChatManager implements Listener {
     public ChatManager(final Azure azure) {
         this.luckPermsUserManager = azure.getLuckPerms().getUserManager();
         this.signatureCache = CacheBuilder.newBuilder()
-                .expireAfterWrite(5, TimeUnit.MINUTES)
+                .expireAfterWrite(PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_CACHE_EXPIRATION_RATE, TimeUnit.MINUTES)
                 .build();
         this.chatCooldowns = new HashMap<>();
     }
@@ -89,12 +89,12 @@ public final class ChatManager implements Listener {
         final String message = PLAIN_SERIALIZER.serialize(event.originalMessage());
         // ...
         final ItemStack item = event.player().getInventory().getItemInMainHand();
-        // ...
-        final Component itemComponent = empty().color(WHITE).append(item.displayName()).hoverEvent(item.asHoverEvent());
         // Creating result Component using serializers player has access to
         final TagResolver matchingResolvers = this.findSuitableTagsCollection(event.player(), PluginConfig.CHAT_MESSAGE_TAGS_DEFAULT);
         // ...
-        final Component result = EMPTY_MINIMESSAGE.deserialize(message, matchingResolvers, Placeholder.component("item", itemComponent));
+        final Component result = (matchingResolvers.has("item") == true)
+                ? EMPTY_MINIMESSAGE.deserialize(message, matchingResolvers, Placeholder.component("item", empty().color(WHITE).append(item.displayName()).hoverEvent(item.asHoverEvent()) ))
+                : EMPTY_MINIMESSAGE.deserialize(message, matchingResolvers);
         // Setting result, the rest is handled within AsyncChatEvent
         event.result(result);
     }
@@ -182,7 +182,7 @@ public final class ChatManager implements Listener {
 
     private @NotNull String findSuitableChatFormat(final @NotNull Player player, final @NotNull String def) {
         return CHAT_FORMATS_REVERSED.stream()
-                .filter(holder -> player.hasPermission("group." + holder.getGroup()) == true)
+                .filter(holder -> player.hasPermission(holder.getPermission()) == true)
                 .map(FormatHolder::getFormat)
                 .findFirst()
                 .orElse(def);

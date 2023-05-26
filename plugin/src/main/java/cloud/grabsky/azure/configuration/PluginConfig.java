@@ -12,6 +12,7 @@ import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.bukkit.permissions.Permissible;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -25,7 +26,7 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("chat_settings.cooldown")
     public static Long CHAT_COOLDOWN;
 
-    // Chat Settings > Formats
+    // Chat Settings > Chat Format
 
     @JsonPath("chat_settings.chat_format.default")
     public static String CHAT_FORMATS_DEFAULT;
@@ -36,18 +37,21 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("chat_settings.chat_format.extra")
     public static List<FormatHolder> CHAT_FORMATS_EXTRA;
 
-    // Chat Settings > Formats > Allowed Tags
+    // Chat Settings > Chat Format > Tags
 
-    @JsonPath("chat_settings.chat_format.allowed_tags.default")
+    @JsonPath("chat_settings.chat_format.tags.default")
     public static TagResolver CHAT_MESSAGE_TAGS_DEFAULT;
 
-    @JsonPath("chat_settings.chat_format.allowed_tags.extra")
+    @JsonPath("chat_settings.chat_format.tags.extra")
     public static List<TagsHolder> CHAT_MESSAGE_TAGS_EXTRA;
 
     // Chat Settings > Moderation > Message Deletion
 
     @JsonPath("chat_settings.moderation.message_deletion.enabled")
     public static boolean CHAT_MODERATION_MESSAGE_DELETION_ENABLED;
+
+    @JsonPath("chat_settings.moderation.message_deletion.cache_expiration_rate")
+    public static long CHAT_MODERATION_MESSAGE_DELETION_CACHE_EXPIRATION_RATE;
 
     @JsonPath("chat_settings.moderation.message_deletion.button")
     public static DeleteButton CHAT_MODERATION_MESSAGE_DELETION_BUTTON;
@@ -100,7 +104,7 @@ public final class PluginConfig implements JsonConfiguration {
     public static final class FormatHolder {
 
         @Getter(AccessLevel.PUBLIC)
-        private final String group;
+        private final String permission;
 
         @Getter(AccessLevel.PUBLIC)
         private final String format;

@@ -10,18 +10,18 @@
             "default": "<player>: <message>",
             // Console chat format. Placeholders: [player, displayname, group, prefix, suffix, message]
             "console": "[<signature_uuid>] [<group>] <player>: <message>",
-            // Per-permission-group formats. Array order works as priority (higher index = more important). Only entry can be applied per player.
+            // Per-permission formats. First matching element will be applied. Iterated in reverse order, from last to first.
             "extra": [
-                { "group": "donator", "format": "(Donator) <player>: <message>" },
-                { "group": "admin", "format": "(Admin) <player>: <message>" }
+                { "permission": "group.donator", "format": "<gold>(Donator)<white> <player>: <message>" },
+                { "permission": "group.admin", "format": "<red>(Admin)<white> <player>: <message>" }
             ],
-            // Tags allowed inside messages. Tags: [click, color, decorations, font, gradient, hover, insertion, keybind, newline, rainbow, reset, selector, transition, translatable]
-            "allowed_tags": {
+            // Tags allowed inside messages. Tags: [click, color, decorations, font, gradient, hover, insertion, item, keybind, newline, rainbow, reset, selector, transition, translatable]
+            "tags": {
                 // Default tags collection used as a fallback.
-                "default": [],
-                // Per-permission tags. Array order works as priority (higher index = more important). Only one entry can be applied per player.
+                "default": ["item"],
+                // Per-permission tags. First matching element will be applied. Iterated in reverse order, from last to first.
                 "extra": [
-                    { "permission": "azure.plugin.chat.staff_allowed_tags", "tags": ["color", "decorations", "gradient", "rainbow", "reset"] }
+                    { "permission": "azure.plugin.chat.staff_allowed_tags", "tags": ["item", "color", "decorations", "gradient", "rainbow", "reset"] }
                 ]
             }
         },
@@ -29,19 +29,25 @@
         "moderation": {
             // Message deletion. Messages can be deleted for 5 minutes after being sent.
             "message_deletion": {
+                // Determinates whether player messages are allowed to be deleted by moderators.
                 "enabled": true,
-                "button": { "position": "before", "text": "<gray>×", "hover": "<gray>Click to delete this message." }
+                // Determinates how long message signature should be stored for. In seconds.
+                "cache_expiration_rate": 300,
+                // Message delete button styling. Position can either be BEFORE or AFTER.
+                "button": { "position": "BEFORE", "text": "<gray>×", "hover": "<gray>Click to delete this message." }
             }
         },
         // Discord webhooks. Forwards chat messages to Discord server using configured webhook.
         "discord_webhooks": {
-            "enabled": true,
+            // Determinates whether chat messages are sent to the discord webhook.
+            "enabled": false,
+            // Discord webhook URL. Keep it secure.
             "discord_webhook_url": ""
         }
     },
     "resource_pack": {
         // Whether resource pack should be send when player joins the server.
-        "send_on_join": true,
+        "send_on_join": false,
         // Marks the resource pack as forced. Player won't be able to join the server without accepting it.
         "is_required": true,
         // Direct downlod URL of the resource pack.
