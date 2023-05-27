@@ -24,6 +24,9 @@ public final class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerJoin(final @NotNull PlayerJoinEvent event) {
         final Player player = event.getPlayer();
+        // Clearing title. (if enabled)
+        if (PluginConfig.GENERAL_CLEAR_TITLE_ON_JOIN == true)
+            player.clearTitle();
         // Sending resource pack 1 tick after event is fired. (if enabled)
         if (PluginConfig.RESOURCE_PACK_SEND_ON_JOIN == true) {
             plugin.getBedrockScheduler().run(1L, (task) -> player.setResourcePack(
