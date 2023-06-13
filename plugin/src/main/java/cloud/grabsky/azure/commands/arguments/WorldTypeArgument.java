@@ -16,7 +16,7 @@ import java.util.List;
 public enum WorldTypeArgument implements ArgumentParser<WorldType>, CompletionsProvider {
     /* SINGLETON */ INSTANCE;
 
-    private static final List<String> WORLD_TYPES = List.of("amplified", "default", "flat", "largebiomes");
+    private static final List<String> WORLD_TYPES = List.of("amplified", "normal", "flat", "largebiomes");
 
     @Override
     public @NotNull List<String> provide(final @NotNull RootCommandContext context) {
