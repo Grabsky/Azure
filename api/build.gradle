@@ -31,3 +31,8 @@ java {
 javadoc {
     (options as CoreJavadocOptions).addStringOption("Xdoclint:none", "-quiet")
 }
+
+gradle.buildFinished {
+    println()
+    println("> " + (isSnapshot == true ? hash7 : project.version))
+}

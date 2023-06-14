@@ -1,10 +1,11 @@
 package cloud.grabsky.azure.commands;
 
 import cloud.grabsky.azure.Azure;
+import cloud.grabsky.azure.commands.arguments.DirectionArgument;
 import cloud.grabsky.azure.commands.arguments.WorldSeedArgument;
 import cloud.grabsky.azure.commands.arguments.WorldTimeArgument;
 import cloud.grabsky.azure.configuration.PluginLocale;
-import cloud.grabsky.azure.world.WorldManager;
+import cloud.grabsky.azure.world.AzureWorldManager;
 import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
@@ -31,6 +32,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
@@ -38,7 +40,7 @@ import static java.lang.String.format;
 public final class WorldCommand extends RootCommand {
 
     private final Azure plugin;
-    private final WorldManager worlds;
+    private final AzureWorldManager worlds;
 
     public WorldCommand(final Azure plugin) {
         super("world", null, "azure.command.world", "/world", "Manage your worlds in-game.");
@@ -93,6 +95,8 @@ public final class WorldCommand extends RootCommand {
                 case 2 -> CompletionsProvider.of("@x @y @z");
                 case 3 -> CompletionsProvider.of("@y @z");
                 case 4 -> CompletionsProvider.of("@z");
+                case 5 -> CompletionsProvider.of("@yaw @pitch");
+                case 6 -> CompletionsProvider.of("@pitch");
                 default -> CompletionsProvider.EMPTY;
             };
             case "teleport" -> switch (index) {
@@ -331,10 +335,13 @@ public final class WorldCommand extends RootCommand {
         if (sender.hasPermission(this.getPermission() + ".spawnpoint") == true) {
             final World world = arguments.next(World.class).asRequired(WORLD_SPAWNPOINT_USAGE);
             final Position position = arguments.next(Position.class).asRequired(WORLD_SPAWNPOINT_USAGE);
+            final DirectionArgument.Direction direction = arguments.next(DirectionArgument.Direction.class, DirectionArgument.INSTANCE).asOptional(null);
             // Creating location from specified position.
-            final Location location = new Location(world, position.x(), position.y(), position.z());
+            final Location location = (direction == null)
+                    ? new Location(world, position.x(), position.y(), position.z())
+                    : new Location(world, position.x(), position.y(), position.z(), direction.getYaw(), direction.getPitch());
             // Updating spawn location.
-            world.setSpawnLocation(location);
+            worlds.setSpawnPoint(world, location);
             // Sending message to command sender.
             Message.of(PluginLocale.COMMAND_WORLD_SPAWNPOINT_SET_SUCCESS)
                     .placeholder("x", format("%.2f", position.x()))
@@ -361,7 +368,7 @@ public final class WorldCommand extends RootCommand {
             final Player target = arguments.next(Player.class).asRequired(WORLD_TELEPORT_USAGE);
             final World world = arguments.next(World.class).asRequired(WORLD_TELEPORT_USAGE);
             // ...
-            target.teleportAsync(world.getSpawnLocation(), TeleportCause.PLUGIN);
+            target.teleportAsync(worlds.getSpawnPoint(world), TeleportCause.PLUGIN);
             Message.of(PluginLocale.COMMAND_WORLD_TELEPORT_SUCCESS)
                     .placeholder("player", target)
                     .placeholder("world", world)

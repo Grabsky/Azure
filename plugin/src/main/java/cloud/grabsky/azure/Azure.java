@@ -22,7 +22,7 @@ import cloud.grabsky.azure.configuration.adapters.BossBarAdapterFactory;
 import cloud.grabsky.azure.configuration.adapters.TagResolverAdapter;
 import cloud.grabsky.azure.listener.PlayerListener;
 import cloud.grabsky.azure.user.AzureUserCache;
-import cloud.grabsky.azure.world.WorldManager;
+import cloud.grabsky.azure.world.AzureWorldManager;
 import cloud.grabsky.bedrock.BedrockPlugin;
 import cloud.grabsky.commands.RootCommandManager;
 import cloud.grabsky.configuration.ConfigurationHolder;
@@ -57,7 +57,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
     private ChatManager chatManager;
 
     @Getter(AccessLevel.PUBLIC)
-    private WorldManager worldManager;
+    private AzureWorldManager worldManager;
 
     @Getter(AccessLevel.PUBLIC)
     private RootCommandManager commandManager;
@@ -87,7 +87,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
         // ...
         this.chatManager = new ChatManager(this);
         // ...
-        this.worldManager = new WorldManager(this);
+        this.worldManager = new AzureWorldManager(this);
         // Loading worlds with autoLoad == true
         try {
             this.worldManager.loadWorlds();

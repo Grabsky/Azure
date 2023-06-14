@@ -1,5 +1,6 @@
 package cloud.grabsky.azure.commands.templates;
 
+import cloud.grabsky.azure.commands.arguments.DirectionArgument;
 import cloud.grabsky.azure.commands.arguments.GameModeArgument;
 import cloud.grabsky.azure.commands.arguments.GameRuleArgument;
 import cloud.grabsky.azure.commands.arguments.WorldEnvironmentArgument;
@@ -30,6 +31,9 @@ public enum CommandArgumentTemplate implements Consumer<RootCommandManager> {
         // org.bukkit.GameMode
         manager.setArgumentParser(GameMode.class, GameModeArgument.INSTANCE);
         manager.setCompletionsProvider(GameMode.class, GameModeArgument.INSTANCE);
+        // cloud.grabsky.azure.commands.arguments.DirectionArgument.Direction
+        manager.setArgumentParser(DirectionArgument.Direction.class, DirectionArgument.INSTANCE);
+        manager.setCompletionsProvider(DirectionArgument.Direction.class, DirectionArgument.INSTANCE);
     }
 
 }

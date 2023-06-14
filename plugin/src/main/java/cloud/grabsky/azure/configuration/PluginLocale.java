@@ -322,6 +322,9 @@ public final class PluginLocale implements JsonConfiguration {
         @JsonPath("invalid_world_type")
         public static String INVALID_WORLD_TYPE;
 
+        @JsonPath("invalid_direction")
+        public static String INVALID_DIRECTION;
+
     }
 
 }

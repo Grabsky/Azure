@@ -34,5 +34,6 @@
     "invalid_gamemode": "<dark_gray>› <red>Tryb gry <gold><input><red> nie istnieje.",
     "invalid_gamerule": "<dark_gray>› <red>Reguła <gold><input><red> nie istnieje.",
     "invalid_world_environment": "<dark_gray>› <red>Środowisko <gold><input><red> nie istnieje.",
-    "invalid_world_type": "<dark_gray>› <red>Typ świata <gold><input><red> nie istnieje."
+    "invalid_world_type": "<dark_gray>› <red>Typ świata <gold><input><red> nie istnieje.",
+    "invalid_direction": "<dark_gray>› <red>Argument <gold><input><red> nie przedstawia prawidłowego kierunku."
 }

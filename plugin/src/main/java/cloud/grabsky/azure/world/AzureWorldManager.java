@@ -1,6 +1,7 @@
 package cloud.grabsky.azure.world;
 
 import cloud.grabsky.azure.Azure;
+import cloud.grabsky.azure.api.world.WorldManager;
 import cloud.grabsky.configuration.paper.adapter.NamespacedKeyAdapter;
 import com.squareup.moshi.Moshi;
 import lombok.AccessLevel;
@@ -8,6 +9,7 @@ import lombok.Getter;
 import okio.BufferedSink;
 import okio.BufferedSource;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
@@ -17,7 +19,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static okio.Okio.buffer;
@@ -25,27 +29,19 @@ import static okio.Okio.sink;
 import static okio.Okio.source;
 import static org.bukkit.NamespacedKey.minecraft;
 
-public final class WorldManager {
+public final class AzureWorldManager implements WorldManager {
 
     @Getter(AccessLevel.PUBLIC)
     private final @NotNull Azure plugin;
-
-    @Getter(AccessLevel.PUBLIC)
-    private final @NotNull World primaryWorld;
 
     private final Moshi moshi;
 
     private static final NamespacedKey OVERWORLD = minecraft("overworld");
 
-    public WorldManager(final Azure plugin) {
+    private final Map<NamespacedKey, WorldConfiguration> configurations = new HashMap<>();
+
+    public AzureWorldManager(final Azure plugin) {
         this.plugin = plugin;
-        // Getting the default/main/primary world.
-        final @Nullable World primaryWorld = plugin.getServer().getWorld(OVERWORLD);
-        // Throwing an exception if no default/main/primary was found. (no clue if that can happen)
-        if (primaryWorld == null)
-            throw new IllegalStateException("Primary world does not exist. ");
-        // ...
-        this.primaryWorld = primaryWorld;
         // Setting up Moshi...
         this.moshi = new Moshi.Builder().add(NamespacedKey.class, NamespacedKeyAdapter.INSTANCE).build();
     }
@@ -82,6 +78,8 @@ public final class WorldManager {
         // ...
         buffer.close();
         // ...
+        configurations.put(world.getKey(), configuration);
+        // ...
         return world;
     }
 
@@ -113,7 +111,11 @@ public final class WorldManager {
         creator.generator(configuration.getGenerator());
         creator.seed(configuration.getSeed());
         // ...
-        return creator.createWorld();
+        final World world = creator.createWorld();
+        // ...
+        configurations.put(world.getKey(), configuration);
+        // ...
+        return world;
     }
 
     public void loadWorlds() throws IOException, IllegalStateException {
@@ -129,6 +131,17 @@ public final class WorldManager {
             // ...
             this.loadWorld(key, false);
         }
+    }
+
+    private static final NamespacedKey SPAWN_POINT = new NamespacedKey("azure", "spawn_point");
+
+    public void setSpawnPoint(final @NotNull World world, final @NotNull Location location) {
+        world.getPersistentDataContainer().set(SPAWN_POINT, WorldManager.Type.ofLocation(SPAWN_POINT), location);
+    }
+
+    @Override
+    public @NotNull Location getSpawnPoint(final @NotNull World world) {
+        return world.getPersistentDataContainer().getOrDefault(SPAWN_POINT, WorldManager.Type.ofLocation(SPAWN_POINT), world.getSpawnLocation());
     }
 
 }
