@@ -64,6 +64,7 @@
             "<dark_gray>› <gold>/world gamerule <white>(world) (rule) <gray>(value)",
             "<dark_gray>› <gold>/world info <gray>(world)",
             "<dark_gray>› <gold>/world load <white>(world)",
+            "<dark_gray>› <gold>/world spawnpoint <white>(world) (x) (y) (z) <gray>(yaw) (pitch)",
             "<dark_gray>› <gold>/world teleport <white>(player) (world)",
             "<dark_gray>› <gold>/world time <white>(world) <gray>(time)",
             "<dark_gray>› <gold>/world weather <white>(world) (weather)",
@@ -113,7 +114,7 @@
         "world_load_failure_not_found": "<dark_gray>› <red>Świat <gold><world><red> nie istnieje.",
         "world_load_failure_other": "<dark_gray>› <red>Wystąpił błąd podczas ładowania świata <gold><world><red>.",
         // World > Spawnpoint
-        "world_spawnpoint_usage": "<dark_gray>› <gray>Użycie: <gold>/world spawnpoint <white>(world) (x) (y) (z)",
+        "world_spawnpoint_usage": "<dark_gray>› <gray>Użycie: <gold>/world spawnpoint <white>(world) (x) (y) (z) <gray>(yaw) (pitch)",
         "world_spawnpoint_set_success": "<dark_gray>› <gray>Pozycja spawnu ustawiona na <gold><x><gray>, <gold><y><gray>, <gold><z><gray>.",
         // World > Teleport
         "world_teleport_usage": "<dark_gray>› <gray>Użycie: <gold>/world teleport <white>(player) (world)",
