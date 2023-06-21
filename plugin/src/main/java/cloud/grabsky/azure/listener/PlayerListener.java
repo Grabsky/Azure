@@ -5,6 +5,7 @@ import cloud.grabsky.azure.Azure.Keys;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -37,25 +38,28 @@ public final class PlayerListener implements Listener {
             ));
         }
         // ...
-        if (player.getPersistentDataContainer().getOrDefault(Keys.IS_VANISHED, PersistentDataType.BYTE, (byte) 0) == (byte) 1) {
+        if (player.getPersistentDataContainer().getOrDefault(Keys.IS_VANISHED, PersistentDataType.BOOLEAN, false) == true) {
             // Hiding join message.
             event.joinMessage(empty());
             // Showing BossBar.
             player.showBossBar(PluginConfig.VANISH_BOSS_BAR);
         }
-        // TO-DO: Hide vanished players...
+        // Hiding vanished players.
+        Bukkit.getServer().getOnlinePlayers().stream()
+                .filter(other -> other.getPersistentDataContainer().getOrDefault(Keys.IS_VANISHED, PersistentDataType.BOOLEAN, false) == true)
+                .forEach(other -> player.hidePlayer(plugin, other));
     }
 
     @EventHandler
     public void onPlayerQuit(final @NotNull PlayerQuitEvent event) {
-        if (event.getPlayer().getPersistentDataContainer().getOrDefault(Keys.IS_VANISHED, PersistentDataType.BYTE, (byte) 0) == (byte) 1)
+        if (event.getPlayer().getPersistentDataContainer().getOrDefault(Keys.IS_VANISHED, PersistentDataType.BOOLEAN, false) == true)
             // Hiding quit message.
             event.quitMessage(empty());
     }
 
     @EventHandler
     public void onGameModeChange(final @NotNull PlayerGameModeChangeEvent event) {
-        if (event.getPlayer().getPersistentDataContainer().getOrDefault(Keys.IS_VANISHED, PersistentDataType.BYTE, (byte) 0) == (byte) 1) {
+        if (event.getPlayer().getPersistentDataContainer().getOrDefault(Keys.IS_VANISHED, PersistentDataType.BOOLEAN, false) == true) {
             event.setCancelled(true);
             event.cancelMessage(empty());
         }

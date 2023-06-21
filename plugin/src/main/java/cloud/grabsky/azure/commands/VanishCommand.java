@@ -69,26 +69,24 @@ public final class VanishCommand extends RootCommand {
     }
 
     private static boolean isVanished(final @NotNull Player target) {
-        return target.getPersistentDataContainer().getOrDefault(Keys.IS_VANISHED, PersistentDataType.BYTE, (byte) 0) == (byte) 1;
+        return target.getPersistentDataContainer().getOrDefault(Keys.IS_VANISHED, PersistentDataType.BOOLEAN, false) == true;
     }
 
     private static boolean setVanished(final @NotNull Plugin plugin, final @NotNull Player target, final boolean state) {
         if (state == true && isVanished(target) == false) {
-            // ...
-            target.setGameMode(GameMode.SPECTATOR);
-            // ...
-            target.getPersistentDataContainer().set(Keys.IS_VANISHED, PersistentDataType.BYTE, (byte) 1);
-            // TO-DO: Show BossBar...
+            target.getPersistentDataContainer().set(Keys.IS_VANISHED, PersistentDataType.BOOLEAN, true);
+            // Showing BossBar.
             target.showBossBar(PluginConfig.VANISH_BOSS_BAR);
-            // ...
+            // Switching game mode to spectator.
+            target.setGameMode(GameMode.SPECTATOR);
+            // Hiding target from other players.
             Bukkit.getOnlinePlayers().stream().filter(player -> player != target && player.hasPermission("azure.bypass.see_vanished_players") == false).forEach(player -> {
                 player.hidePlayer(plugin, target);
             });
             return true;
         } else if (state == false && isVanished(target) == true) {
-            // ...
-            target.getPersistentDataContainer().set(Keys.IS_VANISHED, PersistentDataType.BYTE, (byte) 0);
-            // TO-DO: Hide BossBar...
+            target.getPersistentDataContainer().set(Keys.IS_VANISHED, PersistentDataType.BOOLEAN, false);
+            // Hiding BossBar.
             target.hideBossBar(PluginConfig.VANISH_BOSS_BAR);
             // ...
             final GameMode nextGameMode = (target.getPreviousGameMode() != null)
@@ -96,15 +94,14 @@ public final class VanishCommand extends RootCommand {
                             ? target.getPreviousGameMode()
                             : Bukkit.getDefaultGameMode()
                     : Bukkit.getDefaultGameMode();
-            // ...
+            // Switching to previous, or default game mode.
             target.setGameMode(nextGameMode);
-            // ...
+            // Showing target to other players.
             Bukkit.getOnlinePlayers().stream().filter(player -> player != target).forEach(player -> {
                 player.showPlayer(plugin, target);
             });
             return true;
         }
-        // ...
         return false;
     }
 
