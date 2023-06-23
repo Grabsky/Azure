@@ -16,25 +16,17 @@ import cloud.grabsky.commands.component.ExceptionHandler;
 import cloud.grabsky.commands.exception.CommandLogicException;
 import cloud.grabsky.commands.exception.MissingInputException;
 import io.papermc.paper.math.Position;
-import org.bukkit.Bukkit;
-import org.bukkit.GameRule;
-import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
-import org.bukkit.World;
-import org.bukkit.WorldType;
+import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
-import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
@@ -56,7 +48,7 @@ public final class WorldCommand extends RootCommand {
         final RootCommandInput input = context.getInput();
         // ...
         if (index == 0) return CompletionsProvider.of(
-                Stream.of("create", "delete", "gamerule", "info", "load", "spawnpoint", "teleport", "time", "weather").filter(literal -> sender.hasPermission(this.getPermission() + "." + literal) == true).toList()
+                Stream.of("autoload", "create", "delete", "gamerule", "info", "load", "spawnpoint", "teleport", "time", "unload", "weather").filter(literal -> sender.hasPermission(this.getPermission() + "." + literal) == true).toList()
         );
         // ...
         final String literal = input.at(1).toLowerCase();
@@ -64,15 +56,22 @@ public final class WorldCommand extends RootCommand {
             return CompletionsProvider.EMPTY;
         // ...
         return switch (literal) {
+            case "autoload" -> switch (index) {
+                case 1 -> CompletionsProvider.of(World.class);
+                case 2 -> CompletionsProvider.of(Boolean.class);
+                default -> CompletionsProvider.EMPTY;
+            };
             case "create" -> switch (index) {
                 case 2 -> CompletionsProvider.of(World.Environment.class);
                 case 3 -> CompletionsProvider.of(WorldType.class);
                 case 4 -> WorldSeedArgument.INSTANCE;
                 default -> CompletionsProvider.EMPTY;
             };
-            case "delete" -> (index == 1)
-                    ? CompletionsProvider.of(World.class)
-                    : CompletionsProvider.of("--confirm");
+            case "delete" -> switch (index) {
+                case 1 -> CompletionsProvider.of(World.class);
+                case 2 -> CompletionsProvider.of("--confirm");
+                default -> CompletionsProvider.EMPTY;
+            };
             case "gamerule" -> switch (index) {
                 case 1 -> CompletionsProvider.of(World.class);
                 case 2 -> CompletionsProvider.of(GameRule.class);
@@ -144,6 +143,7 @@ public final class WorldCommand extends RootCommand {
             Message.of(PluginLocale.COMMAND_WORLD_HELP).send(context.getExecutor().asCommandSender());
         } else switch (arguments.next(String.class).asRequired().toLowerCase()) {
             default -> Message.of(PluginLocale.COMMAND_WORLD_HELP).send(context.getExecutor().asCommandSender());
+            case "autoload" -> this.onWorldAutoload(context, arguments);
             case "create" -> this.onWorldCreate(context, arguments);
             case "delete" -> this.onWorldDelete(context, arguments);
             case "gamerule" -> this.onWorldGamerule(context, arguments);
@@ -155,6 +155,34 @@ public final class WorldCommand extends RootCommand {
             case "unload" -> this.onWorldUnload(context, arguments);
             case "weather" -> this.onWorldWeather(context, arguments);
         }
+    }
+
+    private static final ExceptionHandler.Factory WORLD_AUTOLOAD_USAGE = (exception) -> {
+        if (exception instanceof MissingInputException)
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_AUTOLOAD_USAGE).send(context.getExecutor().asCommandSender());
+        // Let other exceptions be handled internally.
+        return null;
+    };
+
+    private void onWorldAutoload(final RootCommandContext context, final ArgumentQueue arguments) {
+        final CommandSender sender = context.getExecutor().asCommandSender();
+        // ...
+        if (sender.hasPermission(this.getPermission() + ".autoload") == true) {
+            final World world = arguments.next(World.class).asRequired(WORLD_AUTOLOAD_USAGE);
+            final boolean state = arguments.next(Boolean.class).asRequired(WORLD_AUTOLOAD_USAGE);
+            // Trying to unload the world...
+            try {
+                worlds.setAutoLoad(world, state);
+                Message.of(state == true ? PluginLocale.COMMAND_WORLD_AUTOLOAD_SUCCESS_ON : PluginLocale.COMMAND_WORLD_AUTOLOAD_SUCCESS_OFF)
+                        .placeholder("world", world).send(sender);
+            } catch (final IOException e) {
+                e.printStackTrace();
+                Message.of(PluginLocale.COMMAND_WORLD_AUTOLOAD_FAILURE).send(sender);
+            }
+            return;
+        }
+        // Sending error message to command sender.
+        Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
     }
 
     private static final ExceptionHandler.Factory WORLD_CREATE_USAGE = (exception) -> {
@@ -295,6 +323,7 @@ public final class WorldCommand extends RootCommand {
             Message.of(PluginLocale.COMMAND_WORLD_INFO)
                     .placeholder("world_name", world.getName())
                     .placeholder("world_key", world.key())
+                    .placeholder("world_autoload", worlds.getAutoLoad(world))
                     .placeholder("world_seed", world.getSeed())
                     .placeholder("world_environment", world.getEnvironment().name())
                     .placeholder("world_online", world.getPlayerCount())

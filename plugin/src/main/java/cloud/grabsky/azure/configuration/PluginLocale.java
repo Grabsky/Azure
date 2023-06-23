@@ -111,6 +111,20 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.world_help")
     public static Component COMMAND_WORLD_HELP;
 
+    // Commands > World > Autoload
+
+    @JsonPath("commands.world_autoload_usage")
+    public static Component COMMAND_WORLD_AUTOLOAD_USAGE;
+
+    @JsonPath("commands.world_autoload_success_on")
+    public static String COMMAND_WORLD_AUTOLOAD_SUCCESS_ON;
+
+    @JsonPath("commands.world_autoload_success_off")
+    public static String COMMAND_WORLD_AUTOLOAD_SUCCESS_OFF;
+
+    @JsonPath("commands.world_autoload_failure")
+    public static String COMMAND_WORLD_AUTOLOAD_FAILURE;
+
     // Commands > World > Create
 
     @JsonPath("commands.world_create_usage")

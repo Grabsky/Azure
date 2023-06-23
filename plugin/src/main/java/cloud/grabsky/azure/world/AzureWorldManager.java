@@ -53,15 +53,15 @@ public final class AzureWorldManager implements WorldManager {
         if (dir.exists() == false)
             throw new IllegalStateException("WORLD_DOES_NOT_EXIST");
         // ...
-        if (remember == true && new File(dir, "_doAutoLoad").createNewFile() == false)
-            plugin.getLogger().warning("World " + key + " is already marked as auto-load.");
+        if (remember == true)
+            new File(dir, "_doAutoLoad").createNewFile();
         // ...
         return new WorldCreator(key).createWorld();
     }
 
     public boolean unloadWorld(final @NotNull World world, final boolean remember) {
-        if (remember == true && new File(world.getWorldFolder(), "_doAutoLoad").delete() == false)
-            plugin.getLogger().warning("World " + world.getKey() + " is not marked as auto-load.");
+        if (remember == true)
+            new File(world.getWorldFolder(), "_doAutoLoad").delete();
         // ...
         return plugin.getServer().unloadWorld(world, true);
     }
@@ -81,6 +81,21 @@ public final class AzureWorldManager implements WorldManager {
     }
 
     private static final NamespacedKey SPAWN_POINT = new NamespacedKey("azure", "spawn_point");
+
+    public boolean getAutoLoad(final @NotNull World world) {
+        return new File(world.getWorldFolder(), "_doAutoLoad").exists();
+    }
+
+    public boolean setAutoLoad(final @NotNull World world, final boolean state) throws IOException {
+        final File file = new File(world.getWorldFolder(), "_doAutoLoad");
+        // ...
+        if (state == true && file.exists() == false)
+            return file.createNewFile();
+        else if (file.exists() == true)
+            return file.delete();
+        // ...
+        return false;
+    }
 
     public void setSpawnPoint(final @NotNull World world, final @NotNull Location location) {
         world.getPersistentDataContainer().set(SPAWN_POINT, WorldManager.Type.ofLocation(SPAWN_POINT), location);
