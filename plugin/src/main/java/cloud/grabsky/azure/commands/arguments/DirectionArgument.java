@@ -88,7 +88,7 @@ public enum DirectionArgument implements ArgumentParser<DirectionArgument.Direct
 
         @Override
         public void accept(final RootCommandContext context) {
-            Message.of(PluginLocale.Commands.INVALID_GAMEMODE).placeholder("input", this.inputValue).send(context.getExecutor().asCommandSender());
+            Message.of(PluginLocale.Commands.INVALID_DIRECTION).placeholder("input", this.inputValue).send(context.getExecutor().asCommandSender());
         }
 
     }
