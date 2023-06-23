@@ -59,7 +59,7 @@
         // World > Help
         "world_help": [
             "",
-            "<dark_gray>› <gold>/world create <white>(name) (env) (type) (gen) (seed) <gray>(-a)",
+            "<dark_gray>› <gold>/world create <white>(name) (env) (type) (seed)",
             "<dark_gray>› <gold>/world delete <white>(world) <gray>(--confirm)",
             "<dark_gray>› <gold>/world gamerule <white>(world) (rule) <gray>(value)",
             "<dark_gray>› <gold>/world info <gray>(world)",
@@ -71,7 +71,7 @@
             ""
         ],
         // World > Create
-        "world_create_usage": "<dark_gray>› <gray>Użycie: <gold>/world create <white>(name) (env) (type) (gen) (seed) <gray>(-a)",
+        "world_create_usage": "<dark_gray>› <gray>Użycie: <gold>/world create <white>(name) (env) (type) (seed)",
         "world_create_confirm": [
             "",
             "<dark_gray>› <gray>Czy na pewno chcesz stworzyć świat <gold><world><gray>?",
@@ -109,7 +109,7 @@
             ""
         ],
         // World > Load
-        "world_load_usage": "<dark_gray>› <gray>Użycie: <gold>/world load <white>(world)",
+        "world_load_usage": "<dark_gray>› <gray>Użycie: <gold>/world load <white>(world) <gray>(--remember)",
         "world_load_success": "<dark_gray>› <gray>Świat <gold><world><gray> został załadowany.",
         "world_load_failure_not_found": "<dark_gray>› <red>Świat <gold><world><red> nie istnieje.",
         "world_load_failure_other": "<dark_gray>› <red>Wystąpił błąd podczas ładowania świata <gold><world><red>.",
@@ -123,6 +123,9 @@
         "world_time_usage": "<dark_gray>› <gray>Użycie: <gold>/world time <white>(world) <gray>(time)",
         "world_time_info": "<dark_gray>› <gray>Czas w <gold><world><gray> to <gold><time><gray>.",
         "world_time_set_success": "<dark_gray>› <gray>Czas w <gold><world><gray> został ustawiony na <gold><time><gray>.",
+        // World > Unload
+        "world_unload_usage": "<dark_gray>› <gray>Użycie: <gold>/world unload <white>(world) <gray>(--remember)",
+        "world_unload_success": "<dark_gray>› <gray>Świat <gold><world><gray> został rozładowany.",
         // World > Weather
         "world_weather_usage": "<dark_gray>› <gray>Użycie: <gold>/world weather <white>(world) (weather)",
         "world_weather_set_success": "<dark_gray>› <gray>Pogoda w <gold><world><gray> została ustawiona na <gold><weather><gray>.",

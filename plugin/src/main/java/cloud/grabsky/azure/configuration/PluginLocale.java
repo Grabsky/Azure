@@ -204,6 +204,14 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.world_time_set_success")
     public static String COMMAND_WORLD_TIME_SET_SUCCESS;
 
+    // Commands > World > Unload
+
+    @JsonPath("commands.world_unload_usage")
+    public static Component COMMAND_WORLD_UNLOAD_USAGE;
+
+    @JsonPath("commands.world_unload_success")
+    public static String COMMAND_WORLD_UNLOAD_SUCCESS;
+
     // Commands > World > Weather
 
     @JsonPath("commands.world_weather_usage")

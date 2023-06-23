@@ -25,12 +25,14 @@ import org.bukkit.WorldType;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -65,9 +67,7 @@ public final class WorldCommand extends RootCommand {
             case "create" -> switch (index) {
                 case 2 -> CompletionsProvider.of(World.Environment.class);
                 case 3 -> CompletionsProvider.of(WorldType.class);
-                case 4 -> CompletionsProvider.of("natural");
-                case 5 -> WorldSeedArgument.INSTANCE;
-                case 6 -> CompletionsProvider.of("-a");
+                case 4 -> WorldSeedArgument.INSTANCE;
                 default -> CompletionsProvider.EMPTY;
             };
             case "delete" -> (index == 1)
@@ -87,9 +87,23 @@ public final class WorldCommand extends RootCommand {
             case "info" -> (index == 1)
                     ? CompletionsProvider.of(World.class)
                     : CompletionsProvider.EMPTY;
-            case "load" -> (index == 1)
-                    ? CompletionsProvider.of(Stream.of(plugin.getServer().getWorldContainer().listFiles()).filter(File::isDirectory).filter(dir -> new File(dir, "level.dat").exists() == true).map(File::getName).toList())
-                    : CompletionsProvider.EMPTY;
+            case "load" -> switch (index) {
+                case 1 -> {
+                    final File[] files = plugin.getServer().getWorldContainer().listFiles();
+                    // ...
+                    if (files == null)
+                        yield  CompletionsProvider.EMPTY;
+                    // ...
+                    yield CompletionsProvider.of(Stream.of(files)
+                            .filter(dir -> dir.isDirectory() == true && new File(dir, "level.dat").exists() == true)
+                            .map(File::getName)
+                            .filter(name -> plugin.getServer().getWorld(name) == null)
+                            .toList()
+                    );
+                }
+                case 2 -> CompletionsProvider.of("--remember");
+                default -> CompletionsProvider.EMPTY;
+            };
             case "spawnpoint" -> switch (index) {
                 case 1 -> CompletionsProvider.of(World.class);
                 case 2 -> CompletionsProvider.of("@x @y @z");
@@ -107,6 +121,11 @@ public final class WorldCommand extends RootCommand {
             case "time" -> switch (index) {
                 case 1 -> CompletionsProvider.of(World.class);
                 case 2 -> WorldTimeArgument.INSTANCE;
+                default -> CompletionsProvider.EMPTY;
+            };
+            case "unload" -> switch (index) {
+                case 1 -> CompletionsProvider.of(World.class);
+                case 2 -> CompletionsProvider.of("--remember");
                 default -> CompletionsProvider.EMPTY;
             };
             case "weather" -> switch (index) {
@@ -133,6 +152,7 @@ public final class WorldCommand extends RootCommand {
             case "spawnpoint" -> this.onWorldSpawnPoint(context, arguments);
             case "teleport" -> this.onWorldTeleport(context, arguments);
             case "time" -> this.onWorldTime(context, arguments);
+            case "unload" -> this.onWorldUnload(context, arguments);
             case "weather" -> this.onWorldWeather(context, arguments);
         }
     }
@@ -152,12 +172,10 @@ public final class WorldCommand extends RootCommand {
             final NamespacedKey key = arguments.next(NamespacedKey.class).asRequired(WORLD_CREATE_USAGE);
             final World.Environment environment = arguments.next(World.Environment.class).asRequired(WORLD_CREATE_USAGE);
             final WorldType type = arguments.next(WorldType.class).asRequired(WORLD_CREATE_USAGE);
-            final String generator = arguments.next(String.class).asRequired(WORLD_CREATE_USAGE);
             final long seed = arguments.next(Long.class, WorldSeedArgument.INSTANCE).asRequired(WORLD_CREATE_USAGE);
-            final boolean isAutoLoad = arguments.next(String.class).asOptional("--no-auto-load").equalsIgnoreCase("-a");
             // ...
             try {
-                final World world = plugin.getWorldManager().createWorld(key, environment, type, generator, seed, isAutoLoad);
+                final World world = plugin.getWorldManager().createWorld(key, environment, type, seed);
                 // ...
                 if (world != null) {
                     // Sending success message to command sender.
@@ -302,9 +320,10 @@ public final class WorldCommand extends RootCommand {
         // ...
         if (sender.hasPermission(this.getPermission() + ".load") == true) {
             final NamespacedKey key = arguments.next(NamespacedKey.class).asRequired(WORLD_LOAD_USAGE);
+            final boolean remember = arguments.next(String.class).asOptional("--none").equalsIgnoreCase("--remember");
             try {
                 // Trying to load the world...
-                plugin.getWorldManager().loadWorld(key, true);
+                plugin.getWorldManager().loadWorld(key, remember);
                 // Sending success message to command sender.
                 Message.of(PluginLocale.COMMAND_WORLD_LOAD_SUCCESS).placeholder("world", key).send(sender);
             } catch (final IllegalStateException e) {
@@ -405,6 +424,29 @@ public final class WorldCommand extends RootCommand {
                     .placeholder("world", world)
                     .placeholder("time", world.getTime())
                     .send(sender);
+            return;
+        }
+        // Sending error message to command sender.
+        Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
+    }
+
+    private static final ExceptionHandler.Factory WORLD_UNLOAD_USAGE = (exception) -> {
+        if (exception instanceof MissingInputException)
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_UNLOAD_USAGE).send(context.getExecutor().asCommandSender());
+        // Let other exceptions be handled internally.
+        return null;
+    };
+
+    private void onWorldUnload(final RootCommandContext context, final ArgumentQueue arguments) {
+        final CommandSender sender = context.getExecutor().asCommandSender();
+        // ...
+        if (sender.hasPermission(this.getPermission() + ".unload") == true) {
+            final World world = arguments.next(World.class).asRequired(WORLD_LOAD_USAGE);
+            final boolean remember = arguments.next(String.class).asOptional("--none").equalsIgnoreCase("--remember");
+            // Trying to unload the world...
+            worlds.unloadWorld(world, remember);
+            // Sending success message to command sender.
+            Message.of(PluginLocale.COMMAND_WORLD_UNLOAD_SUCCESS).placeholder("world", world).send(sender);
             return;
         }
         // Sending error message to command sender.
