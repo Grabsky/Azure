@@ -107,6 +107,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
                 .registerCommand(new WorldCommand(this))
                 .registerCommand(new DeleteCommand(chatManager))
                 .registerCommand(VanishCommand.class);
+        // ...
         // Registering events...
         this.getServer().getPluginManager().registerEvents(chatManager, this);
         this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this);

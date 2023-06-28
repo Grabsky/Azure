@@ -9,6 +9,7 @@ repositories {
     mavenLocal()
     maven { url = "https://repo.grabsky.cloud/releases" }
     maven { url = "https://repo.grabsky.cloud/snapshots" }
+    maven { url = "https://repo.pl3x.net/public/" }
 }
 
 dependencies {
@@ -19,6 +20,8 @@ dependencies {
     implementation("cloud.grabsky:configuration-paper:0.9.7")
     // ...
     compileOnly("net.luckperms:api:5.4")
+    // ...
+    compileOnly("net.pl3x.guithium:guithium-api:0.0.5-SNAPSHOT")
 }
 
 tasks {

@@ -6,6 +6,8 @@ load: POSTWORLD
 dependencies:
   - name: LuckPerms
     required: true
+  - name: Guithium
+    required: true
 load-after:
   - name: LuckPerms
     bootstrap: false

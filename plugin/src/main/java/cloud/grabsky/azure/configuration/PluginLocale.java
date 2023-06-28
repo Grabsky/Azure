@@ -1,5 +1,6 @@
 package cloud.grabsky.azure.configuration;
 
+import cloud.grabsky.commands.argument.StringArgument;
 import cloud.grabsky.configuration.JsonAdapter;
 import cloud.grabsky.configuration.JsonConfiguration;
 import cloud.grabsky.configuration.JsonPath;
@@ -26,6 +27,20 @@ public final class PluginLocale implements JsonConfiguration {
 
     @JsonPath("commands.azure_help")
     public static Component COMMAND_AZURE_HELP;
+
+    // Commands > Ban
+
+    @JsonPath("commands.ban_usage")
+    public static Component BAN_USAGE;
+
+    @JsonPath("commands.ban_success")
+    public static String BAN_SUCCESS;
+
+    @JsonPath("commands.ban_faiulure_player_cannot_be_banned")
+    public static Component BAN_FAIULURE_PLAYER_CANNOT_BE_BANNED;
+
+    @JsonPath("commands.ban_default_reason") // TO-DO: Move to config.json and PluginConfig...
+    public static String BAN_DEFAULT_REASON; // TO-DO: Move to config.json and PluginConfig...
 
     // Commands > Delete
 
