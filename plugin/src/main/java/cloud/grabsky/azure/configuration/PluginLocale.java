@@ -23,6 +23,9 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("chat.on_cooldown")
     public static Component CHAT_ON_COOLDOWN;
 
+    @JsonPath("chat.muted")
+    public static String CHAT_MUTED;
+
     // Commands > Azure
 
     @JsonPath("commands.azure_help")
@@ -49,6 +52,20 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.ban_disconnect_message_permanent")
     @JsonAdapter(fromJson = StringComponentAdapter.class)
     public static String BAN_DISCONNECT_MESSAGE_PERMANENT;
+
+    // Commands > Mute
+
+    @JsonPath("commands.mute_usage")
+    public static Component MUTE_USAGE;
+
+    @JsonPath("commands.mute_success")
+    public static String MUTE_SUCCESS;
+
+    @JsonPath("commands.mute_success_permanent")
+    public static String MUTE_SUCCESS_PERMANENT;
+
+    @JsonPath("commands.mute_failure_player_cannot_be_muted")
+    public static Component MUTE_FAIULURE_PLAYER_CANNOT_BE_MUTED;
 
     // Commands > Delete
 

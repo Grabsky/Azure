@@ -42,10 +42,10 @@ public final class PlayerListener implements Listener {
             final Component message = (entry.getExpiration() != null)
                     ? Message.of(PluginLocale.BAN_DISCONNECT_MESSAGE)
                             .placeholder("duration_left", Interval.between(entry.getExpiration().getTime(), System.currentTimeMillis(), Unit.MILLISECONDS).toString())
-                            .placeholder("reason", entry.getReason() != null ? entry.getReason() : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
+                            .placeholder("reason", (entry.getReason() != null) ? entry.getReason() : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
                             .parse()
                     : Message.of(PluginLocale.BAN_DISCONNECT_MESSAGE_PERMANENT)
-                            .placeholder("reason", entry.getReason() != null ? entry.getReason() : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
+                            .placeholder("reason", (entry.getReason() != null) ? entry.getReason() : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
                             .parse();
             // Setting the kick message, unless null.
             if (message != null)

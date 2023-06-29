@@ -9,6 +9,7 @@ import cloud.grabsky.azure.commands.BanCommand;
 import cloud.grabsky.azure.commands.DeleteCommand;
 import cloud.grabsky.azure.commands.GameModeCommand;
 import cloud.grabsky.azure.commands.GiveCommand;
+import cloud.grabsky.azure.commands.MuteCommand;
 import cloud.grabsky.azure.commands.PackCommand;
 import cloud.grabsky.azure.commands.SpeedCommand;
 import cloud.grabsky.azure.commands.TeleportCommand;
@@ -23,6 +24,7 @@ import cloud.grabsky.azure.configuration.adapters.BossBarAdapterFactory;
 import cloud.grabsky.azure.configuration.adapters.TagResolverAdapter;
 import cloud.grabsky.azure.listener.PlayerListener;
 import cloud.grabsky.azure.user.AzureUserCache;
+import cloud.grabsky.azure.util.FileLogger;
 import cloud.grabsky.azure.world.AzureWorldManager;
 import cloud.grabsky.bedrock.BedrockPlugin;
 import cloud.grabsky.commands.RootCommandManager;
@@ -63,6 +65,9 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
     @Getter(AccessLevel.PUBLIC)
     private RootCommandManager commandManager;
 
+    @Getter(AccessLevel.PUBLIC)
+    private FileLogger punishmentsFileLogger;
+
     private ConfigurationMapper mapper;
 
     @Override
@@ -95,6 +100,8 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
         } catch (final IOException e) {
             e.printStackTrace();
         }
+        // ...
+        this.punishmentsFileLogger = new FileLogger(this, new File(new File(this.getDataFolder(), "logs"), "punishments.log"));
         // Setting-up RootCommandManager... (applying templates, registering commands)
         this.commandManager = new RootCommandManager(this)
                 .apply(CommandArgumentTemplate.INSTANCE)
@@ -108,7 +115,8 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
                 .registerCommand(new WorldCommand(this))
                 .registerCommand(new DeleteCommand(chatManager))
                 .registerCommand(VanishCommand.class)
-                .registerCommand(BanCommand.class);
+                .registerCommand(new BanCommand(this))
+                .registerCommand(new MuteCommand(this));
         // ...
         // Registering events...
         this.getServer().getPluginManager().registerEvents(chatManager, this);

@@ -11,6 +11,7 @@ import cloud.grabsky.bedrock.util.Interval;
 import cloud.grabsky.bedrock.util.Interval.Unit;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import io.papermc.paper.chat.ChatRenderer;
 import io.papermc.paper.event.player.AsyncChatDecorateEvent;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.chat.SignedMessage;
@@ -23,24 +24,30 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.luckperms.api.cacheddata.CachedMetaData;
 import net.luckperms.api.model.user.UserManager;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.jar.Attributes;
 
 import static cloud.grabsky.bedrock.helpers.Conditions.requirePresent;
 import static java.lang.System.currentTimeMillis;
 import static net.kyori.adventure.text.Component.empty;
 import static net.kyori.adventure.text.event.ClickEvent.callback;
+import static net.kyori.adventure.text.event.HoverEvent.showEntity;
 import static net.kyori.adventure.text.event.HoverEvent.showText;
 import static net.kyori.adventure.text.format.NamedTextColor.WHITE;
 
@@ -59,12 +66,30 @@ public final class ChatManager implements Listener {
     public static List<FormatHolder> CHAT_FORMATS_REVERSED;
     public static List<TagsHolder> CHAT_TAGS_REVERSED;
 
+    private static final NamespacedKey KEY_CAN_CHAT_AGAIN = new NamespacedKey("azure", "can_chat_again");
+
     public ChatManager(final Azure azure) {
         this.luckPermsUserManager = azure.getLuckPerms().getUserManager();
         this.signatureCache = CacheBuilder.newBuilder()
                 .expireAfterWrite(PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_CACHE_EXPIRATION_RATE, TimeUnit.MINUTES)
                 .build();
         this.chatCooldowns = new HashMap<>();
+    }
+
+    public boolean isMuted(final @NotNull Player player) {
+        return this.getMuteDurationLeft(player) > 0L;
+    }
+
+    public long getMuteDurationLeft(final @NotNull Player player) {
+        return player.getPersistentDataContainer().getOrDefault(KEY_CAN_CHAT_AGAIN, PersistentDataType.LONG, 0L) - currentTimeMillis();
+    }
+
+    public void mute(final @NotNull Player player, final @Nullable Long expiration) {
+        player.getPersistentDataContainer().set(KEY_CAN_CHAT_AGAIN, PersistentDataType.LONG, requirePresent(expiration, 0L));
+    }
+
+    public void unmute(final @NotNull Player player) {
+        player.getPersistentDataContainer().remove(KEY_CAN_CHAT_AGAIN);
     }
 
     /**
@@ -113,6 +138,17 @@ public final class ChatManager implements Listener {
             }
             // ...setting cooldown
             chatCooldowns.put(event.getPlayer().getUniqueId(), currentTimeMillis());
+        }
+        // Mute handling...
+        if (this.isMuted(event.getPlayer()) == true) {
+            event.setCancelled(true);
+            // Getting the duration left until mute expires.
+            final long durationLeft = this.getMuteDurationLeft(event.getPlayer());
+            // Sending mute information to the player.
+            Message.of(PluginLocale.CHAT_MUTED)
+                    .placeholder("duration_left", Interval.of(durationLeft, Unit.MILLISECONDS).toString())
+                    .send(event.getPlayer());
+            return;
         }
         // ...
         final UUID signatureUUID = (event.signedMessage().signature() != null) ? UUID.randomUUID() : null;
