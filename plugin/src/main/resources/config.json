@@ -49,6 +49,10 @@
             "discord_webhook_url": ""
         }
     },
+    "punishment_settings": {
+        // Default reason to be be displayed in case nothing was provided by operator.
+        "default_reason": "N/A"
+    },
     "resource_pack": {
         // Whether resource pack should be send when player joins the server.
         "send_on_join": false,

@@ -15,7 +15,7 @@ repositories {
 dependencies {
     api project(":azure-api")
     // ...
-    implementation("cloud.grabsky:bedrock:607fb50")
+    implementation("cloud.grabsky:bedrock:e5b4a78")
     implementation("cloud.grabsky:commands:1.0")
     implementation("cloud.grabsky:configuration-paper:0.9.7")
     // ...

@@ -14,16 +14,38 @@
             ""
         ],
         // Ban
-        "ban_usage": "<dark_gray>› <gold>/ban (player) (duration_min) (reason)",
+        "ban_usage": "<dark_gray>› <gray>Użycie: <gold>/ban <white>(player) (duration_min) <gray>(reason)",
         "ban_success": "<dark_gray>› <gray>Gracz <gold><player><gray> został zbanowany (<gold><duration><gray>) za <gold><reason><gray>.",
-        "ban_faiulure_player_cannot_be_banned": "<dark_gray>› <red>Ten gracz nie może zostać zbanowany.",
-        "ban_default_reason": "N/A", // TO-DO: Move to config.json and PluginConfig...
+        "ban_success_permanent": "<dark_gray>› <gray>Gracz <gold><player><gray> został <gold>permantentnie<gray> zbanowany za <gold><reason><gray>.",
+        "ban_failure_player_cannot_be_banned": "<dark_gray>› <red>Ten gracz nie może zostać zbanowany.",
+        // ...
+        "ban_disconnect_message": [
+            "<gray>Zostałeś <red>tymczasowo<gray> zbanowany.",
+            "",
+            "",
+            "<gray>Powód: <red><reason>",
+            "",
+            "",
+            "<gray>Twoja blokada zostanie usunięta za <red><until>",
+            "",
+            "",
+            "<gray>Uważasz, że to pomyłka? Skontaktuj się z nami na <gold>https://firedot.pl/discord<gray> lub napisz na nasz adres <gold>administracja@firedot.pl"
+        ],
+        "ban_disconnect_message_permanent": [
+            "<gray>Zostałeś <red>permanentnie<gray> zbanowany.",
+            "",
+            "",
+            "<gray>Powód: <red><reason>",
+            "",
+            "",
+            "<gray>Uważasz, że to pomyłka? Skontaktuj się z nami na <gold>https://firedot.pl/discord<gray> lub napisz na nasz adres <gold>administracja@firedot.pl"
+        ],
         // Unban
-        "unban_usage": "<dark_gray>› <gold>/unban (player)",
+        "unban_usage": "<dark_gray>› <gray>Użycie: <gold>/unban <white>(player)",
         "unban_success": "<dark_gray>› <gray>Gracz <gold><player><gray> został odbanowany.",
         "unban_faiulure_player_not_banned": "<dark_gray>› <red>Ten gracz nie jest zbanowany.",
         // Kick
-        "kick_usage": "<dark_gray>› <gold>/kick (player) (reason)",
+        "kick_usage": "<dark_gray>› <gray>Użycie: <gold>/kick <white>(player) <gray>(reason)",
         "kick_success": "<dark_gray>› <gray>Gracz <gold><player><gray> został wyrzucony za <gold><reason><gray>.",
         "kick_faiulure_player_cannot_be_kicked": "<dark_gray>› <red>Ten gracz nie może zostać wyrzucony.",
         // Delete

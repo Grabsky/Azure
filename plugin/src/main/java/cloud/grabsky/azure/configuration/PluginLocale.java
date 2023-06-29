@@ -36,11 +36,19 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.ban_success")
     public static String BAN_SUCCESS;
 
-    @JsonPath("commands.ban_faiulure_player_cannot_be_banned")
+    @JsonPath("commands.ban_success_permanent")
+    public static String BAN_SUCCESS_PERMANENT;
+
+    @JsonPath("commands.ban_failure_player_cannot_be_banned")
     public static Component BAN_FAIULURE_PLAYER_CANNOT_BE_BANNED;
 
-    @JsonPath("commands.ban_default_reason") // TO-DO: Move to config.json and PluginConfig...
-    public static String BAN_DEFAULT_REASON; // TO-DO: Move to config.json and PluginConfig...
+    @JsonPath("commands.ban_disconnect_message")
+    @JsonAdapter(fromJson = StringComponentAdapter.class)
+    public static String BAN_DISCONNECT_MESSAGE;
+
+    @JsonPath("commands.ban_disconnect_message_permanent")
+    @JsonAdapter(fromJson = StringComponentAdapter.class)
+    public static String BAN_DISCONNECT_MESSAGE_PERMANENT;
 
     // Commands > Delete
 

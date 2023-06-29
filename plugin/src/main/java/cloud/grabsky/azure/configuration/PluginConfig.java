@@ -68,6 +68,9 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("chat_settings.discord_webhooks.discord_webhook_url")
     public static String CHAT_DISCORD_WEBHOOK_URL;
 
+    @JsonPath("punishment_settings.default_reason")
+    public static String PUNISHMENT_SETTINGS_DEFAULT_REASON;
+
     // Resource Pack
 
     @JsonPath("resource_pack.send_on_join")

@@ -5,6 +5,7 @@ import cloud.grabsky.azure.api.AzureProvider;
 import cloud.grabsky.azure.api.user.UserCache;
 import cloud.grabsky.azure.chat.ChatManager;
 import cloud.grabsky.azure.commands.AzureCommand;
+import cloud.grabsky.azure.commands.BanCommand;
 import cloud.grabsky.azure.commands.DeleteCommand;
 import cloud.grabsky.azure.commands.GameModeCommand;
 import cloud.grabsky.azure.commands.GiveCommand;
@@ -106,7 +107,8 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
                 .registerCommand(TeleportCommand.class)
                 .registerCommand(new WorldCommand(this))
                 .registerCommand(new DeleteCommand(chatManager))
-                .registerCommand(VanishCommand.class);
+                .registerCommand(VanishCommand.class)
+                .registerCommand(BanCommand.class);
         // ...
         // Registering events...
         this.getServer().getPluginManager().registerEvents(chatManager, this);
