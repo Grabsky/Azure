@@ -1,5 +1,6 @@
 package cloud.grabsky.azure.commands;
 
+import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.bedrock.BedrockPlugin;
@@ -15,25 +16,24 @@ import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.component.ExceptionHandler;
 import cloud.grabsky.commands.exception.CommandLogicException;
 import cloud.grabsky.commands.exception.MissingInputException;
-import net.kyori.adventure.text.Component;
 import net.luckperms.api.LuckPermsProvider;
-import org.bukkit.BanEntry;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.time.Instant;
-import java.util.Date;
-
 import static java.lang.System.currentTimeMillis;
 
 // TO-DO: Better duration format, perhaps ["5s, 5min, 5h, 5d, @forever", ...]
+// TO-DO: Notify staff members about bans.
 public class BanCommand extends RootCommand {
 
-    public BanCommand() {
-        super("ban", null, "azure.command.ban", "/ban (player) (duration) (reason)", null);
+    private final Azure plugin;
+
+    public BanCommand(final @NotNull Azure plugin) {
+        super("ban", null, "azure.command.ban", "/ban (player) (duration_min) (reason)", null);
+        this.plugin = plugin;
     }
 
     private static final ExceptionHandler.Factory BAN_USAGE = (exception) -> {
@@ -60,7 +60,7 @@ public class BanCommand extends RootCommand {
         // Getting duration in seconds.
         final long durationInMinutes = arguments.next(Long.class, LongArgument.ofRange(0, Long.MAX_VALUE)).asRequired(BAN_USAGE);
         // (optional) Getting the punishment reason.
-        final @Nullable String reason = arguments.next(String.class, StringArgument.GREEDY).asOptional(null);
+        final @Nullable String reason = arguments.next(String.class, StringArgument.GREEDY).asOptional(PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON);
         // Loading LuckPerms data of targetted player, then running more logic.
         LuckPermsProvider.get().getUserManager().loadUser(target.getUniqueId()).thenAccept(user -> {
             // Checking if specified player is immunote to punishments.
@@ -84,19 +84,21 @@ public class BanCommand extends RootCommand {
                                 .placeholder("player", target.getName())
                                 .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
                                 .send(sender);
+                        // Logging...
+                        plugin.getPunishmentsFileLogger().log(target.getName() + " has been banned (DURATION = permanent, REASON = " + reason + ") by " + sender.getName());
                         return;
                     }
                     // When durationInMinutes is not 0, punishment will be temporary.
                     final Interval interval = Interval.of(durationInMinutes, Unit.MINUTES);
                     // Banning the player. Player will be kicked manually for the sake of custimazble message.
-                    final BanEntry entry = target.banPlayer(reason, interval.and(currentTimeMillis(), Unit.MILLISECONDS).toDate(), sender.getName(), false);
+                    target.banPlayer(reason, interval.and(currentTimeMillis(), Unit.MILLISECONDS).toDate(), sender.getName(), false);
                     // Kicking with custom message.
                     if (target.isOnline() && target instanceof Player onlineTarget) {
                         // Kicking with custom message.
                         onlineTarget.kick(
                                 Message.of(PluginLocale.BAN_DISCONNECT_MESSAGE)
                                         .placeholder("duration_left", interval.toString())
-                                        .placeholder("reason", entry.getReason() != null ? entry.getReason() : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
+                                        .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
                                         .parse()
                         );
                     }
@@ -106,6 +108,8 @@ public class BanCommand extends RootCommand {
                             .placeholder("duration_left", interval.toString())
                             .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
                             .send(sender);
+                    // Logging...
+                    plugin.getPunishmentsFileLogger().log(target.getName() + " has been banned (DURATION = " + interval + ", REASON = " + reason + ") by " + sender.getName());
                 });
                 return;
             }
