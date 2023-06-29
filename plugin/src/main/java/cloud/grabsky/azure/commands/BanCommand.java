@@ -90,7 +90,6 @@ public class BanCommand extends RootCommand {
                     final Interval interval = Interval.of(durationInMinutes, Unit.MINUTES);
                     // Banning the player. Player will be kicked manually for the sake of custimazble message.
                     final BanEntry entry = target.banPlayer(reason, interval.and(currentTimeMillis(), Unit.MILLISECONDS).toDate(), sender.getName(), false);
-                    // Creating new Interval object for easy parsing.
                     // Kicking with custom message.
                     if (target.isOnline() && target instanceof Player onlineTarget) {
                         // Kicking with custom message.
