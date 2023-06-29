@@ -30,19 +30,18 @@ public final class PlayerListener implements Listener {
 
     private final Azure plugin;
 
-    @EventHandler // Applying custom kick message when banned player tries to join the server.
+    // Applies custom kick message when banned player tries to join the server.
+    @EventHandler // TO-DO: Make sure to cover IP-based bans as well.
     public void onPlayerConnect(final @NotNull PlayerLoginEvent event) {
         if (event.getResult() == PlayerLoginEvent.Result.KICK_BANNED) {
             final BanEntry entry = Bukkit.getBanList(BanList.Type.NAME).getBanEntry(event.getPlayer().getName());
             // Skipping if no ban entry was found.
             if (entry == null)
                 return;
-            // ...
             // Preparing the kick message.
             final Component message = (entry.getExpiration() != null)
                     ? Message.of(PluginLocale.BAN_DISCONNECT_MESSAGE)
-                            .placeholder("until", Interval.between(entry.getExpiration().getTime(), System.currentTimeMillis(), Unit.MILLISECONDS).toString())
-                            .placeholder("expiration_date", entry.getExpiration().toString())
+                            .placeholder("duration_left", Interval.between(entry.getExpiration().getTime(), System.currentTimeMillis(), Unit.MILLISECONDS).toString())
                             .placeholder("reason", entry.getReason() != null ? entry.getReason() : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
                             .parse()
                     : Message.of(PluginLocale.BAN_DISCONNECT_MESSAGE_PERMANENT)

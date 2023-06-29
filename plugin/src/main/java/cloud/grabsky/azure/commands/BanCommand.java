@@ -22,6 +22,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 import java.util.Date;
@@ -51,56 +52,65 @@ public class BanCommand extends RootCommand {
         };
     }
 
-    @Override // TO-DO: Check for "immunity" permissions.
+    @Override
     public void onCommand(final @NotNull RootCommandContext context, final @NotNull ArgumentQueue arguments) throws CommandLogicException {
         final CommandSender sender = context.getExecutor().asCommandSender();
-        // ...
+        // Getting OfflinePlayer argument, this can be either a player name or their unique id.
         final OfflinePlayer target = arguments.next(OfflinePlayer.class).asRequired(BAN_USAGE);
-        // ...
-        final long durationMin = arguments.next(Long.class, LongArgument.ofRange(0, Long.MAX_VALUE)).asRequired(BAN_USAGE);
-        final String reason = arguments.next(String.class, StringArgument.GREEDY).asOptional(PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON);
-        // ...
+        // Getting duration in seconds.
+        final long durationInMinutes = arguments.next(Long.class, LongArgument.ofRange(0, Long.MAX_VALUE)).asRequired(BAN_USAGE);
+        // (optional) Getting the punishment reason.
+        final @Nullable String reason = arguments.next(String.class, StringArgument.GREEDY).asOptional(null);
+        // Loading LuckPerms data of targetted player, then running more logic.
         LuckPermsProvider.get().getUserManager().loadUser(target.getUniqueId()).thenAccept(user -> {
             // Checking if specified player is immunote to punishments.
             if (user.getCachedData().getPermissionData().checkPermission("azure.bypass.ban_immunity").asBoolean() == false) {
                 // Following has to be scheduled onto the main thread.
                 ((BedrockPlugin) context.getManager().getPlugin()).getBedrockScheduler().run(1L, (task) -> {
-                    // PERMANTENT
-                    if (durationMin == 0) {
-                        target.banPlayer(reason, sender.getName());
+                    // When durationInMinutes is 0, punishment will be permantent - until manually removed.
+                    if (durationInMinutes == 0) {
+                        // Banning the player. Player will be kicked manually for the sake of custimazble message.
+                        target.banPlayer(reason, null, sender.getName(), false);
+                        // Kicking with custom message.
+                        if (target.isOnline() && target instanceof Player onlineTarget) {
+                            onlineTarget.kick(
+                                    Message.of(PluginLocale.BAN_DISCONNECT_MESSAGE_PERMANENT)
+                                            .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
+                                            .parse()
+                            );
+                        }
+                        // Sending success message to the sender.
                         Message.of(PluginLocale.BAN_SUCCESS_PERMANENT)
                                 .placeholder("player", target.getName())
-                                .placeholder("reason", reason)
+                                .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
                                 .send(sender);
                         return;
                     }
-                    // TEMPORARY
-                    final Interval interval = Interval.of(durationMin, Unit.MINUTES);
-                    final Date expirationDate = Date.from(Instant.ofEpochMilli(currentTimeMillis() + (long) interval.as(Unit.MILLISECONDS)));
+                    // When durationInMinutes is not 0, punishment will be temporary.
+                    final Interval interval = Interval.of(durationInMinutes, Unit.MINUTES);
                     // Banning the player. Player will be kicked manually for the sake of custimazble message.
-                    final BanEntry entry = target.banPlayer(reason, expirationDate, sender.getName(), false);
+                    final BanEntry entry = target.banPlayer(reason, interval.and(currentTimeMillis(), Unit.MILLISECONDS).toDate(), sender.getName(), false);
+                    // Creating new Interval object for easy parsing.
                     // Kicking with custom message.
                     if (target.isOnline() && target instanceof Player onlineTarget) {
-                        final Component message = (entry.getExpiration() != null)
-                                ? Message.of(PluginLocale.BAN_DISCONNECT_MESSAGE)
-                                .placeholder("until", interval.toString())
-                                .placeholder("reason", entry.getReason() != null ? entry.getReason() : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
-                                .parse()
-                                : Message.of(PluginLocale.BAN_DISCONNECT_MESSAGE_PERMANENT)
-                                .placeholder("reason", entry.getReason() != null ? entry.getReason() : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
-                                .parse();
-                        if (message != null)
-                            onlineTarget.kick(message);
+                        // Kicking with custom message.
+                        onlineTarget.kick(
+                                Message.of(PluginLocale.BAN_DISCONNECT_MESSAGE)
+                                        .placeholder("duration_left", interval.toString())
+                                        .placeholder("reason", entry.getReason() != null ? entry.getReason() : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
+                                        .parse()
+                        );
                     }
-                    // ...
+                    // Sending success message to the sender.
                     Message.of(PluginLocale.BAN_SUCCESS)
                             .placeholder("player", target.getName())
-                            .placeholder("duration", interval.toString())
-                            .placeholder("reason", reason)
+                            .placeholder("duration_left", interval.toString())
+                            .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
                             .send(sender);
                 });
                 return;
             }
+            // Sending failure message to the sender.
             Message.of(PluginLocale.BAN_FAIULURE_PLAYER_CANNOT_BE_BANNED).send(sender);
         });
     }
