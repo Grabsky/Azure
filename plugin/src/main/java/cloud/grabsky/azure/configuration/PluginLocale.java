@@ -53,6 +53,17 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonAdapter(fromJson = StringComponentAdapter.class)
     public static String BAN_DISCONNECT_MESSAGE_PERMANENT;
 
+    // Commands > Unban
+
+    @JsonPath("commands.unban_usage")
+    public static Component COMMAND_UNBAN_USAGE;
+
+    @JsonPath("commands.unban_success")
+    public static String COMMAND_UNBAN_SUCCESS;
+
+    @JsonPath("commands.unban_failure_player_not_banned")
+    public static Component COMMAND_UNBAN_FAILURE_PLAYER_NOT_BANNED;
+
     // Commands > Mute
 
     @JsonPath("commands.mute_usage")

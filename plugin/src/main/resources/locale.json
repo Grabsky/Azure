@@ -17,9 +17,8 @@
         // Ban
         "ban_usage": "<dark_gray>› <gray>Użycie: <gold>/ban <white>(player) (duration_min) <gray>(reason)",
         "ban_success": "<dark_gray>› <gray>Gracz <gold><player><gray> został zbanowany (<gold><duration_left><gray>) za <gold><reason><gray>.",
-        "ban_success_permanent": "<dark_gray>› <gray>Gracz <gold><player><gray> został <gold>permantentnie<gray> zbanowany za <gold><reason><gray>.",
+        "ban_success_permanent": "<dark_gray>› <gray>Gracz <gold><player><gray> został <gold>permanentnie<gray> zbanowany za <gold><reason><gray>.",
         "ban_failure_player_cannot_be_banned": "<dark_gray>› <red>Ten gracz nie może zostać zbanowany.",
-        // ...
         "ban_disconnect_message": [
             "<gray>Zostałeś <red>tymczasowo<gray> zbanowany.",
             "",
@@ -49,7 +48,11 @@
         // Unban
         "unban_usage": "<dark_gray>› <gray>Użycie: <gold>/unban <white>(player)",
         "unban_success": "<dark_gray>› <gray>Gracz <gold><player><gray> został odbanowany.",
-        "unban_faiulure_player_not_banned": "<dark_gray>› <red>Ten gracz nie jest zbanowany.",
+        "unban_failure_player_not_banned": "<dark_gray>› <red>Ten gracz nie jest zbanowany.",
+        // Unban
+        "unmute_usage": "<dark_gray>› <gray>Użycie: <gold>/unmute <white>(player)",
+        "unmute_success": "<dark_gray>› <gray>Gracz <gold><player><gray> został odciszony.",
+        "unmute_faiulure_player_not_muted": "<dark_gray>› <red>Ten gracz nie jest wyciszony.",
         // Kick
         "kick_usage": "<dark_gray>› <gray>Użycie: <gold>/kick <white>(player) <gray>(reason)",
         "kick_success": "<dark_gray>› <gray>Gracz <gold><player><gray> został wyrzucony za <gold><reason><gray>.",
