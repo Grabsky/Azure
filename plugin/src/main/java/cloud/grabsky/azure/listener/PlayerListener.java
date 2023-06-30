@@ -31,7 +31,7 @@ public final class PlayerListener implements Listener {
     private final Azure plugin;
 
     // Applies custom kick message when banned player tries to join the server.
-    @EventHandler // TO-DO: Make sure to cover IP-based bans as well.
+    //@EventHandler // TO-DO: Make sure to cover IP-based bans as well.
     public void onPlayerConnect(final @NotNull PlayerLoginEvent event) {
         if (event.getResult() == PlayerLoginEvent.Result.KICK_BANNED) {
             final BanEntry entry = Bukkit.getBanList(BanList.Type.NAME).getBanEntry(event.getPlayer().getName());

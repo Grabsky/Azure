@@ -1,17 +1,26 @@
 package cloud.grabsky.azure.user;
 
+import cloud.grabsky.azure.api.Punishment;
 import cloud.grabsky.azure.api.user.User;
 import cloud.grabsky.azure.api.user.UserCache;
+import cloud.grabsky.azure.configuration.PluginConfig;
+import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.azure.configuration.adapters.UUIDAdapter;
 import cloud.grabsky.bedrock.BedrockPlugin;
+import cloud.grabsky.bedrock.components.Message;
+import cloud.grabsky.bedrock.util.Interval;
+import cloud.grabsky.bedrock.util.Interval.Unit;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.JsonReader;
 import com.squareup.moshi.JsonWriter;
 import com.squareup.moshi.Moshi;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
@@ -44,7 +53,22 @@ public final class AzureUserCache implements UserCache, Listener {
         this.cacheDirectory = new File(plugin.getDataFolder(), "usercache");
         this.internalUserMap = new HashMap<>();
         // ...
-        this.adapter = new Moshi.Builder().add(UUID.class, UUIDAdapter.INSTANCE).build().adapter(AzureUser.class).indent("  ");
+        this.adapter = new Moshi.Builder()
+                .add(UUID.class, UUIDAdapter.INSTANCE)
+                .add(Interval.class, new JsonAdapter<Interval>() {
+
+                    @Override
+                    public @NotNull Interval fromJson(final @NotNull JsonReader reader) throws IOException {
+                        return Interval.of(reader.nextLong(), Unit.MILLISECONDS);
+                    }
+
+                    @Override
+                    public void toJson(final @NotNull JsonWriter writer, @Nullable final Interval value) throws IOException {
+                        writer.value((long) value.as(Unit.MILLISECONDS));
+                    }
+
+                })
+                .build().adapter(AzureUser.class).nullSafe().indent("  ");
         // Caching users.
         this.cacheUsers();
     }
@@ -147,6 +171,33 @@ public final class AzureUserCache implements UserCache, Listener {
                 return true;
         // No user found. Returning false.
         return false;
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onUserLogin(final @NotNull PlayerLoginEvent event) {
+        final Player player = event.getPlayer();
+        // ...
+        if (internalUserMap.containsKey(player.getUniqueId()) == true) {
+            final User user = internalUserMap.get(player.getUniqueId());
+            // ...
+            if (user.getCurrentBan() != null && user.getCurrentBan().isActive() == true) {
+                event.setResult(PlayerLoginEvent.Result.KICK_BANNED);
+                // ...
+                final Punishment punishment = user.getCurrentBan();
+                // Preparing the kick message.
+                final Component message = (punishment.getDuration().as(Unit.MILLISECONDS) != Long.MAX_VALUE)
+                        ? Message.of(PluginLocale.BAN_DISCONNECT_MESSAGE)
+                                .placeholder("duration_left", Interval.between((long) punishment.getEndDate().as(Unit.MILLISECONDS), System.currentTimeMillis(), Unit.MILLISECONDS).toString())
+                                .placeholder("reason", punishment.getReason())
+                                .parse()
+                        : Message.of(PluginLocale.BAN_DISCONNECT_MESSAGE_PERMANENT)
+                                .placeholder("reason", punishment.getReason())
+                                .parse();
+                // Setting the kick message, unless null.
+                if (message != null)
+                    event.kickMessage(message);
+            }
+        }
     }
 
     @EventHandler

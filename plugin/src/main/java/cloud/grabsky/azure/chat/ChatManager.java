@@ -33,8 +33,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -77,11 +79,11 @@ public final class ChatManager implements Listener {
     }
 
     public boolean isMuted(final @NotNull Player player) {
-        return this.getMuteDurationLeft(player) > 0L;
+        return Interval.between((long) this.getMuteExpiration(player).as(Unit.MILLISECONDS), System.currentTimeMillis(), Unit.MILLISECONDS).as(Unit.MILLISECONDS) > 0L;
     }
 
-    public long getMuteDurationLeft(final @NotNull Player player) {
-        return player.getPersistentDataContainer().getOrDefault(KEY_CAN_CHAT_AGAIN, PersistentDataType.LONG, 0L) - currentTimeMillis();
+    public Interval getMuteExpiration(final @NotNull Player player) {
+        return Interval.of(player.getPersistentDataContainer().getOrDefault(KEY_CAN_CHAT_AGAIN, PersistentDataType.LONG, 0L), Unit.MILLISECONDS);
     }
 
     public void mute(final @NotNull Player player, final @Nullable Long expiration) {
@@ -129,25 +131,30 @@ public final class ChatManager implements Listener {
         // Cancelled events are not handled
         if (event.isCancelled() == true)
             return;
-        // Cooldown handling... if enabled and player does not have bypass permission
-        if (PluginConfig.CHAT_COOLDOWN > 0 && event.getPlayer().hasPermission(CHAT_COOLDOWN_BYPASS_PERMISSION) == false) {
-            if (Interval.between(currentTimeMillis(), chatCooldowns.getOrDefault(event.getPlayer().getUniqueId(), 0L), Unit.MILLISECONDS).as(Unit.MILLISECONDS) < PluginConfig.CHAT_COOLDOWN) {
+        // ...
+        final Player player = event.getPlayer();
+        // Cooldown handling... if enabled and player does not have bypass permission.
+        if (PluginConfig.CHAT_COOLDOWN > 0 && player.hasPermission(CHAT_COOLDOWN_BYPASS_PERMISSION) == false) {
+            if (Interval.between(currentTimeMillis(), chatCooldowns.getOrDefault(player.getUniqueId(), 0L), Unit.MILLISECONDS).as(Unit.MILLISECONDS) < PluginConfig.CHAT_COOLDOWN) {
                 event.setCancelled(true);
-                Message.of(PluginLocale.CHAT_ON_COOLDOWN).send(event.getPlayer());
+                Message.of(PluginLocale.CHAT_ON_COOLDOWN).send(player);
                 return;
             }
             // ...setting cooldown
-            chatCooldowns.put(event.getPlayer().getUniqueId(), currentTimeMillis());
+            chatCooldowns.put(player.getUniqueId(), currentTimeMillis());
         }
         // Mute handling...
-        if (this.isMuted(event.getPlayer()) == true) {
+        if (this.isMuted(player) == true) {
             event.setCancelled(true);
             // Getting the duration left until mute expires.
-            final long durationLeft = this.getMuteDurationLeft(event.getPlayer());
+            final Interval muteExpiration = this.getMuteExpiration(player);
             // Sending mute information to the player.
-            Message.of(PluginLocale.CHAT_MUTED)
-                    .placeholder("duration_left", Interval.of(durationLeft, Unit.MILLISECONDS).toString())
-                    .send(event.getPlayer());
+            if (muteExpiration.as(Unit.MILLISECONDS) == Long.MAX_VALUE)
+                Message.of(PluginLocale.CHAT_MUTED_PERMANENT).send(player);
+            else
+                Message.of(PluginLocale.CHAT_MUTED)
+                        .placeholder("duration_left", muteExpiration.and(-currentTimeMillis(), Unit.MILLISECONDS).toString())
+                        .send(player);
             return;
         }
         // ...

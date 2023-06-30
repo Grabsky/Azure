@@ -26,6 +26,9 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("chat.muted")
     public static String CHAT_MUTED;
 
+    @JsonPath("chat.muted_permanent")
+    public static Component CHAT_MUTED_PERMANENT;
+
     // Commands > Azure
 
     @JsonPath("commands.azure_help")

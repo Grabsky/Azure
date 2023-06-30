@@ -5,7 +5,8 @@
     // ...
     "chat": {
         "on_cooldown": "<dark_gray>› <red>Musisz chwilę poczekać...",
-        "muted": "<dark_gray>› <gray>Jesteś wyciszony przez kolejne <red><duration_left><gray>."
+        "muted": "<dark_gray>› <gray>Jesteś wyciszony przez kolejne <red><duration_left><gray>.",
+        "muted_permanent": "<dark_gray>› <gray>Jesteś <red>permanentnie<gray> wyciszony."
     },
     // ...
     "commands": {
@@ -43,7 +44,7 @@
         // Mute
         "mute_usage": "<dark_gray>› <gray>Użycie: <gold>/mute <white>(player) (duration_min) <gray>(reason)",
         "mute_success": "<dark_gray>› <gray>Gracz <gold><player><gray> został wyciszony (<gold><duration_left><gray>) za <gold><reason><gray>.",
-        "mute_success_permanent": "<dark_gray>› <gray>Gracz <gold><player><gray> został <gold>permantentnie<gray> wyciszony za <gold><reason><gray>.",
+        "mute_success_permanent": "<dark_gray>› <gray>Gracz <gold><player><gray> został <gold>permanentnie<gray> wyciszony za <gold><reason><gray>.",
         "mute_failure_player_cannot_be_muted": "<dark_gray>› <red>Ten gracz nie może zostać wyciszony.",
         // Unban
         "unban_usage": "<dark_gray>› <gray>Użycie: <gold>/unban <white>(player)",

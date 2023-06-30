@@ -1,7 +1,7 @@
 package cloud.grabsky.azure.commands;
 
 import cloud.grabsky.azure.Azure;
-import cloud.grabsky.azure.chat.ChatManager;
+import cloud.grabsky.azure.api.user.User;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.bedrock.BedrockPlugin;
@@ -17,16 +17,12 @@ import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.component.ExceptionHandler;
 import cloud.grabsky.commands.exception.CommandLogicException;
 import cloud.grabsky.commands.exception.MissingInputException;
-import com.destroystokyo.paper.event.player.PlayerConnectionCloseEvent;
 import net.luckperms.api.LuckPermsProvider;
-import org.bukkit.BanEntry;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import static java.lang.System.currentTimeMillis;
 
 // TO-DO: Better duration format, perhaps ["5s, 5min, 5h, 5d, @forever", ...]
 // TO-DO: More permantent solution, store mutes inside a JSON file or something. PersistentDataContainer should be fine temporarily though.
@@ -60,7 +56,9 @@ public class MuteCommand extends RootCommand {
     public void onCommand(final @NotNull RootCommandContext context, final @NotNull ArgumentQueue arguments) throws CommandLogicException {
         final CommandSender sender = context.getExecutor().asCommandSender();
         // Getting Player argument.
-        final Player target = arguments.next(Player.class).asRequired(MUTE_USAGE);
+        final OfflinePlayer target = arguments.next(OfflinePlayer.class).asRequired(MUTE_USAGE);
+        // ...
+        final User userTarget = plugin.getUserCache().getUser(target.getUniqueId());
         // Getting duration in seconds.
         final long durationInMinutes = arguments.next(Long.class, LongArgument.ofRange(0, Long.MAX_VALUE)).asRequired(MUTE_USAGE);
         // (optional) Getting the punishment reason. Default has to be explicitly set here, so no "implementation-default" reason is used.
@@ -74,7 +72,7 @@ public class MuteCommand extends RootCommand {
                     // When durationInMinutes is 0, punishment will be permantent - until manually removed.
                     if (durationInMinutes == 0) {
                         // Muting the player.
-                        plugin.getChatManager().mute(target, null);
+                        userTarget.mute(Interval.of(durationInMinutes, Unit.MINUTES), reason, sender.getName());
                         // Sending success message to the sender.
                         Message.of(PluginLocale.MUTE_SUCCESS_PERMANENT)
                                 .placeholder("player", target.getName())
@@ -85,9 +83,9 @@ public class MuteCommand extends RootCommand {
                         return;
                     }
                     // When durationInMinutes is not 0, punishment will be temporary.
-                    final Interval interval = Interval.of(durationInMinutes, Unit.MINUTES);
+                    final Interval interval = Interval.of(durationInMinutes, Unit.MINUTES).and(System.currentTimeMillis(), Unit.MILLISECONDS);
                     // Muting the player.
-                    plugin.getChatManager().mute(target, (long) interval.as(Unit.MILLISECONDS) + currentTimeMillis());
+                    userTarget.mute(null, reason, sender.getName());
                     // Sending success message to the sender.
                     Message.of(PluginLocale.MUTE_SUCCESS)
                             .placeholder("player", target.getName())

@@ -1,6 +1,7 @@
 package cloud.grabsky.azure.commands;
 
 import cloud.grabsky.azure.Azure;
+import cloud.grabsky.azure.api.user.User;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.bedrock.BedrockPlugin;
@@ -57,6 +58,8 @@ public class BanCommand extends RootCommand {
         final CommandSender sender = context.getExecutor().asCommandSender();
         // Getting OfflinePlayer argument, this can be either a player name or their unique id.
         final OfflinePlayer target = arguments.next(OfflinePlayer.class).asRequired(BAN_USAGE);
+        // ...
+        final User userTarget = plugin.getUserCache().getUser(target.getUniqueId());
         // Getting duration in seconds.
         final long durationInMinutes = arguments.next(Long.class, LongArgument.ofRange(0, Long.MAX_VALUE)).asRequired(BAN_USAGE);
         // (optional) Getting the punishment reason.
@@ -70,7 +73,7 @@ public class BanCommand extends RootCommand {
                     // When durationInMinutes is 0, punishment will be permantent - until manually removed.
                     if (durationInMinutes == 0) {
                         // Banning the player. Player will be kicked manually for the sake of custimazble message.
-                        target.banPlayer(reason, null, sender.getName(), false);
+                        userTarget.ban(null, reason, sender.getName());
                         // Kicking with custom message.
                         if (target.isOnline() && target instanceof Player onlineTarget) {
                             onlineTarget.kick(
@@ -91,7 +94,7 @@ public class BanCommand extends RootCommand {
                     // When durationInMinutes is not 0, punishment will be temporary.
                     final Interval interval = Interval.of(durationInMinutes, Unit.MINUTES);
                     // Banning the player. Player will be kicked manually for the sake of custimazble message.
-                    target.banPlayer(reason, interval.and(currentTimeMillis(), Unit.MILLISECONDS).toDate(), sender.getName(), false);
+                    userTarget.ban(interval, reason, sender.getName());
                     // Kicking with custom message.
                     if (target.isOnline() && target instanceof Player onlineTarget) {
                         // Kicking with custom message.
