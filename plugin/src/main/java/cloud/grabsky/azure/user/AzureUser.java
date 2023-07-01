@@ -47,33 +47,39 @@ public final class AzureUser implements User {
 
     @Override
     public @NotNull Punishment ban(final @Nullable Interval duration, final @Nullable String reason, final @Nullable String issuer) {
+        // Overriding previous punishment with a new one.
         this.currentBan = new AzurePunishment(
                 (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON,
-                (issuer != null) ? issuer : "System",
+                (issuer != null) ? issuer : "SYSTEM",
                 Interval.now(),
                 (duration != null) ? duration : Interval.of(Long.MAX_VALUE, Unit.MILLISECONDS)
         );
-        // ...
+        // Saving User data to the filesystem.
         ((AzureUserCache) Azure.getInstance().getUserCache()).saveUser(this).thenAccept(isSuccess -> {
-            System.out.println(this.name + "Saving data of " + this.name + " in the background... SUCCESS = " + isSuccess);
+            System.out.println("Saving data of " + this.name + " in the background... SUCCESS = " + ((isSuccess == true) ? "OK" : "ERROR"));
         });
-        // ...
+        // Logging...
+        Azure.getInstance().getPunishmentsFileLogger().log("BAN | Target: " + this.getName() + " (" + this.getUniqueId() + ") | Duration: " + ((currentBan.isPermantent() == false) ? duration : "PERMANENT") + " | Issuer: " + issuer);
+        // Returning new (and now current) punishment.
         return currentBan;
     }
 
     @Override
     public @NotNull Punishment mute(final @Nullable Interval duration, final @Nullable String reason, final @Nullable String issuer) {
+        // Overriding previous punishment with a new one.
         this.currentMute = new AzurePunishment(
                 (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON,
-                (issuer != null) ? issuer : "System",
+                (issuer != null) ? issuer : "SYSTEM",
                 Interval.now(),
                 (duration != null) ? duration : Interval.of(Long.MAX_VALUE, Unit.MILLISECONDS)
         );
-        // ...
+        // Saving User data to the filesystem.
         ((AzureUserCache) Azure.getInstance().getUserCache()).saveUser(this).thenAccept(isSuccess -> {
-            System.out.println(this.name + "Saving data of " + this.name + " in the background... SUCCESS = " + isSuccess);
+            System.out.println("Saving data of " + this.name + " in the background... SUCCESS = " + ((isSuccess == true) ? "OK" : "ERROR"));
         });
-        // ...
+        // Logging...
+        Azure.getInstance().getPunishmentsFileLogger().log("MUTE | Target: " + this.getName() + " (" + this.getUniqueId() + ") | Duration: " + ((currentMute.isPermantent() == false) ? duration : "PERMANENT") + " | Issuer: " + issuer);
+        // Returning new (and now current) punishment.
         return currentMute;
     }
 

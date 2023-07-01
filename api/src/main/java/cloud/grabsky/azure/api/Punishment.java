@@ -15,11 +15,19 @@ public interface Punishment {
     @NotNull Interval getDuration();
 
     default @NotNull Interval getEndDate() {
-        return this.getStartDate().and((long) this.getDuration().as(Unit.MILLISECONDS), Unit.MILLISECONDS);
+        return this.getStartDate().add(this.getDuration());
+    }
+
+    default @NotNull Interval getDurationLeft() {
+        return this.getEndDate().remove(Interval.now());
+    }
+
+    default boolean isPermantent() {
+        return this.getDuration().as(Unit.MILLISECONDS) == Long.MAX_VALUE;
     }
 
     default boolean isActive() {
-        return System.currentTimeMillis() < this.getEndDate().as(Unit.MILLISECONDS);
+        return this.isPermantent() || this.getEndDate().as(Unit.MILLISECONDS) > System.currentTimeMillis();
     }
 
 }

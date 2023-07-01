@@ -84,36 +84,34 @@ public class BanCommand extends RootCommand {
                         }
                         // Sending success message to the sender.
                         Message.of(PluginLocale.BAN_SUCCESS_PERMANENT)
-                                .placeholder("player", target.getName())
+                                .placeholder("player", userTarget.getName())
                                 .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
                                 .send(sender);
-                        // Logging...
-                        plugin.getPunishmentsFileLogger().log(target.getName() + " has been banned (DURATION = permanent, REASON = " + reason + ") by " + sender.getName());
+                        // Exiting the command block.
                         return;
                     }
                     // When durationInMinutes is not 0, punishment will be temporary.
-                    final Interval interval = Interval.of(durationInMinutes, Unit.MINUTES);
+                    final Interval duration = Interval.of(durationInMinutes, Unit.MINUTES);
                     // Banning the player. Player will be kicked manually for the sake of custimazble message.
-                    userTarget.ban(interval, reason, sender.getName());
+                    userTarget.ban(duration, reason, sender.getName());
                     // Kicking with custom message.
                     if (target.isOnline() && target instanceof Player onlineTarget) {
                         // Kicking with custom message.
                         onlineTarget.kick(
                                 Message.of(PluginLocale.BAN_DISCONNECT_MESSAGE)
-                                        .placeholder("duration_left", interval.toString())
+                                        .placeholder("duration_left", duration.toString())
                                         .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
                                         .parse()
                         );
                     }
                     // Sending success message to the sender.
                     Message.of(PluginLocale.BAN_SUCCESS)
-                            .placeholder("player", target.getName())
-                            .placeholder("duration_left", interval.toString())
+                            .placeholder("player", userTarget.getName())
+                            .placeholder("duration_left", duration.toString())
                             .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
                             .send(sender);
-                    // Logging...
-                    plugin.getPunishmentsFileLogger().log(target.getName() + " has been banned (DURATION = " + interval + ", REASON = " + reason + ") by " + sender.getName());
                 });
+                // Exiting the command block.
                 return;
             }
             // Sending failure message to the sender.

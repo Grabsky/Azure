@@ -160,6 +160,24 @@ public final class AzureUserCache implements UserCache, Listener {
     }
 
     @Override
+    public @NotNull User getUser(final @NotNull Player player) {
+        final UUID uniqueId = player.getUniqueId();
+        // Returning existing user from cache, if exists.
+        if (internalUserMap.containsKey(uniqueId) == true)
+            return internalUserMap.get(uniqueId);
+        // Computing new User otherwise.
+        return internalUserMap.compute(uniqueId, (___, previous) -> {
+            final @Nullable URL skin = player.getPlayerProfile().getTextures().getSkin();
+            // Creating instance of AzureUser containing player information.
+            final AzureUser user = new AzureUser(player.getName(), uniqueId, (skin != null) ? encodeTextures(skin) : "");
+            // Saving to the file.
+            this.saveUser(user);
+            // Returning the User instance.
+            return user;
+        });
+    }
+
+    @Override
     public boolean hasUser(final @NotNull UUID uniqueId) {
         return internalUserMap.containsKey(uniqueId);
     }

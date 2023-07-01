@@ -1,6 +1,8 @@
 package cloud.grabsky.azure.chat;
 
 import cloud.grabsky.azure.Azure;
+import cloud.grabsky.azure.api.Punishment;
+import cloud.grabsky.azure.api.user.User;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.configuration.PluginConfig.DeleteButton.Position;
 import cloud.grabsky.azure.configuration.PluginConfig.FormatHolder;
@@ -11,7 +13,6 @@ import cloud.grabsky.bedrock.util.Interval;
 import cloud.grabsky.bedrock.util.Interval.Unit;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import io.papermc.paper.chat.ChatRenderer;
 import io.papermc.paper.event.player.AsyncChatDecorateEvent;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.chat.SignedMessage;
@@ -30,23 +31,18 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.Range;
 
 import java.time.Duration;
-import java.time.Instant;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.jar.Attributes;
 
 import static cloud.grabsky.bedrock.helpers.Conditions.requirePresent;
 import static java.lang.System.currentTimeMillis;
+import static java.lang.System.setProperty;
 import static net.kyori.adventure.text.Component.empty;
 import static net.kyori.adventure.text.event.ClickEvent.callback;
 import static net.kyori.adventure.text.event.HoverEvent.showEntity;
@@ -54,6 +50,8 @@ import static net.kyori.adventure.text.event.HoverEvent.showText;
 import static net.kyori.adventure.text.format.NamedTextColor.WHITE;
 
 public final class ChatManager implements Listener {
+
+    private final Azure plugin;
 
     private final UserManager luckPermsUserManager;
     private final Cache<UUID, SignedMessage.Signature> signatureCache;
@@ -70,28 +68,13 @@ public final class ChatManager implements Listener {
 
     private static final NamespacedKey KEY_CAN_CHAT_AGAIN = new NamespacedKey("azure", "can_chat_again");
 
-    public ChatManager(final Azure azure) {
-        this.luckPermsUserManager = azure.getLuckPerms().getUserManager();
+    public ChatManager(final Azure plugin) {
+        this.plugin = plugin;
+        this.luckPermsUserManager = plugin.getLuckPerms().getUserManager();
         this.signatureCache = CacheBuilder.newBuilder()
                 .expireAfterWrite(PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_CACHE_EXPIRATION_RATE, TimeUnit.MINUTES)
                 .build();
         this.chatCooldowns = new HashMap<>();
-    }
-
-    public boolean isMuted(final @NotNull Player player) {
-        return Interval.between((long) this.getMuteExpiration(player).as(Unit.MILLISECONDS), System.currentTimeMillis(), Unit.MILLISECONDS).as(Unit.MILLISECONDS) > 0L;
-    }
-
-    public Interval getMuteExpiration(final @NotNull Player player) {
-        return Interval.of(player.getPersistentDataContainer().getOrDefault(KEY_CAN_CHAT_AGAIN, PersistentDataType.LONG, 0L), Unit.MILLISECONDS);
-    }
-
-    public void mute(final @NotNull Player player, final @Nullable Long expiration) {
-        player.getPersistentDataContainer().set(KEY_CAN_CHAT_AGAIN, PersistentDataType.LONG, requirePresent(expiration, 0L));
-    }
-
-    public void unmute(final @NotNull Player player) {
-        player.getPersistentDataContainer().remove(KEY_CAN_CHAT_AGAIN);
     }
 
     /**
@@ -143,18 +126,22 @@ public final class ChatManager implements Listener {
             // ...setting cooldown
             chatCooldowns.put(player.getUniqueId(), currentTimeMillis());
         }
+        final User user = plugin.getUserCache().getUser(player);
         // Mute handling...
-        if (this.isMuted(player) == true) {
+        if (user.getCurrentMute() != null && user.getCurrentMute().isActive() == true) {
+            // Cancelling the event, so message won't go through.
             event.setCancelled(true);
-            // Getting the duration left until mute expires.
-            final Interval muteExpiration = this.getMuteExpiration(player);
+            // Getting the current mute punishment.
+            final Punishment punishment = user.getCurrentMute();
+            // Preparing the message.
+            final Component message = (punishment.isPermantent() == true)
+                    ? PluginLocale.CHAT_MUTED_PERMANENT
+                    : Message.of(PluginLocale.CHAT_MUTED)
+                            .placeholder("duration_left", punishment.getDurationLeft().toString())
+                            .parse();
             // Sending mute information to the player.
-            if (muteExpiration.as(Unit.MILLISECONDS) == Long.MAX_VALUE)
-                Message.of(PluginLocale.CHAT_MUTED_PERMANENT).send(player);
-            else
-                Message.of(PluginLocale.CHAT_MUTED)
-                        .placeholder("duration_left", muteExpiration.and(-currentTimeMillis(), Unit.MILLISECONDS).toString())
-                        .send(player);
+            Message.of(message).send(player);
+            // Exiting the code block.
             return;
         }
         // ...
@@ -166,16 +153,16 @@ public final class ChatManager implements Listener {
         // Customizing renderer...
         event.renderer((source, sourceDisplayName, message, viewer) -> {
             // Getting the luckperms primary group
-            final CachedMetaData user = luckPermsUserManager.getUser(source.getUniqueId()).getCachedData().getMetaData();
+            final CachedMetaData metaData = luckPermsUserManager.getUser(source.getUniqueId()).getCachedData().getMetaData();
             // Console...
             if (viewer instanceof ConsoleCommandSender) {
                 return MiniMessage.miniMessage().deserialize(
                         PluginConfig.CHAT_FORMATS_CONSOLE,
                         Placeholder.unparsed("signature_uuid", signatureUUID.toString()),
                         Placeholder.unparsed("player", source.getName()),
-                        Placeholder.unparsed("group", requirePresent(user.getPrimaryGroup(), "")),
-                        Placeholder.parsed("prefix", requirePresent(user.getPrefix(), "")),
-                        Placeholder.parsed("suffix", requirePresent(user.getSuffix(), "")),
+                        Placeholder.unparsed("group", requirePresent(metaData.getPrimaryGroup(), "")),
+                        Placeholder.parsed("prefix", requirePresent(metaData.getPrefix(), "")),
+                        Placeholder.parsed("suffix", requirePresent(metaData.getSuffix(), "")),
                         Placeholder.component("displayname", sourceDisplayName),
                         Placeholder.component("message", event.message())
                 );
@@ -188,9 +175,9 @@ public final class ChatManager implements Listener {
                 final Component formattedChat = MiniMessage.miniMessage().deserialize(
                         matchingChatFormat,
                         Placeholder.unparsed("player", source.getName()),
-                        Placeholder.unparsed("group", requirePresent(user.getPrimaryGroup(), "")),
-                        Placeholder.parsed("prefix", requirePresent(user.getPrefix(), "")),
-                        Placeholder.parsed("suffix", requirePresent(user.getSuffix(), "")),
+                        Placeholder.unparsed("group", requirePresent(metaData.getPrimaryGroup(), "")),
+                        Placeholder.parsed("prefix", requirePresent(metaData.getPrefix(), "")),
+                        Placeholder.parsed("suffix", requirePresent(metaData.getSuffix(), "")),
                         Placeholder.component("displayname", sourceDisplayName),
                         Placeholder.component("message", event.message())
                 );

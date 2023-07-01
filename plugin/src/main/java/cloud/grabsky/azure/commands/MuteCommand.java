@@ -72,29 +72,27 @@ public class MuteCommand extends RootCommand {
                     // When durationInMinutes is 0, punishment will be permantent - until manually removed.
                     if (durationInMinutes == 0) {
                         // Muting the player.
-                        userTarget.mute(Interval.of(durationInMinutes, Unit.MINUTES), reason, sender.getName());
+                        userTarget.mute(null, reason, sender.getName());
                         // Sending success message to the sender.
                         Message.of(PluginLocale.MUTE_SUCCESS_PERMANENT)
-                                .placeholder("player", target.getName())
+                                .placeholder("player", userTarget.getName())
                                 .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
                                 .send(sender);
-                        // Logging...
-                        plugin.getPunishmentsFileLogger().log(target.getName() + " has been muted (DURATION = permanent, REASON = " + reason + ") by " + sender.getName());
+                        // Exiting the command block.
                         return;
                     }
                     // When durationInMinutes is not 0, punishment will be temporary.
-                    final Interval interval = Interval.of(durationInMinutes, Unit.MINUTES).and(System.currentTimeMillis(), Unit.MILLISECONDS);
+                    final Interval duration = Interval.of(durationInMinutes, Unit.MINUTES);
                     // Muting the player.
-                    userTarget.mute(null, reason, sender.getName());
+                    userTarget.mute(duration, reason, sender.getName());
                     // Sending success message to the sender.
                     Message.of(PluginLocale.MUTE_SUCCESS)
-                            .placeholder("player", target.getName())
-                            .placeholder("duration_left", interval.toString())
+                            .placeholder("player", userTarget.getName())
+                            .placeholder("duration_left", duration.toString())
                             .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
                             .send(sender);
-                    // Logging...
-                    plugin.getPunishmentsFileLogger().log(target.getName() + " has been muted (DURATION = " + interval + ", REASON = " + reason + ") by " + sender.getName());
                 });
+                // Exiting the command block.
                 return;
             }
             // Sending failure message to the sender.

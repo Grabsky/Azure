@@ -1,5 +1,6 @@
 package cloud.grabsky.azure.api.user;
 
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
@@ -27,6 +28,11 @@ public interface UserCache {
      * Returns {@link User} if currently in cache, {@code null} otherwise.
      */
     @Nullable User getUser(final @NotNull String name);
+
+    /**
+     * Returns {@link User} if currently in cache, {@code null} otherwise.
+     */
+    @NotNull User getUser(final @NotNull Player player);
 
     /**
      * Returns {@code true} if user with provided {@link UUID} (uniqueId) is currently in cache.
