@@ -14,6 +14,7 @@ import cloud.grabsky.azure.commands.PackCommand;
 import cloud.grabsky.azure.commands.SpeedCommand;
 import cloud.grabsky.azure.commands.TeleportCommand;
 import cloud.grabsky.azure.commands.UnbanCommand;
+import cloud.grabsky.azure.commands.UnmuteCommand;
 import cloud.grabsky.azure.commands.VanishCommand;
 import cloud.grabsky.azure.commands.WorldCommand;
 import cloud.grabsky.azure.commands.templates.CommandArgumentTemplate;
@@ -120,7 +121,8 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
                 .registerCommand(VanishCommand.class)
                 .registerCommand(new BanCommand(this))
                 .registerCommand(new MuteCommand(this))
-                .registerCommand(new UnbanCommand(this));
+                .registerCommand(new UnbanCommand(this))
+                .registerCommand(new UnmuteCommand(this));
         // ...
         // Registering events...
         this.getServer().getPluginManager().registerEvents(chatManager, this);

@@ -24,8 +24,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static java.lang.System.currentTimeMillis;
-
 // TO-DO: Better duration format, perhaps ["5s, 5min, 5h, 5d, @forever", ...]
 // TO-DO: Notify staff members about bans.
 public class BanCommand extends RootCommand {
@@ -39,7 +37,7 @@ public class BanCommand extends RootCommand {
 
     private static final ExceptionHandler.Factory BAN_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)
-            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.BAN_USAGE).send(context.getExecutor().asCommandSender());
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_BAN_USAGE).send(context.getExecutor().asCommandSender());
         // Let other exceptions be handled internally.
         return null;
     };
@@ -77,13 +75,13 @@ public class BanCommand extends RootCommand {
                         // Kicking with custom message.
                         if (target.isOnline() && target instanceof Player onlineTarget) {
                             onlineTarget.kick(
-                                    Message.of(PluginLocale.BAN_DISCONNECT_MESSAGE_PERMANENT)
+                                    Message.of(PluginLocale.COMMAND_BAN_DISCONNECT_MESSAGE_PERMANENT)
                                             .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
                                             .parse()
                             );
                         }
                         // Sending success message to the sender.
-                        Message.of(PluginLocale.BAN_SUCCESS_PERMANENT)
+                        Message.of(PluginLocale.COMMAND_BAN_SUCCESS_PERMANENT)
                                 .placeholder("player", userTarget.getName())
                                 .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
                                 .send(sender);
@@ -98,14 +96,14 @@ public class BanCommand extends RootCommand {
                     if (target.isOnline() && target instanceof Player onlineTarget) {
                         // Kicking with custom message.
                         onlineTarget.kick(
-                                Message.of(PluginLocale.BAN_DISCONNECT_MESSAGE)
+                                Message.of(PluginLocale.COMMAND_BAN_DISCONNECT_MESSAGE)
                                         .placeholder("duration_left", duration.toString())
                                         .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
                                         .parse()
                         );
                     }
                     // Sending success message to the sender.
-                    Message.of(PluginLocale.BAN_SUCCESS)
+                    Message.of(PluginLocale.COMMAND_BAN_SUCCESS)
                             .placeholder("player", userTarget.getName())
                             .placeholder("duration_left", duration.toString())
                             .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
@@ -115,7 +113,7 @@ public class BanCommand extends RootCommand {
                 return;
             }
             // Sending failure message to the sender.
-            Message.of(PluginLocale.BAN_FAIULURE_PLAYER_CANNOT_BE_BANNED).send(sender);
+            Message.of(PluginLocale.COMMAND_BAN_FAIULURE_PLAYER_CANNOT_BE_BANNED).send(sender);
         });
     }
 

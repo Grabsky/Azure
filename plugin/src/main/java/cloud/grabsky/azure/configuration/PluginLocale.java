@@ -1,6 +1,5 @@
 package cloud.grabsky.azure.configuration;
 
-import cloud.grabsky.commands.argument.StringArgument;
 import cloud.grabsky.configuration.JsonAdapter;
 import cloud.grabsky.configuration.JsonConfiguration;
 import cloud.grabsky.configuration.JsonPath;
@@ -37,24 +36,24 @@ public final class PluginLocale implements JsonConfiguration {
     // Commands > Ban
 
     @JsonPath("commands.ban_usage")
-    public static Component BAN_USAGE;
+    public static Component COMMAND_BAN_USAGE;
 
     @JsonPath("commands.ban_success")
-    public static String BAN_SUCCESS;
+    public static String COMMAND_BAN_SUCCESS;
 
     @JsonPath("commands.ban_success_permanent")
-    public static String BAN_SUCCESS_PERMANENT;
+    public static String COMMAND_BAN_SUCCESS_PERMANENT;
 
     @JsonPath("commands.ban_failure_player_cannot_be_banned")
-    public static Component BAN_FAIULURE_PLAYER_CANNOT_BE_BANNED;
+    public static Component COMMAND_BAN_FAIULURE_PLAYER_CANNOT_BE_BANNED;
 
     @JsonPath("commands.ban_disconnect_message")
     @JsonAdapter(fromJson = StringComponentAdapter.class)
-    public static String BAN_DISCONNECT_MESSAGE;
+    public static String COMMAND_BAN_DISCONNECT_MESSAGE;
 
     @JsonPath("commands.ban_disconnect_message_permanent")
     @JsonAdapter(fromJson = StringComponentAdapter.class)
-    public static String BAN_DISCONNECT_MESSAGE_PERMANENT;
+    public static String COMMAND_BAN_DISCONNECT_MESSAGE_PERMANENT;
 
     // Commands > Unban
 
@@ -67,19 +66,30 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.unban_failure_player_not_banned")
     public static Component COMMAND_UNBAN_FAILURE_PLAYER_NOT_BANNED;
 
+    // Commands > Unmute
+
+    @JsonPath("commands.unmute_usage")
+    public static Component COMMAND_UNMUTE_USAGE;
+
+    @JsonPath("commands.unmute_success")
+    public static String COMMAND_UNMUTE_SUCCESS;
+
+    @JsonPath("commands.unmute_failure_player_not_muted")
+    public static Component COMMAND_UNMUTE_FAILURE_PLAYER_NOT_BANNED;
+
     // Commands > Mute
 
     @JsonPath("commands.mute_usage")
-    public static Component MUTE_USAGE;
+    public static Component COMMAND_MUTE_USAGE;
 
     @JsonPath("commands.mute_success")
-    public static String MUTE_SUCCESS;
+    public static String COMMAND_MUTE_SUCCESS;
 
     @JsonPath("commands.mute_success_permanent")
-    public static String MUTE_SUCCESS_PERMANENT;
+    public static String COMMAND_MUTE_SUCCESS_PERMANENT;
 
     @JsonPath("commands.mute_failure_player_cannot_be_muted")
-    public static Component MUTE_FAIULURE_PLAYER_CANNOT_BE_MUTED;
+    public static Component COMMAND_MUTE_FAIULURE_PLAYER_CANNOT_BE_MUTED;
 
     // Commands > Delete
 

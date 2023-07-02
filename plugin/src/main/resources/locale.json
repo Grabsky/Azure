@@ -53,7 +53,7 @@
         // Unban
         "unmute_usage": "<dark_gray>› <gray>Użycie: <gold>/unmute <white>(player)",
         "unmute_success": "<dark_gray>› <gray>Gracz <gold><player><gray> został odciszony.",
-        "unmute_faiulure_player_not_muted": "<dark_gray>› <red>Ten gracz nie jest wyciszony.",
+        "unmute_failure_player_not_muted": "<dark_gray>› <red>Ten gracz nie jest wyciszony.",
         // Kick
         "kick_usage": "<dark_gray>› <gray>Użycie: <gold>/kick <white>(player) <gray>(reason)",
         "kick_success": "<dark_gray>› <gray>Gracz <gold><player><gray> został wyrzucony za <gold><reason><gray>.",

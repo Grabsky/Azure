@@ -38,7 +38,7 @@ public class MuteCommand extends RootCommand {
 
     private static final ExceptionHandler.Factory MUTE_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)
-            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.MUTE_USAGE).send(context.getExecutor().asCommandSender());
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_MUTE_USAGE).send(context.getExecutor().asCommandSender());
         // Let other exceptions be handled internally.
         return null;
     };
@@ -74,7 +74,7 @@ public class MuteCommand extends RootCommand {
                         // Muting the player.
                         userTarget.mute(null, reason, sender.getName());
                         // Sending success message to the sender.
-                        Message.of(PluginLocale.MUTE_SUCCESS_PERMANENT)
+                        Message.of(PluginLocale.COMMAND_MUTE_SUCCESS_PERMANENT)
                                 .placeholder("player", userTarget.getName())
                                 .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
                                 .send(sender);
@@ -86,7 +86,7 @@ public class MuteCommand extends RootCommand {
                     // Muting the player.
                     userTarget.mute(duration, reason, sender.getName());
                     // Sending success message to the sender.
-                    Message.of(PluginLocale.MUTE_SUCCESS)
+                    Message.of(PluginLocale.COMMAND_MUTE_SUCCESS)
                             .placeholder("player", userTarget.getName())
                             .placeholder("duration_left", duration.toString())
                             .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
@@ -96,7 +96,7 @@ public class MuteCommand extends RootCommand {
                 return;
             }
             // Sending failure message to the sender.
-            Message.of(PluginLocale.MUTE_FAIULURE_PLAYER_CANNOT_BE_MUTED).send(sender);
+            Message.of(PluginLocale.COMMAND_MUTE_FAIULURE_PLAYER_CANNOT_BE_MUTED).send(sender);
         });
     }
 

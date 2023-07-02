@@ -1,6 +1,5 @@
 package cloud.grabsky.azure.user;
 
-import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.api.Punishment;
 import cloud.grabsky.azure.api.user.User;
 import cloud.grabsky.azure.api.user.UserCache;
@@ -201,11 +200,11 @@ public final class AzureUserCache implements UserCache, Listener {
                 final Punishment punishment = user.getMostRecentBan();
                 // Preparing the kick message.
                 final Component message = (punishment.getDuration().as(Unit.MILLISECONDS) != Long.MAX_VALUE)
-                        ? Message.of(PluginLocale.BAN_DISCONNECT_MESSAGE)
+                        ? Message.of(PluginLocale.COMMAND_BAN_DISCONNECT_MESSAGE)
                                 .placeholder("duration_left", Interval.between((long) punishment.getEndDate().as(Unit.MILLISECONDS), System.currentTimeMillis(), Unit.MILLISECONDS).toString())
                                 .placeholder("reason", punishment.getReason())
                                 .parse()
-                        : Message.of(PluginLocale.BAN_DISCONNECT_MESSAGE_PERMANENT)
+                        : Message.of(PluginLocale.COMMAND_BAN_DISCONNECT_MESSAGE_PERMANENT)
                                 .placeholder("reason", punishment.getReason())
                                 .parse();
                 // Setting the kick message, unless null.
