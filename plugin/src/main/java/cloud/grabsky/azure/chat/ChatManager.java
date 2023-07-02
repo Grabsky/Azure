@@ -127,7 +127,7 @@ public final class ChatManager implements Listener {
         }
         final User user = plugin.getUserCache().getUser(player);
         // Mute handling...
-        if (user.getMostRecentMute() != null && user.getMostRecentMute().isActive() == true) {
+        if (user.isMuted() == true) {
             // Cancelling the event, so message won't go through.
             event.setCancelled(true);
             // Getting the current mute punishment.
