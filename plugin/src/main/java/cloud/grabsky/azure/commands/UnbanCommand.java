@@ -11,7 +11,6 @@ import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.component.ExceptionHandler;
 import cloud.grabsky.commands.exception.CommandLogicException;
 import cloud.grabsky.commands.exception.MissingInputException;
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +27,7 @@ public final class UnbanCommand extends RootCommand {
     @Override
     public @NotNull CompletionsProvider onTabComplete(final @NotNull RootCommandContext context, final int index) {
         return (index == 0)
-                ? (ctx) -> Bukkit.getBannedPlayers().stream().map(OfflinePlayer::getName).toList()
+                ? (ctx) -> plugin.getUserCache().getUsers().stream().filter(User::isBanned).map(User::getName).toList()
                 : CompletionsProvider.EMPTY;
     }
 
