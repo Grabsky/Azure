@@ -6,18 +6,15 @@ import cloud.grabsky.azure.api.user.User;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.bedrock.util.Interval;
 import cloud.grabsky.bedrock.util.Interval.Unit;
-import com.squareup.moshi.Json;
-import com.squareup.moshi.JsonClass;
-import com.squareup.moshi.JsonQualifier;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 public final class AzureUser implements User {
 
     @Getter(AccessLevel.PUBLIC)
@@ -30,25 +27,25 @@ public final class AzureUser implements User {
     private final @NotNull String textures;
 
     // Defined as implementation rather than interface because we want Moshi to know what adapter to use.
-    private @Nullable AzurePunishment currentBan;
+    private @Nullable AzurePunishment mostRecentBan;
 
     // Defined as implementation rather than interface because we want Moshi to know what adapter to use.
-    private @Nullable AzurePunishment currentMute;
+    private @Nullable AzurePunishment mostRecentMute;
 
     @Override
-    public @Nullable Punishment getCurrentBan() {
-        return currentBan;
+    public @Nullable Punishment getMostRecentBan() {
+        return mostRecentBan;
     }
 
     @Override
-    public @Nullable Punishment getCurrentMute() {
-        return currentMute;
+    public @Nullable Punishment getMostRecentMute() {
+        return mostRecentMute;
     }
 
     @Override
     public @NotNull Punishment ban(final @Nullable Interval duration, final @Nullable String reason, final @Nullable String issuer) {
         // Overriding previous punishment with a new one.
-        this.currentBan = new AzurePunishment(
+        this.mostRecentBan = new AzurePunishment(
                 (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON,
                 (issuer != null) ? issuer : "SYSTEM",
                 Interval.now(),
@@ -59,15 +56,27 @@ public final class AzureUser implements User {
             System.out.println("Saving data of " + this.name + " in the background... SUCCESS = " + ((isSuccess == true) ? "OK" : "ERROR"));
         });
         // Logging...
-        Azure.getInstance().getPunishmentsFileLogger().log("BAN | Target: " + this.getName() + " (" + this.getUniqueId() + ") | Duration: " + ((currentBan.isPermantent() == false) ? duration : "PERMANENT") + " | Issuer: " + issuer);
+        Azure.getInstance().getPunishmentsFileLogger().log("BAN | Target: " + this.getName() + " (" + this.getUniqueId() + ") | Duration: " + ((mostRecentBan.isPermantent() == false) ? duration : "PERMANENT") + " | Issuer: " + issuer);
         // Returning new (and now current) punishment.
-        return currentBan;
+        return mostRecentBan;
+    }
+
+    @Override
+    public void unban(final @Nullable String issuer) {
+        // Overriding previous punishment with a null one.
+        this.mostRecentBan = null;
+        // Saving User data to the filesystem.
+        ((AzureUserCache) Azure.getInstance().getUserCache()).saveUser(this).thenAccept(isSuccess -> {
+            System.out.println("Saving data of " + this.name + " in the background... SUCCESS = " + ((isSuccess == true) ? "OK" : "ERROR"));
+        });
+        // Logging...
+        Azure.getInstance().getPunishmentsFileLogger().log("UNBAN | Target: " + this.getName() + " (" + this.getUniqueId() + ") | Issuer: " + issuer);
     }
 
     @Override
     public @NotNull Punishment mute(final @Nullable Interval duration, final @Nullable String reason, final @Nullable String issuer) {
         // Overriding previous punishment with a new one.
-        this.currentMute = new AzurePunishment(
+        this.mostRecentMute = new AzurePunishment(
                 (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON,
                 (issuer != null) ? issuer : "SYSTEM",
                 Interval.now(),
@@ -78,9 +87,21 @@ public final class AzureUser implements User {
             System.out.println("Saving data of " + this.name + " in the background... SUCCESS = " + ((isSuccess == true) ? "OK" : "ERROR"));
         });
         // Logging...
-        Azure.getInstance().getPunishmentsFileLogger().log("MUTE | Target: " + this.getName() + " (" + this.getUniqueId() + ") | Duration: " + ((currentMute.isPermantent() == false) ? duration : "PERMANENT") + " | Issuer: " + issuer);
+        Azure.getInstance().getPunishmentsFileLogger().log("MUTE | Target: " + this.getName() + " (" + this.getUniqueId() + ") | Duration: " + ((mostRecentMute.isPermantent() == false) ? duration : "PERMANENT") + " | Issuer: " + issuer);
         // Returning new (and now current) punishment.
-        return currentMute;
+        return mostRecentMute;
+    }
+
+    @Override
+    public void unmute(final @Nullable String issuer) {
+        // Overriding previous punishment with a null one.
+        this.mostRecentMute = null;
+        // Saving User data to the filesystem.
+        ((AzureUserCache) Azure.getInstance().getUserCache()).saveUser(this).thenAccept(isSuccess -> {
+            System.out.println("Saving data of " + this.name + " in the background... SUCCESS = " + ((isSuccess == true) ? "OK" : "ERROR"));
+        });
+        // Logging...
+        Azure.getInstance().getPunishmentsFileLogger().log("UNMUTE | Target: " + this.getName() + " (" + this.getUniqueId() + ") | Issuer: " + issuer);
     }
 
     @Override

@@ -1,9 +1,9 @@
 package cloud.grabsky.azure.user;
 
+import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.api.Punishment;
 import cloud.grabsky.azure.api.user.User;
 import cloud.grabsky.azure.api.user.UserCache;
-import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.azure.configuration.adapters.UUIDAdapter;
 import cloud.grabsky.bedrock.BedrockPlugin;
@@ -162,14 +162,11 @@ public final class AzureUserCache implements UserCache, Listener {
     @Override
     public @NotNull User getUser(final @NotNull Player player) {
         final UUID uniqueId = player.getUniqueId();
-        // Returning existing user from cache, if exists.
-        if (internalUserMap.containsKey(uniqueId) == true)
-            return internalUserMap.get(uniqueId);
-        // Computing new User otherwise.
-        return internalUserMap.compute(uniqueId, (___, previous) -> {
+        // Returning existing user from cache or computing new one, if absent.
+        return internalUserMap.computeIfAbsent(uniqueId, (___) -> {
             final @Nullable URL skin = player.getPlayerProfile().getTextures().getSkin();
             // Creating instance of AzureUser containing player information.
-            final AzureUser user = new AzureUser(player.getName(), uniqueId, (skin != null) ? encodeTextures(skin) : "");
+            final AzureUser user = new AzureUser(player.getName(), uniqueId, (skin != null) ? encodeTextures(skin) : "", null, null);
             // Saving to the file.
             this.saveUser(user);
             // Returning the User instance.
@@ -198,10 +195,10 @@ public final class AzureUserCache implements UserCache, Listener {
         if (internalUserMap.containsKey(player.getUniqueId()) == true) {
             final User user = internalUserMap.get(player.getUniqueId());
             // ...
-            if (user.getCurrentBan() != null && user.getCurrentBan().isActive() == true) {
+            if (user.getMostRecentBan() != null && user.getMostRecentBan().isActive() == true) {
                 event.setResult(PlayerLoginEvent.Result.KICK_BANNED);
                 // ...
-                final Punishment punishment = user.getCurrentBan();
+                final Punishment punishment = user.getMostRecentBan();
                 // Preparing the kick message.
                 final Component message = (punishment.getDuration().as(Unit.MILLISECONDS) != Long.MAX_VALUE)
                         ? Message.of(PluginLocale.BAN_DISCONNECT_MESSAGE)
@@ -224,8 +221,11 @@ public final class AzureUserCache implements UserCache, Listener {
         // Updating cache with up-to-date data...
         internalUserMap.compute(player.getUniqueId(), (uuid, existingUser) -> {
             final @Nullable URL skin = player.getPlayerProfile().getTextures().getSkin();
+            // Getting punishment information.
+            final @Nullable AzurePunishment mostRecentBan = (existingUser != null) ? (AzurePunishment) existingUser.getMostRecentBan() : null;
+            final @Nullable AzurePunishment mostRecentMute = (existingUser != null) ? (AzurePunishment) existingUser.getMostRecentMute() : null;
             // Creating instance of AzureUser containing player information.
-            final AzureUser user = new AzureUser(player.getName(), uuid, (skin != null) ? encodeTextures(skin) : "");
+            final AzureUser user = new AzureUser(player.getName(), uuid, (skin != null) ? encodeTextures(skin) : "", mostRecentBan, mostRecentMute);
             // Saving to the file in case no information was previously cached or "new" instance is different than cached one.
             if (existingUser == null || user.equals(existingUser) == false)
                 this.saveUser(user);

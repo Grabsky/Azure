@@ -42,7 +42,6 @@ import java.util.concurrent.TimeUnit;
 
 import static cloud.grabsky.bedrock.helpers.Conditions.requirePresent;
 import static java.lang.System.currentTimeMillis;
-import static java.lang.System.setProperty;
 import static net.kyori.adventure.text.Component.empty;
 import static net.kyori.adventure.text.event.ClickEvent.callback;
 import static net.kyori.adventure.text.event.HoverEvent.showEntity;
@@ -128,11 +127,11 @@ public final class ChatManager implements Listener {
         }
         final User user = plugin.getUserCache().getUser(player);
         // Mute handling...
-        if (user.getCurrentMute() != null && user.getCurrentMute().isActive() == true) {
+        if (user.getMostRecentMute() != null && user.getMostRecentMute().isActive() == true) {
             // Cancelling the event, so message won't go through.
             event.setCancelled(true);
             // Getting the current mute punishment.
-            final Punishment punishment = user.getCurrentMute();
+            final Punishment punishment = user.getMostRecentMute();
             // Preparing the message.
             final Component message = (punishment.isPermantent() == true)
                     ? PluginLocale.CHAT_MUTED_PERMANENT

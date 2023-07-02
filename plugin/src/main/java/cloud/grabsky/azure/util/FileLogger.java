@@ -13,7 +13,7 @@ public final class FileLogger {
     private final Plugin plugin;
     private final File file;
 
-    private static final SimpleDateFormat DATE_FORMAT =  new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    private static final SimpleDateFormat DATE_FORMAT =  new SimpleDateFormat("dd MMM yy, HH:mm");
 
     public FileLogger(final @NotNull Plugin plugin, final @NotNull File file) {
         this.plugin = plugin;
@@ -30,7 +30,7 @@ public final class FileLogger {
             // Creating new instance of PrintWriter.
             final PrintWriter writer = new PrintWriter(new FileWriter(file, true));
             // Printing line to the file.
-            writer.println("[" + DATE_FORMAT.format(System.currentTimeMillis()) + "]: " + text);
+            writer.println(DATE_FORMAT.format(System.currentTimeMillis()) + " | " + text);
             // Closing PrintWriter.
             writer.close();
         } catch (final IOException e) {

@@ -1,6 +1,7 @@
 package cloud.grabsky.azure.commands;
 
 import cloud.grabsky.azure.Azure;
+import cloud.grabsky.azure.api.user.User;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.commands.ArgumentQueue;
@@ -10,7 +11,6 @@ import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.component.ExceptionHandler;
 import cloud.grabsky.commands.exception.CommandLogicException;
 import cloud.grabsky.commands.exception.MissingInputException;
-import org.bukkit.BanList.Type;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -44,18 +44,23 @@ public final class UnbanCommand extends RootCommand {
         final CommandSender sender = context.getExecutor().asCommandSender();
         // Getting OfflinePlayer argument, this can be either a player name or their unique id.
         final OfflinePlayer target = arguments.next(OfflinePlayer.class).asRequired(UNBAN_USAGE);
-        // Checking if player is banned.
-        if (target.isBanned() == true && target.getName() != null) {
-            // Unbanning the player.
-            Bukkit.getBanList(Type.NAME).pardon(target.getName());
-            // Sending success message to the sender.
-            Message.of(PluginLocale.COMMAND_UNBAN_SUCCESS).placeholder("player", target.getName()).send(sender);
-            // Logging...
-            plugin.getPunishmentsFileLogger().log(target.getName() + " has been unbanned by " + sender.getName());
+        // ...
+        final User targetUser = plugin.getUserCache().getUser(target.getUniqueId());
+        // ...
+        if (targetUser != null) {
+            // Checking if player is banned.
+            if (targetUser.isBanned() == true) {
+                // Unbanning the player.
+                targetUser.unban(sender.getName());
+                // Sending success message to the sender.
+                Message.of(PluginLocale.COMMAND_UNBAN_SUCCESS).placeholder("player", targetUser.getName()).send(sender);
+                return;
+            }
+            // Sending failure message to the sender.
+            Message.of(PluginLocale.COMMAND_UNBAN_FAILURE_PLAYER_NOT_BANNED).send(sender);
             return;
         }
-        // Sending failure message to the sender.
-        Message.of(PluginLocale.COMMAND_UNBAN_FAILURE_PLAYER_NOT_BANNED).send(sender);
+        Message.of(PluginLocale.Commands.INVALID_OFFLINE_PLAYER).send(sender);
     }
 
 }
