@@ -31,7 +31,7 @@ public class BanCommand extends RootCommand {
     private final Azure plugin;
 
     public BanCommand(final @NotNull Azure plugin) {
-        super("ban", null, "azure.command.ban", "/ban (player) (duration_min) (reason)", null);
+        super("ban", null, "azure.command.ban", "/ban (player) (duration) (reason)", null);
         this.plugin = plugin;
     }
 

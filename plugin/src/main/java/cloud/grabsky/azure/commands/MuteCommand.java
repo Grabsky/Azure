@@ -25,12 +25,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 // TO-DO: Support for "@forever" selector which defaults to 0s, making the punishment permantent. (low priority)
+// TO-DO: Notify staff members about bans.
 public class MuteCommand extends RootCommand {
 
     private final Azure plugin;
 
     public MuteCommand(final @NotNull Azure plugin) {
-        super("mute", null, "azure.command.mute", "/mute (player) (duration_min) (reason)", null);
+        super("mute", null, "azure.command.mute", "/mute (player) (duration) (reason)", null);
         this.plugin = plugin;
     }
 

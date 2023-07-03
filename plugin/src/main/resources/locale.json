@@ -16,7 +16,7 @@
             ""
         ],
         // Ban
-        "ban_usage": "<dark_gray>› <gray>Użycie: <gold>/ban <white>(player) (duration_min) <gray>(reason)",
+        "ban_usage": "<dark_gray>› <gray>Użycie: <gold>/ban <white>(player) (duration) <gray>(reason)",
         "ban_success": "<dark_gray>› <gray>Gracz <gold><player><gray> został zbanowany (<gold><duration_left><gray>) za <gold><reason><gray>.",
         "ban_success_permanent": "<dark_gray>› <gray>Gracz <gold><player><gray> został <gold>permanentnie<gray> zbanowany za <gold><reason><gray>.",
         "ban_failure_player_cannot_be_banned": "<dark_gray>› <red>Ten gracz nie może zostać zbanowany.",
@@ -42,7 +42,7 @@
             "<gray>Uważasz, że to pomyłka? Skontaktuj się z nami na <gold>https://firedot.pl/discord<gray> lub napisz na nasz adres <gold>administracja@firedot.pl"
         ],
         // Mute
-        "mute_usage": "<dark_gray>› <gray>Użycie: <gold>/mute <white>(player) (duration_min) <gray>(reason)",
+        "mute_usage": "<dark_gray>› <gray>Użycie: <gold>/mute <white>(player) (duration) <gray>(reason)",
         "mute_success": "<dark_gray>› <gray>Gracz <gold><player><gray> został wyciszony (<gold><duration_left><gray>) za <gold><reason><gray>.",
         "mute_success_permanent": "<dark_gray>› <gray>Gracz <gold><player><gray> został <gold>permanentnie<gray> wyciszony za <gold><reason><gray>.",
         "mute_failure_player_cannot_be_muted": "<dark_gray>› <red>Ten gracz nie może zostać wyciszony.",
