@@ -25,7 +25,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 // TO-DO: Support for "@forever" selector which defaults to 0s, making the punishment permantent. (low priority)
-// TO-DO: Notify staff members about bans.
 public class MuteCommand extends RootCommand {
 
     private final Azure plugin;
@@ -76,7 +75,8 @@ public class MuteCommand extends RootCommand {
                         Message.of(PluginLocale.COMMAND_MUTE_SUCCESS_PERMANENT)
                                 .placeholder("player", userTarget.getName())
                                 .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
-                                .send(sender);
+                                // Sending to all players with specific permission.
+                                .broadcast(receiver -> receiver.hasPermission("azure.command.mute") == true);
                         // Exiting the command block.
                         return;
                     }
@@ -87,7 +87,8 @@ public class MuteCommand extends RootCommand {
                             .placeholder("player", userTarget.getName())
                             .placeholder("duration_left", duration.toString())
                             .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
-                            .send(sender);
+                            // Sending to all players with specific permission.
+                            .broadcast(receiver -> receiver.hasPermission("azure.command.mute") == true);
                 });
                 // Exiting the command block.
                 return;

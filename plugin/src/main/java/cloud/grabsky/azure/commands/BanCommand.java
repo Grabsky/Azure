@@ -24,7 +24,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-// TO-DO: Notify staff members about bans.
 // TO-DO: Support for "@forever" selector which defaults to 0s, making the punishment permantent. (low priority)
 public class BanCommand extends RootCommand {
 
@@ -84,7 +83,8 @@ public class BanCommand extends RootCommand {
                         Message.of(PluginLocale.COMMAND_BAN_SUCCESS_PERMANENT)
                                 .placeholder("player", userTarget.getName())
                                 .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
-                                .send(sender);
+                                // Sending to all players with specific permission.
+                                .broadcast(receiver -> receiver.hasPermission("azure.command.mute") == true);
                         // Exiting the command block.
                         return;
                     }
@@ -105,7 +105,8 @@ public class BanCommand extends RootCommand {
                             .placeholder("player", userTarget.getName())
                             .placeholder("duration_left", duration.toString())
                             .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
-                            .send(sender);
+                            // Sending to all players with specific permission.
+                            .broadcast(receiver -> receiver.hasPermission("azure.command.mute") == true);
                 });
                 // Exiting the command block.
                 return;
