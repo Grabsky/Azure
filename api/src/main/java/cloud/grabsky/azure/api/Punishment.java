@@ -22,13 +22,12 @@ public interface Punishment {
         return this.getEndDate().remove(Interval.now());
     }
 
-    // SOMETHING DOES NOT WORK...
-    default boolean isPermantent() {
+    default boolean isPermanent() {
         return this.getDuration().as(Unit.MILLISECONDS) == Long.MAX_VALUE;
     }
 
     default boolean isActive() {
-        return this.isPermantent() == true || this.getEndDate().as(Unit.MILLISECONDS) > System.currentTimeMillis();
+        return this.isPermanent() == true || this.getEndDate().as(Unit.MILLISECONDS) > System.currentTimeMillis();
     }
 
 }

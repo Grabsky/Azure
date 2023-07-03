@@ -23,13 +23,13 @@ public interface User {
     @Nullable Punishment getMostRecentBan();
 
     default boolean isBanned() {
-        return this.getMostRecentBan() != null && (this.getMostRecentBan().isPermantent() == true || this.getMostRecentBan().isActive() == true);
+        return this.getMostRecentBan() != null && (this.getMostRecentBan().isPermanent() == true || this.getMostRecentBan().isActive() == true);
     }
 
     @Nullable Punishment getMostRecentMute();
 
     default boolean isMuted() {
-        return this.getMostRecentMute() != null && (this.getMostRecentMute().isPermantent() == true || this.getMostRecentMute().isActive() == true);
+        return this.getMostRecentMute() != null && (this.getMostRecentMute().isPermanent() == true || this.getMostRecentMute().isActive() == true);
     }
 
     default @Nullable Player toPlayer() {

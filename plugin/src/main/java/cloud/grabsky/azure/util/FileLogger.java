@@ -10,8 +10,8 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 
 public final class FileLogger {
-    private final Plugin plugin;
-    private final File file;
+    private final @NotNull Plugin plugin;
+    private final @NotNull File file;
 
     private static final SimpleDateFormat DATE_FORMAT =  new SimpleDateFormat("dd MMM yy, HH:mm");
 
@@ -23,9 +23,15 @@ public final class FileLogger {
     public void log(final @NotNull String text) {
         try {
             // Creating log file if does not exist.
-            if (file.exists() == false && (file.getParentFile().mkdirs() == false || file.createNewFile() == false)) {
-                plugin.getLogger().warning("Logging to '" + file.getPath() + "' failed. Using main logger:");
-                plugin.getLogger().info(text);
+            if (file.exists() == false) {
+                // Trying to create parent directories.
+                file.getParentFile().mkdirs();
+                // Trying to create a new file... In case operation was unsuccessful, regular Bukkit logger is used.
+                if (file.createNewFile() == false) {
+                    plugin.getLogger().warning("Logging to '" + file.getPath() + "' failed. Using main logger:");
+                    plugin.getLogger().info(text);
+                    return;
+                }
             }
             // Creating new instance of PrintWriter.
             final PrintWriter writer = new PrintWriter(new FileWriter(file, true));
@@ -37,4 +43,5 @@ public final class FileLogger {
             e.printStackTrace();
         }
     }
+
 }
