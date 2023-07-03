@@ -45,7 +45,7 @@ public class MuteCommand extends RootCommand {
     public @NotNull CompletionsProvider onTabComplete(final @NotNull RootCommandContext context, final int index) throws CommandLogicException {
         return switch (index) {
             case 0 -> CompletionsProvider.of(Player.class);
-            case 1 -> CompletionsProvider.of("0", "30", "60", "1440");
+            case 1 -> IntervalArgument.ofRange(0L, 12L, Unit.YEARS);
             default -> CompletionsProvider.EMPTY;
         };
     }
