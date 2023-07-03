@@ -115,16 +115,6 @@ public final class ChatManager implements Listener {
             return;
         // ...
         final Player player = event.getPlayer();
-        // Cooldown handling... if enabled and player does not have bypass permission.
-        if (PluginConfig.CHAT_COOLDOWN > 0 && player.hasPermission(CHAT_COOLDOWN_BYPASS_PERMISSION) == false) {
-            if (Interval.between(currentTimeMillis(), chatCooldowns.getOrDefault(player.getUniqueId(), 0L), Unit.MILLISECONDS).as(Unit.MILLISECONDS) < PluginConfig.CHAT_COOLDOWN) {
-                event.setCancelled(true);
-                Message.of(PluginLocale.CHAT_ON_COOLDOWN).send(player);
-                return;
-            }
-            // ...setting cooldown
-            chatCooldowns.put(player.getUniqueId(), currentTimeMillis());
-        }
         final User user = plugin.getUserCache().getUser(player);
         // Mute handling...
         if (user.isMuted() == true) {
@@ -142,6 +132,16 @@ public final class ChatManager implements Listener {
             Message.of(message).send(player);
             // Exiting the code block.
             return;
+        }
+        // Cooldown handling... if enabled and player does not have bypass permission.
+        if (PluginConfig.CHAT_COOLDOWN > 0 && player.hasPermission(CHAT_COOLDOWN_BYPASS_PERMISSION) == false) {
+            if (Interval.between(currentTimeMillis(), chatCooldowns.getOrDefault(player.getUniqueId(), 0L), Unit.MILLISECONDS).as(Unit.MILLISECONDS) < PluginConfig.CHAT_COOLDOWN) {
+                event.setCancelled(true);
+                Message.of(PluginLocale.CHAT_ON_COOLDOWN).send(player);
+                return;
+            }
+            // ...setting cooldown
+            chatCooldowns.put(player.getUniqueId(), currentTimeMillis());
         }
         // ...
         final UUID signatureUUID = (event.signedMessage().signature() != null) ? UUID.randomUUID() : null;
