@@ -411,6 +411,12 @@ public final class PluginLocale implements JsonConfiguration {
         @JsonPath("invalid_direction")
         public static String INVALID_DIRECTION;
 
+        @JsonPath("invalid_interval")
+        public static String INVALID_INTERVAL;
+
+        @JsonPath("invalid_interval_not_in_range")
+        public static String INVALID_INTERVAL_NOT_IN_RANGE;
+
     }
 
 }

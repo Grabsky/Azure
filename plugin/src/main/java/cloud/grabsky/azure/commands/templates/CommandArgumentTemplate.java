@@ -3,8 +3,10 @@ package cloud.grabsky.azure.commands.templates;
 import cloud.grabsky.azure.commands.arguments.DirectionArgument;
 import cloud.grabsky.azure.commands.arguments.GameModeArgument;
 import cloud.grabsky.azure.commands.arguments.GameRuleArgument;
+import cloud.grabsky.azure.commands.arguments.IntervalArgument;
 import cloud.grabsky.azure.commands.arguments.WorldEnvironmentArgument;
 import cloud.grabsky.azure.commands.arguments.WorldTypeArgument;
+import cloud.grabsky.bedrock.util.Interval;
 import cloud.grabsky.commands.RootCommandManager;
 import org.bukkit.GameMode;
 import org.bukkit.GameRule;
@@ -34,6 +36,9 @@ public enum CommandArgumentTemplate implements Consumer<RootCommandManager> {
         // cloud.grabsky.azure.commands.arguments.DirectionArgument.Direction
         manager.setArgumentParser(DirectionArgument.Direction.class, DirectionArgument.INSTANCE);
         manager.setCompletionsProvider(DirectionArgument.Direction.class, DirectionArgument.INSTANCE);
+        // cloud.grabsky.bedrock.util.Interval
+        manager.setArgumentParser(Interval.class, IntervalArgument.DEFAULT_RANGE);
+        manager.setCompletionsProvider(Interval.class, IntervalArgument.DEFAULT_RANGE);
     }
 
 }

@@ -35,5 +35,7 @@
     "invalid_gamerule": "<dark_gray>› <red>Reguła <gold><input><red> nie istnieje.",
     "invalid_world_environment": "<dark_gray>› <red>Środowisko <gold><input><red> nie istnieje.",
     "invalid_world_type": "<dark_gray>› <red>Typ świata <gold><input><red> nie istnieje.",
-    "invalid_direction": "<dark_gray>› <red>Argument <gold><input><red> nie przedstawia prawidłowego kierunku."
+    "invalid_direction": "<dark_gray>› <red>Argument <gold><input><red> nie przedstawia prawidłowego kierunku.",
+    "invalid_interval": "<dark_gray>› <red>Argument <gold><input><red> nie jest prawidłową długością w czasie.",
+    "invalid_interval_not_in_range": "<dark_gray>› <red>Argument <gold><input><red> musi być długością w czasie od <gold><min><red> do <gold><max><red>."
 }

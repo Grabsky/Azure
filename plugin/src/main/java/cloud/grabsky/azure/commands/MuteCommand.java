@@ -2,6 +2,7 @@ package cloud.grabsky.azure.commands;
 
 import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.api.user.User;
+import cloud.grabsky.azure.commands.arguments.IntervalArgument;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.bedrock.BedrockPlugin;
@@ -11,7 +12,6 @@ import cloud.grabsky.bedrock.util.Interval.Unit;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
-import cloud.grabsky.commands.argument.LongArgument;
 import cloud.grabsky.commands.argument.StringArgument;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.component.ExceptionHandler;
@@ -24,9 +24,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-// TO-DO: Better duration format, perhaps ["5s, 5min, 5h, 5d, @forever", ...]
-// TO-DO: More permantent solution, store mutes inside a JSON file or something. PersistentDataContainer should be fine temporarily though.
-// TO-DO: Store the source of mute.
+// TO-DO: Support for "@forever" selector which defaults to 0s, making the punishment permantent. (low priority)
 public class MuteCommand extends RootCommand {
 
     private final Azure plugin;
@@ -59,8 +57,8 @@ public class MuteCommand extends RootCommand {
         final OfflinePlayer target = arguments.next(OfflinePlayer.class).asRequired(MUTE_USAGE);
         // ...
         final User userTarget = plugin.getUserCache().getUser(target.getUniqueId());
-        // Getting duration in seconds.
-        final long durationInMinutes = arguments.next(Long.class, LongArgument.ofRange(0, Long.MAX_VALUE)).asRequired(MUTE_USAGE);
+        // Getting duration.
+        final Interval duration = arguments.next(Interval.class, IntervalArgument.ofRange(0L, 12L, Unit.YEARS)).asRequired(MUTE_USAGE);
         // (optional) Getting the punishment reason. Default has to be explicitly set here, so no "implementation-default" reason is used.
         final @Nullable String reason = arguments.next(String.class, StringArgument.GREEDY).asOptional(PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON);
         // Loading LuckPerms data of targetted player, then running more logic.
@@ -69,8 +67,8 @@ public class MuteCommand extends RootCommand {
             if (user.getCachedData().getPermissionData().checkPermission("azure.bypass.mute_immunity").asBoolean() == false) {
                 // Following has to be scheduled onto the main thread.
                 ((BedrockPlugin) context.getManager().getPlugin()).getBedrockScheduler().run(1L, (task) -> {
-                    // When durationInMinutes is 0, punishment will be permantent - until manually removed.
-                    if (durationInMinutes == 0) {
+                    // When duration is 0, punishment will be permantent - until manually removed.
+                    if (duration.as(Unit.MILLISECONDS) == 0) {
                         // Muting the player.
                         userTarget.mute(null, reason, sender.getName());
                         // Sending success message to the sender.
@@ -81,9 +79,7 @@ public class MuteCommand extends RootCommand {
                         // Exiting the command block.
                         return;
                     }
-                    // When durationInMinutes is not 0, punishment will be temporary.
-                    final Interval duration = Interval.of(durationInMinutes, Unit.MINUTES);
-                    // Muting the player.
+                    // Muting the player temporarily.
                     userTarget.mute(duration, reason, sender.getName());
                     // Sending success message to the sender.
                     Message.of(PluginLocale.COMMAND_MUTE_SUCCESS)

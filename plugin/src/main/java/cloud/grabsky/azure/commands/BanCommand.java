@@ -2,6 +2,7 @@ package cloud.grabsky.azure.commands;
 
 import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.api.user.User;
+import cloud.grabsky.azure.commands.arguments.IntervalArgument;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.bedrock.BedrockPlugin;
@@ -11,7 +12,6 @@ import cloud.grabsky.bedrock.util.Interval.Unit;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
-import cloud.grabsky.commands.argument.LongArgument;
 import cloud.grabsky.commands.argument.StringArgument;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.component.ExceptionHandler;
@@ -24,8 +24,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-// TO-DO: Better duration format, perhaps ["5s, 5min, 5h, 5d, @forever", ...]
 // TO-DO: Notify staff members about bans.
+// TO-DO: Support for "@forever" selector which defaults to 0s, making the punishment permantent. (low priority)
 public class BanCommand extends RootCommand {
 
     private final Azure plugin;
@@ -46,7 +46,7 @@ public class BanCommand extends RootCommand {
     public @NotNull CompletionsProvider onTabComplete(final @NotNull RootCommandContext context, final int index) throws CommandLogicException {
         return switch (index) {
             case 0 -> CompletionsProvider.of(Player.class);
-            case 1 -> CompletionsProvider.of("0", "30", "60", "1440");
+            case 1 -> IntervalArgument.ofRange(0L, 12L, Unit.YEARS);
             default -> CompletionsProvider.EMPTY;
         };
     }
@@ -58,8 +58,8 @@ public class BanCommand extends RootCommand {
         final OfflinePlayer target = arguments.next(OfflinePlayer.class).asRequired(BAN_USAGE);
         // ...
         final User userTarget = plugin.getUserCache().getUser(target.getUniqueId());
-        // Getting duration in seconds.
-        final long durationInMinutes = arguments.next(Long.class, LongArgument.ofRange(0, Long.MAX_VALUE)).asRequired(BAN_USAGE);
+        // Getting duration.
+        final Interval duration = arguments.next(Interval.class, IntervalArgument.ofRange(0L, 12L, Unit.YEARS)).asRequired(BAN_USAGE);
         // (optional) Getting the punishment reason.
         final @Nullable String reason = arguments.next(String.class, StringArgument.GREEDY).asOptional(PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON);
         // Loading LuckPerms data of targetted player, then running more logic.
@@ -68,8 +68,8 @@ public class BanCommand extends RootCommand {
             if (user.getCachedData().getPermissionData().checkPermission("azure.bypass.ban_immunity").asBoolean() == false) {
                 // Following has to be scheduled onto the main thread.
                 ((BedrockPlugin) context.getManager().getPlugin()).getBedrockScheduler().run(1L, (task) -> {
-                    // When durationInMinutes is 0, punishment will be permantent - until manually removed.
-                    if (durationInMinutes == 0) {
+                    // When duration is 0, punishment will be permantent - until manually removed.
+                    if (duration.as(Unit.MILLISECONDS) == 0) {
                         // Banning the player. Player will be kicked manually for the sake of custimazble message.
                         userTarget.ban(null, reason, sender.getName());
                         // Kicking with custom message.
@@ -88,9 +88,7 @@ public class BanCommand extends RootCommand {
                         // Exiting the command block.
                         return;
                     }
-                    // When durationInMinutes is not 0, punishment will be temporary.
-                    final Interval duration = Interval.of(durationInMinutes, Unit.MINUTES);
-                    // Banning the player. Player will be kicked manually for the sake of custimazble message.
+                    // Banning the player temporarily. Player will be kicked manually for the sake of custimazble message.
                     userTarget.ban(duration, reason, sender.getName());
                     // Kicking with custom message.
                     if (target.isOnline() && target instanceof Player onlineTarget) {
