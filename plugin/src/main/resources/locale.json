@@ -61,6 +61,10 @@
         // Delete
         "delete_usage": "<dark_gray>› <gold>/delete <white>(signature_uuid)",
         "delete_failure": "<dark_gray>› <red>Usuwanie wiadomości nie powiodło się.",
+        // Inventory
+        "inventory_usage": "<dark_gray>› <gold>/inventory <white>(player)",
+        // Enderchest
+        "enderchest_usage": "<dark_gray>› <gold>/enderchest <white>(player)",
         // Gamemode
         "gamemode_usage": "<dark_gray>› <gray>Użycie: <gold>/gamemode <white>(player) <gray>(gamemode)",
         "gamemode_info": "<dark_gray>› <gray>Tryb gry gracza <gold><player><gray> to <gold><mode><gray>.",

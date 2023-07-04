@@ -99,6 +99,16 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.delete_failure")
     public static Component COMMAND_DELETE_FAILURE;
 
+    // Commands > Inventory
+
+    @JsonPath("commands.inventory_usage")
+    public static Component COMMAND_INVENTORY_USAGE;
+
+    // Commands > Inventory
+
+    @JsonPath("commands.enderchest_usage")
+    public static Component COMMAND_ENDERCHEST_USAGE;
+
     // Commands > Gamemode
 
     @JsonPath("commands.gamemode_usage")

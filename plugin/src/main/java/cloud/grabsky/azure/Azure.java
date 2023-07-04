@@ -7,8 +7,10 @@ import cloud.grabsky.azure.chat.ChatManager;
 import cloud.grabsky.azure.commands.AzureCommand;
 import cloud.grabsky.azure.commands.BanCommand;
 import cloud.grabsky.azure.commands.DeleteCommand;
+import cloud.grabsky.azure.commands.EnderchestCommand;
 import cloud.grabsky.azure.commands.GameModeCommand;
 import cloud.grabsky.azure.commands.GiveCommand;
+import cloud.grabsky.azure.commands.InventoryCommand;
 import cloud.grabsky.azure.commands.MuteCommand;
 import cloud.grabsky.azure.commands.PackCommand;
 import cloud.grabsky.azure.commands.SpeedCommand;
@@ -17,6 +19,7 @@ import cloud.grabsky.azure.commands.UnbanCommand;
 import cloud.grabsky.azure.commands.UnmuteCommand;
 import cloud.grabsky.azure.commands.VanishCommand;
 import cloud.grabsky.azure.commands.WorldCommand;
+import cloud.grabsky.azure.commands.arguments.IntervalArgument;
 import cloud.grabsky.azure.commands.templates.CommandArgumentTemplate;
 import cloud.grabsky.azure.commands.templates.CommandExceptionTemplate;
 import cloud.grabsky.azure.configuration.PluginConfig;
@@ -122,7 +125,9 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
                 .registerCommand(new BanCommand(this))
                 .registerCommand(new MuteCommand(this))
                 .registerCommand(new UnbanCommand(this))
-                .registerCommand(new UnmuteCommand(this));
+                .registerCommand(new UnmuteCommand(this))
+                .registerCommand(InventoryCommand.class)
+                .registerCommand(EnderchestCommand.class);
         // ...
         // Registering events...
         this.getServer().getPluginManager().registerEvents(chatManager, this);
