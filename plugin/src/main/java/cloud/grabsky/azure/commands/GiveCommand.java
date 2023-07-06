@@ -66,7 +66,7 @@ public final class GiveCommand extends RootCommand {
         target.getInventory().addItem(item);
         // ...
         if (sender != target) {
-            Message.of(PluginLocale.COMMAND_GIVE_SENDER)
+            Message.of(PluginLocale.COMMAND_GIVE_SUCCESS_SENDER)
                     .placeholder("player", target)
                     .placeholder("amount", amount)
                     .placeholder("item", display)
@@ -74,7 +74,7 @@ public final class GiveCommand extends RootCommand {
         }
         // ...
         if (isSilent == false) {
-            Message.of(PluginLocale.COMMAND_GIVE_TARGET)
+            Message.of(PluginLocale.COMMAND_GIVE_SUCCESS_TARGET)
                     .placeholder("amount", amount)
                     .placeholder("item", display)
                     .send(target);

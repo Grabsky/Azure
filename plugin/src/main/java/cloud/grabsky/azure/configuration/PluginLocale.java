@@ -128,11 +128,11 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.give_usage")
     public static Component COMMAND_GIVE_USAGE;
 
-    @JsonPath("commands.give_sent")
-    public static String COMMAND_GIVE_SENDER;
+    @JsonPath("commands.give_success_sender")
+    public static String COMMAND_GIVE_SUCCESS_SENDER;
 
-    @JsonPath("commands.give_received")
-    public static String COMMAND_GIVE_TARGET;
+    @JsonPath("commands.give_success_target")
+    public static String COMMAND_GIVE_SUCCESS_TARGET;
 
     // Commands > Pack
 

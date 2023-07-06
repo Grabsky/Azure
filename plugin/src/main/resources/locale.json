@@ -72,8 +72,8 @@
         "gamemode_set_success_target": "<dark_gray>› <gray>Twój tryb został ustawiony na <gold><mode><gray>.",
         // Give
         "give_usage": "<dark_gray>› <gray>Użycie: <gold>/give <white>(player) (material) (amount) <gray>(--silent)",
-        "give_sent": "<dark_gray>› <gray>Gracz <gold><player><gray> otrzymał <gold><item><gray>.",
-        "give_received": "<dark_gray>› <gray>Otrzymałeś <gold><item><gray>.",
+        "give_success_sender": "<dark_gray>› <gray>Gracz <gold><player><gray> otrzymał <gold><item><gray>.",
+        "give_success_target": "<dark_gray>› <gray>Otrzymałeś <gold><item><gray>.",
         // Pack
         "pack_help": [
             "",
