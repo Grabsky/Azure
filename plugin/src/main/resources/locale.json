@@ -3,6 +3,17 @@
     "reload_success": "<dark_gray>› <gray>Plugin <gold>Azure <gray>został załadowany pomyślnie.",
     "reload_failure": "<dark_gray>› <red>Wystąpił błąd podczas ładowania pluginu <gold>Azure<red>.",
     // ...
+    "yes": "Tak",
+    "no": "Nie",
+    // ...
+    "enabled": "Włączone",
+    "disabled": "Wyłączone",
+    //
+    "adventure": "Przygoda",
+    "creative": "Kreatywny",
+    "spectator": "Obserwator",
+    "survival": "Przetrwanie",
+    // ...
     "chat": {
         "on_cooldown": "<dark_gray>› <red>Musisz chwilę poczekać...",
         "muted": "<dark_gray>› <gray>Jesteś wyciszony przez kolejne <red><duration_left><gray>.",

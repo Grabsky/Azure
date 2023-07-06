@@ -40,7 +40,7 @@ public final class VanishCommand extends RootCommand {
             final boolean isVanished = isVanished(sender);
             // ...
             if (setVanished(context.getManager().getPlugin(), sender, !isVanished) == true) {
-                Message.of(!isVanished == true ? PluginLocale.VANISH_SUCCESS_STATE_ON : PluginLocale.VANISH_SUCCESS_STATE_OFF).send(sender);
+                Message.of(!isVanished == true ? PluginLocale.COMMAND_VANISH_SUCCESS_STATE_ON : PluginLocale.COMMAND_VANISH_SUCCESS_STATE_OFF).send(sender);
             }
             return;
         }
@@ -59,12 +59,12 @@ public final class VanishCommand extends RootCommand {
         if (setVanished(context.getManager().getPlugin(), target, nextVanishState) == true) {
             // ...
             if (sender != target) {
-                Message.of(nextVanishState == true ? PluginLocale.VANISH_SUCCESS_STATE_ON_TARGET : PluginLocale.VANISH_SUCCESS_STATE_OFF_TARGET)
+                Message.of(nextVanishState == true ? PluginLocale.COMMAND_VANISH_SUCCESS_STATE_ON_TARGET : PluginLocale.COMMAND_VANISH_SUCCESS_STATE_OFF_TARGET)
                         .placeholder("target", target)
                         .send(target);
                 return;
             }
-            Message.of(nextVanishState == true ? PluginLocale.VANISH_SUCCESS_STATE_ON : PluginLocale.VANISH_SUCCESS_STATE_OFF).send(target);
+            Message.of(nextVanishState == true ? PluginLocale.COMMAND_VANISH_SUCCESS_STATE_ON : PluginLocale.COMMAND_VANISH_SUCCESS_STATE_OFF).send(target);
         }
     }
 

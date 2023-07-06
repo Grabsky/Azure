@@ -5,6 +5,9 @@ import cloud.grabsky.configuration.JsonConfiguration;
 import cloud.grabsky.configuration.JsonPath;
 import cloud.grabsky.configuration.paper.adapter.StringComponentAdapter;
 import net.kyori.adventure.text.Component;
+import org.bukkit.GameMode;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnknownNullability;
 
 public final class PluginLocale implements JsonConfiguration {
 
@@ -16,6 +19,53 @@ public final class PluginLocale implements JsonConfiguration {
 
     @JsonPath("reload_failure")
     public static Component RELOAD_FAILURE;
+
+    // ...
+
+    @JsonPath("yes")
+    public static Component YES;
+
+    @JsonPath("no")
+    public static Component NO;
+
+    public static @UnknownNullability Component getBooleanShort(final boolean bool) {
+        return bool == true ? YES : NO;
+    }
+
+    // ...
+
+    @JsonPath("enabled")
+    public static Component ENABLED;
+
+    @JsonPath("disabled")
+    public static Component DISABLED;
+
+    public static @UnknownNullability Component getBooleanLong(final boolean bool) {
+        return bool == true ? ENABLED : DISABLED;
+    }
+
+    // ...
+
+    @JsonPath("adventure")
+    public static Component ADVENTURE;
+
+    @JsonPath("creative")
+    public static Component CREATIVE;
+
+    @JsonPath("spectator")
+    public static Component SPECTATOR;
+
+    @JsonPath("survival")
+    public static Component SURVIVAL;
+
+    public static @UnknownNullability Component getGameMode(final @NotNull GameMode mode) {
+        return switch (mode) {
+            case ADVENTURE -> ADVENTURE;
+            case CREATIVE -> CREATIVE;
+            case SPECTATOR -> SPECTATOR;
+            case SURVIVAL -> SURVIVAL;
+        };
+    }
 
     // Chat
 
@@ -314,17 +364,16 @@ public final class PluginLocale implements JsonConfiguration {
     // Commands > Vanish
 
     @JsonPath("commands.vanish_success_state_on")
-    public static Component VANISH_SUCCESS_STATE_ON;
+    public static Component COMMAND_VANISH_SUCCESS_STATE_ON;
 
     @JsonPath("commands.vanish_success_state_off")
-    public static Component VANISH_SUCCESS_STATE_OFF;
+    public static Component COMMAND_VANISH_SUCCESS_STATE_OFF;
 
     @JsonPath("commands.vanish_success_state_on_target")
-    public static String VANISH_SUCCESS_STATE_ON_TARGET;
+    public static String COMMAND_VANISH_SUCCESS_STATE_ON_TARGET;
 
     @JsonPath("commands.vanish_success_state_off_target")
-    public static String VANISH_SUCCESS_STATE_OFF_TARGET;
-
+    public static String COMMAND_VANISH_SUCCESS_STATE_OFF_TARGET;
 
 
     public static final class Commands implements JsonConfiguration {
