@@ -148,7 +148,6 @@ public final class PlayerCommand extends RootCommand {
         }
         // Displaying information to the console (or self) otherwise.
         showOfflinePlayerInfo(sender, target, targetUser);
-
     }
 
     // Displays information about player that is currently offline.
