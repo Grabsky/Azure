@@ -375,6 +375,18 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.vanish_success_state_off_target")
     public static String COMMAND_VANISH_SUCCESS_STATE_OFF_TARGET;
 
+    // Commands > Player
+
+    @JsonPath("commands.player_usage")
+    public static Component COMMAND_PLAYER_USAGE;
+
+    @JsonPath("commands.player_success_online")
+    @JsonAdapter(fromJson = StringComponentAdapter.class)
+    public static String COMMAND_PLAYER_SUCCESS_ONLINE;
+
+    @JsonPath("commands.player_success_offline")
+    @JsonAdapter(fromJson = StringComponentAdapter.class)
+    public static String COMMAND_PLAYER_SUCCESS_OFFLINE;
 
     public static final class Commands implements JsonConfiguration {
 

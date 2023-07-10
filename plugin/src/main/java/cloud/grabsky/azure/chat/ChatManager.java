@@ -44,7 +44,6 @@ import static cloud.grabsky.bedrock.helpers.Conditions.requirePresent;
 import static java.lang.System.currentTimeMillis;
 import static net.kyori.adventure.text.Component.empty;
 import static net.kyori.adventure.text.event.ClickEvent.callback;
-import static net.kyori.adventure.text.event.HoverEvent.showEntity;
 import static net.kyori.adventure.text.event.HoverEvent.showText;
 import static net.kyori.adventure.text.format.NamedTextColor.WHITE;
 

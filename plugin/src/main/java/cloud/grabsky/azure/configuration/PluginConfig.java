@@ -12,7 +12,6 @@ import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import org.bukkit.permissions.Permissible;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;

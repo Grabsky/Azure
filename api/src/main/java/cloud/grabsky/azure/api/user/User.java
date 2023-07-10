@@ -1,12 +1,18 @@
 package cloud.grabsky.azure.api.user;
 
+import cloud.grabsky.azure.api.AzureProvider;
 import cloud.grabsky.azure.api.Punishment;
 import cloud.grabsky.bedrock.util.Interval;
+import net.kyori.adventure.nbt.BinaryTagIO;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.UUID;
 
 /**
@@ -19,6 +25,10 @@ public interface User {
     @NotNull UUID getUniqueId();
 
     @NotNull String getTextures();
+
+    @NotNull String getLastAddress();
+
+    @NotNull String getLastCountryCode();
 
     @Nullable Punishment getMostRecentBan();
 
@@ -36,6 +46,10 @@ public interface User {
         return Bukkit.getPlayer(this.getUniqueId());
     }
 
+    default @Nullable OfflinePlayer toOfflinePlayer() {
+        return Bukkit.getOfflinePlayer(this.getUniqueId());
+    }
+
     @NotNull Punishment ban(final @Nullable Interval duration, final @Nullable String reason, final @Nullable String issuer);
 
     void unban(final @Nullable String issuer);
@@ -43,5 +57,11 @@ public interface User {
     @NotNull Punishment mute(final @Nullable Interval duration, final @Nullable String reason, final @Nullable String issuer);
 
     void unmute(final @Nullable String issuer);
+
+    default CompoundBinaryTag getPlayerData() throws IOException {
+        final File file = new File(new File(AzureProvider.getAPI().getWorldManager().getPrimaryWorld().getWorldFolder(), "playerdata"), getUniqueId() + ".dat");
+        // ...
+        return BinaryTagIO.reader().read(file.toPath(), BinaryTagIO.Compression.GZIP); // Should be automatically closed.
+    }
 
 }

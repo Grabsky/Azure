@@ -9,6 +9,8 @@ import cloud.grabsky.bedrock.util.Interval.Unit;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,6 +27,12 @@ public final class AzureUser implements User {
 
     @Getter(AccessLevel.PUBLIC)
     private final @NotNull String textures;
+
+    @Getter(AccessLevel.PUBLIC)
+    private @NotNull String lastAddress;
+
+    @Getter(AccessLevel.PUBLIC) @Setter(value = AccessLevel.PACKAGE, onMethod = @__(@ApiStatus.Internal))
+    private @NotNull String lastCountryCode;
 
     // Defined as implementation rather than interface because we want Moshi to know what adapter to use.
     private @Nullable AzurePunishment mostRecentBan;

@@ -13,13 +13,13 @@ import cloud.grabsky.azure.commands.GiveCommand;
 import cloud.grabsky.azure.commands.InventoryCommand;
 import cloud.grabsky.azure.commands.MuteCommand;
 import cloud.grabsky.azure.commands.PackCommand;
+import cloud.grabsky.azure.commands.PlayerCommand;
 import cloud.grabsky.azure.commands.SpeedCommand;
 import cloud.grabsky.azure.commands.TeleportCommand;
 import cloud.grabsky.azure.commands.UnbanCommand;
 import cloud.grabsky.azure.commands.UnmuteCommand;
 import cloud.grabsky.azure.commands.VanishCommand;
 import cloud.grabsky.azure.commands.WorldCommand;
-import cloud.grabsky.azure.commands.arguments.IntervalArgument;
 import cloud.grabsky.azure.commands.templates.CommandArgumentTemplate;
 import cloud.grabsky.azure.commands.templates.CommandExceptionTemplate;
 import cloud.grabsky.azure.configuration.PluginConfig;
@@ -32,8 +32,6 @@ import cloud.grabsky.azure.user.AzureUserCache;
 import cloud.grabsky.azure.util.FileLogger;
 import cloud.grabsky.azure.world.AzureWorldManager;
 import cloud.grabsky.bedrock.BedrockPlugin;
-import cloud.grabsky.bedrock.util.Interval;
-import cloud.grabsky.bedrock.util.Interval.Unit;
 import cloud.grabsky.commands.RootCommandManager;
 import cloud.grabsky.configuration.ConfigurationHolder;
 import cloud.grabsky.configuration.ConfigurationMapper;
@@ -127,7 +125,8 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
                 .registerCommand(new UnbanCommand(this))
                 .registerCommand(new UnmuteCommand(this))
                 .registerCommand(InventoryCommand.class)
-                .registerCommand(EnderchestCommand.class);
+                .registerCommand(EnderchestCommand.class)
+                .registerCommand(new PlayerCommand(this));
         // ...
         // Registering events...
         this.getServer().getPluginManager().registerEvents(chatManager, this);

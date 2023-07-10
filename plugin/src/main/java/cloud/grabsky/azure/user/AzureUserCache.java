@@ -22,10 +22,14 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 import org.jetbrains.annotations.Unmodifiable;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Base64;
 import java.util.Collection;
@@ -164,10 +168,25 @@ public final class AzureUserCache implements UserCache, Listener {
         // Returning existing user from cache or computing new one, if absent.
         return internalUserMap.computeIfAbsent(uniqueId, (___) -> {
             final @Nullable URL skin = player.getPlayerProfile().getTextures().getSkin();
+            // ...
+            final @Nullable String address = (player.getAddress() != null) ? player.getAddress().getHostString() : null;
             // Creating instance of AzureUser containing player information.
-            final AzureUser user = new AzureUser(player.getName(), uniqueId, (skin != null) ? encodeTextures(skin) : "", null, null);
+            final AzureUser user = new AzureUser(
+                    player.getName(),
+                    uniqueId,
+                    (skin != null) ? encodeTextures(skin) : "",
+                    (address != null) ? address : "N/A",
+                    "N/A", // Country code is fetched asynchronously, just before saving.
+                    null,
+                    null
+            );
             // Saving to the file.
-            this.saveUser(user);
+            CompletableFuture.runAsync(() -> {
+                final String countryCode = fetchCountry(address, 1);
+                // ...
+                if (countryCode != null)
+                    user.setLastCountryCode(countryCode);
+            }).thenCompose((v) -> this.saveUser(user));
             // Returning the User instance.
             return user;
         });
@@ -218,14 +237,30 @@ public final class AzureUserCache implements UserCache, Listener {
     public void onUserJoin(final @NotNull PlayerJoinEvent event) {
         final Player player = event.getPlayer();
         // Updating cache with up-to-date data...
-        internalUserMap.compute(player.getUniqueId(), (uuid, existingUser) -> {
+        internalUserMap.compute(player.getUniqueId(), (uniqueId, existingUser) -> {
             final @Nullable URL skin = player.getPlayerProfile().getTextures().getSkin();
+            // ...
+            final @Nullable String address = (player.getAddress() != null) ? player.getAddress().getHostString() : null;
             // Getting punishment information.
             final @Nullable AzurePunishment mostRecentBan = (existingUser != null) ? (AzurePunishment) existingUser.getMostRecentBan() : null;
             final @Nullable AzurePunishment mostRecentMute = (existingUser != null) ? (AzurePunishment) existingUser.getMostRecentMute() : null;
             // Creating instance of AzureUser containing player information.
-            final AzureUser user = new AzureUser(player.getName(), uuid, (skin != null) ? encodeTextures(skin) : "", mostRecentBan, mostRecentMute);
-            // Saving to the file in case no information was previously cached or "new" instance is different than cached one.
+            final AzureUser user = new AzureUser(
+                    player.getName(),
+                    uniqueId,
+                    (skin != null) ? encodeTextures(skin) : "",
+                    (address != null) ? address : "N/A",
+                    "N/A", // Country code is fetched asynchronously, just before saving.
+                    mostRecentBan,
+                    mostRecentMute
+            );
+            // Saving to the file.
+            CompletableFuture.runAsync(() -> {
+                final String countryCode = fetchCountry(address, 1);
+                // ...
+                if (countryCode != null)
+                    user.setLastCountryCode(countryCode);
+            }).thenCompose((v) -> this.saveUser(user));
             if (existingUser == null || user.equals(existingUser) == false)
                 this.saveUser(user);
             // Returning "new" instance, replacing the previous one.
@@ -264,6 +299,39 @@ public final class AzureUserCache implements UserCache, Listener {
                                }
                                """.trim().formatted(url).getBytes()
         );
+    }
+
+    private static final String API_URL = "https://get.geojs.io/v1/ip/country/";
+
+    private @Nullable String fetchCountry(final @Nullable String address, @Range(from = 0L, to = 5L) int maxRetries) {
+        if (address == null)
+            return null;
+        // Adding one as to
+        maxRetries = maxRetries + 1;
+        // ...
+        try {
+            final URL uri = new URL(API_URL + address);
+            // ...
+            while (maxRetries != 0) {
+                // Sending request to an API.
+                final BufferedReader reader = new BufferedReader(new InputStreamReader(uri.openStream()));
+                if (reader.ready()) {
+                    // Getting country name.
+                    final String country = reader.readLine();
+                    // Closing reader.
+                    reader.close();
+                    // Returning fetched country name or null.
+                    return country.equals("nil") == false ? country : null;
+                }
+                maxRetries--;
+            }
+        } catch (final MalformedURLException e) {
+            plugin.getLogger().severe("Malformed URI = " + API_URL + "[_REDACTED_ADDRESS_]");
+        } catch (final IOException e) {
+            plugin.getLogger().severe("An error occurred while trying to send request to '" + API_URL + "[_REDACTED_ADDRESS_]'... retrying...");
+        }
+        // ...
+        return null;
     }
 
 }

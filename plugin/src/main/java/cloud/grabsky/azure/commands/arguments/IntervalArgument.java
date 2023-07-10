@@ -6,7 +6,6 @@ import cloud.grabsky.bedrock.util.Interval;
 import cloud.grabsky.bedrock.util.Interval.Unit;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommandContext;
-import cloud.grabsky.commands.argument.IntegerArgument;
 import cloud.grabsky.commands.component.ArgumentParser;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.exception.ArgumentParseException;

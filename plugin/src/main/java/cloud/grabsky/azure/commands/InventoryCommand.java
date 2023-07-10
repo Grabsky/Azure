@@ -1,9 +1,7 @@
 package cloud.grabsky.azure.commands;
 
-import cloud.grabsky.azure.commands.arguments.IntervalArgument;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.bedrock.components.Message;
-import cloud.grabsky.bedrock.util.Interval;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;

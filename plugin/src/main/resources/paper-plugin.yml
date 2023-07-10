@@ -4,10 +4,10 @@ api-version: '1.19'
 main: 'cloud.grabsky.azure.Azure'
 load: POSTWORLD
 dependencies:
-  - name: LuckPerms
-    required: true
-  - name: Guithium
-    required: true
-load-after:
-  - name: LuckPerms
-    bootstrap: false
+  server:
+    LuckPerms:
+      load: BEFORE
+      required: true
+    Guithium:
+      load: BEFORE
+      required: true

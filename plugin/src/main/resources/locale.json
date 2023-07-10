@@ -200,6 +200,31 @@
         "vanish_success_state_on": "<dark_gray>› <gray>Stałeś się ukryty dla innych graczy.",
         "vanish_success_state_off": "<dark_gray>› <gray>Stałeś się widoczny dla innych graczy.",
         "vanish_success_state_on_target": "<dark_gray>› <gray><gold><target><gray> stał się niewidoczny dla innych graczy.",
-        "vanish_success_state_off_target": "<dark_gray>› <gray><gold><target><gray> stał się widoczny dla innych graczy."
+        "vanish_success_state_off_target": "<dark_gray>› <gray><gold><target><gray> stał się widoczny dla innych graczy.",
+        // Player
+        "player_usage": "<dark_gray>› <gray>Użycie: <gold>/player <gray>(player)",
+        "player_success_online": [
+            "",
+            "<dark_gray>› <gray>Gracz: <gold><name><dark_gray> / <gray>Identyfikator: <gold><uuid>...",
+            "<dark_gray>› <gray>Adres IP: <gold><ip><dark_gray> / <gray>Kraj: <gold><country><dark_gray> / <gray>Opóźnienie: <gold><ping>",
+            "<dark_gray>› <gray>Zarejestrowano: <gold><first_join><dark_gray> / <gray>Czas gry: <gold><time_played>",
+            "<dark_gray>› <gray>Klient: <gold><client><dark_gray> / <gray>Wersja: <gold><version><dark_gray> / <gray>Online od: <green><online_since>",
+            "<dark_gray>› <gray>Lokalizacja: <gold><x><gray>, <gold><y><gray>, <gold><z><dark_gray> / <gray>Świat: <gold><world>",
+            "<dark_gray>› <gray>Tryb gry: <gold><gamemode><dark_gray> / <gray>Latanie: <is_flying><dark_gray> / <gray>Nietykalność: <is_invulnerable>",
+            "<dark_gray>› <gray>Zdrowie: <gold><health>/10<dark_gray> / <gray>Głód: <gold><hunger>/10<dark_gray> / <gray>Poziom: <gold><xp_level> <gray>(<xp_progress>%)",
+            "<dark_gray>› <gray>Zbanowany: <is_banned><dark_gray> / <gray>Wyciszony: <is_muted><dark_gray><dark_gray> / <gray>Guithium: <has_guithium>",
+            ""
+        ],
+        "player_success_offline": [
+            "",
+            "<dark_gray>› <gray>Gracz: <gold><name><dark_gray> / <gray>Identyfikator: <gold><uuid>...",
+            "<dark_gray>› <gray>Adres IP: <gold><ip><dark_gray> / <gray>Kraj: <gold><country><dark_gray> / <gray>Offline od: <red><offline_since>",
+            "<dark_gray>› <gray>Zarejestrowano: <gold><first_join><dark_gray> / <gray>Czas gry: <gold><time_played>",
+            "<dark_gray>› <gray>Lokalizacja: <gold><x><gray>, <gold><y><gray>, <gold><z><dark_gray> / <gray>Świat: <gold><world>",
+            "<dark_gray>› <gray>Tryb gry: <gold><gamemode><dark_gray> / <gray>Latanie: <is_flying><dark_gray> / <gray>Nietykalność: <is_invulnerable>",
+            "<dark_gray>› <gray>Zdrowie: <gold><health>/10<dark_gray> / <gray>Głód: <gold><hunger>/10<dark_gray> / <gray>Poziom: <gold><xp_level> <gray>(<xp_progress>%)",
+            "<dark_gray>› <gray>Zbanowany: <is_banned><dark_gray> / <gray>Wyciszony: <is_muted><dark_gray>",
+            ""
+        ]
     }
 }
