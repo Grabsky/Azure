@@ -17,6 +17,8 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
+// TO-DO: Store vanish state in JSON.
+// TO-DO: Weight based checks, rather than permission based.
 public final class VanishCommand extends RootCommand {
 
     public VanishCommand() {
@@ -40,7 +42,7 @@ public final class VanishCommand extends RootCommand {
             final boolean isVanished = isVanished(sender);
             // ...
             if (setVanished(context.getManager().getPlugin(), sender, !isVanished) == true) {
-                Message.of(!isVanished == true ? PluginLocale.COMMAND_VANISH_SUCCESS_STATE_ON : PluginLocale.COMMAND_VANISH_SUCCESS_STATE_OFF).send(sender);
+                Message.of(PluginLocale.COMMAND_VANISH_SUCCESS_TARGET).placeholder("state", PluginLocale.getBooleanLong(!isVanished == true)).send(sender);
             }
             return;
         }
@@ -59,12 +61,13 @@ public final class VanishCommand extends RootCommand {
         if (setVanished(context.getManager().getPlugin(), target, nextVanishState) == true) {
             // ...
             if (sender != target) {
-                Message.of(nextVanishState == true ? PluginLocale.COMMAND_VANISH_SUCCESS_STATE_ON_TARGET : PluginLocale.COMMAND_VANISH_SUCCESS_STATE_OFF_TARGET)
-                        .placeholder("target", target)
-                        .send(target);
+                Message.of(PluginLocale.COMMAND_VANISH_SUCCESS)
+                        .placeholder("player", target)
+                        .placeholder("state", PluginLocale.getBooleanLong(nextVanishState == true))
+                        .send(sender);
                 return;
             }
-            Message.of(nextVanishState == true ? PluginLocale.COMMAND_VANISH_SUCCESS_STATE_ON : PluginLocale.COMMAND_VANISH_SUCCESS_STATE_OFF).send(target);
+            Message.of(PluginLocale.COMMAND_VANISH_SUCCESS_TARGET).placeholder("state", PluginLocale.getBooleanLong(nextVanishState == true)).send(sender);
         }
     }
 
@@ -90,7 +93,7 @@ public final class VanishCommand extends RootCommand {
             target.hideBossBar(PluginConfig.VANISH_BOSS_BAR);
             // ...
             final GameMode nextGameMode = (target.getPreviousGameMode() != null)
-                    ? (target.hasPermission("azure.plugin.vanish_switch_previous_gamemode") == true)
+                    ? (target.hasPermission("azure.plugin.vanish_switch_previous_gamemode") == true) // ???
                             ? target.getPreviousGameMode()
                             : Bukkit.getDefaultGameMode()
                     : Bukkit.getDefaultGameMode();

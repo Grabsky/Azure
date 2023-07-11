@@ -363,17 +363,11 @@ public final class PluginLocale implements JsonConfiguration {
 
     // Commands > Vanish
 
-    @JsonPath("commands.vanish_success_state_on")
-    public static Component COMMAND_VANISH_SUCCESS_STATE_ON;
+    @JsonPath("commands.vanish_success")
+    public static String COMMAND_VANISH_SUCCESS;
 
-    @JsonPath("commands.vanish_success_state_off")
-    public static Component COMMAND_VANISH_SUCCESS_STATE_OFF;
-
-    @JsonPath("commands.vanish_success_state_on_target")
-    public static String COMMAND_VANISH_SUCCESS_STATE_ON_TARGET;
-
-    @JsonPath("commands.vanish_success_state_off_target")
-    public static String COMMAND_VANISH_SUCCESS_STATE_OFF_TARGET;
+    @JsonPath("commands.vanish_success_target")
+    public static String COMMAND_VANISH_SUCCESS_TARGET;
 
     // Commands > Player
 
