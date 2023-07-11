@@ -2,7 +2,9 @@
 {
     "general_settings": {
         // Determinates whether titles should be cleared on join.
-        "clear_title_on_join": false
+        "clear_title_on_join": false,
+        // Determinates whether player should respawn on spawnpoint of the primary world.
+        "respawn_on_primary_world_spawn": true
     },
     // Chat settings.
     "chat_settings": {

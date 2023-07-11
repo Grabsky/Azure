@@ -2,11 +2,11 @@ package cloud.grabsky.azure.listener;
 
 import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.Azure.Keys;
-import cloud.grabsky.azure.api.world.WorldManager;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,9 +26,13 @@ public final class PlayerListener implements Listener {
 
     @EventHandler
     public void onPlayerRespawn(final @NotNull PlayerRespawnEvent event) {
-        final WorldManager worlds = plugin.getWorldManager();
-        // Setting respawn location to spawn point of the primary world.
-        event.setRespawnLocation(worlds.getSpawnPoint(worlds.getPrimaryWorld()));
+        // Setting respawn location to spawn point of the primary world. (if enabled)
+        if (PluginConfig.GENERAL_RESPAWN_ON_PRIMARY_WORLD_SPAWN == true) {
+            // Getting the primary world.
+            final World primaryWorld = plugin.getWorldManager().getPrimaryWorld();
+            // Setting the respawn location.
+            event.setRespawnLocation(plugin.getWorldManager().getSpawnPoint(primaryWorld));
+        }
     }
 
     @EventHandler
