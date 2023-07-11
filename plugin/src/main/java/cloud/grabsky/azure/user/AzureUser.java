@@ -69,7 +69,7 @@ public final class AzureUser implements User {
             this.isVanished = true;
             // Saving User data to the filesystem.
             ((AzureUserCache) Azure.getInstance().getUserCache()).saveUser(this).thenAccept(isSuccess -> {
-                Azure.getInstance().getLogger().info("Saving data of " + this.name + " in the background... SUCCESS = " + (isSuccess == true ? "OK" : "ERROR"));
+                Azure.getInstance().getLogger().info("Saving data of " + this.name + " in the background... " + (isSuccess == true ? "OK" : "ERROR"));
             });
             // Showing BossBar.
             thisPlayer.showBossBar(PluginConfig.VANISH_BOSS_BAR);
@@ -78,11 +78,11 @@ public final class AzureUser implements User {
             // Hiding target from other players.
             final LuckPerms luckperms = Azure.getInstance().getLuckPerms();
             Bukkit.getOnlinePlayers().forEach(otherPlayer -> {
-                if (otherPlayer != thisPlayer) {
+                if (thisPlayer != otherPlayer) {
                     final @Nullable Group playerGroup = luckperms.getGroupManager().getGroup(luckperms.getPlayerAdapter(Player.class).getUser(thisPlayer).getPrimaryGroup());
                     final @Nullable Group otherGroup = luckperms.getGroupManager().getGroup(luckperms.getPlayerAdapter(Player.class).getUser(otherPlayer).getPrimaryGroup());
                     // Comparing group weights.
-                    if (playerGroup != null && otherGroup != null && playerGroup.getWeight().orElse(0) <= otherGroup.getWeight().orElse(0))
+                    if (playerGroup != null && otherGroup != null && playerGroup.getWeight().orElse(0) > otherGroup.getWeight().orElse(0))
                         otherPlayer.hidePlayer(Azure.getInstance(), thisPlayer);
                 }
             });
@@ -132,7 +132,7 @@ public final class AzureUser implements User {
         this.mostRecentBan = null;
         // Saving User data to the filesystem.
         ((AzureUserCache) Azure.getInstance().getUserCache()).saveUser(this).thenAccept(isSuccess -> {
-            Azure.getInstance().getLogger().info("Saving data of " + this.name + " in the background... SUCCESS = " + (isSuccess == true ? "OK" : "ERROR"));
+            Azure.getInstance().getLogger().info("Saving data of " + this.name + " in the background... " + (isSuccess == true ? "OK" : "ERROR"));
         });
         // Logging...
         Azure.getInstance().getPunishmentsFileLogger().log("Player " + this.getName() + " (" + this.getUniqueId() + ") has been UNBANNED by " + (issuer != null ? issuer : "SYSTEM"));
@@ -149,7 +149,7 @@ public final class AzureUser implements User {
         );
         // Saving User data to the filesystem.
         ((AzureUserCache) Azure.getInstance().getUserCache()).saveUser(this).thenAccept(isSuccess -> {
-            Azure.getInstance().getLogger().info("Saving data of " + this.name + " in the background... SUCCESS = " + (isSuccess == true ? "OK" : "ERROR"));
+            Azure.getInstance().getLogger().info("Saving data of " + this.name + " in the background... " + (isSuccess == true ? "OK" : "ERROR"));
         });
         // Logging...
         Azure.getInstance().getPunishmentsFileLogger().log("Player " + this.getName() + " (" + this.getUniqueId() + ") has been MUTED (" + (mostRecentMute.isPermanent() == false ? mostRecentMute.getDuration() : "permanent") + ") by " + mostRecentMute.getIssuer() + " with a reason: " + mostRecentMute.getReason());
@@ -163,7 +163,7 @@ public final class AzureUser implements User {
         this.mostRecentMute = null;
         // Saving User data to the filesystem.
         ((AzureUserCache) Azure.getInstance().getUserCache()).saveUser(this).thenAccept(isSuccess -> {
-            Azure.getInstance().getLogger().info("Saving data of " + this.name + " in the background... SUCCESS = " + (isSuccess == true ? "OK" : "ERROR"));
+            Azure.getInstance().getLogger().info("Saving data of " + this.name + " in the background... " + (isSuccess == true ? "OK" : "ERROR"));
         });
         // Logging...
         Azure.getInstance().getPunishmentsFileLogger().log("Player " + this.getName() + " (" + this.getUniqueId() + ") has been UNMUTED by " + (issuer != null ? issuer : "SYSTEM"));

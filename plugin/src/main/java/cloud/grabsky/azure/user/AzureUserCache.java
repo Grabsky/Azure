@@ -1,11 +1,12 @@
 package cloud.grabsky.azure.user;
 
+import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.api.Punishment;
 import cloud.grabsky.azure.api.user.User;
 import cloud.grabsky.azure.api.user.UserCache;
+import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.azure.configuration.adapters.UUIDAdapter;
-import cloud.grabsky.bedrock.BedrockPlugin;
 import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.bedrock.util.Interval;
 import cloud.grabsky.bedrock.util.Interval.Unit;
@@ -14,12 +15,16 @@ import com.squareup.moshi.JsonReader;
 import com.squareup.moshi.JsonWriter;
 import com.squareup.moshi.Moshi;
 import net.kyori.adventure.text.Component;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.model.group.Group;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
@@ -45,13 +50,13 @@ import static okio.Okio.source;
 
 public final class AzureUserCache implements UserCache, Listener {
 
-    private final BedrockPlugin plugin;
+    private final Azure plugin;
     private final File cacheDirectory;
     private final Map<UUID, AzureUser> internalUserMap;
 
     private final JsonAdapter<AzureUser> adapter;
 
-    public AzureUserCache(final @NotNull BedrockPlugin plugin) {
+    public AzureUserCache(final @NotNull Azure plugin) {
         this.plugin = plugin;
         this.cacheDirectory = new File(plugin.getDataFolder(), "usercache");
         this.internalUserMap = new HashMap<>();
@@ -236,18 +241,18 @@ public final class AzureUserCache implements UserCache, Listener {
 
     @EventHandler
     public void onUserJoin(final @NotNull PlayerJoinEvent event) {
-        final Player player = event.getPlayer();
+        final Player thisPlayer = event.getPlayer();
         // Updating cache with up-to-date data...
-        internalUserMap.compute(player.getUniqueId(), (uniqueId, existingUser) -> {
-            final @Nullable URL skin = player.getPlayerProfile().getTextures().getSkin();
+        final User thisUser = internalUserMap.compute(thisPlayer.getUniqueId(), (uniqueId, existingUser) -> {
+            final @Nullable URL skin = thisPlayer.getPlayerProfile().getTextures().getSkin();
             // ...
-            final @Nullable String address = (player.getAddress() != null) ? player.getAddress().getHostString() : null;
+            final @Nullable String address = (thisPlayer.getAddress() != null) ? thisPlayer.getAddress().getHostString() : null;
             // Creating instance of AzureUser containing player information.
-            final AzureUser user = new AzureUser(
-                    player.getName(),
+            final AzureUser computeUser = new AzureUser(
+                    thisPlayer.getName(),
                     uniqueId,
                     (skin != null) ? encodeTextures(skin) : "",
-                    (player.getAddress() != null) ? player.getAddress().getHostString() : "N/A",
+                    (thisPlayer.getAddress() != null) ? thisPlayer.getAddress().getHostString() : "N/A",
                     "N/A", // Country code is fetched asynchronously in the next step.
                     (existingUser != null) ? existingUser.isVanished() : false,
                     (existingUser != null) ? (AzurePunishment) existingUser.getMostRecentBan() : null,
@@ -258,13 +263,53 @@ public final class AzureUserCache implements UserCache, Listener {
                 final String countryCode = fetchCountry(address, 1);
                 // ...
                 if (countryCode != null)
-                    user.setLastCountryCode(countryCode);
-            }).thenCompose(_void -> this.saveUser(user));
-            if (existingUser == null || user.equals(existingUser) == false)
-                this.saveUser(user);
+                    computeUser.setLastCountryCode(countryCode);
+            }).thenCompose(_void -> this.saveUser(computeUser));
+            if (existingUser == null || computeUser.equals(existingUser) == false)
+                this.saveUser(computeUser);
             // Returning "new" instance, replacing the previous one.
-            return user;
+            return computeUser;
         });
+        // Hiding vanished players. This was previously handled inside PlayerListener, until we migrated state storage from PDC to User JSON data.
+        // NOTE: Handling that inside PlayerJoinEvent event may result in vanished player being exposed until he is hidden.
+        // NOTE: Here and eevrywhere else (I believe) - vanished players of the same group weight can see eachother.
+        if (thisUser.isVanished() == true) {
+            // Removing the join message, this should be configurable in the future.
+            event.joinMessage(null);
+            // Showing BossBar.
+            thisPlayer.showBossBar(PluginConfig.VANISH_BOSS_BAR);
+        }
+        // Getting instance of LuckPerms to compare group weights later on.
+        final LuckPerms luckperms = plugin.getLuckPerms();
+        // Iterating over list of online players to hide (this) player from them, and potentially (other) players from (this) player.
+        Bukkit.getOnlinePlayers().forEach(otherPlayer -> {
+            if (thisPlayer != otherPlayer) {
+                final @Nullable Group playerGroup = luckperms.getGroupManager().getGroup(luckperms.getPlayerAdapter(Player.class).getUser(thisPlayer).getPrimaryGroup());
+                final @Nullable Group otherGroup = luckperms.getGroupManager().getGroup(luckperms.getPlayerAdapter(Player.class).getUser(otherPlayer).getPrimaryGroup());
+                // Getting User object of the (other) player.
+                final User otherUser = this.getUser(otherPlayer);
+                // Hiding (other) player from (this) player, if feasible.
+                if (otherUser.isVanished() == true) {
+                    // Comparing group weights.
+                    if (playerGroup != null && otherGroup != null && otherGroup.getWeight().orElse(0) > playerGroup.getWeight().orElse(0)) // Same check as below but inverted.
+                        thisPlayer.hidePlayer(plugin, otherPlayer);
+                }
+                // Hiding (this) player from (other) player, if feasible.
+                if (thisUser.isVanished() == true) {
+                    // Comparing group weights.
+                    if (playerGroup != null && otherGroup != null && playerGroup.getWeight().orElse(0) > otherGroup.getWeight().orElse(0))
+                        otherPlayer.hidePlayer(plugin, thisPlayer);
+                }
+            }
+        });
+    }
+
+    @EventHandler
+    public void onUserQuit(final @NotNull PlayerQuitEvent event) {
+        // Removing the quit message, this should be configurable in the future.
+        if (this.getUser(event.getPlayer()).isVanished() == true) {
+            event.quitMessage(null);
+        }
     }
 
     /**

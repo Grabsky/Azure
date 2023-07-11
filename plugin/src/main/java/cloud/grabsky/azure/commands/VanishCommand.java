@@ -1,9 +1,6 @@
 package cloud.grabsky.azure.commands;
 
 import cloud.grabsky.azure.Azure;
-import cloud.grabsky.azure.Azure.Keys;
-import cloud.grabsky.azure.api.user.User;
-import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.azure.user.AzureUser;
 import cloud.grabsky.bedrock.components.Message;
@@ -12,13 +9,13 @@ import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.exception.CommandLogicException;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
+import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+
+import static net.kyori.adventure.text.format.NamedTextColor.GREEN;
+import static net.kyori.adventure.text.format.NamedTextColor.RED;
 
 // TO-DO: Store vanish state in JSON.
 // TO-DO: Weight based checks, rather than permission based.
@@ -52,7 +49,7 @@ public final class VanishCommand extends RootCommand {
             // Changing vanish state.
             user.setVanished(nextVanishState);
             // Sending success message to the sender.
-            Message.of(PluginLocale.COMMAND_VANISH_SUCCESS_TARGET).placeholder("state", PluginLocale.getBooleanLong(nextVanishState == true)).send(sender);
+            Message.of(PluginLocale.COMMAND_VANISH_SUCCESS_TARGET).placeholder("state", getColoredBooleanLong(nextVanishState == true)).send(sender);
             return;
         }
         final CommandSender sender = context.getExecutor().asCommandSender();
@@ -74,11 +71,15 @@ public final class VanishCommand extends RootCommand {
         if (sender != target) {
             Message.of(PluginLocale.COMMAND_VANISH_SUCCESS)
                     .placeholder("player", target)
-                    .placeholder("state", PluginLocale.getBooleanLong(nextVanishState == true))
+                    .placeholder("state", getColoredBooleanLong(nextVanishState == true))
                     .send(sender);
             return;
         }
-        Message.of(PluginLocale.COMMAND_VANISH_SUCCESS_TARGET).placeholder("state", PluginLocale.getBooleanLong(nextVanishState == true)).send(target);
+        Message.of(PluginLocale.COMMAND_VANISH_SUCCESS_TARGET).placeholder("state", getColoredBooleanLong(nextVanishState == true)).send(target);
+    }
+
+    private Component getColoredBooleanLong(final boolean bool) {
+        return (bool == true) ? PluginLocale.getBooleanLong(true).color(GREEN) : PluginLocale.getBooleanLong(false).color(RED);
     }
 
 }

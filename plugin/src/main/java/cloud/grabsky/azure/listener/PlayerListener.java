@@ -3,9 +3,6 @@ package cloud.grabsky.azure.listener;
 import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.Azure.Keys;
 import cloud.grabsky.azure.configuration.PluginConfig;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,10 +16,13 @@ import org.jetbrains.annotations.NotNull;
 
 import static net.kyori.adventure.text.Component.empty;
 
-@RequiredArgsConstructor(access = AccessLevel.PUBLIC)
 public final class PlayerListener implements Listener {
 
     private final Azure plugin;
+
+    public PlayerListener(final @NotNull Azure plugin) {
+        this.plugin = plugin;
+    }
 
     @EventHandler
     public void onPlayerRespawn(final @NotNull PlayerRespawnEvent event) {
@@ -50,17 +50,6 @@ public final class PlayerListener implements Listener {
                     PluginConfig.RESOURCE_PACK_PROMPT_MESSAGE
             ));
         }
-        // ...
-        if (player.getPersistentDataContainer().getOrDefault(Keys.IS_VANISHED, PersistentDataType.BOOLEAN, false) == true) {
-            // Hiding join message.
-            event.joinMessage(empty());
-            // Showing BossBar.
-            player.showBossBar(PluginConfig.VANISH_BOSS_BAR);
-        }
-        // Hiding vanished players.
-        Bukkit.getServer().getOnlinePlayers().stream()
-                .filter(other -> other.getPersistentDataContainer().getOrDefault(Keys.IS_VANISHED, PersistentDataType.BOOLEAN, false) == true)
-                .forEach(other -> player.hidePlayer(plugin, other));
     }
 
     @EventHandler

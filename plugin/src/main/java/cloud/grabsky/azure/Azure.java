@@ -44,9 +44,11 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import org.bukkit.NamespacedKey;
+import org.bukkit.command.Command;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
 
@@ -119,7 +121,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
                 .registerCommand(TeleportCommand.class)
                 .registerCommand(new WorldCommand(this))
                 .registerCommand(new DeleteCommand(chatManager))
-                .registerCommand(VanishCommand.class)
+                .registerCommand(new VanishCommand(this))
                 .registerCommand(new BanCommand(this))
                 .registerCommand(new MuteCommand(this))
                 .registerCommand(new UnbanCommand(this))
