@@ -1,8 +1,11 @@
 package cloud.grabsky.azure.commands;
 
+import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.Azure.Keys;
+import cloud.grabsky.azure.api.user.User;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.configuration.PluginLocale;
+import cloud.grabsky.azure.user.AzureUser;
 import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
@@ -21,8 +24,12 @@ import org.jetbrains.annotations.NotNull;
 // TO-DO: Weight based checks, rather than permission based.
 public final class VanishCommand extends RootCommand {
 
-    public VanishCommand() {
+    private final Azure plugin;
+
+    public VanishCommand(final @NotNull Azure plugin) {
         super("vanish", null, "azure.command.vanish", "/vanish (target) (true/false)", "Modify in-game visibility.");
+        // ...
+        this.plugin = plugin;
     }
 
     @Override
@@ -39,11 +46,13 @@ public final class VanishCommand extends RootCommand {
         if (arguments.hasNext() == false) {
             final Player sender = context.getExecutor().asPlayer();
             // ...
-            final boolean isVanished = isVanished(sender);
+            final AzureUser user = (AzureUser) plugin.getUserCache().getUser(sender);
             // ...
-            if (setVanished(context.getManager().getPlugin(), sender, !isVanished) == true) {
-                Message.of(PluginLocale.COMMAND_VANISH_SUCCESS_TARGET).placeholder("state", PluginLocale.getBooleanLong(!isVanished == true)).send(sender);
-            }
+            final boolean nextVanishState = !user.isVanished();
+            // Changing vanish state.
+            user.setVanished(nextVanishState);
+            // Sending success message to the sender.
+            Message.of(PluginLocale.COMMAND_VANISH_SUCCESS_TARGET).placeholder("state", PluginLocale.getBooleanLong(nextVanishState == true)).send(sender);
             return;
         }
         final CommandSender sender = context.getExecutor().asCommandSender();
@@ -56,56 +65,20 @@ public final class VanishCommand extends RootCommand {
             return;
         }
         // ...
-        final boolean nextVanishState = (state != null) ? state : !isVanished(target);
+        final AzureUser targetUser = (AzureUser) plugin.getUserCache().getUser(target);
         // ...
-        if (setVanished(context.getManager().getPlugin(), target, nextVanishState) == true) {
-            // ...
-            if (sender != target) {
-                Message.of(PluginLocale.COMMAND_VANISH_SUCCESS)
-                        .placeholder("player", target)
-                        .placeholder("state", PluginLocale.getBooleanLong(nextVanishState == true))
-                        .send(sender);
-                return;
-            }
-            Message.of(PluginLocale.COMMAND_VANISH_SUCCESS_TARGET).placeholder("state", PluginLocale.getBooleanLong(nextVanishState == true)).send(sender);
-        }
-    }
+        final boolean nextVanishState = (state != null) ? state : !targetUser.isVanished();
+        // ...
+        targetUser.setVanished(nextVanishState);
 
-    private static boolean isVanished(final @NotNull Player target) {
-        return target.getPersistentDataContainer().getOrDefault(Keys.IS_VANISHED, PersistentDataType.BOOLEAN, false) == true;
-    }
-
-    private static boolean setVanished(final @NotNull Plugin plugin, final @NotNull Player target, final boolean state) {
-        if (state == true && isVanished(target) == false) {
-            target.getPersistentDataContainer().set(Keys.IS_VANISHED, PersistentDataType.BOOLEAN, true);
-            // Showing BossBar.
-            target.showBossBar(PluginConfig.VANISH_BOSS_BAR);
-            // Switching game mode to spectator.
-            target.setGameMode(GameMode.SPECTATOR);
-            // Hiding target from other players.
-            Bukkit.getOnlinePlayers().stream().filter(player -> player != target && player.hasPermission("azure.bypass.see_vanished_players") == false).forEach(player -> {
-                player.hidePlayer(plugin, target);
-            });
-            return true;
-        } else if (state == false && isVanished(target) == true) {
-            target.getPersistentDataContainer().set(Keys.IS_VANISHED, PersistentDataType.BOOLEAN, false);
-            // Hiding BossBar.
-            target.hideBossBar(PluginConfig.VANISH_BOSS_BAR);
-            // ...
-            final GameMode nextGameMode = (target.getPreviousGameMode() != null)
-                    ? (target.hasPermission("azure.plugin.vanish_switch_previous_gamemode") == true) // ???
-                            ? target.getPreviousGameMode()
-                            : Bukkit.getDefaultGameMode()
-                    : Bukkit.getDefaultGameMode();
-            // Switching to previous, or default game mode.
-            target.setGameMode(nextGameMode);
-            // Showing target to other players.
-            Bukkit.getOnlinePlayers().stream().filter(player -> player != target).forEach(player -> {
-                player.showPlayer(plugin, target);
-            });
-            return true;
+        if (sender != target) {
+            Message.of(PluginLocale.COMMAND_VANISH_SUCCESS)
+                    .placeholder("player", target)
+                    .placeholder("state", PluginLocale.getBooleanLong(nextVanishState == true))
+                    .send(sender);
+            return;
         }
-        return false;
+        Message.of(PluginLocale.COMMAND_VANISH_SUCCESS_TARGET).placeholder("state", PluginLocale.getBooleanLong(nextVanishState == true)).send(target);
     }
 
 }

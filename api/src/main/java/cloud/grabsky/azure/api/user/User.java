@@ -30,6 +30,10 @@ public interface User {
 
     @NotNull String getLastCountryCode();
 
+    boolean isVanished();
+
+    void setVanished(boolean state);
+
     @Nullable Punishment getMostRecentBan();
 
     default boolean isBanned() {
@@ -42,14 +46,6 @@ public interface User {
         return this.getMostRecentMute() != null && (this.getMostRecentMute().isPermanent() == true || this.getMostRecentMute().isActive() == true);
     }
 
-    default @Nullable Player toPlayer() {
-        return Bukkit.getPlayer(this.getUniqueId());
-    }
-
-    default @Nullable OfflinePlayer toOfflinePlayer() {
-        return Bukkit.getOfflinePlayer(this.getUniqueId());
-    }
-
     @NotNull Punishment ban(final @Nullable Interval duration, final @Nullable String reason, final @Nullable String issuer);
 
     void unban(final @Nullable String issuer);
@@ -57,6 +53,14 @@ public interface User {
     @NotNull Punishment mute(final @Nullable Interval duration, final @Nullable String reason, final @Nullable String issuer);
 
     void unmute(final @Nullable String issuer);
+
+    default @Nullable Player toPlayer() {
+        return Bukkit.getPlayer(this.getUniqueId());
+    }
+
+    default @Nullable OfflinePlayer toOfflinePlayer() {
+        return Bukkit.getOfflinePlayer(this.getUniqueId());
+    }
 
     default CompoundBinaryTag getPlayerData() throws IOException {
         final File file = new File(new File(AzureProvider.getAPI().getWorldManager().getPrimaryWorld().getWorldFolder(), "playerdata"), getUniqueId() + ".dat");

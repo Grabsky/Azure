@@ -176,7 +176,8 @@ public final class AzureUserCache implements UserCache, Listener {
                     uniqueId,
                     (skin != null) ? encodeTextures(skin) : "",
                     (address != null) ? address : "N/A",
-                    "N/A", // Country code is fetched asynchronously, just before saving.
+                    "N/A", // Country code is fetched asynchronously in the next step.
+                    false,
                     null,
                     null
             );
@@ -186,7 +187,7 @@ public final class AzureUserCache implements UserCache, Listener {
                 // ...
                 if (countryCode != null)
                     user.setLastCountryCode(countryCode);
-            }).thenCompose((v) -> this.saveUser(user));
+            }).thenCompose(_void -> this.saveUser(user));
             // Returning the User instance.
             return user;
         });
@@ -241,18 +242,16 @@ public final class AzureUserCache implements UserCache, Listener {
             final @Nullable URL skin = player.getPlayerProfile().getTextures().getSkin();
             // ...
             final @Nullable String address = (player.getAddress() != null) ? player.getAddress().getHostString() : null;
-            // Getting punishment information.
-            final @Nullable AzurePunishment mostRecentBan = (existingUser != null) ? (AzurePunishment) existingUser.getMostRecentBan() : null;
-            final @Nullable AzurePunishment mostRecentMute = (existingUser != null) ? (AzurePunishment) existingUser.getMostRecentMute() : null;
             // Creating instance of AzureUser containing player information.
             final AzureUser user = new AzureUser(
                     player.getName(),
                     uniqueId,
                     (skin != null) ? encodeTextures(skin) : "",
-                    (address != null) ? address : "N/A",
-                    "N/A", // Country code is fetched asynchronously, just before saving.
-                    mostRecentBan,
-                    mostRecentMute
+                    (player.getAddress() != null) ? player.getAddress().getHostString() : "N/A",
+                    "N/A", // Country code is fetched asynchronously in the next step.
+                    (existingUser != null) ? existingUser.isVanished() : false,
+                    (existingUser != null) ? (AzurePunishment) existingUser.getMostRecentBan() : null,
+                    (existingUser != null) ? (AzurePunishment) existingUser.getMostRecentMute() : null
             );
             // Saving to the file.
             CompletableFuture.runAsync(() -> {
@@ -260,7 +259,7 @@ public final class AzureUserCache implements UserCache, Listener {
                 // ...
                 if (countryCode != null)
                     user.setLastCountryCode(countryCode);
-            }).thenCompose((v) -> this.saveUser(user));
+            }).thenCompose(_void -> this.saveUser(user));
             if (existingUser == null || user.equals(existingUser) == false)
                 this.saveUser(user);
             // Returning "new" instance, replacing the previous one.
