@@ -13,6 +13,7 @@ import cloud.grabsky.azure.commands.GameModeCommand;
 import cloud.grabsky.azure.commands.GiveCommand;
 import cloud.grabsky.azure.commands.HealCommand;
 import cloud.grabsky.azure.commands.InventoryCommand;
+import cloud.grabsky.azure.commands.InvulnerableCommand;
 import cloud.grabsky.azure.commands.MuteCommand;
 import cloud.grabsky.azure.commands.PackCommand;
 import cloud.grabsky.azure.commands.PlayerCommand;
@@ -130,7 +131,8 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
                 .registerCommand(EnderchestCommand.class)
                 .registerCommand(new PlayerCommand(this))
                 .registerCommand(HealCommand.class)
-                .registerCommand(FeedCommand.class);
+                .registerCommand(FeedCommand.class)
+                .registerCommand(InvulnerableCommand.class);
         // ...
         // Registering events...
         this.getServer().getPluginManager().registerEvents(chatManager, this);

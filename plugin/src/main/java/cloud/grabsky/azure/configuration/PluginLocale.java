@@ -372,6 +372,17 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.vanish_success_target")
     public static String COMMAND_VANISH_SUCCESS_TARGET;
 
+    // Commands > Invulnerable
+
+    @JsonPath("commands.invulnerable_usage")
+    public static Component COMMAND_INVULNERABLE_USAGE;
+
+    @JsonPath("commands.invulnerable_success")
+    public static String COMMAND_INVULNERABLE_SUCCESS;
+
+    @JsonPath("commands.invulnerable_success_target")
+    public static String COMMAND_INVULNERABLE_SUCCESS_TARGET;
+
     // Commands > Heal
 
     @JsonPath("commands.heal_usage")

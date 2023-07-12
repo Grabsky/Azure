@@ -200,6 +200,10 @@
         "vanish_usage": "<dark_gray>› <gray>Użycie: <gold>/vanish <gray>(player) (state)",
         "vanish_success": "<dark_gray>› <gray>Tryb niewidzialności gracza <gold><player><gray>: <state>",
         "vanish_success_target": "<dark_gray>› <gray>Tryb niewidzialności: <state>",
+        // Invulnerable
+        "invulnerable_usage": "<dark_gray>› <gray>Użycie: <gold>/invulnerable <gray>(player) (state)",
+        "invulnerable_success": "<dark_gray>› <gray>Tryb nietykalności gracza <gold><player><gray>: <state>",
+        "invulnerable_success_target": "<dark_gray>› <gray>Tryb nietykalności: <state>",
         // Heal
         "heal_usage": "<dark_gray>› <gray>Użycie: <gold>/heal <gray>(player)",
         "heal_success": "<dark_gray>› <gray>Punkty zdrowia gracza <gold><player><gray> zostały uzupełnione.",

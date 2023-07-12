@@ -7,7 +7,8 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerGameModeChangeEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -57,6 +58,20 @@ public final class PlayerListener implements Listener {
         if (event.getPlayer().getPersistentDataContainer().getOrDefault(Keys.IS_VANISHED, PersistentDataType.BOOLEAN, false) == true)
             // Hiding quit message.
             event.quitMessage(empty());
+    }
+
+    @EventHandler(ignoreCancelled = true) // Enables void damge to invulnerable players.
+    public void onVoidDamage(final @NotNull EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player player)
+            if (player.isInvulnerable() == true && event.getCause() != EntityDamageEvent.DamageCause.VOID)
+                event.setCancelled(true);
+    }
+
+    @EventHandler(ignoreCancelled = true) // Disablees hunger loss of invulnerable players.
+    public void onHungerLoss(FoodLevelChangeEvent event) {
+        if (event.getEntity() instanceof Player player)
+            if (player.isInvulnerable() == true)
+                event.setCancelled(true);
     }
 
 }
