@@ -94,9 +94,6 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.ban_success_permanent")
     public static String COMMAND_BAN_SUCCESS_PERMANENT;
 
-    @JsonPath("commands.ban_failure_player_cannot_be_banned")
-    public static Component COMMAND_BAN_FAIULURE_PLAYER_CANNOT_BE_BANNED;
-
     @JsonPath("commands.ban_disconnect_message")
     @JsonAdapter(fromJson = StringComponentAdapter.class)
     public static String COMMAND_BAN_DISCONNECT_MESSAGE;
@@ -138,8 +135,17 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.mute_success_permanent")
     public static String COMMAND_MUTE_SUCCESS_PERMANENT;
 
-    @JsonPath("commands.mute_failure_player_cannot_be_muted")
-    public static Component COMMAND_MUTE_FAIULURE_PLAYER_CANNOT_BE_MUTED;
+    // Command > Kick
+
+    @JsonPath("commands.kick_usage")
+    public static Component COMMAND_KICK_USAGE;
+
+    @JsonPath("commands.kick_success")
+    public static String COMMAND_KICK_SUCCESS;
+
+    @JsonPath("commands.kick_disconnect_message")
+    @JsonAdapter(fromJson = StringComponentAdapter.class)
+    public static String COMMAND_KICK_DISCONNECT_MESSAGE;
 
     // Commands > Delete
 

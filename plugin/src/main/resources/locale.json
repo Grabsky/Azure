@@ -66,7 +66,15 @@
         // Kick
         "kick_usage": "<dark_gray>› <gray>Użycie: <gold>/kick <white>(player) <gray>(reason)",
         "kick_success": "<dark_gray>› <gray>Gracz <gold><player><gray> został wyrzucony za <gold><reason><gray>.",
-        "kick_faiulure_player_cannot_be_kicked": "<dark_gray>› <red>Ten gracz nie może zostać wyrzucony.",
+        "kick_disconnect_message": [
+            "<gray>Zostałeś wyrzucony z serwera.",
+            "",
+            "",
+            "<gray>Powód: <red><reason>",
+            "",
+            "",
+            "<gray>Uważasz, że to pomyłka? Skontaktuj się z nami na <gold>https://firedot.pl/discord<gray> lub napisz na nasz adres <gold>administracja@firedot.pl"
+        ],
         // Delete
         "delete_usage": "<dark_gray>› <gray>Użycie: <gold>/delete <white>(signature_uuid)",
         "delete_failure": "<dark_gray>› <red>Usuwanie wiadomości nie powiodło się.",
