@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 
 // TO-DO: Support for "@forever" selector which defaults to 0s, making the punishment permantent. (low priority)
-public class MuteCommand extends RootCommand {
+public final class MuteCommand extends RootCommand {
 
     private final Azure plugin;
     private final LuckPerms luckperms;
