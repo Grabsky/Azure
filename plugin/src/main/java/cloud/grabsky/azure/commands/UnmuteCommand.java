@@ -50,7 +50,7 @@ public final class UnmuteCommand extends RootCommand {
             // Checking if player is muted.
             if (targetUser.isMuted() == true) {
                 // Unmuting the player.
-                targetUser.unmute(sender.getName());
+                targetUser.unmute(sender);
                 // Sending success message to the sender.
                 Message.of(PluginLocale.COMMAND_UNMUTE_SUCCESS).placeholder("player", targetUser.getName()).send(sender);
                 return;

@@ -98,7 +98,7 @@ public final class MuteCommand extends RootCommand {
         // When duration is 0, punishment will be permantent - until manually removed.
         if (duration.as(Unit.MILLISECONDS) == 0) {
             // Muting the player.
-            targetUser.mute(null, reason, sender.getName());
+            targetUser.mute(null, reason, sender);
             // Sending success message to the sender.
             Message.of(PluginLocale.COMMAND_MUTE_SUCCESS_PERMANENT)
                     .placeholder("player", targetUser.getName())
@@ -109,7 +109,7 @@ public final class MuteCommand extends RootCommand {
             return;
         }
         // Muting the player temporarily.
-        targetUser.mute(duration, reason, sender.getName());
+        targetUser.mute(duration, reason, sender);
         // Sending success message to the sender.
         Message.of(PluginLocale.COMMAND_MUTE_SUCCESS)
                 .placeholder("player", targetUser.getName())

@@ -50,7 +50,7 @@ public final class UnbanCommand extends RootCommand {
             // Checking if player is banned.
             if (targetUser.isBanned() == true) {
                 // Unbanning the player.
-                targetUser.unban(sender.getName());
+                targetUser.unban(sender);
                 // Sending success message to the sender.
                 Message.of(PluginLocale.COMMAND_UNBAN_SUCCESS).placeholder("player", targetUser.getName()).send(sender);
                 return;

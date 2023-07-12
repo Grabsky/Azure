@@ -14,6 +14,7 @@ import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.group.Group;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -110,11 +111,11 @@ public final class AzureUser implements User {
     }
 
     @Override
-    public @NotNull Punishment ban(final @Nullable Interval duration, final @Nullable String reason, final @Nullable String issuer) {
+    public @NotNull Punishment ban(final @Nullable Interval duration, final @Nullable String reason, final @NotNull CommandSender issuer) {
         // Overriding previous punishment with a new one.
         this.mostRecentBan = new AzurePunishment(
                 (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON,
-                (issuer != null) ? issuer : "SYSTEM",
+                issuer.getName(),
                 Interval.now(),
                 (duration != null) ? duration : Interval.of(Long.MAX_VALUE, Unit.MILLISECONDS)
         );
@@ -129,7 +130,7 @@ public final class AzureUser implements User {
     }
 
     @Override
-    public void unban(final @Nullable String issuer) {
+    public void unban(final @NotNull CommandSender issuer) {
         // Overriding previous punishment with a null one.
         this.mostRecentBan = null;
         // Saving User data to the filesystem.
@@ -137,15 +138,15 @@ public final class AzureUser implements User {
             Azure.getInstance().getLogger().info("Saving data of " + this.name + " in the background... " + (isSuccess == true ? "OK" : "ERROR"));
         });
         // Logging...
-        Azure.getInstance().getPunishmentsFileLogger().log("Player " + this.getName() + " (" + this.getUniqueId() + ") has been UNBANNED by " + (issuer != null ? issuer : "SYSTEM"));
+        Azure.getInstance().getPunishmentsFileLogger().log("Player " + this.getName() + " (" + this.getUniqueId() + ") has been UNBANNED by " + issuer.getName());
     }
 
     @Override
-    public @NotNull Punishment mute(final @Nullable Interval duration, final @Nullable String reason, final @Nullable String issuer) {
+    public @NotNull Punishment mute(final @Nullable Interval duration, final @Nullable String reason, final @NotNull CommandSender issuer) {
         // Overriding previous punishment with a new one.
         this.mostRecentMute = new AzurePunishment(
                 (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON,
-                (issuer != null) ? issuer : "SYSTEM",
+                issuer.getName(),
                 Interval.now(),
                 (duration != null) ? duration : Interval.of(Long.MAX_VALUE, Unit.MILLISECONDS)
         );
@@ -160,7 +161,7 @@ public final class AzureUser implements User {
     }
 
     @Override
-    public void unmute(final @Nullable String issuer) {
+    public void unmute(final @NotNull CommandSender issuer) {
         // Overriding previous punishment with a null one.
         this.mostRecentMute = null;
         // Saving User data to the filesystem.
@@ -168,7 +169,7 @@ public final class AzureUser implements User {
             Azure.getInstance().getLogger().info("Saving data of " + this.name + " in the background... " + (isSuccess == true ? "OK" : "ERROR"));
         });
         // Logging...
-        Azure.getInstance().getPunishmentsFileLogger().log("Player " + this.getName() + " (" + this.getUniqueId() + ") has been UNMUTED by " + (issuer != null ? issuer : "SYSTEM"));
+        Azure.getInstance().getPunishmentsFileLogger().log("Player " + this.getName() + " (" + this.getUniqueId() + ") has been UNMUTED by " + issuer.getName());
     }
 
     @Override

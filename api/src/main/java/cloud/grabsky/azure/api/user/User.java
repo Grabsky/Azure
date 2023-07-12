@@ -7,6 +7,7 @@ import net.kyori.adventure.nbt.BinaryTagIO;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -90,22 +91,22 @@ public interface User {
     /**
      * Bans this {@link User} for specified duration of time or permanently in case {@code null} duration is provided.
      */
-    @NotNull Punishment ban(final @Nullable Interval duration, final @Nullable String reason, final @Nullable String issuer);
+    @NotNull Punishment ban(final @Nullable Interval duration, final @Nullable String reason, final @NotNull CommandSender issuer);
 
     /**
      * Removes current ban {@link Punishment} of this {@link User}.
      */
-    void unban(final @Nullable String issuer);
+    void unban(final @NotNull CommandSender issuer);
 
     /**
      * Mutes this {@link User} for specified duration of time or permanently in case {@code null} duration is provided.
      */
-    @NotNull Punishment mute(final @Nullable Interval duration, final @Nullable String reason, final @Nullable String issuer);
+    @NotNull Punishment mute(final @Nullable Interval duration, final @Nullable String reason, final @NotNull CommandSender issuer);
 
     /**
      * Removes current mute {@link Punishment} of this {@link User}.
      */
-    void unmute(final @Nullable String issuer);
+    void unmute(final @NotNull CommandSender issuer);
 
     /**
      * Returns {@link Player} object obtained using unique identifier of this {@link User}.
