@@ -1,5 +1,7 @@
 package cloud.grabsky.azure.commands;
 
+import cloud.grabsky.azure.Azure;
+import cloud.grabsky.azure.api.user.User;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.commands.ArgumentQueue;
@@ -9,6 +11,7 @@ import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.component.ExceptionHandler;
 import cloud.grabsky.commands.exception.CommandLogicException;
 import cloud.grabsky.commands.exception.MissingInputException;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -19,8 +22,12 @@ import static net.kyori.adventure.text.Component.translatable;
 
 public final class GameModeCommand extends RootCommand {
 
-    public GameModeCommand() {
+    private final Azure plugin;
+
+    public GameModeCommand(final @NotNull Azure plugin) {
         super("gamemode", null, "azure.command.gamemode", "/gamemode (player) (gamemode)", "...");
+        // ...
+        this.plugin = plugin;
     }
 
     private static final ExceptionHandler.Factory GAMEMODE_USAGE = (exception) -> {
@@ -71,6 +78,14 @@ public final class GameModeCommand extends RootCommand {
         Message.of(PluginLocale.COMMAND_GAMEMODE_SET_SUCCESS_TARGET)
                 .placeholder("mode", translatable(mode.translationKey()))
                 .send(target);
+        // Getting user object.
+        final User targetUser = plugin.getUserCache().getUser(target);
+        // Disabling vanish state if enabled.
+        if (targetUser.isVanished() == true) {
+            targetUser.setVanished(false, false);
+            // Sending message to the player.
+            Message.of(PluginLocale.COMMAND_VANISH_SUCCESS_TARGET).placeholder("state", PluginLocale.DISABLED.color(NamedTextColor.RED)).send(target);
+        }
     }
 
 }

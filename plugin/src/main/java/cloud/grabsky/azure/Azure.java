@@ -117,7 +117,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
                 .registerCommand(GiveCommand.class)
                 .registerCommand(SpeedCommand.class)
                 .registerCommand(PackCommand.class)
-                .registerCommand(GameModeCommand.class)
+                .registerCommand(new GameModeCommand(this))
                 .registerCommand(TeleportCommand.class)
                 .registerCommand(new WorldCommand(this))
                 .registerCommand(new DeleteCommand(chatManager))

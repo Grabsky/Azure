@@ -59,7 +59,7 @@ public final class AzureUser implements User {
     }
 
     @Override
-    public void setVanished(final boolean state) throws UnsupportedOperationException {
+    public void setVanished(final boolean state, final boolean updateGamemodeWhenDisabling) throws UnsupportedOperationException {
         final @Nullable Player thisPlayer = this.toPlayer();
         // Throwing an exception if trying to change vanish state of an offline player. Not yet supported.
         if (thisPlayer == null || thisPlayer.isOnline() == false)
@@ -92,14 +92,16 @@ public final class AzureUser implements User {
                 } else {
                     // Hiding BossBar.
                     thisPlayer.hideBossBar(PluginConfig.VANISH_BOSS_BAR);
-                    // ...
-                    final GameMode nextGameMode = (thisPlayer.getPreviousGameMode() != null)
-                            ? (thisPlayer.hasPermission("azure.plugin.vanish_switch_previous_gamemode") == true) // ???
-                            ? thisPlayer.getPreviousGameMode()
-                            : Bukkit.getDefaultGameMode()
-                            : Bukkit.getDefaultGameMode();
-                    // Switching to previous, or default game mode.
-                    thisPlayer.setGameMode(nextGameMode);
+                    // Switching game mode to previous game mode or default, or not doing anything if 'updateGamemodeWhenDisabling' is false.
+                    if (updateGamemodeWhenDisabling == true) {
+                        final GameMode nextGameMode = (thisPlayer.getPreviousGameMode() != null)
+                                ? (thisPlayer.hasPermission("azure.plugin.vanish_switch_previous_gamemode") == true) // ???
+                                        ? thisPlayer.getPreviousGameMode()
+                                        : Bukkit.getDefaultGameMode()
+                                : Bukkit.getDefaultGameMode();
+                        // Switching to previous, or default game mode.
+                        thisPlayer.setGameMode(nextGameMode);
+                    }
                     // Showing target to other players.
                     Bukkit.getOnlinePlayers().forEach(otherPlayer -> otherPlayer.showPlayer(Azure.getInstance(), thisPlayer));
                 }

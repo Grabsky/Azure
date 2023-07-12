@@ -59,12 +59,4 @@ public final class PlayerListener implements Listener {
             event.quitMessage(empty());
     }
 
-    @EventHandler
-    public void onGameModeChange(final @NotNull PlayerGameModeChangeEvent event) {
-        if (event.getPlayer().getPersistentDataContainer().getOrDefault(Keys.IS_VANISHED, PersistentDataType.BOOLEAN, false) == true) {
-            event.setCancelled(true);
-            event.cancelMessage(empty());
-        }
-    }
-
 }
