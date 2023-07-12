@@ -8,8 +8,10 @@ import cloud.grabsky.azure.commands.AzureCommand;
 import cloud.grabsky.azure.commands.BanCommand;
 import cloud.grabsky.azure.commands.DeleteCommand;
 import cloud.grabsky.azure.commands.EnderchestCommand;
+import cloud.grabsky.azure.commands.FeedCommand;
 import cloud.grabsky.azure.commands.GameModeCommand;
 import cloud.grabsky.azure.commands.GiveCommand;
+import cloud.grabsky.azure.commands.HealCommand;
 import cloud.grabsky.azure.commands.InventoryCommand;
 import cloud.grabsky.azure.commands.MuteCommand;
 import cloud.grabsky.azure.commands.PackCommand;
@@ -44,11 +46,9 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import org.bukkit.NamespacedKey;
-import org.bukkit.command.Command;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 
 import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
 
@@ -128,7 +128,9 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
                 .registerCommand(new UnmuteCommand(this))
                 .registerCommand(InventoryCommand.class)
                 .registerCommand(EnderchestCommand.class)
-                .registerCommand(new PlayerCommand(this));
+                .registerCommand(new PlayerCommand(this))
+                .registerCommand(HealCommand.class)
+                .registerCommand(FeedCommand.class);
         // ...
         // Registering events...
         this.getServer().getPluginManager().registerEvents(chatManager, this);

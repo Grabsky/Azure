@@ -372,6 +372,28 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.vanish_success_target")
     public static String COMMAND_VANISH_SUCCESS_TARGET;
 
+    // Commands > Heal
+
+    @JsonPath("commands.heal_usage")
+    public static Component COMMAND_HEAL_USAGE;
+
+    @JsonPath("commands.heal_success")
+    public static String COMMAND_HEAL_SUCCESS;
+
+    @JsonPath("commands.heal_success_target")
+    public static Component COMMAND_HEAL_SUCCESS_TARGET;
+
+    // Commands > Feed
+
+    @JsonPath("commands.feed_usage")
+    public static Component COMMAND_FEED_USAGE;
+
+    @JsonPath("commands.feed_success")
+    public static String COMMAND_FEED_SUCCESS;
+
+    @JsonPath("commands.feed_success_target")
+    public static Component COMMAND_FEED_SUCCESS_TARGET;
+
     // Commands > Player
 
     @JsonPath("commands.player_usage")
