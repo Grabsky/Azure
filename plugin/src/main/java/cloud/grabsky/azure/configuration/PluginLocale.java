@@ -364,7 +364,7 @@ public final class PluginLocale implements JsonConfiguration {
     // Commands > Vanish
 
     @JsonPath("commands.vanish_usage")
-    public static String COMMAND_VANISH_USAGE;
+    public static Component COMMAND_VANISH_USAGE;
 
     @JsonPath("commands.vanish_success")
     public static String COMMAND_VANISH_SUCCESS;

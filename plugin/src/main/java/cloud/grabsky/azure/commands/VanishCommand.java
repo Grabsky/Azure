@@ -11,12 +11,9 @@ import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.component.ExceptionHandler;
 import cloud.grabsky.commands.exception.CommandLogicException;
 import cloud.grabsky.commands.exception.MissingInputException;
-import cloud.grabsky.configuration.JsonPath;
-import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.checkerframework.framework.qual.CFComment;
 import org.jetbrains.annotations.NotNull;
 
 import static net.kyori.adventure.text.format.NamedTextColor.GREEN;
@@ -79,13 +76,11 @@ public final class VanishCommand extends RootCommand {
         // Changing vanish state.
         targetUser.setVanished(nextVanishState);
         // Sending success message to the sender. (if applicable)
-        if (sender != target) {
+        if (sender != target)
             Message.of(PluginLocale.COMMAND_VANISH_SUCCESS)
                     .placeholder("player", target)
                     .placeholder("state", getColoredBooleanLong(nextVanishState == true))
                     .send(sender);
-            return;
-        }
         // Sending success message to the target.
         Message.of(PluginLocale.COMMAND_VANISH_SUCCESS_TARGET).placeholder("state", getColoredBooleanLong(nextVanishState == true)).send(target);
     }
