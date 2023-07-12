@@ -1,5 +1,6 @@
 package cloud.grabsky.azure.commands;
 
+import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.chat.ChatManager;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.bedrock.components.Message;
@@ -17,9 +18,10 @@ public final class DeleteCommand extends RootCommand {
 
     private final ChatManager chat;
 
-    public DeleteCommand(final ChatManager chat) {
+    public DeleteCommand(final @NotNull Azure plugin) {
         super("delete", null, "azure.command.delete", "/delete <signature_uuid>", null);
-        this.chat = chat;
+        // ...
+        this.chat = plugin.getChatManager();
     }
 
     private static final ExceptionHandler.Factory DELETE_USAGE = (exception) -> {
