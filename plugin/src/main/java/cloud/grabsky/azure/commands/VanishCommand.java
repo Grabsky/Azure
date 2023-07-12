@@ -8,7 +8,9 @@ import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
 import cloud.grabsky.commands.component.CompletionsProvider;
+import cloud.grabsky.commands.component.ExceptionHandler;
 import cloud.grabsky.commands.exception.CommandLogicException;
+import cloud.grabsky.commands.exception.MissingInputException;
 import cloud.grabsky.configuration.JsonPath;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
@@ -25,10 +27,17 @@ public final class VanishCommand extends RootCommand {
     private final Azure plugin;
 
     public VanishCommand(final @NotNull Azure plugin) {
-        super("vanish", null, "azure.command.vanish", "/vanish (target) (true/false)", "Modify in-game visibility.");
+        super("vanish", null, "azure.command.vanish", "/vanish (target) (state)", "Modify in-game visibility.");
         // ...
         this.plugin = plugin;
     }
+
+    private static final ExceptionHandler.Factory VANISH_USAGE = (exception) -> {
+        if (exception instanceof MissingInputException)
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_VANISH_USAGE).send(context.getExecutor().asCommandSender());
+        // Let other exceptions be handled internally.
+        return null;
+    };
 
     @Override
     public @NotNull CompletionsProvider onTabComplete(final @NotNull RootCommandContext context, final int index) throws CommandLogicException {
@@ -56,9 +65,9 @@ public final class VanishCommand extends RootCommand {
         }
         final CommandSender sender = context.getExecutor().asCommandSender();
         // Getting arguments.
-        final Player target = arguments.next(Player.class).asRequired();
+        final Player target = arguments.next(Player.class).asRequired(VANISH_USAGE);
         final Boolean state = arguments.next(Boolean.class).asOptional();
-        // Exiting command block in case specified target is different from sender, and sender does not have permissions to do so.
+        // Exiting command block in case specified target is different from sender, and sender does not have permissions to "use" other players.
         if (sender != target && context.getExecutor().asCommandSender().hasPermission(this.getPermission() + ".others") == false) {
             Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
             return;
