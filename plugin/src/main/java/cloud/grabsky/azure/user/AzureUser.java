@@ -59,52 +59,52 @@ public final class AzureUser implements User {
     }
 
     @Override
-    public void setVanished(final boolean state) {
+    public void setVanished(final boolean state) throws UnsupportedOperationException {
         final @Nullable Player thisPlayer = this.toPlayer();
-        // ...
+        // Throwing an exception if trying to change vanish state of an offline player. Not yet supported.
         if (thisPlayer == null || thisPlayer.isOnline() == false)
-            throw new IllegalStateException("Player must be online to have his vanish state changed.");
-        // ...
-        if (state == true && this.isVanished == false) {
-            this.isVanished = true;
-            // Saving User data to the filesystem.
-            ((AzureUserCache) Azure.getInstance().getUserCache()).saveUser(this).thenAccept(isSuccess -> {
-                Azure.getInstance().getLogger().info("Saving data of " + this.name + " in the background... " + (isSuccess == true ? "OK" : "ERROR"));
-            });
-            // Showing BossBar.
-            thisPlayer.showBossBar(PluginConfig.VANISH_BOSS_BAR);
-            // Switching game mode to spectator.
-            thisPlayer.setGameMode(GameMode.SPECTATOR);
-            // Hiding target from other players.
-            final LuckPerms luckperms = Azure.getInstance().getLuckPerms();
-            Bukkit.getOnlinePlayers().forEach(otherPlayer -> {
-                if (thisPlayer != otherPlayer) {
-                    final @Nullable Group playerGroup = luckperms.getGroupManager().getGroup(luckperms.getPlayerAdapter(Player.class).getUser(thisPlayer).getPrimaryGroup());
-                    final @Nullable Group otherGroup = luckperms.getGroupManager().getGroup(luckperms.getPlayerAdapter(Player.class).getUser(otherPlayer).getPrimaryGroup());
-                    // Comparing group weights.
-                    if (playerGroup != null && otherGroup != null && playerGroup.getWeight().orElse(0) > otherGroup.getWeight().orElse(0))
-                        otherPlayer.hidePlayer(Azure.getInstance(), thisPlayer);
+            throw new UnsupportedOperationException("Player must be online to have his vanish state changed.");
+        // Changing vanish state.
+        this.isVanished = state;
+        // Saving User data to the filesystem.
+        ((AzureUserCache) Azure.getInstance().getUserCache()).saveUser(this).thenAccept(isSuccess -> {
+            Azure.getInstance().getLogger().info("Saving data of " + this.name + " in the background... " + (isSuccess == true ? "OK" : "ERROR"));
+            // Scheduling more logic onto the main thread.
+            Azure.getInstance().getBedrockScheduler().run(1L, (task) -> {
+                // Executing post-actions for the "enabled" state.
+                if (state == true) {
+                    // Showing BossBar.
+                    thisPlayer.showBossBar(PluginConfig.VANISH_BOSS_BAR);
+                    // Switching game mode to spectator.
+                    thisPlayer.setGameMode(GameMode.SPECTATOR);
+                    // Hiding target from other players.
+                    final LuckPerms luckperms = Azure.getInstance().getLuckPerms();
+                    Bukkit.getOnlinePlayers().forEach(otherPlayer -> {
+                        if (thisPlayer != otherPlayer) {
+                            final @Nullable Group playerGroup = luckperms.getGroupManager().getGroup(luckperms.getPlayerAdapter(Player.class).getUser(thisPlayer).getPrimaryGroup());
+                            final @Nullable Group otherGroup = luckperms.getGroupManager().getGroup(luckperms.getPlayerAdapter(Player.class).getUser(otherPlayer).getPrimaryGroup());
+                            // Comparing group weights.
+                            if (playerGroup != null && otherGroup != null && playerGroup.getWeight().orElse(0) > otherGroup.getWeight().orElse(0))
+                                otherPlayer.hidePlayer(Azure.getInstance(), thisPlayer);
+                        }
+                    });
+                // Otherwise, executing post-actions for the "disabled" state.
+                } else {
+                    // Hiding BossBar.
+                    thisPlayer.hideBossBar(PluginConfig.VANISH_BOSS_BAR);
+                    // ...
+                    final GameMode nextGameMode = (thisPlayer.getPreviousGameMode() != null)
+                            ? (thisPlayer.hasPermission("azure.plugin.vanish_switch_previous_gamemode") == true) // ???
+                            ? thisPlayer.getPreviousGameMode()
+                            : Bukkit.getDefaultGameMode()
+                            : Bukkit.getDefaultGameMode();
+                    // Switching to previous, or default game mode.
+                    thisPlayer.setGameMode(nextGameMode);
+                    // Showing target to other players.
+                    Bukkit.getOnlinePlayers().forEach(otherPlayer -> otherPlayer.showPlayer(Azure.getInstance(), thisPlayer));
                 }
             });
-        } else if (state == false && this.isVanished == true) {
-            this.isVanished = false;
-            // Saving User data to the filesystem.
-            ((AzureUserCache) Azure.getInstance().getUserCache()).saveUser(this).thenAccept(isSuccess -> {
-                Azure.getInstance().getLogger().info("Saving data of " + this.name + " in the background... " + (isSuccess == true ? "OK" : "ERROR"));
-            });
-            // Hiding BossBar.
-            thisPlayer.hideBossBar(PluginConfig.VANISH_BOSS_BAR);
-            // ...
-            final GameMode nextGameMode = (thisPlayer.getPreviousGameMode() != null)
-                    ? (thisPlayer.hasPermission("azure.plugin.vanish_switch_previous_gamemode") == true) // ???
-                    ? thisPlayer.getPreviousGameMode()
-                    : Bukkit.getDefaultGameMode()
-                    : Bukkit.getDefaultGameMode();
-            // Switching to previous, or default game mode.
-            thisPlayer.setGameMode(nextGameMode);
-            // Showing target to other players.
-            Bukkit.getOnlinePlayers().forEach(otherPlayer -> otherPlayer.showPlayer(Azure.getInstance(), thisPlayer));
-        }
+        });
     }
 
     @Override
