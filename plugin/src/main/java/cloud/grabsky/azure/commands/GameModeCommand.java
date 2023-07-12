@@ -58,7 +58,7 @@ public final class GameModeCommand extends RootCommand {
         if (mode == null) {
             Message.of(PluginLocale.COMMAND_GAMEMODE_INFO)
                     .placeholder("player", target)
-                    .placeholder("mode", translatable(target.getGameMode().translationKey()))
+                    .placeholder("mode", PluginLocale.getGameMode(target.getGameMode()))
                     .send(sender);
             return;
         }
@@ -72,11 +72,11 @@ public final class GameModeCommand extends RootCommand {
         if (sender != target)
             Message.of(PluginLocale.COMMAND_GAMEMODE_SET_SUCCESS_SENDER)
                     .placeholder("player", target)
-                    .placeholder("mode", translatable(mode.translationKey()))
+                    .placeholder("mode", PluginLocale.getGameMode(mode))
                     .send(sender);
         // ...
         Message.of(PluginLocale.COMMAND_GAMEMODE_SET_SUCCESS_TARGET)
-                .placeholder("mode", translatable(mode.translationKey()))
+                .placeholder("mode", PluginLocale.getGameMode(mode))
                 .send(target);
         // Getting user object.
         final User targetUser = plugin.getUserCache().getUser(target);
