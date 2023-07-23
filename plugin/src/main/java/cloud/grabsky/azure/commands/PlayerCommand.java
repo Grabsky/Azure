@@ -17,8 +17,6 @@ import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.text.Component;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.group.Group;
-import net.pl3x.guithium.api.Guithium;
-import net.pl3x.guithium.api.player.WrappedPlayer;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -93,7 +91,7 @@ public final class PlayerCommand extends RootCommand {
                 }
             }
             // Continuing...
-            final WrappedPlayer guithiumTarget = Guithium.api().getPlayerManager().get(targetUniqueId);
+            // final WrappedPlayer guithiumTarget = Guithium.api().getPlayerManager().get(targetUniqueId);
             final Location location = targetOnline.getLocation();
             final String address = (targetUser.getLastAddress().equals("N/A") == false)
                     ? (sender.hasPermission("azure.command.player.can_see_address") == true)
@@ -125,7 +123,7 @@ public final class PlayerCommand extends RootCommand {
                     .placeholder("xp_progress", Math.round(targetOnline.getExp() * 100))
                     .placeholder("is_banned", getColoredBooleanShort(targetUser.isBanned() == true))
                     .placeholder("is_muted", getColoredBooleanShort(targetUser.isMuted() == true))
-                    .placeholder("has_guithium", getColoredBooleanShort(guithiumTarget != null && guithiumTarget.hasGuithium() == true))
+                    // .placeholder("has_guithium", getColoredBooleanShort(guithiumTarget != null && guithiumTarget.hasGuithium() == true))
                     .send(sender);
             return;
         }

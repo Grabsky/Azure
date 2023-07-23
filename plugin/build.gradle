@@ -20,7 +20,7 @@ dependencies {
     // ...
     compileOnly("net.luckperms:api:5.4")
     // ...
-    compileOnly("net.pl3x.guithium:guithium-api:0.1.0-SNAPSHOT")
+    // compileOnly("net.pl3x.guithium:guithium-api:0.1.0-SNAPSHOT")
 }
 
 tasks {
