@@ -17,9 +17,7 @@ public enum WorldSeedArgument implements ArgumentParser<Long>, CompletionsProvid
 
     @Override
     public @NotNull List<String> provide(final @NotNull RootCommandContext context) {
-        return (context.getExecutor().isPlayer() == true)
-                ? List.of("@random", String.valueOf(context.getExecutor().asPlayer().getWorld().getSeed()))
-                : List.of("@random");
+        return (context.getExecutor().isPlayer() == true) ? List.of("@random", "@current") : List.of("@random");
     }
 
     @Override
@@ -28,9 +26,11 @@ public enum WorldSeedArgument implements ArgumentParser<Long>, CompletionsProvid
         // ...
         final String value = arguments.nextString();
         // ...
-        return (value.equalsIgnoreCase("@random") == true)
-                ? new Random().nextLong()
-                : LongArgument.DEFAULT_RANGE.parse(context, peek);
+        return switch (value.toLowerCase()) {
+            case "@random" -> new Random().nextLong();
+            case "@current" -> context.getExecutor().asPlayer().getWorld().getSeed();
+            default -> LongArgument.DEFAULT_RANGE.parse(context, peek);
+        };
     }
 
 }
