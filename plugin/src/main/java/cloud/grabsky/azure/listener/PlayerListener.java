@@ -62,16 +62,14 @@ public final class PlayerListener implements Listener {
 
     @EventHandler(ignoreCancelled = true) // Enables void damge to invulnerable players.
     public void onVoidDamage(final @NotNull EntityDamageEvent event) {
-        if (event.getEntity() instanceof Player player)
-            if (player.isInvulnerable() == true && event.getCause() != EntityDamageEvent.DamageCause.VOID)
-                event.setCancelled(true);
+        if (event.getEntity() instanceof Player player && player.isInvulnerable() == true && event.getCause() != EntityDamageEvent.DamageCause.VOID)
+            event.setCancelled(true);
     }
 
-    @EventHandler(ignoreCancelled = true) // Disablees hunger loss of invulnerable players.
-    public void onHungerLoss(FoodLevelChangeEvent event) {
-        if (event.getEntity() instanceof Player player)
-            if (player.isInvulnerable() == true)
-                event.setCancelled(true);
+    @EventHandler(ignoreCancelled = true) // Disables hunger loss of invulnerable players.
+    public void onHungerLoss(final @NotNull FoodLevelChangeEvent event) {
+        if (event.getEntity().getFoodLevel() > event.getFoodLevel() && event.getEntity() instanceof Player player && player.isInvulnerable() == true)
+            event.setCancelled(true);
     }
 
 }
