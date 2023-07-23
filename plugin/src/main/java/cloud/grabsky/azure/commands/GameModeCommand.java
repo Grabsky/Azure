@@ -18,8 +18,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static net.kyori.adventure.text.Component.translatable;
-
 public final class GameModeCommand extends RootCommand {
 
     private final Azure plugin;
