@@ -32,6 +32,7 @@ import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.azure.configuration.adapters.BossBarAdapterFactory;
 import cloud.grabsky.azure.configuration.adapters.TagResolverAdapter;
 import cloud.grabsky.azure.listener.PlayerListener;
+import cloud.grabsky.azure.tweaks.consumables.ConsumablesOverride;
 import cloud.grabsky.azure.user.AzureUserCache;
 import cloud.grabsky.azure.util.FileLogger;
 import cloud.grabsky.azure.world.AzureWorldManager;
@@ -90,9 +91,9 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
             moshi.add(DeleteButton.Position.class, new AbstractEnumJsonAdapter<>(DeleteButton.Position.class, false) { /* DEFAULT */ });
             moshi.add(BossBarAdapterFactory.INSTANCE);
         });
-        // this#onReload throws ConfigurationMappingException which should stop the server in case of failure.
-        if (this.onReload() == false) {
-            return;
+        // Reloading and stopping the server in case of failure.
+        if (this.reloadConfiguration() == false) {
+            this.getServer().shutdown();
         }
         // ...
         this.userCache = new AzureUserCache(this);
@@ -135,7 +136,6 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
                 .registerCommand(HealCommand.class)
                 .registerCommand(FeedCommand.class)
                 .registerCommand(InvulnerableCommand.class);
-        // ...
         // Registering events...
         this.getServer().getPluginManager().registerEvents(chatManager, this);
         this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
@@ -145,7 +145,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
 
     public boolean reloadConfiguration() {
         try {
-            return onReload();
+            return this.onReload();
         } catch (final IllegalStateException | ConfigurationMappingException e) {
             e.printStackTrace();
             return false;
@@ -158,15 +158,17 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
             final File locale = ensureResourceExistence(this, new File(this.getDataFolder(), "locale.json"));
             final File localeCommands = ensureResourceExistence(this, new File(this.getDataFolder(), "locale_commands.json"));
             final File config = ensureResourceExistence(this, new File(this.getDataFolder(), "config.json"));
-            // ...
+            // Reloading configuration files.
             mapper.map(
                     ConfigurationHolder.of(PluginLocale.class, locale),
                     ConfigurationHolder.of(PluginLocale.Commands.class, localeCommands),
                     ConfigurationHolder.of(PluginConfig.class, config)
             );
+            // Returning 'true' as reload finished without any exceptions.
             return true;
         } catch (final IOException e) {
-            throw new IllegalStateException(e); // Re-throwing as runtime exception.
+            e.printStackTrace();
+            return false;
         }
     }
 
