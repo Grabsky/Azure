@@ -29,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
@@ -366,7 +367,7 @@ public final class WorldCommand extends RootCommand {
             } catch (final IOException e) {
                 e.printStackTrace();
                 // Sending error message to command sender.
-                Message.of(PluginLocale.COMMAND_WORLD_LOAD_FAILURE_OTHER).placeholder("world", key).send(sender);
+                Message.of(PluginLocale.COMMAND_WORLD_LOAD_FAILURE_OTHER).placeholder("world", key).placeholder("exception", e.getClass().getName()).send(sender);
             }
             return;
         }
