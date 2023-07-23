@@ -5,8 +5,6 @@ import cloud.grabsky.azure.api.world.WorldManager;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.kyori.adventure.nbt.BinaryTagIO;
-import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -18,12 +16,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.AccessDeniedException;
 import java.util.stream.Stream;
 
 import static cloud.grabsky.bedrock.helpers.Conditions.requirePresent;
 import static org.bukkit.NamespacedKey.minecraft;
 
+// NOTE: In the future, when more per-world properties needs to be stored, consider using PDC <---> level.dat (adventure-nbt).
 @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
 public final class AzureWorldManager implements WorldManager {
 
