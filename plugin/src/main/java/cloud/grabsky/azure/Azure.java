@@ -32,7 +32,6 @@ import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.azure.configuration.adapters.BossBarAdapterFactory;
 import cloud.grabsky.azure.configuration.adapters.TagResolverAdapter;
 import cloud.grabsky.azure.listener.PlayerListener;
-import cloud.grabsky.azure.tweaks.consumables.ConsumablesOverride;
 import cloud.grabsky.azure.user.AzureUserCache;
 import cloud.grabsky.azure.util.FileLogger;
 import cloud.grabsky.azure.world.AzureWorldManager;
