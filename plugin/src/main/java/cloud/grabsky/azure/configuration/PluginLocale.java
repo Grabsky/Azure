@@ -301,12 +301,6 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.world_gamerule_set_failure")
     public static String COMMAND_WORLD_GAMERULE_SET_FAILURE;
 
-    // Commands > World > Info
-
-    @JsonPath("commands.world_info")
-    @JsonAdapter(fromJson = StringComponentAdapter.class)
-    public static String COMMAND_WORLD_INFO;
-
     // Commands > World > Load
 
     @JsonPath("commands.world_load_usage")
@@ -320,6 +314,26 @@ public final class PluginLocale implements JsonConfiguration {
 
     @JsonPath("commands.world_load_failure_other")
     public static String COMMAND_WORLD_LOAD_FAILURE_OTHER;
+
+    // Commands > World > Info
+
+    @JsonPath("commands.world_info")
+    @JsonAdapter(fromJson = StringComponentAdapter.class)
+    public static String COMMAND_WORLD_INFO;
+
+    // Commands > World > Load
+
+    @JsonPath("commands.world_import_usage")
+    public static Component COMMAND_WORLD_IMPORT_USAGE;
+
+    @JsonPath("commands.world_import_success")
+    public static String COMMAND_WORLD_IMPORT_SUCCESS;
+
+    @JsonPath("commands.world_import_failure_not_found")
+    public static String COMMAND_WORLD_IMPORT_FAILURE_NOT_FOUND;
+
+    @JsonPath("commands.world_import_failure_other")
+    public static String COMMAND_WORLD_IMPORT_FAILURE_OTHER;
 
     // Commands > World > Spawnpoint
 
@@ -355,6 +369,12 @@ public final class PluginLocale implements JsonConfiguration {
 
     @JsonPath("commands.world_unload_success")
     public static String COMMAND_WORLD_UNLOAD_SUCCESS;
+
+    @JsonPath("commands.world_unload_failure_primary_world")
+    public static Component COMMAND_WORLD_UNLOAD_FAILURE_PRIMARY_WORLD;
+
+    @JsonPath("commands.world_unload_failure_other")
+    public static String COMMAND_WORLD_UNLOAD_FAILURE_OTHER;
 
     // Commands > World > Weather
 

@@ -172,6 +172,11 @@
         "world_gamerule_info": "<dark_gray>› <gray>Wartość reguły <gold><rule><gray> to <gold><value>",
         "world_gamerule_set_success": "<dark_gray>› <gray>Ustawiono wartość reguły <gold><rule><gray> na <gold><value>",
         "world_gamerule_set_failure": "<dark_gray>› <red>Wartość reguły <gold><rule><red> nie została zaktualizowana.",
+        // World > Import
+        "world_import_usage": "<dark_gray>› <gray>Użycie: <gold>/world import <white>(world) (environment)",
+        "world_import_success": "<dark_gray>› <gray>Świat <gold><world><gray> został zaimportowany.",
+        "world_import_failure_not_found": "<dark_gray>› <red>Świat <gold><world><red> nie istnieje.",
+        "world_import_failure_other": "<dark_gray>› <red>Wystąpił błąd podczas importowania świata <gold><world><red>.",
         // World > Info
         "world_info": [
             "",
@@ -181,10 +186,10 @@
             ""
         ],
         // World > Load
-        "world_load_usage": "<dark_gray>› <gray>Użycie: <gold>/world load <white>(world) <gray>(--remember)",
+        "world_load_usage": "<dark_gray>› <gray>Użycie: <gold>/world load <white>(world)",
         "world_load_success": "<dark_gray>› <gray>Świat <gold><world><gray> został załadowany.",
         "world_load_failure_not_found": "<dark_gray>› <red>Świat <gold><world><red> nie istnieje.",
-        "world_load_failure_other": "<dark_gray>› <red>Wystąpił błąd podczas ładowania świata <gold><world><red>. (<exception>)",
+        "world_load_failure_other": "<dark_gray>› <red>Wystąpił błąd podczas ładowania świata <gold><world><red>.",
         // World > Spawnpoint
         "world_spawnpoint_usage": "<dark_gray>› <gray>Użycie: <gold>/world spawnpoint <white>(world) (x) (y) (z) <gray>(yaw) (pitch)",
         "world_spawnpoint_set_success": "<dark_gray>› <gray>Pozycja spawnu ustawiona na <gold><x><gray>, <gold><y><gray>, <gold><z><gray>.",
@@ -196,8 +201,10 @@
         "world_time_info": "<dark_gray>› <gray>Czas w <gold><world><gray> to <gold><time><gray>.",
         "world_time_set_success": "<dark_gray>› <gray>Czas w <gold><world><gray> został ustawiony na <gold><time><gray>.",
         // World > Unload
-        "world_unload_usage": "<dark_gray>› <gray>Użycie: <gold>/world unload <white>(world) <gray>(--remember)",
+        "world_unload_usage": "<dark_gray>› <gray>Użycie: <gold>/world unload <white>(world)",
         "world_unload_success": "<dark_gray>› <gray>Świat <gold><world><gray> został rozładowany.",
+        "world_unload_failure_primary_world": "<dark_gray>› <red>Podstawowy świat nie może zostać rozładowany.",
+        "world_unload_failure_other": "<dark_gray>› <red>Wystąpił błąd podczas rozładowywania świata <gold><world><red>.",
         // World > Weather
         "world_weather_usage": "<dark_gray>› <gray>Użycie: <gold>/world weather <white>(world) (weather)",
         "world_weather_set_success": "<dark_gray>› <gray>Pogoda w <gold><world><gray> została ustawiona na <gold><weather><gray>.",

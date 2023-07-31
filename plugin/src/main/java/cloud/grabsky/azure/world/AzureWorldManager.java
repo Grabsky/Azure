@@ -2,44 +2,52 @@ package cloud.grabsky.azure.world;
 
 import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.api.world.WorldManager;
+import cloud.grabsky.azure.util.Enums;
+import cloud.grabsky.azure.util.UnifiedLocation;
+import cloud.grabsky.azure.world.AzureWorldManager.WorldOperationException.Reason;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.kyori.adventure.nbt.BinaryTagIO;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.stream.Stream;
 
 import static cloud.grabsky.bedrock.helpers.Conditions.requirePresent;
-import static org.bukkit.NamespacedKey.minecraft;
 
-// NOTE: In the future, when more per-world properties needs to be stored, consider using PDC <---> level.dat (adventure-nbt).
+// NOTE: Looking forward to improve that once some better API is added to Paper.
 @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
 public final class AzureWorldManager implements WorldManager {
 
     @Getter(AccessLevel.PUBLIC)
     private final @NotNull Azure plugin;
 
-    private static final String AUTO_LOAD_FILE_NAME = ".setAutoLoadEnabled";
+    private static final NamespacedKey KEY_SPAWN_POINT = new NamespacedKey("azure", "spawn_point");
+    private static final NamespacedKey KEY_AUTO_LOAD = new NamespacedKey("azure", "auto_load");
+    private static final NamespacedKey KEY_ENVIRONMENT = new NamespacedKey("azure", "environment");
 
-    public @Nullable World createWorld(
-            final @NotNull NamespacedKey key,
-            final @NotNull World.Environment environment,
-            final @NotNull WorldType type,
-            final @Nullable Long seed
-    ) throws IOException, IllegalStateException {
+    /**
+     * Creates a world using specified parameters.
+     */
+    public @NotNull World createWorld(final @NotNull NamespacedKey key, final @NotNull World.Environment environment, final @NotNull WorldType type, final @Nullable Long seed) throws IOException, WorldOperationException {
         final File worldDir = new File(plugin.getServer().getWorldContainer(), key.getKey());
         // Throwing an exception in case world already exists.
         if (worldDir.exists() == true)
-            throw new IllegalStateException("WORLD_ALREADY_EXISTS");
+            throw new WorldOperationException(Reason.ALREADY_EXISTS, "An error occurred while trying to load the world. Directory named " + key.value() + " already exists.");
         // Creating new WorldCreator instance with initial values.
         final WorldCreator creator = new WorldCreator(key)
                 .environment(environment)
@@ -48,68 +56,170 @@ public final class AzureWorldManager implements WorldManager {
         if (seed != null)
             creator.seed(seed);
         // Creating the world.
-        final World world = Bukkit.createWorld(creator);
-        // Making world load automatically on server startup.
-        if (new File(worldDir, AUTO_LOAD_FILE_NAME).createNewFile() == false)
-            plugin.getLogger().warning("World " + key + " is already enabled.");
+        final @Nullable World world = Bukkit.createWorld(creator);
+        // Throwing an exception if created World object is null.
+        if (world == null)
+            throw new WorldOperationException(Reason.OTHER, "An error occurred while trying to import the world. Perhaps wrong timing?");
+        // Setting PDC values.
+        world.getPersistentDataContainer().set(KEY_AUTO_LOAD, PersistentDataType.BOOLEAN, true);
+        world.getPersistentDataContainer().set(KEY_ENVIRONMENT, PersistentDataType.STRING, environment.name());
+        // Saving the world. This should (hopefully) save level.dat as well.
+        world.save();
         // Returning newly created World object.
         return world;
     }
 
-    public @Nullable World loadWorld(final @NotNull NamespacedKey key, final boolean remember) throws IOException, IllegalStateException {
+    /**
+     * Loads a world. This method uses world-specific properties defined inside {@code level.dat} file.
+     */
+    public @NotNull World loadWorld(final @NotNull NamespacedKey key) throws IOException, WorldOperationException {
+        final File dir = new File(plugin.getServer().getWorldContainer(), key.value());
+        // Throwing an exception in case world with such name does not exist.
+        if (dir.exists() == false)
+            throw new WorldOperationException(Reason.DOES_NOT_EXIST, "An error occurred while trying to load the world. No directory named " + key.value() + " was found.");
+        // Reading PDC.
+        final CompoundBinaryTag compound = BinaryTagIO.reader().read(new File(dir, "level.dat").toPath(), BinaryTagIO.Compression.GZIP).getCompound("Data").getCompound("BukkitValues");
+        // Reading environment of the World, stored in PDC.
+        final @Nullable World.Environment environment = Enums.findMatching(World.Environment.class, compound.getString(KEY_ENVIRONMENT.asString()));
+        // Throwing an exception if environment has not been found for that World.
+        if (environment == null)
+            throw new WorldOperationException(Reason.OTHER, "An error occurred while trying to load the world. Environment has not been specified. Try importing the world instead.");
+        // Creating the World object.
+        final @Nullable World world = new WorldCreator(key).environment(environment).createWorld();
+        // Throwing an exception if created World object is null.
+        if (world == null)
+            throw new IllegalStateException("An error occurred while trying to import the world. Perhaps wrong timing?");
+        // Setting PDC.
+        world.getPersistentDataContainer().set(KEY_AUTO_LOAD, PersistentDataType.BOOLEAN, true); // Imported worlds should be automatically loaded by default.
+        // Returning the World object.
+        return world;
+    }
+
+    /**
+     * Imports the world. When world is loaded for the first time, it's necessary to specify {@link World.Environment} it uses - Bukkit API can't guess that, apparently.
+     */
+    public @NotNull World importWorld(final @NotNull NamespacedKey key, final @NotNull World.Environment environment) throws WorldOperationException {
         final File dir = new File(plugin.getServer().getWorldContainer(), key.getKey());
         // Throwing an exception in case world with such name does not exist.
         if (dir.exists() == false)
-            throw new IllegalStateException("WORLD_DOES_NOT_EXIST");
-        // Making world load automatically on server startup, if enabled.
-        if (remember == true)
-            new File(dir, AUTO_LOAD_FILE_NAME).createNewFile();
-        // Loading and returning the World object.
-        return new WorldCreator(key).createWorld();
+            throw new WorldOperationException(Reason.DOES_NOT_EXIST, "An error occurred while trying to load the world. No directory named " + key.value() + " was found.");
+        // Returning the World object.
+        final @Nullable World world = new WorldCreator(key).environment(environment).createWorld();
+        // Throwing an exception if created World object is null.
+        if (world == null)
+            throw new WorldOperationException(Reason.OTHER, "An error occurred while trying to load the world. Environment has not been specified. Try importing the world instead.");
+        // Setting PDC values.
+        world.getPersistentDataContainer().set(KEY_ENVIRONMENT, PersistentDataType.STRING, environment.toString());
+        world.getPersistentDataContainer().set(KEY_AUTO_LOAD, PersistentDataType.BOOLEAN, true); // Imported worlds should be automatically loaded by default.
+        // Returning the World object.
+        return world;
     }
 
-    public boolean unloadWorld(final @NotNull World world, final boolean remember) {
-        // Making world NOT load automatically on server startup, if enabled.
-        if (remember == true)
-            new File(world.getWorldFolder(), AUTO_LOAD_FILE_NAME).delete();
+    /**
+     * Unloads the world. Can ocassionally fail, according to Bukkit API. This has the same effect as {@link Bukkit#unloadWorld}.
+     */
+    public boolean unloadWorld(final @NotNull World world) throws WorldOperationException {
+        if (this.getPrimaryWorld().equals(world) == true)
+            throw new WorldOperationException(Reason.PRIMARY_WORLD, "An error occurred while trying to unload a world. Default world cannot be unloaded.");
+        // Moving all players to spawn of the main world.
+        world.getPlayers().forEach(player -> player.teleport(this.getSpawnPoint(this.getPrimaryWorld()))); // Not async to prevent next call from failiing.
+        // Setting PDC values.
+        world.getPersistentDataContainer().set(KEY_AUTO_LOAD, PersistentDataType.BOOLEAN, false); // Unloaded worlds shouldn't be loaded automatically until requested.
         // Returning 'true' if unloading was successful.
         return plugin.getServer().unloadWorld(world, true);
     }
 
-    public void loadWorlds() throws IOException, IllegalStateException {
+    /**
+     * Deletes the world. Can ocassionally fail, according to Bukkit API.
+     */
+    public boolean deleteWorld(final @NotNull World world) throws WorldOperationException {
+        if (this.getPrimaryWorld().equals(world) == true)
+            throw new WorldOperationException(Reason.PRIMARY_WORLD, "An error occurred while trying to unload a world. Default world cannot be deleted.");
+        // Unloading the world. This method also moves all players to spawn of the primary world.
+        this.unloadWorld(world);
+        // Deleting the directory and returning the result.
+        return deleteDirectory(world.getWorldFolder());
+    }
+
+    /**
+     * Loads all worlds that have auto-load enabled.
+     */
+    public void loadWorlds() throws IOException, WorldOperationException {
         final File[] dirs = requirePresent(plugin.getServer().getWorldContainer().listFiles(), new File[0]);
         // Streaming over all world directories and loading corresponding worlds, if AUTO_LOAD_FILE_NAME file is present.
-        Stream.of(dirs).filter(File::isDirectory).filter(dir -> new File(dir, AUTO_LOAD_FILE_NAME).exists() == true).forEach(worldDir -> {
-            final NamespacedKey key = minecraft(worldDir.getName());
-            // Creating an existing world simply loads it from the disk.
-            new WorldCreator(key).createWorld();
-        });
+        for (final File directory : dirs) {
+            // Skipping non-worlds.
+            if (new File(directory, "level.dat").exists() == false)
+                continue;
+            final String name = directory.getName();
+            // Skipping "default" worlds. There may be a better way to do that but this one should work for now.
+            if (name.equals(this.getPrimaryWorld().getName()) == true || name.equals(this.getPrimaryWorld().getName() + "_nether") == true || name.equals(this.getPrimaryWorld().getName() + "_the_end") == true)
+                continue;
+            // Creating a key.
+            final NamespacedKey key = NamespacedKey.minecraft(directory.getName());
+            // Loading the world.
+            this.loadWorld(key);
+        }
     }
 
-    private static final NamespacedKey SPAWN_POINT = new NamespacedKey("azure", "spawn_point");
-
-    public boolean getAutoLoad(final @NotNull World world) {
-        return new File(world.getWorldFolder(), AUTO_LOAD_FILE_NAME).exists();
-    }
-
-    public boolean setAutoLoad(final @NotNull World world, final boolean state) throws IOException {
-        final File file = new File(world.getWorldFolder(), AUTO_LOAD_FILE_NAME);
-        // ...
-        if (state == true && file.exists() == false)
-            return file.createNewFile();
-        else if (file.exists() == true)
-            return file.delete();
-        // ...
-        return false;
-    }
-
-    public void setSpawnPoint(final @NotNull World world, final @NotNull Location location) {
-        world.getPersistentDataContainer().set(SPAWN_POINT, WorldManager.Type.ofLocation(SPAWN_POINT), location);
-    }
-
+    /**
+     * Returns spawn point of specified {@link World}.
+     */
     @Override
     public @NotNull Location getSpawnPoint(final @NotNull World world) {
-        return world.getPersistentDataContainer().getOrDefault(SPAWN_POINT, WorldManager.Type.ofLocation(SPAWN_POINT), world.getSpawnLocation());
+        final @Nullable UnifiedLocation location = (world.getPersistentDataContainer().has(KEY_SPAWN_POINT) == true)
+                ? world.getPersistentDataContainer().get(KEY_SPAWN_POINT, UnifiedLocation.PERSISTENT_DATA_TYPE)
+                : null;
+        // Returning...
+        return (location != null) ? location.toBukkitLocation(world) : world.getSpawnLocation();
+    }
+
+    /**
+     * Changes spawn point of specified {@link World} to provided {@link Location}.
+     */
+    public void setSpawnPoint(final @NotNull World world, final @NotNull Location location) {
+        world.getPersistentDataContainer().set(KEY_SPAWN_POINT, UnifiedLocation.PERSISTENT_DATA_TYPE, UnifiedLocation.fromLocation(location));
+    }
+
+    /**
+     * Changes auto load flag of specified {@link World}.
+     */
+    public void setAutoLoad(final @NotNull World world, final boolean state) {
+        world.getPersistentDataContainer().set(KEY_AUTO_LOAD, PersistentDataType.BOOLEAN, state);
+    }
+
+    /**
+     * Returns true if provided {@link World} should be auto loaded.
+     */
+    public boolean getAutoLoad(final @NotNull World world) {
+        return world.getPersistentDataContainer().getOrDefault(KEY_AUTO_LOAD, PersistentDataType.BOOLEAN, false);
+    }
+
+    private static boolean deleteDirectory(final File file) {
+        try (final Stream<Path> walk = Files.walk(file.toPath())) {
+            walk.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+            return true;
+        } catch (final IOException e) {
+            return false;
+        }
+    }
+
+    @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
+    public static final class WorldOperationException extends IllegalStateException {
+
+        @Getter(AccessLevel.PUBLIC)
+        private final Reason reason;
+
+        public WorldOperationException(final @NotNull Reason reason, final @NotNull String message) {
+            super(message);
+            // ...
+            this.reason = reason;
+        }
+
+        public enum Reason {
+            PRIMARY_WORLD, DOES_NOT_EXIST, ALREADY_EXISTS, OTHER
+        }
+
     }
 
 }
