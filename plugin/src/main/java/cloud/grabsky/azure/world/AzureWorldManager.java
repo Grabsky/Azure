@@ -19,6 +19,7 @@ import org.bukkit.WorldType;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.io.File;
 import java.io.IOException;
@@ -73,12 +74,24 @@ public final class AzureWorldManager implements WorldManager {
      * Loads a world. This method uses world-specific properties defined inside {@code level.dat} file.
      */
     public @NotNull World loadWorld(final @NotNull NamespacedKey key) throws IOException, WorldOperationException {
+        return this.loadWorld(key, true);
+    }
+
+    /**
+     * Loads a world. This method uses world-specific properties defined inside {@code level.dat} file.
+     *
+     * @apiNote In case {@code force} is set to {@code false} and world is not marked to be automatically loaded, {@code null} is returned.
+     */
+    public @UnknownNullability World loadWorld(final @NotNull NamespacedKey key, final boolean force) throws IOException, WorldOperationException {
         final File dir = new File(plugin.getServer().getWorldContainer(), key.value());
         // Throwing an exception in case world with such name does not exist.
         if (dir.exists() == false)
             throw new WorldOperationException(Reason.DOES_NOT_EXIST, "An error occurred while trying to load the world. No directory named " + key.value() + " was found.");
         // Reading PDC.
         final CompoundBinaryTag compound = BinaryTagIO.reader().read(new File(dir, "level.dat").toPath(), BinaryTagIO.Compression.GZIP).getCompound("Data").getCompound("BukkitValues");
+        // Skipping worlds that should not be loaded automatically.
+        if (force == false && compound.getBoolean(KEY_AUTO_LOAD.asString(), false) == false)
+            return null;
         // Reading environment of the World, stored in PDC.
         final @Nullable World.Environment environment = Enums.findMatching(World.Environment.class, compound.getString(KEY_ENVIRONMENT.asString()));
         // Throwing an exception if environment has not been found for that World.
@@ -158,7 +171,7 @@ public final class AzureWorldManager implements WorldManager {
             // Creating a key.
             final NamespacedKey key = NamespacedKey.minecraft(directory.getName());
             // Loading the world.
-            this.loadWorld(key);
+            this.loadWorld(key, false); // "Disabled" worlds are ignored.
         }
     }
 

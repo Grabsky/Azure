@@ -221,20 +221,19 @@ public final class WorldCommand extends RootCommand {
                 final World world = plugin.getWorldManager().createWorld(key, environment, type, seed);
                 // Sending success message to command sender.
                 Message.of(PluginLocale.COMMAND_WORLD_CREATE_SUCCESS).placeholder("world", world).send(sender);
-                return;
             } catch (final WorldOperationException e) {
                 // Sending reason-specific error message to command sender.
                 if (e.getReason() == Reason.ALREADY_EXISTS)
                     Message.of(PluginLocale.COMMAND_WORLD_CREATE_FAILURE_ALREADY_EXISTS).placeholder("world", key).send(sender);
                 else if (e.getReason() == Reason.OTHER)
                     Message.of(PluginLocale.COMMAND_WORLD_CREATE_FAILURE_OTHER).placeholder("world", key).send(sender);
-                return;
-            } catch (final IOException e) {
+            // Catch any RuntimeException, I'm tired of guessing what exceptions Bukkit can throw...
+            } catch (final IOException | RuntimeException e) {
                 e.printStackTrace();
                 // Sending error message to command sender.
                 Message.of(PluginLocale.COMMAND_WORLD_CREATE_FAILURE_OTHER).placeholder("world", key).send(sender);
-                return;
             }
+            return;
         }
         // Sending error message to command sender.
         Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
@@ -340,6 +339,9 @@ public final class WorldCommand extends RootCommand {
                     Message.of(PluginLocale.COMMAND_WORLD_IMPORT_FAILURE_NOT_FOUND).placeholder("world", key).send(sender);
                 else if (e.getReason() == Reason.OTHER)
                     Message.of(PluginLocale.COMMAND_WORLD_IMPORT_FAILURE_OTHER).placeholder("world", key).send(sender);
+            // Catch any RuntimeException, I'm tired of guessing what exceptions Bukkit can throw...
+            } catch (final RuntimeException e) {
+                Message.of(PluginLocale.COMMAND_WORLD_IMPORT_FAILURE_OTHER).placeholder("world", key).send(sender);
             }
             return;
         }
@@ -401,7 +403,11 @@ public final class WorldCommand extends RootCommand {
                 e.printStackTrace();
                 // Sending error message to command sender.
                 Message.of(PluginLocale.COMMAND_WORLD_LOAD_FAILURE_OTHER).placeholder("world", key).send(sender);
+            // Catch any RuntimeException, I'm tired of guessing what exceptions Bukkit can throw...
+            } catch (final RuntimeException e) {
+                Message.of(PluginLocale.COMMAND_WORLD_LOAD_FAILURE_OTHER).placeholder("world", key).send(sender);
             }
+
             return;
         }
         // Sending error message to command sender.
