@@ -36,7 +36,7 @@ public final class PlayerListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler // NOTE: Some resource pack sending changes might be necessary once 1.20.2 is live. (see 23w31a)
     public void onPlayerJoin(final @NotNull PlayerJoinEvent event) {
         final Player player = event.getPlayer();
         // Clearing title. (if enabled)
