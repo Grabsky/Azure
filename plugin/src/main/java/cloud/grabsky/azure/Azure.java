@@ -6,6 +6,7 @@ import cloud.grabsky.azure.api.user.UserCache;
 import cloud.grabsky.azure.chat.ChatManager;
 import cloud.grabsky.azure.commands.AzureCommand;
 import cloud.grabsky.azure.commands.BanCommand;
+import cloud.grabsky.azure.commands.DebugCommand;
 import cloud.grabsky.azure.commands.DeleteCommand;
 import cloud.grabsky.azure.commands.EnderchestCommand;
 import cloud.grabsky.azure.commands.FeedCommand;
@@ -31,6 +32,7 @@ import cloud.grabsky.azure.configuration.PluginConfig.DeleteButton;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.azure.configuration.adapters.BossBarAdapterFactory;
 import cloud.grabsky.azure.configuration.adapters.TagResolverAdapter;
+import cloud.grabsky.azure.features.ExtraItems;
 import cloud.grabsky.azure.listener.PlayerListener;
 import cloud.grabsky.azure.user.AzureUserCache;
 import cloud.grabsky.azure.util.FileLogger;
@@ -134,10 +136,14 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
                 .registerCommand(new PlayerCommand(this))
                 .registerCommand(HealCommand.class)
                 .registerCommand(FeedCommand.class)
-                .registerCommand(InvulnerableCommand.class);
+                .registerCommand(InvulnerableCommand.class)
+                // DEBUG
+                .registerCommand(new DebugCommand(this));
         // Registering events...
         this.getServer().getPluginManager().registerEvents(chatManager, this);
         this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
+        // ...
+        new ExtraItems(this).initialize();
         // Finalizing... (exposing instance to the API)
         AzureProvider.finalize(this);
     }
