@@ -12,6 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
+import org.bukkit.event.inventory.PrepareGrindstoneEvent;
 import org.bukkit.event.inventory.PrepareSmithingEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -19,6 +20,7 @@ import org.bukkit.inventory.meta.ArmorMeta;
 import org.bukkit.inventory.meta.trim.ArmorTrim;
 import org.bukkit.inventory.meta.trim.TrimMaterial;
 import org.bukkit.inventory.meta.trim.TrimPattern;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,23 +40,20 @@ public final class FancyTooltips implements Listener {
         return "trim_material." + material.key().namespace() + "." + material.key().value();
     }
 
-    private static final Component LORE_SEPARATOR = Component.text("\u2004");
     private static final Component SEGMENT_SEPARATOR = Component.text("\u2006");
 
     public static @NotNull ItemStack create(final ItemStack item, final @Nullable Event associatedEvent) {
         item.editMeta(meta -> {
-            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ARMOR_TRIM);
-            // ...
             final @NotNull List<Component> existingLore = meta.hasLore() ? meta.lore().stream().takeWhile(c -> c.equals(SEGMENT_SEPARATOR) == false).toList() : new ArrayList<>(); // Cannot be null.
             // ...
             final @NotNull List<Component> resultLore = new ArrayList<>(existingLore);
-
             // Trims...
             if (meta instanceof ArmorMeta armor) {
                 // Getting the trim.
                 final @Nullable ArmorTrim trim = armor.getTrim();
                 // Proceeding to append trims to the lore.
                 if (trim != null) {
+                    meta.addItemFlags(ItemFlag.HIDE_ARMOR_TRIM);
                     // Seperating from above...
                     resultLore.add(SEGMENT_SEPARATOR);
                     // Appending segment title. Translation key will be used in the future.
@@ -63,7 +62,8 @@ public final class FancyTooltips implements Listener {
                     resultLore.add(ComponentBuilder.of(" ").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.DARK_GRAY).appendTranslation(getTrimPatternTranslationKey(trim.getPattern())).build());
                     // Appending (translatable) trim material name.
                     resultLore.add(ComponentBuilder.of(" ").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.DARK_GRAY).appendTranslation(getTrimMaterialTranslationKey(trim.getMaterial())).build());
-                }
+                // Othwerwise, HIDE_ARMOR_TRIM flag is being removed.
+                } else meta.removeItemFlags(ItemFlag.HIDE_ARMOR_TRIM);
             }
 
             // Enchantments...
@@ -77,6 +77,7 @@ public final class FancyTooltips implements Listener {
                 });
             // Proceeding to append enchantments to the lore.
             if (enchantments.isEmpty() == false) {
+                meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                 // Seperating from above...
                 resultLore.add(SEGMENT_SEPARATOR);
                 // Appending segment title. Translation key will be used in the future.
@@ -94,7 +95,12 @@ public final class FancyTooltips implements Listener {
                             // Building and adding new line.
                             resultLore.add(builder.build());
                         });
-            }
+            // Othwerwise, HIDE_ENCHANTS flag is being removed.
+            } else meta.removeItemFlags(ItemFlag.HIDE_ENCHANTS);
+
+            // Custom Enchantments...
+            final PersistentDataContainer container = meta.getPersistentDataContainer();
+
             // Applyin the lore.
             meta.lore(resultLore);
         });
@@ -102,15 +108,13 @@ public final class FancyTooltips implements Listener {
         return item;
     }
 
-
-
     @EventHandler(ignoreCancelled = true)
-    public void onEnchant(final EnchantItemEvent event) {
+    public void onEnchantItemEvent(final @NotNull EnchantItemEvent event) {
         create(event.getItem(), event); // This event's ItemStack is mutable.
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onSmith(final PrepareSmithingEvent event) {
+    public void onPrepareSmithingEvent(final @NotNull PrepareSmithingEvent event) {
         if (event.getResult() == null)
             return;
         // ...
@@ -120,7 +124,7 @@ public final class FancyTooltips implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onAnvil(final PrepareAnvilEvent event) {
+    public void onPrepareAnvilEvent(final @NotNull PrepareAnvilEvent event) {
         final var s1 = System.nanoTime();
         if (event.getInventory().getFirstItem() == null || event.getInventory().getSecondItem() == null || event.getInventory().getResult() == null)
             return;
@@ -131,6 +135,16 @@ public final class FancyTooltips implements Listener {
         final @NotNull ItemStack item = create(event.getResult(), event); // This event's ItemStack is immutable.
         final var s2 = System.nanoTime();
         System.out.println(BigDecimal.valueOf((double) (s2 - s1) / 1_000_000.0) + "ms");
+        // ...
+        event.setResult(item);
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPrepareGrindstoneEvent(final @NotNull PrepareGrindstoneEvent event) {
+        if (event.getResult() == null)
+            return;
+        // ...
+        final @NotNull ItemStack item = create(event.getResult(), event); // This event's ItemStack is immutable.
         // ...
         event.setResult(item);
     }
