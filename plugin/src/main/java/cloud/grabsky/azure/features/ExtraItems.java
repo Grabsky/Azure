@@ -5,7 +5,12 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -29,7 +34,11 @@ public final class ExtraItems implements Listener {
     private static final NamespacedKey KEY_HAS_SPEED_BOOST = new NamespacedKey("azure", "item/has_speed_boost");
 
     public void initialize() {
-        // Cancelling existing task to make sure logic is not duplicated.
+        // Unregistering events to make sure no logic is duplicated
+        HandlerList.unregisterAll(this);
+        // Registering event(s).
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+        // Cancelling existing task to make sure no logic is duplicated.
         if (TASK != null)
             TASK.cancel();
         // Scheduling a new repeating task.
@@ -39,12 +48,26 @@ public final class ExtraItems implements Listener {
                     final PersistentDataContainer container = player.getInventory().getBoots().getItemMeta().getPersistentDataContainer();
                     if (container.has(KEY_HAS_SPEED_BOOST) == true)
                         player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 21, 0, false, false, false));
-                    if (container.has(KEY_HAS_JUMP_BOOST) == true)
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 21, 2, false, false, false));
+                    if (container.has(KEY_HAS_JUMP_BOOST) == true) {
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 21, 3, false, false, false));
+                    }
                 }
             });
             return true;
         });
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onFallDamage(final EntityDamageEvent event) {
+        if (event.getCause() != DamageCause.FALL)
+            return;
+        // ...
+        if (event.getEntity() instanceof Player player)
+            if (player.getInventory().getBoots() != null && player.getInventory().getBoots().hasItemMeta() == true) {
+                final PersistentDataContainer container = player.getInventory().getBoots().getItemMeta().getPersistentDataContainer();
+                if (container.has(KEY_HAS_JUMP_BOOST) == true)
+                    event.setCancelled(true);
+            }
     }
 
 }

@@ -7,12 +7,15 @@ import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.exception.CommandLogicException;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.jetbrains.annotations.NotNull;
 
 public class DebugCommand extends RootCommand implements Listener {
@@ -27,7 +30,7 @@ public class DebugCommand extends RootCommand implements Listener {
 
     @Override
     public @NotNull CompletionsProvider onTabComplete(final @NotNull RootCommandContext context, final int index) throws CommandLogicException {
-        return (index == 0) ? CompletionsProvider.of("refresh_listeners", "delete_entity") : CompletionsProvider.EMPTY;
+        return (index == 0) ? CompletionsProvider.of("refresh_listeners", "refresh_recipes", "delete_entity") : CompletionsProvider.EMPTY;
     }
 
     @Override
@@ -51,6 +54,21 @@ public class DebugCommand extends RootCommand implements Listener {
                         final Entity entity = senderPlayer.getTargetEntity(20);
                         if (entity instanceof LivingEntity == true)
                             entity.remove();
+                    }
+                }
+                case "refresh_recipes" -> {
+                    // ...
+                }
+                case "modify" -> {
+                    if (sender instanceof Player senderPlayer) {
+                        final ItemStack item = senderPlayer.getInventory().getItemInMainHand();
+                        // ...
+                        if (item.getType() == Material.AIR)
+                            return;
+                        // ...
+                        item.editMeta(meta -> {
+                            final PersistentDataContainer container = meta.getPersistentDataContainer();
+                        });
                     }
                 }
             }
