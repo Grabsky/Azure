@@ -138,7 +138,7 @@
             ""
         ],
         // World > Autoload
-        "world_autoload_usage": "<dark_gray>› <gray>Użycie: <gold>/world autoload (true/false)",
+        "world_autoload_usage": "<dark_gray>› <gray>Użycie: <gold>/world autoload <white>(world) (true/false)",
         "world_autoload_success_on": "<dark_gray>› <gray>Automatyczne ładowanie świata <gold><world><gray> zostało włączone.",
         "world_autoload_success_off": "<dark_gray>› <gray>Automatyczne ładowanie świata <gold><world><gray> zostało wyłączone.",
         "world_autoload_failure": "<dark_gray>› <red>Nie udało się zmienić wartości automatycznego ładowania świata.",
