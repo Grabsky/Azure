@@ -165,8 +165,8 @@ public final class AzureWorldManager implements WorldManager {
             if (new File(directory, "level.dat").exists() == false)
                 continue;
             final String name = directory.getName();
-            // Skipping "default" worlds. There may be a better way to do that but this one should work for now.
-            if (name.equals(this.getPrimaryWorld().getName()) == true || name.equals(this.getPrimaryWorld().getName() + "_nether") == true || name.equals(this.getPrimaryWorld().getName() + "_the_end") == true)
+            // Skipping "default" world. There may be a better way to do that but this one should work for now.
+            if (name.equals(this.getPrimaryWorld().getName()) == true)
                 continue;
             // Creating a key.
             final NamespacedKey key = NamespacedKey.minecraft(directory.getName());
