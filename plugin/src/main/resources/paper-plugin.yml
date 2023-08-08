@@ -8,6 +8,3 @@ dependencies:
     LuckPerms:
       load: BEFORE
       required: true
-    # Guithium:
-    #   load: BEFORE
-    #   required: true
