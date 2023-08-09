@@ -258,13 +258,14 @@ public final class AzureUserCache implements UserCache, Listener {
                     (existingUser != null) ? (AzurePunishment) existingUser.getMostRecentBan() : null,
                     (existingUser != null) ? (AzurePunishment) existingUser.getMostRecentMute() : null
             );
-            // Saving to the file.
+            // Completing...
             CompletableFuture.runAsync(() -> {
                 final String countryCode = fetchCountry(address, 1);
                 // ...
                 if (countryCode != null)
                     computeUser.setLastCountryCode(countryCode);
             }).thenCompose(_void -> this.saveUser(computeUser));
+            // Saving if modified.
             if (existingUser == null || computeUser.equals(existingUser) == false)
                 this.saveUser(computeUser);
             // Returning "new" instance, replacing the previous one.
@@ -272,7 +273,7 @@ public final class AzureUserCache implements UserCache, Listener {
         });
         // Hiding vanished players. This was previously handled inside PlayerListener, until we migrated state storage from PDC to User JSON data.
         // NOTE: Handling that inside PlayerJoinEvent event may result in vanished player being exposed until he is hidden.
-        // NOTE: Here and eevrywhere else (I believe) - vanished players of the same group weight can see eachother.
+        // NOTE: Here and everywhere else (I believe) - vanished players of the same group weight can see eachother.
         if (thisUser.isVanished() == true) {
             // Removing the join message, this should be configurable in the future.
             event.joinMessage(null);
