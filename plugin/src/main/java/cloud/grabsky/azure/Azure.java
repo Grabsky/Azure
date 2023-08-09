@@ -50,7 +50,6 @@ import lombok.Getter;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
-import org.bukkit.NamespacedKey;
 
 import java.io.File;
 import java.io.IOException;
@@ -179,13 +178,4 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
         }
     }
 
-
-    /**
-     * Some {@link NamespacedKey} instances used within the {@link Azure} plugin are defined here.
-     */
-    public static final class Keys {
-
-        public static final NamespacedKey IS_VANISHED = new NamespacedKey("azure", "is_vanished");
-
-    }
 }

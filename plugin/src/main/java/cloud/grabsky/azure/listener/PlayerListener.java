@@ -1,7 +1,6 @@
 package cloud.grabsky.azure.listener;
 
 import cloud.grabsky.azure.Azure;
-import cloud.grabsky.azure.Azure.Keys;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -10,12 +9,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
-
-import static net.kyori.adventure.text.Component.empty;
 
 public final class PlayerListener implements Listener {
 
@@ -51,13 +46,6 @@ public final class PlayerListener implements Listener {
                     PluginConfig.RESOURCE_PACK_PROMPT_MESSAGE
             ));
         }
-    }
-
-    @EventHandler
-    public void onPlayerQuit(final @NotNull PlayerQuitEvent event) {
-        if (event.getPlayer().getPersistentDataContainer().getOrDefault(Keys.IS_VANISHED, PersistentDataType.BOOLEAN, false) == true)
-            // Hiding quit message.
-            event.quitMessage(empty());
     }
 
     @EventHandler(ignoreCancelled = true) // Enables void damge to invulnerable players.
