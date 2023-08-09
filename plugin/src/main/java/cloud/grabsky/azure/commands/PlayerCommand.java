@@ -9,6 +9,8 @@ import cloud.grabsky.bedrock.util.Interval.Unit;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
+import cloud.grabsky.commands.annotation.Command;
+import cloud.grabsky.commands.annotation.Dependency;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.component.ExceptionHandler;
 import cloud.grabsky.commands.exception.CommandLogicException;
@@ -25,6 +27,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -35,20 +38,18 @@ import static net.kyori.adventure.text.format.NamedTextColor.GREEN;
 import static net.kyori.adventure.text.format.NamedTextColor.RED;
 import static net.kyori.adventure.text.format.NamedTextColor.YELLOW;
 
+@Command(name = "player", permission = "azure.command.player", usage = "/player (player)")
 public final class PlayerCommand extends RootCommand {
 
-    private final Azure plugin;
-    private final LuckPerms luckperms;
+    @Dependency
+    private @UnknownNullability Azure plugin;
+
+    @Dependency
+    private @UnknownNullability LuckPerms luckperms;
+
 
     private final static DecimalFormat ONE_DECIMAL_PLACE = new DecimalFormat("#.#");
     private final static SimpleDateFormat DD_MM_YYYY = new SimpleDateFormat("dd.MM.yyyy HH:mm");
-
-    public PlayerCommand(final @NotNull Azure plugin) {
-        super("player", null, "azure.command.player", "/player (player)", null);
-        // ...
-        this.plugin = plugin;
-        this.luckperms = plugin.getLuckPerms();
-    }
 
     private static final ExceptionHandler.Factory PLAYER_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)

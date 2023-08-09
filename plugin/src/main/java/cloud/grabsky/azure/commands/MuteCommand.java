@@ -11,6 +11,8 @@ import cloud.grabsky.bedrock.util.Interval.Unit;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
+import cloud.grabsky.commands.annotation.Command;
+import cloud.grabsky.commands.annotation.Dependency;
 import cloud.grabsky.commands.argument.StringArgument;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.component.ExceptionHandler;
@@ -23,21 +25,20 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.UUID;
 
 // TO-DO: Support for "@forever" selector which defaults to 0s, making the punishment permantent. (low priority)
+@Command(name = "mute", permission = "azure.command.mute", usage = "/mute (player) (duration) (reason)")
 public final class MuteCommand extends RootCommand {
 
-    private final Azure plugin;
-    private final LuckPerms luckperms;
+    @Dependency
+    private @UnknownNullability Azure plugin;
 
-    public MuteCommand(final @NotNull Azure plugin) {
-        super("mute", null, "azure.command.mute", "/mute (player) (duration) (reason)", null);
-        // ...
-        this.plugin = plugin;
-        this.luckperms = plugin.getLuckPerms();
-    }
+    @Dependency
+    private @UnknownNullability LuckPerms luckperms;
+
 
     private static final ExceptionHandler.Factory MUTE_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)

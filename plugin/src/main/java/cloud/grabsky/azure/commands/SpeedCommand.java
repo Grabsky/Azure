@@ -5,6 +5,7 @@ import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
+import cloud.grabsky.commands.annotation.Command;
 import cloud.grabsky.commands.argument.FloatArgument;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.component.ExceptionHandler;
@@ -13,11 +14,8 @@ import cloud.grabsky.commands.exception.MissingInputException;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+@Command(name = "speed", permission = "azure.command.speed", usage = "/speed (player) (speed)")
 public final class SpeedCommand extends RootCommand {
-
-    public SpeedCommand() {
-        super("speed", null, "azure.command.speed", "/speed <player> [speed]", "Modify in-game movement speed.");
-    }
 
     private static final ExceptionHandler.Factory SPEED_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)

@@ -5,6 +5,7 @@ import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
+import cloud.grabsky.commands.annotation.Command;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.component.ExceptionHandler;
 import cloud.grabsky.commands.exception.CommandLogicException;
@@ -13,11 +14,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class FeedCommand extends RootCommand {
-
-    public FeedCommand() {
-        super("feed", null, "azure.command.feed", "/feed (player)", null);
-    }
+@Command(name = "feed", permission = "azure.command.feed", usage = "/feed (player)")
+public final class FeedCommand extends RootCommand {
 
     private static final ExceptionHandler.Factory FEED_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)

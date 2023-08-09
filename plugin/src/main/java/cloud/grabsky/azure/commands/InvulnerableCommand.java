@@ -5,6 +5,7 @@ import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
+import cloud.grabsky.commands.annotation.Command;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.component.ExceptionHandler;
 import cloud.grabsky.commands.exception.CommandLogicException;
@@ -17,11 +18,8 @@ import org.jetbrains.annotations.NotNull;
 import static net.kyori.adventure.text.format.NamedTextColor.GREEN;
 import static net.kyori.adventure.text.format.NamedTextColor.RED;
 
-public class InvulnerableCommand extends RootCommand {
-
-    public InvulnerableCommand() {
-        super("invulnerable", null, "azure.command.invulnerable", "/invulnerable (player) (state)", null);
-    }
+@Command(name = "invulnerable", permission = "azure.command.invulnerable", usage = "/invulnerable (player) (state)")
+public final class InvulnerableCommand extends RootCommand {
 
     private static final ExceptionHandler.Factory INVULNERABLE_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)

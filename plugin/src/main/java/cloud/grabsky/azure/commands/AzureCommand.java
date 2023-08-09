@@ -6,16 +6,14 @@ import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
+import cloud.grabsky.commands.annotation.Command;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.exception.CommandLogicException;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
+@Command(name = "azure", permission = "azure.command.azure", usage = "/azure (...)")
 public final class AzureCommand extends RootCommand {
-
-    public AzureCommand() {
-        super("azure", null, "azure.command.azure", "/azure", null);
-    }
 
     @Override
     public @NotNull CompletionsProvider onTabComplete(final @NotNull RootCommandContext context, final int index) {

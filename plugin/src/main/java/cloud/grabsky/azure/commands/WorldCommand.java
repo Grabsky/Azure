@@ -11,6 +11,8 @@ import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
 import cloud.grabsky.commands.RootCommandInput;
+import cloud.grabsky.commands.annotation.Command;
+import cloud.grabsky.commands.annotation.Dependency;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.component.ExceptionHandler;
 import cloud.grabsky.commands.exception.CommandLogicException;
@@ -25,6 +27,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,16 +37,15 @@ import static cloud.grabsky.azure.world.AzureWorldManager.WorldOperationExceptio
 import static cloud.grabsky.azure.world.AzureWorldManager.WorldOperationException.Reason;
 import static java.lang.String.format;
 
+@Command(name = "world", permission = "azure.command.world", usage = "/world (...)")
 public final class WorldCommand extends RootCommand {
 
-    private final Azure plugin;
-    private final AzureWorldManager worlds;
+    @Dependency
+    private @UnknownNullability Azure plugin;
 
-    public WorldCommand(final Azure plugin) {
-        super("world", null, "azure.command.world", "/world", "Manage your worlds in-game.");
-        this.plugin = plugin;
-        this.worlds = plugin.getWorldManager();
-    }
+    @Dependency
+    private @UnknownNullability AzureWorldManager worlds;
+
 
     @Override
     public @NotNull CompletionsProvider onTabComplete(final @NotNull RootCommandContext context, final int index) {

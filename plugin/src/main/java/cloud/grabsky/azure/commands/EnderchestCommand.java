@@ -5,6 +5,7 @@ import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
+import cloud.grabsky.commands.annotation.Command;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.component.ExceptionHandler;
 import cloud.grabsky.commands.exception.CommandLogicException;
@@ -12,11 +13,8 @@ import cloud.grabsky.commands.exception.MissingInputException;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class EnderchestCommand extends RootCommand {
-
-    public EnderchestCommand() {
-        super("enderchest", null, "azure.command.enderchest", "/enderchest (player)", null);
-    }
+@Command(name = "enderchest", permission = "azure.command.enderchest", usage = "/enderchest (player)")
+public final class EnderchestCommand extends RootCommand {
 
     private static final ExceptionHandler.Factory ENDERCHEST_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)

@@ -1,12 +1,13 @@
 package cloud.grabsky.azure.commands;
 
-import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.chat.ChatManager;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
+import cloud.grabsky.commands.annotation.Command;
+import cloud.grabsky.commands.annotation.Dependency;
 import cloud.grabsky.commands.component.ExceptionHandler;
 import cloud.grabsky.commands.exception.CommandLogicException;
 import cloud.grabsky.commands.exception.MissingInputException;
@@ -14,15 +15,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
+@Command(name = "delete", permission = "azure.command.delete", usage = "/delete (signature_uuid)")
 public final class DeleteCommand extends RootCommand {
 
-    private final ChatManager chat;
+    private @Dependency ChatManager chat;
 
-    public DeleteCommand(final @NotNull Azure plugin) {
-        super("delete", null, "azure.command.delete", "/delete <signature_uuid>", null);
-        // ...
-        this.chat = plugin.getChatManager();
-    }
 
     private static final ExceptionHandler.Factory DELETE_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)

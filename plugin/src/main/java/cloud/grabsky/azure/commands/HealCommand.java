@@ -5,6 +5,7 @@ import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
+import cloud.grabsky.commands.annotation.Command;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.component.ExceptionHandler;
 import cloud.grabsky.commands.exception.CommandLogicException;
@@ -14,11 +15,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class HealCommand extends RootCommand {
-
-    public HealCommand() {
-        super("heal", null, "azure.command.heal", "/heal (player)", null);
-    }
+@Command(name = "heal", permission = "azure.command.heal", usage = "/heal (player)")
+public final class HealCommand extends RootCommand {
 
     private static final ExceptionHandler.Factory HEAL_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)

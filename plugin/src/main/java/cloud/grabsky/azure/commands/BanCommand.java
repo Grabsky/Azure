@@ -11,6 +11,8 @@ import cloud.grabsky.bedrock.util.Interval.Unit;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
+import cloud.grabsky.commands.annotation.Command;
+import cloud.grabsky.commands.annotation.Dependency;
 import cloud.grabsky.commands.argument.StringArgument;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.component.ExceptionHandler;
@@ -27,17 +29,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 
 // TO-DO: Support for "@forever" selector which defaults to 0s, making the punishment permantent. (low priority)
+@Command(name = "ban", permission = "azure.command.ban", usage = "/ban (player) (duration) (reason)")
 public final class BanCommand extends RootCommand {
 
-    private final Azure plugin;
-    private final LuckPerms luckperms;
+    private @Dependency Azure plugin;
+    private @Dependency LuckPerms luckperms;
 
-    public BanCommand(final @NotNull Azure plugin) {
-        super("ban", null, "azure.command.ban", "/ban (player) (duration) (reason)", null);
-        // ...
-        this.plugin = plugin;
-        this.luckperms = plugin.getLuckPerms();
-    }
 
     private static final ExceptionHandler.Factory BAN_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)

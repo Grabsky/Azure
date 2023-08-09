@@ -5,6 +5,8 @@ import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
+import cloud.grabsky.commands.annotation.Command;
+import cloud.grabsky.commands.annotation.Dependency;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.exception.CommandLogicException;
 import org.bukkit.Material;
@@ -17,15 +19,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.jetbrains.annotations.NotNull;
 
-public class DebugCommand extends RootCommand implements Listener {
+@Command(name = "debug", permission = "azure.command.debug", usage = "/debug (...)")
+public final class DebugCommand extends RootCommand implements Listener {
 
-    private final @NotNull Azure plugin;
+    private @Dependency Azure plugin;
 
-    public DebugCommand(final @NotNull Azure plugin) {
-        super("debug", null, "azure.command.debug", "/debug", null);
-        // ...
-        this.plugin = plugin;
-    }
 
     @Override
     public @NotNull CompletionsProvider onTabComplete(final @NotNull RootCommandContext context, final int index) throws CommandLogicException {

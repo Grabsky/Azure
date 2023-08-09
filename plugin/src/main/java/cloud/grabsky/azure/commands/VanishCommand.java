@@ -7,6 +7,8 @@ import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
+import cloud.grabsky.commands.annotation.Command;
+import cloud.grabsky.commands.annotation.Dependency;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.component.ExceptionHandler;
 import cloud.grabsky.commands.exception.CommandLogicException;
@@ -15,19 +17,17 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnknownNullability;
 
 import static net.kyori.adventure.text.format.NamedTextColor.GREEN;
 import static net.kyori.adventure.text.format.NamedTextColor.RED;
 
+@Command(name = "vanish", permission = "azure.command.vanish", usage = "/vanish (target) (state)")
 public final class VanishCommand extends RootCommand {
 
-    private final Azure plugin;
+    @Dependency
+    private @UnknownNullability Azure plugin;
 
-    public VanishCommand(final @NotNull Azure plugin) {
-        super("vanish", null, "azure.command.vanish", "/vanish (target) (state)", "Modify in-game visibility.");
-        // ...
-        this.plugin = plugin;
-    }
 
     private static final ExceptionHandler.Factory VANISH_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)

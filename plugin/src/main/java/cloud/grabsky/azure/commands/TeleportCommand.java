@@ -5,6 +5,7 @@ import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
+import cloud.grabsky.commands.annotation.Command;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.component.ExceptionHandler;
 import cloud.grabsky.commands.exception.CommandLogicException;
@@ -19,11 +20,8 @@ import org.jetbrains.annotations.NotNull;
 import static java.lang.String.format;
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
+@Command(name = "teleport", permission = "azure.command.teleport", usage = "/teleport (target) (destination) (--silent)")
 public final class TeleportCommand extends RootCommand {
-
-    public TeleportCommand() {
-        super("teleport", null, "azure.command.teleport", "/teleport (target) (destination) (--silent)", "...");
-    }
 
     private static final ExceptionHandler.Factory TELEPORT_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)

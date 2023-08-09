@@ -7,6 +7,8 @@ import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
+import cloud.grabsky.commands.annotation.Command;
+import cloud.grabsky.commands.annotation.Dependency;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.component.ExceptionHandler;
 import cloud.grabsky.commands.exception.CommandLogicException;
@@ -14,15 +16,14 @@ import cloud.grabsky.commands.exception.MissingInputException;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnknownNullability;
 
+@Command(name = "unban", permission = "azure.command.unban", usage = "/unban (player)")
 public final class UnbanCommand extends RootCommand {
 
-    private final Azure plugin;
+    @Dependency
+    private @UnknownNullability Azure plugin;
 
-    public UnbanCommand(final @NotNull Azure plugin) {
-        super("unban", null, "azure.command.unban", "/unban (player)", null);
-        this.plugin = plugin;
-    }
 
     @Override
     public @NotNull CompletionsProvider onTabComplete(final @NotNull RootCommandContext context, final int index) {

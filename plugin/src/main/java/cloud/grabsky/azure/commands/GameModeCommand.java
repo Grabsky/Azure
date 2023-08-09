@@ -1,12 +1,14 @@
 package cloud.grabsky.azure.commands;
 
-import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.api.user.User;
+import cloud.grabsky.azure.api.user.UserCache;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
+import cloud.grabsky.commands.annotation.Command;
+import cloud.grabsky.commands.annotation.Dependency;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.component.ExceptionHandler;
 import cloud.grabsky.commands.exception.CommandLogicException;
@@ -17,16 +19,14 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 
+@Command(name = "gamemode", permission = "azure.command.gamemode", usage = "/gamemode (player) (gamemode)")
 public final class GameModeCommand extends RootCommand {
 
-    private final Azure plugin;
+    @Dependency
+    private @UnknownNullability UserCache userCache;
 
-    public GameModeCommand(final @NotNull Azure plugin) {
-        super("gamemode", null, "azure.command.gamemode", "/gamemode (player) (gamemode)", "...");
-        // ...
-        this.plugin = plugin;
-    }
 
     private static final ExceptionHandler.Factory GAMEMODE_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)
@@ -77,7 +77,7 @@ public final class GameModeCommand extends RootCommand {
                 .placeholder("mode", PluginLocale.getGameMode(mode))
                 .send(target);
         // Getting user object.
-        final User targetUser = plugin.getUserCache().getUser(target);
+        final User targetUser = userCache.getUser(target);
         // Disabling vanish state if enabled.
         if (targetUser.isVanished() == true) {
             targetUser.setVanished(false, false);

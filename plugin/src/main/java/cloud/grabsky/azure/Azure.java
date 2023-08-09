@@ -115,35 +115,43 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
         this.punishmentsFileLogger = new FileLogger(this, new File(new File(this.getDataFolder(), "logs"), "punishments.log"));
         // Setting-up RootCommandManager... (applying templates, registering commands)
         this.commandManager = new RootCommandManager(this)
+                // Applying templates...
                 .apply(CommandArgumentTemplate.INSTANCE)
                 .apply(CommandExceptionTemplate.INSTANCE)
+                // Registering dependencies...
+                .registerDependency(Azure.class, instance)
+                .registerDependency(LuckPerms.class, luckPerms)
+                .registerDependency(ChatManager.class, chatManager)
+                .registerDependency(AzureWorldManager.class, worldManager)
+                .registerDependency(UserCache.class, userCache)
+                // Registering commands...
                 .registerCommand(AzureCommand.class)
-                .registerCommand(GiveCommand.class)
-                .registerCommand(SpeedCommand.class)
-                .registerCommand(PackCommand.class)
-                .registerCommand(new GameModeCommand(this))
-                .registerCommand(TeleportCommand.class)
-                .registerCommand(new WorldCommand(this))
-                .registerCommand(new DeleteCommand(this))
-                .registerCommand(new VanishCommand(this))
-                .registerCommand(new BanCommand(this))
-                .registerCommand(new MuteCommand(this))
-                .registerCommand(new UnbanCommand(this))
-                .registerCommand(new UnmuteCommand(this))
-                .registerCommand(new KickCommand(this))
-                .registerCommand(InventoryCommand.class)
+                .registerCommand(BanCommand.class)
+                .registerCommand(DeleteCommand.class)
                 .registerCommand(EnderchestCommand.class)
-                .registerCommand(new PlayerCommand(this))
-                .registerCommand(HealCommand.class)
                 .registerCommand(FeedCommand.class)
+                .registerCommand(GameModeCommand.class)
+                .registerCommand(GiveCommand.class)
+                .registerCommand(HealCommand.class)
+                .registerCommand(InventoryCommand.class)
                 .registerCommand(InvulnerableCommand.class)
-                // DEBUG
-                .registerCommand(new DebugCommand(this));
+                .registerCommand(KickCommand.class)
+                .registerCommand(MuteCommand.class)
+                .registerCommand(PackCommand.class)
+                .registerCommand(PlayerCommand.class)
+                .registerCommand(SpeedCommand.class)
+                .registerCommand(TeleportCommand.class)
+                .registerCommand(UnbanCommand.class)
+                .registerCommand(UnmuteCommand.class)
+                .registerCommand(VanishCommand.class)
+                .registerCommand(WorldCommand.class)
+                // Registering debug commands...
+                .registerCommand(DebugCommand.class);
         // Registering events...
         this.getServer().getPluginManager().registerEvents(chatManager, this);
         this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         this.getServer().getPluginManager().registerEvents(new FancyTooltips(), this);
-        // ...
+        // Initializing extra items... (cloud boost, speed boots)
         new ExtraItems(this).initialize();
         // Finalizing... (exposing instance to the API)
         AzureProvider.finalize(this);

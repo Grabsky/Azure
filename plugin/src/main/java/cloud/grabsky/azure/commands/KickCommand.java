@@ -7,6 +7,8 @@ import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
+import cloud.grabsky.commands.annotation.Command;
+import cloud.grabsky.commands.annotation.Dependency;
 import cloud.grabsky.commands.argument.StringArgument;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.component.ExceptionHandler;
@@ -18,20 +20,19 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.UUID;
 
+@Command(name = "kick", permission = "azure.command.kick", usage = "/kick (player) (reason)")
 public final class KickCommand extends RootCommand {
 
-    private final Azure plugin;
-    private final LuckPerms luckperms;
+    @Dependency
+    private @UnknownNullability Azure plugin;
 
-    public KickCommand(final @NotNull Azure plugin) {
-        super("kick", null, "azure.command.kick", "/kick (player) (reason)", null);
-        // ...
-        this.plugin = plugin;
-        this.luckperms = plugin.getLuckPerms();
-    }
+    @Dependency
+    private @UnknownNullability LuckPerms luckperms;
+
 
     private static final ExceptionHandler.Factory KICK_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)

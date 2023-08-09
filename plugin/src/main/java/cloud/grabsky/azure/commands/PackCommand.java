@@ -6,6 +6,7 @@ import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
+import cloud.grabsky.commands.annotation.Command;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.exception.CommandLogicException;
 import org.bukkit.Bukkit;
@@ -14,11 +15,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.stream.Stream;
 
+@Command(name = "pack", permission = "azure.command.pack", usage = "/pack (...)")
 public final class PackCommand extends RootCommand {
-
-    public PackCommand() {
-        super("pack", null, "azure.command.pack", "/pack", "...");
-    }
 
     @Override
     public @NotNull CompletionsProvider onTabComplete(final @NotNull RootCommandContext context, final int index) throws CommandLogicException {

@@ -5,6 +5,7 @@ import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
+import cloud.grabsky.commands.annotation.Command;
 import cloud.grabsky.commands.argument.IntegerArgument;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.component.ExceptionHandler;
@@ -20,11 +21,8 @@ import org.jetbrains.annotations.NotNull;
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
 
+@Command(name = "give", permission = "azure.command.give", usage = "/give (player) (material) (amount) (--silent)")
 public final class GiveCommand extends RootCommand {
-
-    public GiveCommand() {
-        super("give", null, "azure.command.give", "/give (player) (material) (amount) (--silent)", "Gives an item.");
-    }
 
     private static final ExceptionHandler.Factory GIVE_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)
