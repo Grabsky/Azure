@@ -34,9 +34,7 @@ public final class GiveCommand extends RootCommand {
     @Override
     public @NotNull CompletionsProvider onTabComplete(final @NotNull RootCommandContext context, final int index) {
         return switch (index) {
-            case 0 -> (context.getExecutor().asCommandSender().hasPermission(this.getPermission() + ".others") == true)
-                    ? CompletionsProvider.of(Player.class)
-                    : CompletionsProvider.of("@self");
+            case 0 -> CompletionsProvider.of(Player.class);
             case 1 -> CompletionsProvider.of(Material.class);
             case 2 -> CompletionsProvider.of("1", "16", "32", "64");
             case 3 -> CompletionsProvider.of("--silent");

@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// NOTE: This really should not be part of this plugin.
 public final class FancyTooltips implements Listener {
 
     public static String getTrimPatternTranslationKey(final @NotNull TrimPattern pattern) {

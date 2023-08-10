@@ -9,17 +9,20 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor(access = AccessLevel.PUBLIC)
 public final class FileLogger {
+
     private final @NotNull Plugin plugin;
     private final @NotNull File file;
 
     private static final SimpleDateFormat DATE_FORMAT =  new SimpleDateFormat("dd MMM yy, HH:mm");
 
-    public FileLogger(final @NotNull Plugin plugin, final @NotNull File file) {
-        this.plugin = plugin;
-        this.file = file;
-    }
-
+    /**
+     * Logs message to the file associated with this {@link FileLogger} instance.
+     */
     public void log(final @NotNull String text) {
         try {
             // Creating log file if does not exist.
@@ -28,7 +31,7 @@ public final class FileLogger {
                 file.getParentFile().mkdirs();
                 // Trying to create a new file... In case operation was unsuccessful, regular Bukkit logger is used.
                 if (file.createNewFile() == false) {
-                    plugin.getLogger().warning("Logging to '" + file.getPath() + "' failed. Using main logger:");
+                    plugin.getLogger().warning("Logging to '" + file.getPath() + "' failed. Using default Plugin#getLogger now:");
                     plugin.getLogger().info(text);
                     return;
                 }

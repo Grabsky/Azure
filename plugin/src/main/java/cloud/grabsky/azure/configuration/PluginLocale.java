@@ -60,10 +60,10 @@ public final class PluginLocale implements JsonConfiguration {
 
     public static @UnknownNullability Component getGameMode(final @NotNull GameMode mode) {
         return switch (mode) {
-            case ADVENTURE -> ADVENTURE;
-            case CREATIVE -> CREATIVE;
-            case SPECTATOR -> SPECTATOR;
-            case SURVIVAL -> SURVIVAL;
+            case ADVENTURE -> PluginLocale.ADVENTURE;
+            case CREATIVE -> PluginLocale.CREATIVE;
+            case SPECTATOR -> PluginLocale.SPECTATOR;
+            case SURVIVAL -> PluginLocale.SURVIVAL;
         };
     }
 
@@ -269,6 +269,20 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.world_create_failure_other")
     public static String COMMAND_WORLD_CREATE_FAILURE_OTHER;
 
+    // Commands > World > Description
+
+    @JsonPath("commands.world_description_usage")
+    public static Component COMMAND_WORLD_DESCRIPTION_USAGE;
+
+    @JsonPath("commands.world_description_set_success")
+    public static String COMMAND_WORLD_DESCRIPTION_SET_SUCCESS;
+
+    @JsonPath("commands.world_description_reset_success")
+    public static String COMMAND_WORLD_DESCRIPTION_RESET_SUCCESS;
+
+    @JsonPath("commands.world_description_set_failure_not_in_range")
+    public static String COMMAND_WORLD_DESCRIPTION_SET_FAILURE_NOT_IN_RANGE;
+
     // Commands > World > Delete
 
     @JsonPath("commands.world_delete_usage")
@@ -300,20 +314,6 @@ public final class PluginLocale implements JsonConfiguration {
 
     @JsonPath("commands.world_gamerule_set_failure")
     public static String COMMAND_WORLD_GAMERULE_SET_FAILURE;
-
-    // Commands > World > Description
-
-    @JsonPath("commands.world_description_usage")
-    public static Component COMMAND_WORLD_DESCRIPTION_USAGE;
-
-    @JsonPath("commands.world_description_set_success")
-    public static String COMMAND_WORLD_DESCRIPTION_SET_SUCCESS;
-
-    @JsonPath("commands.world_description_reset_success")
-    public static String COMMAND_WORLD_DESCRIPTION_RESET_SUCCESS;
-
-    @JsonPath("commands.world_description_set_failure_not_in_range")
-    public static String COMMAND_WORLD_DESCRIPTION_SET_FAILURE_NOT_IN_RANGE;
 
     // Commands > World > List
 

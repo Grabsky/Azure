@@ -55,17 +55,18 @@ public final class WorldCommand extends RootCommand {
     public @NotNull CompletionsProvider onTabComplete(final @NotNull RootCommandContext context, final int index) {
         final CommandSender sender = context.getExecutor().asCommandSender();
         final RootCommandInput input = context.getInput();
-        // ...
+        // Returning list of sub-commands when no argument was specified in the input.
         if (index == 0) return CompletionsProvider.of(
                 Stream.of("autoload", "create", "delete", "description", "gamerule", "import", "info", "list", "load", "spawnpoint", "teleport", "time", "unload", "weather")
                         .filter(literal -> sender.hasPermission(this.getPermission() + "." + literal) == true)
                         .toList()
         );
-        // ...
+        // Getting the first literal (argument) of user input.
         final String literal = input.at(1).toLowerCase();
+        // Returning empty completions provider when missing permission for that literal.
         if (sender.hasPermission(this.getPermission() + "." + literal) == false)
             return CompletionsProvider.EMPTY;
-        // ...
+        // Returning sub-command-aware completions provider.
         return switch (literal) {
             case "autoload" -> switch (index) {
                 case 1 -> CompletionsProvider.of(World.class);
@@ -83,10 +84,7 @@ public final class WorldCommand extends RootCommand {
                 case 2 -> CompletionsProvider.of("--confirm");
                 default -> CompletionsProvider.EMPTY;
             };
-            case "description" -> switch (index) {
-                case 1 -> CompletionsProvider.of(World.class);
-                default -> CompletionsProvider.EMPTY;
-            };
+            case "description" -> (index == 1) ? CompletionsProvider.of(World.class) : CompletionsProvider.EMPTY;
             case "gamerule" -> switch (index) {
                 case 1 -> CompletionsProvider.of(World.class);
                 case 2 -> CompletionsProvider.of(GameRule.class);
@@ -115,10 +113,7 @@ public final class WorldCommand extends RootCommand {
                 case 2 -> CompletionsProvider.of(World.Environment.class);
                 default -> CompletionsProvider.EMPTY;
             };
-            case "info" -> switch (index) {
-                case 1 -> CompletionsProvider.of(World.class);
-                default -> CompletionsProvider.EMPTY;
-            };
+            case "info" -> (index == 1) ? CompletionsProvider.of(World.class) : CompletionsProvider.EMPTY;
             case "load" -> switch (index) {
                 case 1 -> {
                     final File[] files = plugin.getServer().getWorldContainer().listFiles();
@@ -154,13 +149,10 @@ public final class WorldCommand extends RootCommand {
                 case 2 -> WorldTimeArgument.INSTANCE;
                 default -> CompletionsProvider.EMPTY;
             };
-            case "unload" -> switch (index) {
-                case 1 -> CompletionsProvider.of(World.class);
-                default -> CompletionsProvider.EMPTY;
-            };
+            case "unload" -> (index == 1) ? CompletionsProvider.of(World.class) : CompletionsProvider.EMPTY;
             case "weather" -> switch (index) {
                 case 1 -> CompletionsProvider.of(World.class);
-                case 2 -> CompletionsProvider.of("clear", "rain", "thunder");
+                case 2 -> CompletionsProvider.of("clear", "rain", "thunder"); // There is no weather "registry" or anything like that.
                 default -> CompletionsProvider.EMPTY;
             };
             // ...

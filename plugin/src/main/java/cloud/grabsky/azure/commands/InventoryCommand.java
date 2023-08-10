@@ -25,10 +25,7 @@ public final class InventoryCommand extends RootCommand {
 
     @Override
     public @NotNull CompletionsProvider onTabComplete(final @NotNull RootCommandContext context, final int index) throws CommandLogicException {
-        return switch (index) {
-            case 0 -> CompletionsProvider.of(Player.class);
-            default -> CompletionsProvider.EMPTY;
-        };
+        return (index == 0) ? CompletionsProvider.of(Player.class) : CompletionsProvider.EMPTY;
     }
 
     @Override

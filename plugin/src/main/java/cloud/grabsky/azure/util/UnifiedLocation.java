@@ -50,10 +50,10 @@ public final class UnifiedLocation {
         final @Nullable Double z = container.get(KEY_Z, org.bukkit.persistence.PersistentDataType.DOUBLE);
         final @Nullable Float yaw = container.get(KEY_YAW, org.bukkit.persistence.PersistentDataType.FLOAT);
         final @Nullable Float pitch = container.get(KEY_PITCH, org.bukkit.persistence.PersistentDataType.FLOAT);
-
+        // Throwing exception when some data is missing.
         if (x == null || y == null || z == null || yaw == null || pitch == null)
             throw new IllegalArgumentException("Cannot create UnifiedLocation because one or more values are null.");
-
+        // Returning new UnifiedLocation object.
         return new UnifiedLocation(x, y, z, yaw, pitch);
     }
 
@@ -63,10 +63,10 @@ public final class UnifiedLocation {
         final double z = compound.getDouble(KEY_Z.getKey(), Double.MAX_VALUE);
         final float yaw = compound.getFloat(KEY_YAW.getKey(), Float.MAX_VALUE);
         final float pitch = compound.getFloat(KEY_PITCH.getKey(), Float.MAX_VALUE);
-
+        // Throwing exception when some data is missing.
         if (x == Double.MAX_VALUE || y == Double.MAX_VALUE || z == Double.MAX_VALUE || yaw == Float.MAX_VALUE || pitch == Float.MAX_VALUE)
             throw new IllegalArgumentException("Cannot create UnifiedLocation because one or more values are null.");
-
+        // Returning new UnifiedLocation object.
         return new UnifiedLocation(x, y, z, yaw, pitch);
     }
 
@@ -89,13 +89,13 @@ public final class UnifiedLocation {
         @Override
         public @NotNull PersistentDataContainer toPrimitive(final @NotNull UnifiedLocation complex, final @NotNull PersistentDataAdapterContext context) {
             final PersistentDataContainer container = context.newPersistentDataContainer();
-
+            // ...
             container.set(KEY_X, PersistentDataType.DOUBLE, complex.x);
             container.set(KEY_Y, PersistentDataType.DOUBLE, complex.y);
             container.set(KEY_Z, PersistentDataType.DOUBLE, complex.z);
             container.set(KEY_YAW, PersistentDataType.FLOAT, complex.yaw);
             container.set(KEY_PITCH, PersistentDataType.FLOAT, complex.pitch);
-
+            // ...
             return container;
         }
 

@@ -3,6 +3,10 @@ package cloud.grabsky.azure.util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Enums {
 
     public static <T extends Enum<?>> @Nullable T findMatching(final @NotNull Class<T> clazz, final @Nullable String name) throws IllegalArgumentException {

@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
+// NOTE: This really should not be part of this plugin.
 // NOTE: The reason why this is hard-coded is because there is pretty much nothing to change.
 // NOTE: Implementation does not use PlayerArmorChangeEvent because of following reasons:
 //         - Current implementation shouldn't have much impact on performance.
