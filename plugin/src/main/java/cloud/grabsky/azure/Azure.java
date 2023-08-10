@@ -45,14 +45,15 @@ import cloud.grabsky.configuration.ConfigurationMapper;
 import cloud.grabsky.configuration.adapter.AbstractEnumJsonAdapter;
 import cloud.grabsky.configuration.exception.ConfigurationMappingException;
 import cloud.grabsky.configuration.paper.PaperConfigurationMapper;
-import lombok.AccessLevel;
-import lombok.Getter;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 
 import java.io.File;
 import java.io.IOException;
+
+import lombok.AccessLevel;
+import lombok.Getter;
 
 import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
 

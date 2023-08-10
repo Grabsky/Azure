@@ -1,12 +1,13 @@
 package cloud.grabsky.azure.util;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.ApiStatus.Internal;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 @Internal
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

@@ -1,8 +1,6 @@
 package cloud.grabsky.azure.features;
 
 import cloud.grabsky.azure.Azure;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -17,6 +15,9 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 
 // NOTE: The reason why this is hard-coded is because there is pretty much nothing to change.
 // NOTE: Implementation does not use PlayerArmorChangeEvent because of following reasons:

@@ -1,8 +1,9 @@
 package cloud.grabsky.azure.api;
 
+import org.jetbrains.annotations.ApiStatus.Internal;
+
 import lombok.AccessLevel;
 import lombok.Getter;
-import org.jetbrains.annotations.ApiStatus.Internal;
 
 public final class AzureProvider {
 
