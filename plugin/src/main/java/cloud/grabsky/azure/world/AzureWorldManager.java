@@ -40,6 +40,7 @@ public final class AzureWorldManager implements WorldManager {
     private static final NamespacedKey KEY_SPAWN_POINT = new NamespacedKey("azure", "spawn_point");
     private static final NamespacedKey KEY_AUTO_LOAD = new NamespacedKey("azure", "auto_load");
     private static final NamespacedKey KEY_ENVIRONMENT = new NamespacedKey("azure", "environment");
+    private static final NamespacedKey KEY_DESCRIPTION = new NamespacedKey("azure", "description");
 
     /**
      * Creates a world using specified parameters.
@@ -206,6 +207,19 @@ public final class AzureWorldManager implements WorldManager {
      */
     public boolean getAutoLoad(final @NotNull World world) {
         return world.getPersistentDataContainer().getOrDefault(KEY_AUTO_LOAD, PersistentDataType.BOOLEAN, false);
+    }
+
+    public void setDescription(final @NotNull World world, final @Nullable String description) {
+        if (description == null || description.isBlank() == true) {
+            world.getPersistentDataContainer().remove(KEY_DESCRIPTION);
+            return;
+        }
+        // ...
+        world.getPersistentDataContainer().set(KEY_DESCRIPTION, PersistentDataType.STRING, description);
+    }
+
+    public @Nullable String getDescription(final @NotNull World world) {
+        return world.getPersistentDataContainer().get(KEY_DESCRIPTION, PersistentDataType.STRING);
     }
 
     private static boolean deleteDirectory(final File file) {

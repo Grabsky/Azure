@@ -185,6 +185,19 @@
             "<dark_gray>› <gray>Spawn: <gold><spawn_x><gray>, <gold><spawn_y><gray>, <gold><spawn_z> <dark_gray>/ <gray>Liczba graczy: <gold><world_online>",
             ""
         ],
+        // World > Description
+        "world_description_usage": "<dark_gray>› <gray>Użycie: <gold>/world description <white>(world) <gray>(description)",
+        "world_description_set_success": "<dark_gray>› <gray>Opis świata <gold><world> <gray>został zaktualizowany.",
+        "world_description_reset_success": "<dark_gray>› <gray>Opis świata <gold><world> <gray>został zresetowany.",
+        "world_description_set_failure_not_in_range": "<dark_gray>› <red>Opis musi mieć od 3 do 32 znaków.",
+        // World > List
+        "world_list_header": [
+            "<dark_gray>› <gray>Na serwerze załadowanych jest <gold><worlds_count> <gray>światów:",
+            ""
+        ],
+        "world_list_footer": "<white>",
+        "world_list_entry": "<dark_gray>›   <hover:show_text:'<gray>Kliknij, aby się teleportować.'><click:run_command:'/world teleport @self <world_key>'><gold><world_key> <dark_gray> - <gray><description></click>",
+        "world_list_entry_no_description": "<dark_gray>›   <hover:show_text:'<gray>Kliknij, aby się teleportować.'><click:run_command:'/world teleport @self <world_key>'><gold><world_key></click>",
         // World > Load
         "world_load_usage": "<dark_gray>› <gray>Użycie: <gold>/world load <white>(world)",
         "world_load_success": "<dark_gray>› <gray>Świat <gold><world><gray> został załadowany.",

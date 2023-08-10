@@ -13,6 +13,7 @@ import cloud.grabsky.commands.RootCommandContext;
 import cloud.grabsky.commands.RootCommandInput;
 import cloud.grabsky.commands.annotation.Command;
 import cloud.grabsky.commands.annotation.Dependency;
+import cloud.grabsky.commands.argument.StringArgument;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.component.ExceptionHandler;
 import cloud.grabsky.commands.exception.CommandLogicException;
@@ -27,6 +28,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
 
 import java.io.File;
@@ -35,6 +37,8 @@ import java.util.stream.Stream;
 
 import static cloud.grabsky.azure.world.AzureWorldManager.WorldOperationException;
 import static cloud.grabsky.azure.world.AzureWorldManager.WorldOperationException.Reason;
+import static cloud.grabsky.bedrock.helpers.Conditions.inRange;
+import static cloud.grabsky.bedrock.helpers.Conditions.requirePresent;
 import static java.lang.String.format;
 
 @Command(name = "world", permission = "azure.command.world", usage = "/world (...)")
@@ -53,7 +57,7 @@ public final class WorldCommand extends RootCommand {
         final RootCommandInput input = context.getInput();
         // ...
         if (index == 0) return CompletionsProvider.of(
-                Stream.of("autoload", "create", "delete", "gamerule", "import", "info", "load", "spawnpoint", "teleport", "time", "unload", "weather").filter(literal -> sender.hasPermission(this.getPermission() + "." + literal) == true).toList()
+                Stream.of("autoload", "create", "delete", "description", "gamerule", "import", "info", "list", "load", "spawnpoint", "teleport", "time", "unload", "weather").filter(literal -> sender.hasPermission(this.getPermission() + "." + literal) == true).toList()
         );
         // ...
         final String literal = input.at(1).toLowerCase();
@@ -75,6 +79,10 @@ public final class WorldCommand extends RootCommand {
             case "delete" -> switch (index) {
                 case 1 -> CompletionsProvider.of(World.class);
                 case 2 -> CompletionsProvider.of("--confirm");
+                default -> CompletionsProvider.EMPTY;
+            };
+            case "description" -> switch (index) {
+                case 1 -> CompletionsProvider.of(World.class);
                 default -> CompletionsProvider.EMPTY;
             };
             case "gamerule" -> switch (index) {
@@ -167,9 +175,11 @@ public final class WorldCommand extends RootCommand {
             case "autoload" -> this.onWorldAutoload(context, arguments);
             case "create" -> this.onWorldCreate(context, arguments);
             case "delete" -> this.onWorldDelete(context, arguments);
+            case "description" -> this.onWorldDescription(context, arguments);
             case "gamerule" -> this.onWorldGamerule(context, arguments);
             case "import" -> this.onWorldImport(context, arguments);
             case "info" -> this.onWorldInfo(context, arguments);
+            case "list" -> this.onWorldList(context, arguments);
             case "load" -> this.onWorldLoad(context, arguments);
             case "spawnpoint" -> this.onWorldSpawnPoint(context, arguments);
             case "teleport" -> this.onWorldTeleport(context, arguments);
@@ -574,6 +584,58 @@ public final class WorldCommand extends RootCommand {
             }
             // Sending success message to command sender.
             Message.of(PluginLocale.COMMAND_WORLD_WEATHER_SET_SUCCESS).placeholder("world", world).placeholder("weather", weather).send(sender);
+            return;
+        }
+        // Sending error message to command sender.
+        Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
+    }
+
+
+    private static final ExceptionHandler.Factory WORLD_DESCRIPTION_USAGE = (exception) -> {
+        if (exception instanceof MissingInputException)
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_DESCRIPTION_USAGE).send(context.getExecutor().asCommandSender());
+        // Let other exceptions be handled internally.
+        return null;
+    };
+
+    private void onWorldDescription(final RootCommandContext context, final ArgumentQueue arguments) {
+        final CommandSender sender = context.getExecutor().asCommandSender();
+        // ...
+        if (sender.hasPermission(this.getPermission() + ".description") == true) {
+            final World world = arguments.next(World.class).asRequired(WORLD_DESCRIPTION_USAGE);
+            final @Nullable String description = arguments.next(String.class, StringArgument.GREEDY).asOptional(null);
+            // Sending current time message if new one is not specified.
+            if (description != null && inRange(description.length(), 3, 32) == false) {
+                // Sending (status) message to command sender.
+                Message.of(PluginLocale.COMMAND_WORLD_DESCRIPTION_SET_FAILURE_NOT_IN_RANGE).send(sender);
+                return;
+            }
+            // Setting the description.
+            worlds.setDescription(world, description);
+            // Sending success message to command sender.
+            Message.of((description != null) ? PluginLocale.COMMAND_WORLD_DESCRIPTION_SET_SUCCESS : PluginLocale.COMMAND_WORLD_DESCRIPTION_RESET_SUCCESS).placeholder("world", world).send(sender);
+            return;
+        }
+        // Sending error message to command sender.
+        Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
+    }
+
+
+    private void onWorldList(final RootCommandContext context, final ArgumentQueue arguments) {
+        final CommandSender sender = context.getExecutor().asCommandSender();
+        // ...
+        if (sender.hasPermission(this.getPermission() + ".list") == true) {
+            Message.of(PluginLocale.COMMAND_WORLD_LIST_HEADER).placeholder("worlds_count", plugin.getServer().getWorlds().size()).send(sender);
+            // ...
+            plugin.getServer().getWorlds().forEach(world -> {
+                final @Nullable String description = worlds.getDescription(world);
+                // ...
+                Message.of(description != null ? PluginLocale.COMMAND_WORLD_LIST_ENTRY : PluginLocale.COMMAND_WORLD_LIST_ENTRY_NO_DESCRIPTION)
+                        .replace("<world_key>", world.key().asString())
+                        .placeholder("description", requirePresent(description, "N/A"))
+                        .send(sender);
+            });
+            Message.of(PluginLocale.COMMAND_WORLD_LIST_FOOTER).send(sender);
             return;
         }
         // Sending error message to command sender.

@@ -301,6 +301,36 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.world_gamerule_set_failure")
     public static String COMMAND_WORLD_GAMERULE_SET_FAILURE;
 
+    // Commands > World > Description
+
+    @JsonPath("commands.world_description_usage")
+    public static Component COMMAND_WORLD_DESCRIPTION_USAGE;
+
+    @JsonPath("commands.world_description_set_success")
+    public static String COMMAND_WORLD_DESCRIPTION_SET_SUCCESS;
+
+    @JsonPath("commands.world_description_reset_success")
+    public static String COMMAND_WORLD_DESCRIPTION_RESET_SUCCESS;
+
+    @JsonPath("commands.world_description_set_failure_not_in_range")
+    public static String COMMAND_WORLD_DESCRIPTION_SET_FAILURE_NOT_IN_RANGE;
+
+    // Commands > World > List
+
+    @JsonPath("commands.world_list_header")
+    @JsonAdapter(fromJson = StringComponentAdapter.class)
+    public static String COMMAND_WORLD_LIST_HEADER;
+
+    @JsonPath("commands.world_list_footer")
+    @JsonAdapter(fromJson = StringComponentAdapter.class)
+    public static String COMMAND_WORLD_LIST_FOOTER;
+
+    @JsonPath("commands.world_list_entry")
+    public static String COMMAND_WORLD_LIST_ENTRY;
+
+    @JsonPath("commands.world_list_entry_no_description")
+    public static String COMMAND_WORLD_LIST_ENTRY_NO_DESCRIPTION;
+
     // Commands > World > Load
 
     @JsonPath("commands.world_load_usage")
