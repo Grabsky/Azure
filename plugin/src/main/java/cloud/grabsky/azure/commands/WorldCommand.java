@@ -57,7 +57,9 @@ public final class WorldCommand extends RootCommand {
         final RootCommandInput input = context.getInput();
         // ...
         if (index == 0) return CompletionsProvider.of(
-                Stream.of("autoload", "create", "delete", "description", "gamerule", "import", "info", "list", "load", "spawnpoint", "teleport", "time", "unload", "weather").filter(literal -> sender.hasPermission(this.getPermission() + "." + literal) == true).toList()
+                Stream.of("autoload", "create", "delete", "description", "gamerule", "import", "info", "list", "load", "spawnpoint", "teleport", "time", "unload", "weather")
+                        .filter(literal -> sender.hasPermission(this.getPermission() + "." + literal) == true)
+                        .toList()
         );
         // ...
         final String literal = input.at(1).toLowerCase();
@@ -104,7 +106,7 @@ public final class WorldCommand extends RootCommand {
                         yield CompletionsProvider.EMPTY;
                     // ...
                     yield CompletionsProvider.of(Stream.of(files)
-                            .filter(dir -> dir.isDirectory() == true && new File(dir, "level.dat").exists() == true)
+                            .filter(dir -> dir.isDirectory() == true && new File(dir, "level.dat").exists() == true && plugin.getServer().getWorld(dir.getName()) == null)
                             .map(File::getName)
                             .filter(name -> plugin.getServer().getWorld(name) == null)
                             .toList()
@@ -286,6 +288,36 @@ public final class WorldCommand extends RootCommand {
             }
             // Sending confirmation message to command sender.
             Message.of(PluginLocale.COMMAND_WORLD_DELETE_CONFIRM).replace("<input>", context.getInput().toString()).placeholder("world", world).send(sender);
+            return;
+        }
+        // Sending error message to command sender.
+        Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
+    }
+
+
+    private static final ExceptionHandler.Factory WORLD_DESCRIPTION_USAGE = (exception) -> {
+        if (exception instanceof MissingInputException)
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_DESCRIPTION_USAGE).send(context.getExecutor().asCommandSender());
+        // Let other exceptions be handled internally.
+        return null;
+    };
+
+    private void onWorldDescription(final RootCommandContext context, final ArgumentQueue arguments) {
+        final CommandSender sender = context.getExecutor().asCommandSender();
+        // ...
+        if (sender.hasPermission(this.getPermission() + ".description") == true) {
+            final World world = arguments.next(World.class).asRequired(WORLD_DESCRIPTION_USAGE);
+            final @Nullable String description = arguments.next(String.class, StringArgument.GREEDY).asOptional(null);
+            // Making sure description length is between 3 and 32 characters.
+            if (description != null && inRange(description.length(), 3, 32) == false) {
+                // Sending failure message to command sender.
+                Message.of(PluginLocale.COMMAND_WORLD_DESCRIPTION_SET_FAILURE_NOT_IN_RANGE).send(sender);
+                return;
+            }
+            // Setting the description.
+            worlds.setDescription(world, description);
+            // Sending success message to command sender.
+            Message.of(description != null ? PluginLocale.COMMAND_WORLD_DESCRIPTION_SET_SUCCESS : PluginLocale.COMMAND_WORLD_DESCRIPTION_RESET_SUCCESS).placeholder("world", world).send(sender);
             return;
         }
         // Sending error message to command sender.
@@ -584,36 +616,6 @@ public final class WorldCommand extends RootCommand {
             }
             // Sending success message to command sender.
             Message.of(PluginLocale.COMMAND_WORLD_WEATHER_SET_SUCCESS).placeholder("world", world).placeholder("weather", weather).send(sender);
-            return;
-        }
-        // Sending error message to command sender.
-        Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
-    }
-
-
-    private static final ExceptionHandler.Factory WORLD_DESCRIPTION_USAGE = (exception) -> {
-        if (exception instanceof MissingInputException)
-            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_DESCRIPTION_USAGE).send(context.getExecutor().asCommandSender());
-        // Let other exceptions be handled internally.
-        return null;
-    };
-
-    private void onWorldDescription(final RootCommandContext context, final ArgumentQueue arguments) {
-        final CommandSender sender = context.getExecutor().asCommandSender();
-        // ...
-        if (sender.hasPermission(this.getPermission() + ".description") == true) {
-            final World world = arguments.next(World.class).asRequired(WORLD_DESCRIPTION_USAGE);
-            final @Nullable String description = arguments.next(String.class, StringArgument.GREEDY).asOptional(null);
-            // Sending current time message if new one is not specified.
-            if (description != null && inRange(description.length(), 3, 32) == false) {
-                // Sending (status) message to command sender.
-                Message.of(PluginLocale.COMMAND_WORLD_DESCRIPTION_SET_FAILURE_NOT_IN_RANGE).send(sender);
-                return;
-            }
-            // Setting the description.
-            worlds.setDescription(world, description);
-            // Sending success message to command sender.
-            Message.of((description != null) ? PluginLocale.COMMAND_WORLD_DESCRIPTION_SET_SUCCESS : PluginLocale.COMMAND_WORLD_DESCRIPTION_RESET_SUCCESS).placeholder("world", world).send(sender);
             return;
         }
         // Sending error message to command sender.
