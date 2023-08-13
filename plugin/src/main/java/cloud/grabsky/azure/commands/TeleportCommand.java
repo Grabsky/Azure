@@ -32,20 +32,15 @@ public final class TeleportCommand extends RootCommand {
 
     @Override
     public @NotNull CompletionsProvider onTabComplete(final @NotNull RootCommandContext context, final int index) throws CommandLogicException {
+        final String input = context.getInput().at(index, "");
         return switch (index) {
             case 0 -> CompletionsProvider.of(Player.class);
-            case 1 -> {
-                final String input = context.getInput().at(index);
-                yield (input.equalsIgnoreCase("@self") == true || Bukkit.getPlayerExact(input) != null)
+            case 1 -> (input.equalsIgnoreCase("@self") == true || Bukkit.getPlayerExact(input) != null)
                         ? CompletionsProvider.of(Player.class, "@x @y @z")
                         : CompletionsProvider.EMPTY;
-            }
-            case 2 -> {
-                final String input = context.getInput().at(index);
-                yield (input.equalsIgnoreCase("@self") == true || Bukkit.getPlayerExact(input) != null)
+            case 2 -> (input.equalsIgnoreCase("@self") == true || Bukkit.getPlayerExact(input) != null)
                         ? CompletionsProvider.of("--silent")
                         : CompletionsProvider.of("@y @z");
-            }
             case 3 -> CompletionsProvider.of("@z");
             case 4 -> CompletionsProvider.of("--silent");
             default -> CompletionsProvider.EMPTY;
@@ -55,7 +50,7 @@ public final class TeleportCommand extends RootCommand {
     @Override
     public void onCommand(final @NotNull RootCommandContext context, final @NotNull ArgumentQueue arguments) throws CommandLogicException {
         // Trying to resolve the command using Player as a destination...
-        if (context.getInput().length() == 2 || context.getInput().at(3).equalsIgnoreCase("--silent") == true)
+        if (context.getInput().length() == 2 || context.getInput().at(3, "").equalsIgnoreCase("--silent") == true)
             this.onTeleportToPlayer(context, arguments);
         // ...or using Position otherwise...
         else this.onTeleportToPosition(context, arguments);
