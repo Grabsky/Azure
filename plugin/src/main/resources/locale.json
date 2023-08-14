@@ -251,7 +251,7 @@
             "<dark_gray>› <gray>Lokalizacja: <gold><x><gray>, <gold><y><gray>, <gold><z><dark_gray> / <gray>Świat: <gold><world>",
             "<dark_gray>› <gray>Tryb gry: <gold><gamemode><dark_gray> / <gray>Latanie: <is_flying><dark_gray> / <gray>Nietykalność: <is_invulnerable>",
             "<dark_gray>› <gray>Zdrowie: <gold><health>/10<dark_gray> / <gray>Głód: <gold><hunger>/10<dark_gray> / <gray>Poziom: <gold><xp_level> <gray>(<xp_progress>%)",
-            "<dark_gray>› <gray>Zbanowany: <is_banned><dark_gray> / <gray>Wyciszony: <is_muted><dark_gray><dark_gray> / <gray>Guithium: <has_guithium>",
+            "<dark_gray>› <gray>Zbanowany: <is_banned><dark_gray> / <gray>Wyciszony: <is_muted><dark_gray><dark_gray>",
             ""
         ],
         "player_success_offline": [

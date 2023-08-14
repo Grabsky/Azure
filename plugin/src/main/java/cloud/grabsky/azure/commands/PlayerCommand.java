@@ -107,7 +107,7 @@ public final class PlayerCommand extends RootCommand {
                     .placeholder("country", targetUser.getLastCountryCode())
                     .placeholder("ping", getColoredPing(targetOnline.getPing()))
                     .placeholder("first_join", DD_MM_YYYY.format(targetOnline.getFirstPlayed()))
-                    .placeholder("time_played", Interval.of(target.getStatistic(Statistic.PLAY_ONE_MINUTE), Unit.SECONDS))
+                    .placeholder("time_played", (long) Math.floor(Interval.of(target.getStatistic(Statistic.PLAY_ONE_MINUTE), Unit.TICKS).as(Unit.HOURS)) + "h")
                     .placeholder("client", (targetOnline.getClientBrandName() != null) ? targetOnline.getClientBrandName() : "N/A")
                     .placeholder("version", getVersionFromProtocol(targetOnline.getProtocolVersion()))
                     .placeholder("online_since", Interval.between(System.currentTimeMillis(), targetOnline.getLastLogin(), Unit.MILLISECONDS))
@@ -124,7 +124,6 @@ public final class PlayerCommand extends RootCommand {
                     .placeholder("xp_progress", Math.round(targetOnline.getExp() * 100))
                     .placeholder("is_banned", getColoredBooleanShort(targetUser.isBanned() == true))
                     .placeholder("is_muted", getColoredBooleanShort(targetUser.isMuted() == true))
-                    // .placeholder("has_guithium", getColoredBooleanShort(guithiumTarget != null && guithiumTarget.hasGuithium() == true))
                     .send(sender);
             return;
         }
@@ -186,7 +185,7 @@ public final class PlayerCommand extends RootCommand {
                     .placeholder("ip", address)
                     .placeholder("country", targetUser.getLastCountryCode())
                     .placeholder("first_join", DD_MM_YYYY.format(firstPlayed))
-                    .placeholder("time_played", Interval.of(target.getStatistic(Statistic.PLAY_ONE_MINUTE), Unit.SECONDS))
+                    .placeholder("time_played", (long) Math.floor(Interval.of(target.getStatistic(Statistic.PLAY_ONE_MINUTE), Unit.TICKS).as(Unit.HOURS)) + "h")
                     .placeholder("offline_since", Interval.between(System.currentTimeMillis(), lastSeen, Unit.MILLISECONDS))
                     .placeholder("x", lastX)
                     .placeholder("y", lastY)
