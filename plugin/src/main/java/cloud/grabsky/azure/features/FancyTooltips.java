@@ -11,16 +11,17 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.enchantment.EnchantItemEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.event.inventory.PrepareGrindstoneEvent;
 import org.bukkit.event.inventory.PrepareSmithingEvent;
+import org.bukkit.event.world.LootGenerateEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ArmorMeta;
 import org.bukkit.inventory.meta.trim.ArmorTrim;
 import org.bukkit.inventory.meta.trim.TrimMaterial;
 import org.bukkit.inventory.meta.trim.TrimPattern;
-import org.bukkit.persistence.PersistentDataContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,11 +44,16 @@ public final class FancyTooltips implements Listener {
 
     private static final Component SEGMENT_SEPARATOR = Component.text("\u2006");
 
-    public static @NotNull ItemStack create(final ItemStack item, final @Nullable Event associatedEvent) {
+    public static @NotNull ItemStack create(final @NotNull ItemStack item, final @Nullable Event associatedEvent) {
+        // Early returning items with no meta.
+        if (item.hasItemMeta() == false)
+            return item;
+        // Modifying item.
         item.editMeta(meta -> {
             final @NotNull List<Component> existingLore = meta.hasLore() ? meta.lore().stream().takeWhile(c -> c.equals(SEGMENT_SEPARATOR) == false).toList() : new ArrayList<>(); // Cannot be null.
             // ...
             final @NotNull List<Component> resultLore = new ArrayList<>(existingLore);
+
             // Trims...
             if (meta instanceof ArmorMeta armor) {
                 // Getting the trim.
@@ -73,9 +79,7 @@ public final class FancyTooltips implements Listener {
             item.getEnchantments().forEach((enchantment, level) -> enchantments.put(enchantment.getKey(), new Pair<>(enchantment, level)));
             // Adding enchantments that are about to be added from EnchantItemEvent.
             if (associatedEvent instanceof EnchantItemEvent event)
-                event.getEnchantsToAdd().forEach((enchantment, level) -> {
-                    enchantments.put(enchantment.getKey(), new Pair<>(enchantment, level));
-                });
+                event.getEnchantsToAdd().forEach((enchantment, level) -> enchantments.put(enchantment.getKey(), new Pair<>(enchantment, level)));
             // Proceeding to append enchantments to the lore.
             if (enchantments.isEmpty() == false) {
                 meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
@@ -99,10 +103,7 @@ public final class FancyTooltips implements Listener {
             // Othwerwise, HIDE_ENCHANTS flag is being removed.
             } else meta.removeItemFlags(ItemFlag.HIDE_ENCHANTS);
 
-            // Custom Enchantments...
-            final PersistentDataContainer container = meta.getPersistentDataContainer();
-
-            // Applyin the lore.
+            // Applying the lore.
             meta.lore(resultLore);
         });
         // Returning modified item.
@@ -148,6 +149,18 @@ public final class FancyTooltips implements Listener {
         final @NotNull ItemStack item = create(event.getResult(), event); // This event's ItemStack is immutable.
         // ...
         event.setResult(item);
+    }
+
+    @EventHandler
+    public void onLootGenerate(final @NotNull LootGenerateEvent event) {
+        // Modifying ItemStack(s) in loot list. According to Bukkit, this list is mutable.
+        event.getLoot().forEach(item -> create(item, event));
+    }
+
+    @EventHandler
+    public void onEntityDeath(final @NotNull EntityDeathEvent event) {
+        // Modifying ItemStack(s) in loot list. It's not mentioned anywhere, but this list should be mutable.
+        event.getDrops().forEach(item -> create(item, event));
     }
 
 }
