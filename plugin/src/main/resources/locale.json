@@ -242,6 +242,7 @@
         "feed_success_target": "<dark_gray>› <gray>Twoje punkty głodu zostały uzupełnione.",
         // Player
         "player_usage": "<dark_gray>› <gray>Użycie: <gold>/player <gray>(player)",
+        "player_hidden_entry": "<white>ᴜᴋʀʏᴛᴇ",
         "player_success_online": [
             "",
             "<dark_gray>› <gray>Gracz: <gold><name><dark_gray> / <gray>Identyfikator: <gold><uuid>...",
@@ -264,6 +265,7 @@
             "<dark_gray>› <gray>Zdrowie: <gold><health>/10<dark_gray> / <gray>Głód: <gold><hunger>/10<dark_gray> / <gray>Poziom: <gold><xp_level> <gray>(<xp_progress>%)",
             "<dark_gray>› <gray>Zbanowany: <is_banned><dark_gray> / <gray>Wyciszony: <is_muted><dark_gray>",
             ""
-        ]
+        ],
+        "player_failure": "<dark_gray>› <red>Nie udało się uzyskać informacji na temat tego gracza."
     }
 }

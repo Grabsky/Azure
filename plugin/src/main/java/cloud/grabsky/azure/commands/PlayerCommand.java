@@ -30,6 +30,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
 
 import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.UUID;
@@ -60,21 +61,32 @@ public final class PlayerCommand extends RootCommand {
 
     @Override
     public @NotNull CompletionsProvider onTabComplete(final @NotNull RootCommandContext context, final int index) throws CommandLogicException {
-        return (index == 0) ? CompletionsProvider.of(OfflinePlayer.class) : CompletionsProvider.EMPTY;
+        return switch (index) {
+            case 0 -> CompletionsProvider.of(OfflinePlayer.class);
+            case 1 -> (context.getExecutor().asCommandSender().hasPermission(this.getPermission() + ".sensitive") == true)
+                            ? CompletionsProvider.of("--sensitive")
+                            : CompletionsProvider.EMPTY;
+            default -> CompletionsProvider.EMPTY;
+        };
     }
 
     @Override @SuppressWarnings("UnstableApiUsage")
     public void onCommand(final @NotNull RootCommandContext context, final @NotNull ArgumentQueue arguments) throws CommandLogicException {
         final CommandSender sender = context.getExecutor().asCommandSender();
         // Parsing next argument as OfflinePlayer. Can be UUID or player name.
-        final OfflinePlayer target = (sender instanceof Player senderPlayer)
-                ? arguments.next(OfflinePlayer.class).asOptional(senderPlayer)
-                : arguments.next(OfflinePlayer.class).asRequired(PLAYER_USAGE);
+        final OfflinePlayer target = arguments.next(OfflinePlayer.class).asRequired(PLAYER_USAGE);
+        // Whether to include sensitive data or not.
+        final boolean isSensitive = arguments.next(String.class).asOptional("").equalsIgnoreCase("--sensitive");
+        // Leaving the command block in case "--sensitive" flag is present but sender has no permission to use it.
+        if (isSensitive == true && sender.hasPermission(this.getPermission() + ".sensitive") == false) {
+            Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
+            return;
+        }
         // Getting UUID.
         final UUID targetUniqueId = target.getUniqueId();
         // Getting User object from UUID - can be null.
         final @Nullable User targetUser = plugin.getUserCache().getUser(targetUniqueId);
-        // Leaving the command block in case that User object for provided player does not exist.
+        // Leaving the command block in case User object for provided player does not exist.
         if (targetUser == null) {
             Message.of(PluginLocale.Commands.INVALID_OFFLINE_PLAYER).placeholder("input", targetUniqueId).send(sender);
             return;
@@ -92,19 +104,13 @@ public final class PlayerCommand extends RootCommand {
                 }
             }
             // Continuing...
-            // final WrappedPlayer guithiumTarget = Guithium.api().getPlayerManager().get(targetUniqueId);
             final Location location = targetOnline.getLocation();
-            final String address = (targetUser.getLastAddress().equals("N/A") == false)
-                    ? (sender.hasPermission("azure.command.player.can_see_address") == true)
-                            ? targetUser.getLastAddress()
-                            : "*****"
-                    : "N/A";
             // Preparing and sending the message.
             Message.of(PluginLocale.COMMAND_PLAYER_SUCCESS_ONLINE)
                     .placeholder("name", targetUser.getName())
                     .placeholder("uuid", targetUniqueId.toString().substring(0, 13))
-                    .placeholder("ip", address)
-                    .placeholder("country", targetUser.getLastCountryCode())
+                    .placeholder("ip", (isSensitive == true) ? Component.text(targetUser.getLastAddress()) : PluginLocale.COMMAND_PLAYER_HIDDEN_ENTRY)
+                    .placeholder("country", (isSensitive == true) ? Component.text(targetUser.getLastCountryCode()) : PluginLocale.COMMAND_PLAYER_HIDDEN_ENTRY)
                     .placeholder("ping", getColoredPing(targetOnline.getPing()))
                     .placeholder("first_join", DD_MM_YYYY.format(targetOnline.getFirstPlayed()))
                     .placeholder("time_played", (long) Math.floor(Interval.of(target.getStatistic(Statistic.PLAY_ONE_MINUTE), Unit.TICKS).as(Unit.HOURS)) + "h")
@@ -125,9 +131,10 @@ public final class PlayerCommand extends RootCommand {
                     .placeholder("is_banned", getColoredBooleanShort(targetUser.isBanned() == true))
                     .placeholder("is_muted", getColoredBooleanShort(targetUser.isMuted() == true))
                     .send(sender);
+            // Returning...
             return;
         }
-        // Leaving the command block in case target is immune to this command check.
+        // Leaving the command block in case target is "immune" to this command check.
         if (sender instanceof Player senderOnline && sender != target) {
             // Getting group of the sender.
             final @Nullable Group senderGroup = luckperms.getGroupManager().getGroup(luckperms.getPlayerAdapter(Player.class).getUser(senderOnline).getPrimaryGroup());
@@ -140,24 +147,18 @@ public final class PlayerCommand extends RootCommand {
                     return;
                 }
                 // Continuing... scheduling the rest of the logic onto the main thread.
-                plugin.getBedrockScheduler().run(1L, (task) -> showOfflinePlayerInfo(sender, target, targetUser));
+                plugin.getBedrockScheduler().run(1L, (task) -> showOfflinePlayerInfo(sender, target, targetUser, isSensitive));
             });
             return;
         }
         // Displaying information to the console (or self) otherwise.
-        showOfflinePlayerInfo(sender, target, targetUser);
+        showOfflinePlayerInfo(sender, target, targetUser, isSensitive);
     }
 
     // Displays information about player that is currently offline.
     @SuppressWarnings("UnstableApiUsage")
-    private void showOfflinePlayerInfo(final @NotNull CommandSender sender, final @NotNull OfflinePlayer target, final @NotNull User targetUser) {
+    private void showOfflinePlayerInfo(final @NotNull CommandSender sender, final @NotNull OfflinePlayer target, final @NotNull User targetUser, final boolean isSensitive) {
         try {
-            // Getting the last ip address - may be redacted in case sender does not have permission to see it.
-            final String address = (targetUser.getLastAddress().equals("N/A") == false)
-                    ? (sender.hasPermission("azure.command.info.can_see_address") == true)
-                            ? targetUser.getLastAddress()
-                            : "*****"
-                    : "N/A";
             // Reading 'PRIMARY_WORLD/playerdata/UUID.dat' file...
             final CompoundBinaryTag tag = targetUser.getPlayerData();
             // Getting last known location.
@@ -169,7 +170,7 @@ public final class PlayerCommand extends RootCommand {
             final long lastSeen = tag.getCompound("Paper").getLong("LastSeen");
             final long firstPlayed = tag.getCompound("bukkit").getLong("firstPlayed");
             // Getting last known gamemode, flying state and invulnerability state.
-            final GameMode gamemode = GameMode.getByValue(tag.getInt("playerGameType")); // Should never be null.
+            final GameMode gamemode = GameMode.getByValue(tag.getInt("playerGameType")); // Despite being @Deprecated, this is how gamemode is stored internally. Also should not be null.
             final boolean isFlying = tag.getCompound("abilities").getBoolean("flying");
             final boolean isInvulnerable = tag.getCompound("abilities").getBoolean("invulnerable");
             // Getting health and hunger.
@@ -182,15 +183,15 @@ public final class PlayerCommand extends RootCommand {
             Message.of(PluginLocale.COMMAND_PLAYER_SUCCESS_OFFLINE)
                     .placeholder("name", targetUser.getName())
                     .placeholder("uuid", target.getUniqueId().toString().substring(0, 13))
-                    .placeholder("ip", address)
-                    .placeholder("country", targetUser.getLastCountryCode())
+                    .placeholder("ip", (isSensitive == true) ? targetUser.getLastAddress() : PluginLocale.COMMAND_PLAYER_HIDDEN_ENTRY)
+                    .placeholder("country", (isSensitive == true) ? targetUser.getLastCountryCode() : PluginLocale.COMMAND_PLAYER_HIDDEN_ENTRY)
                     .placeholder("first_join", DD_MM_YYYY.format(firstPlayed))
                     .placeholder("time_played", (long) Math.floor(Interval.of(target.getStatistic(Statistic.PLAY_ONE_MINUTE), Unit.TICKS).as(Unit.HOURS)) + "h")
                     .placeholder("offline_since", Interval.between(System.currentTimeMillis(), lastSeen, Unit.MILLISECONDS))
                     .placeholder("x", lastX)
                     .placeholder("y", lastY)
                     .placeholder("z", lastZ)
-                    .placeholder("world", (lastWorld.equals("") == false) ? lastWorld : "N/A")
+                    .placeholder("world", (lastWorld.isEmpty() == false) ? lastWorld : "N/A")
                     .placeholder("gamemode", PluginLocale.getGameMode(gamemode)) // Should never be null.
                     .placeholder("is_flying", getColoredBooleanShort(isFlying == true))
                     .placeholder("is_invulnerable", getColoredBooleanShort(isInvulnerable == true))
@@ -201,7 +202,11 @@ public final class PlayerCommand extends RootCommand {
                     .placeholder("is_banned", getColoredBooleanShort(targetUser.isBanned() == true))
                     .placeholder("is_muted", getColoredBooleanShort(targetUser.isMuted() == true))
                     .send(sender);
+        } catch (final NoSuchFileException e) {
+            Message.of(PluginLocale.COMMAND_PLAYER_FAILURE).send(sender);
+            plugin.getLogger().severe("Requested data of \"" + targetUser.getName() + "\" but \"" + e.getFile() + "\" file has not been found.");
         } catch (final IOException e) {
+            Message.of(PluginLocale.COMMAND_PLAYER_FAILURE).send(sender);
             e.printStackTrace();
         }
     }

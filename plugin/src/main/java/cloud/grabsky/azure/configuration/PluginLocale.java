@@ -466,6 +466,9 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.player_usage")
     public static Component COMMAND_PLAYER_USAGE;
 
+    @JsonPath("commands.player_hidden_entry")
+    public static Component COMMAND_PLAYER_HIDDEN_ENTRY;
+
     @JsonPath("commands.player_success_online")
     @JsonAdapter(fromJson = StringComponentAdapter.class)
     public static String COMMAND_PLAYER_SUCCESS_ONLINE;
@@ -473,6 +476,9 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.player_success_offline")
     @JsonAdapter(fromJson = StringComponentAdapter.class)
     public static String COMMAND_PLAYER_SUCCESS_OFFLINE;
+
+    @JsonPath("commands.player_failure")
+    public static Component COMMAND_PLAYER_FAILURE;
 
     public static final class Commands implements JsonConfiguration {
 
