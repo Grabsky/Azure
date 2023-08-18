@@ -32,6 +32,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -54,6 +55,7 @@ public final class ChatManager implements Listener {
     private final UserManager luckPermsUserManager;
     private final Cache<UUID, SignedMessage.Signature> signatureCache;
     private final Map<UUID, Long> chatCooldowns;
+    private final Map<UUID, UUID> lastRecipients;
 
     private static final MiniMessage EMPTY_MINIMESSAGE = MiniMessage.builder().tags(TagResolver.empty()).build();
     private static final PlainTextComponentSerializer PLAIN_SERIALIZER = PlainTextComponentSerializer.plainText();
@@ -73,6 +75,7 @@ public final class ChatManager implements Listener {
                 .expireAfterWrite(PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_CACHE_EXPIRATION_RATE, TimeUnit.MINUTES)
                 .build();
         this.chatCooldowns = new HashMap<>();
+        this.lastRecipients = new HashMap<>();
     }
 
     /**
@@ -198,6 +201,15 @@ public final class ChatManager implements Listener {
         if (PluginConfig.CHAT_DISCORD_WEBHOOK_ENABLED == true) {
             // TO-DO: ...
         }
+    }
+
+    public void setLastRecipients(final @NotNull UUID first, final @NotNull UUID second) {
+        this.lastRecipients.put(first, second);
+        this.lastRecipients.put(second, first);
+    }
+
+    public @Nullable UUID getLastRecipient(final @NotNull UUID uniqueId) {
+        return lastRecipients.get(uniqueId);
     }
 
     private @NotNull TagResolver findSuitableTagsCollection(final @NotNull Player player, final @NotNull TagResolver def) {

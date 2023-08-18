@@ -31,9 +31,18 @@ public final class PlayerListener implements Listener {
         }
     }
 
+
     @EventHandler // NOTE: Some resource pack sending changes might be necessary once 1.20.2 is live. (see 23w31a)
     public void onPlayerJoin(final @NotNull PlayerJoinEvent event) {
         final Player player = event.getPlayer();
+        // Teleporting new players to spawn. (if enabled)
+        if (player.hasPlayedBefore() == false && PluginConfig.GENERAL_TELEPORT_NEW_PLAYERS_TO_PRIMARY_WORLD_SPAWN == true) {
+            System.out.println("Executing...");
+            // Getting the primary world.
+            final World primaryWorld = plugin.getWorldManager().getPrimaryWorld();
+            // Setting the respawn location.
+            plugin.getBedrockScheduler().run(1L, (task) -> player.teleportAsync(plugin.getWorldManager().getSpawnPoint(primaryWorld)));
+        }
         // Clearing title. (if enabled)
         if (PluginConfig.GENERAL_CLEAR_TITLE_ON_JOIN == true)
             player.clearTitle();

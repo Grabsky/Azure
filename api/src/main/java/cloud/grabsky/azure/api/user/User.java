@@ -53,6 +53,11 @@ public interface User {
     boolean isVanished();
 
     /**
+     * Returns {@code true} if this {@link User} is currently spying.
+     */
+    boolean isSpying();
+
+    /**
      * Changes vanish state of this {@link User}. This also hides the player, changes gamemode, shows {@link net.kyori.adventure.bossbar.BossBar} etc.
      */
     default void setVanished(final boolean state) {

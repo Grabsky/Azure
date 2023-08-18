@@ -29,6 +29,9 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("general_settings.respawn_on_primary_world_spawn")
     public static boolean GENERAL_RESPAWN_ON_PRIMARY_WORLD_SPAWN;
 
+    @JsonPath("general_settings.teleport_new_players_to_primary_world_spawn")
+    public static boolean GENERAL_TELEPORT_NEW_PLAYERS_TO_PRIMARY_WORLD_SPAWN;
+
     // Chat Settings
 
     @JsonPath("chat_settings.cooldown")

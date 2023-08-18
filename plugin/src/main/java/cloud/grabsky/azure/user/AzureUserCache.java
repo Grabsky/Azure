@@ -183,6 +183,7 @@ public final class AzureUserCache implements UserCache, Listener {
                     (address != null) ? address : "N/A",
                     "N/A", // Country code is fetched asynchronously in the next step.
                     false,
+                    false,
                     null,
                     null
             );
@@ -255,6 +256,7 @@ public final class AzureUserCache implements UserCache, Listener {
                     (thisPlayer.getAddress() != null) ? thisPlayer.getAddress().getHostString() : "N/A",
                     "N/A", // Country code is fetched asynchronously in the next step.
                     (existingUser != null) ? existingUser.isVanished() : false,
+                    (existingUser != null) ? existingUser.isSpying() : false,
                     (existingUser != null) ? (AzurePunishment) existingUser.getMostRecentBan() : null,
                     (existingUser != null) ? (AzurePunishment) existingUser.getMostRecentMute() : null
             );

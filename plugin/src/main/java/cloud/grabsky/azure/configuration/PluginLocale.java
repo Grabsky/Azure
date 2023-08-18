@@ -428,6 +428,23 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.vanish_success_target")
     public static String COMMAND_VANISH_SUCCESS_TARGET;
 
+    // Commands > Spy
+
+    @JsonPath("commands.spy_usage")
+    public static Component COMMAND_SPY_USAGE;
+
+    @JsonPath("commands.spy_success")
+    public static String COMMAND_SPY_SUCCESS;
+
+    @JsonPath("commands.spy_success_target")
+    public static String COMMAND_SPY_SUCCESS_TARGET;
+
+    @JsonPath("commands.spy_message_format")
+    public static String COMMAND_SPY_MESSAGE_FORMAT;
+
+    @JsonPath("commands.spy_message_format_console")
+    public static String COMMAND_SPY_MESSAGE_FORMAT_CONSOLE;
+
     // Commands > Invulnerable
 
     @JsonPath("commands.invulnerable_usage")
@@ -479,6 +496,35 @@ public final class PluginLocale implements JsonConfiguration {
 
     @JsonPath("commands.player_failure")
     public static Component COMMAND_PLAYER_FAILURE;
+
+    // Commands > Message
+
+    @JsonPath("commands.message_usage")
+    public static Component COMMAND_MESSAGE_USAGE;
+
+    @JsonPath("commands.message_success_to")
+    public static String COMMAND_MESSAGE_SUCCESS_TO;
+
+    @JsonPath("commands.message_success_from")
+    public static String COMMAND_MESSAGE_SUCCESS_FROM;
+
+    @JsonPath("commands.message_failure_recipient_must_not_be_sender")
+    public static Component COMMAND_MESSAGE_FAILURE_RECIPIENT_MUST_NOT_BE_SENDER;
+
+    // Commands > Reply
+
+    @JsonPath("commands.reply_usage")
+    public static Component COMMAND_REPLY_USAGE;
+
+    @JsonPath("commands.reply_success_to")
+    public static String COMMAND_REPLY_SUCCESS_TO;
+
+    @JsonPath("commands.reply_success_from")
+    public static String COMMAND_REPLY_SUCCESS_FROM;
+
+    @JsonPath("commands.reply_failure")
+    public static Component COMMAND_REPLY_FAILURE;
+
 
     public static final class Commands implements JsonConfiguration {
 

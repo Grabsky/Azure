@@ -12,7 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,11 +38,14 @@ public final class AzureUser implements User {
     @Getter(AccessLevel.PUBLIC)
     private @NotNull String lastAddress;
 
-    @Getter(AccessLevel.PUBLIC) @Setter(value = AccessLevel.PACKAGE, onMethod = @__(@ApiStatus.Internal))
+    @Getter(AccessLevel.PUBLIC) @Setter(value = AccessLevel.PACKAGE, onMethod = @__(@Internal))
     private @NotNull String lastCountryCode;
 
     @Getter(AccessLevel.PUBLIC)
     private boolean isVanished;
+
+    @Getter(AccessLevel.PUBLIC) @Setter(value = AccessLevel.PUBLIC, onMethod = @__(@Internal))
+    private boolean isSpying;
 
     // Defined as implementation rather than interface because we want Moshi to know what adapter to use.
     private @Nullable AzurePunishment mostRecentBan;
