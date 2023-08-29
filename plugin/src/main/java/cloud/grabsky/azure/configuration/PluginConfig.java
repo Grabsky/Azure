@@ -32,6 +32,9 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("general_settings.teleport_new_players_to_primary_world_spawn")
     public static boolean GENERAL_TELEPORT_NEW_PLAYERS_TO_PRIMARY_WORLD_SPAWN;
 
+    @JsonPath("general_settings.use_blocked_command_error_message_for_unknown_command")
+    public static boolean USE_BLOCKED_COMMAND_ERROR_MESSAGE_FOR_UNKNOWN_COMMAND;
+
     // Chat Settings
 
     @JsonPath("chat_settings.cooldown")
@@ -55,6 +58,26 @@ public final class PluginConfig implements JsonConfiguration {
 
     @JsonPath("chat_settings.chat_format.tags.extra")
     public static List<TagsHolder> CHAT_MESSAGE_TAGS_EXTRA;
+
+    // Command Filter
+
+    @JsonPath("command_filter.enabled")
+    public static boolean COMMAND_FILTER_ENABLED;
+
+    @JsonPath("command_filter.use_as_blacklist")
+    public static boolean COMMAND_FILTER_USE_AS_BLACKLIST;
+
+    @JsonPath("command_filter.block_filtered_commands")
+    public static boolean COMMAND_FILTER_BLOCK_FILTERED_COMMANDS;
+
+    @JsonPath("command_filter.blocked_command_error_message")
+    public static Component BLOCKED_COMMAND_ERROR_MESSAGE;
+
+    @JsonPath("command_filter.default")
+    public static List<String> COMMAND_FILTER_DEFAULT;
+
+    @JsonPath("command_filter.extra")
+    public static List<CommandsHolder> COMMAND_FILTER_EXTRA;
 
     // Chat Settings > Moderation > Message Deletion
 
@@ -134,6 +157,18 @@ public final class PluginConfig implements JsonConfiguration {
 
         @Getter(AccessLevel.PUBLIC)
         private final TagResolver tags;
+
+    }
+
+    // Moshi should be able to create instance of the object despite the constructor being private.
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class CommandsHolder {
+
+        @Getter(AccessLevel.PUBLIC)
+        private final String permission;
+
+        @Getter(AccessLevel.PUBLIC)
+        private final List<String> commands;
 
     }
 

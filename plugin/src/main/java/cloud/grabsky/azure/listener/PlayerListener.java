@@ -2,35 +2,31 @@ package cloud.grabsky.azure.listener;
 
 import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.configuration.PluginConfig;
+import cloud.grabsky.bedrock.components.Message;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.command.UnknownCommandEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerCommandSendEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.HashSet;
 
 public final class PlayerListener implements Listener {
 
     private final Azure plugin;
 
+    private static final String PERMISSION_BYPASS_COMMAND_FILTER = "azure.plugin.bypass_command_filter";
+
     public PlayerListener(final @NotNull Azure plugin) {
         this.plugin = plugin;
     }
-
-    @EventHandler
-    public void onPlayerRespawn(final @NotNull PlayerRespawnEvent event) {
-        // Setting respawn location to spawn point of the primary world. (if enabled)
-        if (PluginConfig.GENERAL_RESPAWN_ON_PRIMARY_WORLD_SPAWN == true) {
-            // Getting the primary world.
-            final World primaryWorld = plugin.getWorldManager().getPrimaryWorld();
-            // Setting the respawn location.
-            event.setRespawnLocation(plugin.getWorldManager().getSpawnPoint(primaryWorld));
-        }
-    }
-
 
     @EventHandler // NOTE: Some resource pack sending changes might be necessary once 1.20.2 is live. (see 23w31a)
     public void onPlayerJoin(final @NotNull PlayerJoinEvent event) {
@@ -57,6 +53,19 @@ public final class PlayerListener implements Listener {
         }
     }
 
+    @EventHandler
+    public void onPlayerRespawn(final @NotNull PlayerRespawnEvent event) {
+        // Setting respawn location to spawn point of the primary world. (if enabled)
+        if (PluginConfig.GENERAL_RESPAWN_ON_PRIMARY_WORLD_SPAWN == true) {
+            // Getting the primary world.
+            final World primaryWorld = plugin.getWorldManager().getPrimaryWorld();
+            // Setting the respawn location.
+            event.setRespawnLocation(plugin.getWorldManager().getSpawnPoint(primaryWorld));
+        }
+    }
+
+    /* INVULNERABLE PLAYERS - Enables void damage and prevents hunger loss for invulnerable players. */
+
     @EventHandler(ignoreCancelled = true) // Enables void damge to invulnerable players.
     public void onVoidDamage(final @NotNull EntityDamageEvent event) {
         if (event.getEntity() instanceof Player player && player.isInvulnerable() == true && event.getCause() != EntityDamageEvent.DamageCause.VOID)
@@ -67,6 +76,69 @@ public final class PlayerListener implements Listener {
     public void onHungerLoss(final @NotNull FoodLevelChangeEvent event) {
         if (event.getEntity().getFoodLevel() > event.getFoodLevel() && event.getEntity() instanceof Player player && player.isInvulnerable() == true)
             event.setCancelled(true);
+    }
+
+    /* COMMAND FILTERING - Defined here because it's so small it doesn't deserve it's own class. */
+
+    @EventHandler
+    public void onPlayerSendCommandMap(final @NotNull PlayerCommandSendEvent event) {
+        // Exiting if disabled or player has bypass permission.
+        if (PluginConfig.COMMAND_FILTER_ENABLED == false || event.getPlayer().hasPermission(PERMISSION_BYPASS_COMMAND_FILTER) == true)
+            return;
+        // Constructing a new HashSet with default entries.
+        final HashSet<String> commands = new HashSet<>(PluginConfig.COMMAND_FILTER_DEFAULT);
+        // Sending debug message.
+        if (plugin.isDebugEnabled() == true)
+            plugin.getLogger().info("[DEBUG] Updating command map of " + event.getPlayer().getName() + "...");
+        // Collecting commands to filter.
+        PluginConfig.COMMAND_FILTER_EXTRA.stream()
+                .filter(holder -> event.getPlayer().hasPermission(holder.getPermission()) == true)
+                .flatMap(holder -> holder.getCommands().stream())
+                .forEach(commands::add);
+        // Filtering...
+        event.getCommands().removeIf(it -> commands.contains(it) == PluginConfig.COMMAND_FILTER_USE_AS_BLACKLIST);
+    }
+
+    @EventHandler
+    public void onCommandPreprocess(final @NotNull PlayerCommandPreprocessEvent event) {
+        // Exiting if disabled or player has bypass permission.
+        if (PluginConfig.COMMAND_FILTER_ENABLED == false || PluginConfig.COMMAND_FILTER_BLOCK_FILTERED_COMMANDS == false || event.getPlayer().hasPermission(PERMISSION_BYPASS_COMMAND_FILTER) == true)
+            return;
+        // Getting the player.
+        final Player player = event.getPlayer();
+        final String message = event.getMessage().substring(1);
+        // Checking matches for default command filter.
+        if (PluginConfig.COMMAND_FILTER_DEFAULT.stream().anyMatch(message::startsWith) == PluginConfig.COMMAND_FILTER_USE_AS_BLACKLIST) {
+            // Cancelling the event.
+            event.setCancelled(true);
+            // Sending error message to the player.
+            Message.of(PluginConfig.BLOCKED_COMMAND_ERROR_MESSAGE).send(player);
+            // Returning...
+            return;
+        }
+        // Checking matches for extra command filters.
+        for (final PluginConfig.CommandsHolder holder : PluginConfig.COMMAND_FILTER_EXTRA) {
+            final String permission = holder.getPermission();
+            // ...
+            if (player.hasPermission(permission) == PluginConfig.COMMAND_FILTER_USE_AS_BLACKLIST)
+                return;
+            // Checking matches.
+            if (holder.getCommands().stream().anyMatch(message::startsWith) == true) {
+                // Cancelling the event.
+                event.setCancelled(true);
+                // Sending error message to the player.
+                Message.of(PluginConfig.BLOCKED_COMMAND_ERROR_MESSAGE).send(player);
+                // Returning...
+                return;
+            }
+        }
+    }
+
+    /* UNKNOWN COMMAND MESSAGE - Changes error message that is sent when player tries to execute invalid/unknown command. Configurable. */
+
+    public void onUnknownCommand(final @NotNull UnknownCommandEvent event) {
+        if (PluginConfig.USE_BLOCKED_COMMAND_ERROR_MESSAGE_FOR_UNKNOWN_COMMAND == true)
+            event.message(PluginConfig.BLOCKED_COMMAND_ERROR_MESSAGE);
     }
 
 }
