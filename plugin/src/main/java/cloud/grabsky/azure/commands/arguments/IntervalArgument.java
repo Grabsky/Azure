@@ -11,11 +11,13 @@ import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.exception.ArgumentParseException;
 import cloud.grabsky.commands.exception.MissingInputException;
 import cloud.grabsky.commands.exception.NumberParseException;
+import it.unimi.dsi.fastutil.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import lombok.AccessLevel;
@@ -27,6 +29,8 @@ import static cloud.grabsky.bedrock.helpers.Conditions.inRange;
 @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
 public final class IntervalArgument implements ArgumentParser<Interval>, CompletionsProvider {
     /* SINGLETON */ public static final IntervalArgument DEFAULT_RANGE = new IntervalArgument(Long.MIN_VALUE, Long.MAX_VALUE);
+
+    private static final Pattern SPLIT_PATTERN = Pattern.compile("(?<=\\d)(?=\\D)");
 
     public static IntervalArgument ofRange(final long min, final long max, final Unit rangeUnit) {
         return new IntervalArgument(min * rangeUnit.getFactor(), max * rangeUnit.getFactor());
@@ -40,32 +44,21 @@ public final class IntervalArgument implements ArgumentParser<Interval>, Complet
 
     @Override
     public @NotNull List<String> provide(final @NotNull RootCommandContext context) {
-        final String value = context.getInput().at(context.getInput().length());
-        final String[] split = value.split("(?<=\\d)(?=\\D)");
+        final String value = context.getInput().at(context.getInput().maxIndex(), "");
+        final String[] split = SPLIT_PATTERN.split(value);
         // ...
         final @Nullable Long num = parseLong(split[0]);
-        // ...
+        // Checking that the number is not null.
         if (num != null) {
-            return Stream.of(split[0] + "s", split[0] + "min", split[0] + "h", split[0] + "d", split[0] + "m", split[0] + "y")
-                    .filter(completion -> {
-                        final String[] completionSplit = completion.split("(?<=\\d)(?=\\D)");
-                        // Choosing the the right unit.
-                        final @Nullable Unit unit = switch (completionSplit[1].toLowerCase()) {
-                            case "s" -> Unit.SECONDS;
-                            case "min" -> Unit.MINUTES;
-                            case "h" -> Unit.HOURS;
-                            case "d" -> Unit.DAYS;
-                            case "m" -> Unit.MONTHS;
-                            case "y" -> Unit.YEARS;
-                            default -> null;
-                        };
-                        // Checking if parsed unit is not null.
-                        if (unit != null)
-                            // Returning 'true' if interval is in range.
-                            return inRange((long) Interval.of(num, unit).as(Unit.MILLISECONDS), min, max);
-                        // Returning 'false' if invalid unit has been provided.
-                        return false;
-                    }).toList();
+            // Filtering and returning completions for intervals that are in specified min-max range.
+            return Stream.of(
+                    Pair.of(Interval.of(num, Unit.SECONDS), Unit.SECONDS),
+                    Pair.of(Interval.of(num, Unit.MINUTES), Unit.MINUTES),
+                    Pair.of(Interval.of(num, Unit.HOURS), Unit.HOURS),
+                    Pair.of(Interval.of(num, Unit.DAYS), Unit.DAYS),
+                    Pair.of(Interval.of(num, Unit.MONTHS), Unit.MONTHS),
+                    Pair.of(Interval.of(num, Unit.YEARS), Unit.YEARS)
+            ).filter(pair -> inRange((long) pair.first().as(Unit.MILLISECONDS), min, max) == true).map(pair -> num + pair.second().getShortCode()).toList();
         }
         return new ArrayList<>();
     }
@@ -73,35 +66,24 @@ public final class IntervalArgument implements ArgumentParser<Interval>, Complet
     @Override
     public Interval parse(final @NotNull RootCommandContext context, final @NotNull ArgumentQueue queue) throws ArgumentParseException, MissingInputException {
         final String value = queue.next(String.class).asRequired();
-        // ...
-        final String[] split = value.split("(?<=\\d)(?=\\D)");
+        // Splitting on position between digit and letter.
+        final String[] split = SPLIT_PATTERN.split(value);
         // Throwing exception when split total elements is not 2.
         if (split.length != 2)
             throw new IntervalArgument.ParseException(value);
         // Parsing to long.
         final @Nullable Long num = parseLong(split[0]);
-        // Checking if parsed long is not null.
-        if (num != null) {
-            // Choosing the the right unit.
-            final @Nullable Unit unit = switch (split[1].toLowerCase()) {
-                case "s" -> Unit.SECONDS;
-                case "min" -> Unit.MINUTES;
-                case "h" -> Unit.HOURS;
-                case "d" -> Unit.DAYS;
-                case "m" -> Unit.MONTHS;
-                case "y" -> Unit.YEARS;
-                default -> null;
-            };
-            // Checking if parsed unit is not null.
-            if (unit != null) {
-                final Interval result = Interval.of(num, unit);
-                // ...
-                if (inRange((long) result.as(Unit.MILLISECONDS), min, max) == true)
-                    return result;
-                throw new IntervalArgument.RangeException(value, min, max);
-            }
-        }
-        throw new IntervalArgument.ParseException(value);
+        final @Nullable Unit unit = Unit.fromShortCode(split[1].toLowerCase());
+        // Throwing an exception if either number or unit has not been provided and is null.
+        if (num == null || unit == null)
+            throw new IntervalArgument.ParseException(value);
+        // Creating a new Interval instance.
+        final Interval result = Interval.of(num, unit);
+        // Returning Interval if in range.
+        if (inRange((long) result.as(Unit.MILLISECONDS), min, max) == true)
+            return result;
+        // Throwing an exception otherwise.
+        throw new IntervalArgument.RangeException(value, min, max);
     }
 
     private @Nullable Long parseLong(final String value) {
