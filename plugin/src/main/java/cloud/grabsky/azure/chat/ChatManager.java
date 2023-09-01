@@ -24,7 +24,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.luckperms.api.cacheddata.CachedMetaData;
 import net.luckperms.api.model.user.UserManager;
-import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -85,7 +84,8 @@ public final class ChatManager implements Listener {
         final SignedMessage.Signature signature = signatureCache.getIfPresent(signatureUUID);
         // ...
         if (signature != null) {
-            Bukkit.getOnlinePlayers().forEach(player -> player.deleteMessage(signature));
+            // Deleting the message for whole server, console *should* be exluded.
+            plugin.getServer().deleteMessage(signature);
             return true;
         }
         return false;
