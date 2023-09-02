@@ -1,5 +1,6 @@
 package cloud.grabsky.azure.commands;
 
+import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.bedrock.components.Message;
@@ -7,16 +8,22 @@ import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
 import cloud.grabsky.commands.annotation.Command;
+import cloud.grabsky.commands.annotation.Dependency;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.exception.CommandLogicException;
-import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.stream.Stream;
 
 @Command(name = "pack", permission = "azure.command.pack", usage = "/pack (...)")
 public final class PackCommand extends RootCommand {
+
+    @Dependency
+    private @UnknownNullability Azure plugin;
+
 
     @Override
     public @NotNull CompletionsProvider onTabComplete(final @NotNull RootCommandContext context, final int index) throws CommandLogicException {
@@ -43,17 +50,16 @@ public final class PackCommand extends RootCommand {
                 final CommandSender sender = context.getExecutor().asCommandSender();
                 // ...
                 if (sender.hasPermission(this.getPermission() + ".notify") == true) {
-                    final boolean isConfirm = arguments.next(String.class).asOptional("--no-confirm").equalsIgnoreCase("--confirm");
+                    final boolean isConfirm = arguments.next(String.class).asOptional("").equalsIgnoreCase("--confirm");
                     // Checking for --confirm flag.
                     if (isConfirm == true) {
-                        // Iterating over online players.
-                        Bukkit.getServer().getOnlinePlayers().forEach(it -> {
-                            // Playing notification sound.
-                            if (PluginConfig.RESOURCE_PACK_NOTIFICATION_SOUND != null)
-                                it.playSound(PluginConfig.RESOURCE_PACK_NOTIFICATION_SOUND);
-                            // Sending notification message.
-                            Message.of(PluginLocale.COMMAND_PACK_NOTIFICATION).send(it);
-                        });
+                        // Getting the server audience.
+                        final Server server = plugin.getServer();
+                        // Playing notification sound.
+                        if (PluginConfig.RESOURCE_PACK_NOTIFICATION_SOUND != null)
+                            server.playSound(PluginConfig.RESOURCE_PACK_NOTIFICATION_SOUND);
+                        // Sending notification message.
+                        Message.of(PluginLocale.COMMAND_PACK_NOTIFICATION).send(server);
                         return;
                     }
                     Message.of(PluginLocale.COMMAND_PACK_NOTIFY_CONFIRM).replace("<input>", context.getInput().toString()).send(sender);
