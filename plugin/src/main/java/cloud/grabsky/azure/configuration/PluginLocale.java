@@ -525,6 +525,20 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.reply_failure")
     public static Component COMMAND_REPLY_FAILURE;
 
+    // Commands > Skull
+
+    @JsonPath("commands.skull_usage")
+    public static Component COMMAND_SKULL_USAGE;
+
+    @JsonPath("commands.skull_success_player")
+    public static String COMMAND_SKULL_SUCCESS_PLAYER;
+
+    @JsonPath("commands.skull_success_base64")
+    public static String COMMAND_SKULL_SUCCESS_BASE64;
+
+    @JsonPath("commands.skull_failure")
+    public static String COMMAND_SKULL_FAILURE;
+
 
     public static final class Commands implements JsonConfiguration {
 

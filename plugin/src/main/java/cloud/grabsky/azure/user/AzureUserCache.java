@@ -334,7 +334,7 @@ public final class AzureUserCache implements UserCache, Listener {
     /**
      * Returns Base64-encoded {@link String} representing textures from specified {@link URL}.
      */
-    private static @NotNull String encodeTextures(final @NotNull URL url) {
+    public static @NotNull String encodeTextures(final @NotNull URL url) {
         return Base64.getEncoder().encodeToString(
                                """
                                {

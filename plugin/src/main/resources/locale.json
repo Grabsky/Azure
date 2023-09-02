@@ -282,6 +282,11 @@
         "reply_usage": "<dark_gray>› <gray>Użycie: <gold>/reply (message)",
         "reply_success_to": "<dark_gray>(<gray>Ja<dark_gray> → <gold><target><dark_gray>): <gray><message>",
         "reply_success_from": "<dark_gray>(<gold><sender><dark_gray> → <gray>Ja<dark_gray>): <gray><message>",
-        "reply_failure": "<dark_gray>› <red>Nie masz komu odpowiedzieć."
+        "reply_failure": "<dark_gray>› <red>Nie masz komu odpowiedzieć.",
+        // Skull
+        "skull_usage": "<dark_gray>› <gray>Użycie: <gold>/skull <gray>(texture)",
+        "skull_success_player": "<dark_gray>› <gray>Otrzymałeś głowę gracza <gold><player><gray>.",
+        "skull_success_base64": "<dark_gray>› <gray>Otrzymałes zakodowaną głowę nieznanego gracza.",
+        "skull_failure": "<dark_gray>› <red>Argument musi być <gold>nickiem gracza<red> lub <gold>zakodowanym skinem<red>."
     }
 }

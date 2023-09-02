@@ -21,6 +21,7 @@ import cloud.grabsky.azure.commands.MuteCommand;
 import cloud.grabsky.azure.commands.PackCommand;
 import cloud.grabsky.azure.commands.PlayerCommand;
 import cloud.grabsky.azure.commands.ReplyCommand;
+import cloud.grabsky.azure.commands.SkullCommand;
 import cloud.grabsky.azure.commands.SpeedCommand;
 import cloud.grabsky.azure.commands.SpyCommand;
 import cloud.grabsky.azure.commands.TeleportCommand;
@@ -152,6 +153,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
                 .registerCommand(UnmuteCommand.class)
                 .registerCommand(VanishCommand.class)
                 .registerCommand(WorldCommand.class)
+                .registerCommand(SkullCommand.class)
                 // Registering debug commands...
                 .registerCommand(DebugCommand.class);
         // Registering events...
