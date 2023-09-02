@@ -50,7 +50,7 @@ public final class TeleportCommand extends RootCommand {
     @Override
     public void onCommand(final @NotNull RootCommandContext context, final @NotNull ArgumentQueue arguments) throws CommandLogicException {
         // Trying to resolve the command using Player as a destination...
-        if (context.getInput().length() == 2 || context.getInput().at(3, "").equalsIgnoreCase("--silent") == true)
+        if (context.getInput().maxIndex() == 2 || context.getInput().at(3, "").equalsIgnoreCase("--silent") == true)
             this.onTeleportToPlayer(context, arguments);
         // ...or using Position otherwise...
         else this.onTeleportToPosition(context, arguments);
