@@ -23,11 +23,11 @@
  */
 package cloud.grabsky.azure.configuration.adapters;
 
+import cloud.grabsky.bedrock.components.ComponentBuilder;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.JsonDataException;
 import com.squareup.moshi.JsonReader;
 import com.squareup.moshi.JsonWriter;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
@@ -46,39 +46,56 @@ public final class TagResolverAdapter extends JsonAdapter<TagResolver> {
 
     @Override
     public TagResolver fromJson(final @NotNull JsonReader in) throws IOException {
+        // Creating new (empty) instance of TagResolver.Builder which will then be populated with resolvers specified in the array.
         final TagResolver.Builder builder = TagResolver.builder();
-        // ...
+        // Beginning JSON array.
         in.beginArray();
+        // Iterating over elements inside the JSON array.
         while (in.hasNext() != false) {
             final String nextString = in.nextString().toLowerCase();
-            switch (nextString) {
-                case "click" -> builder.resolver(StandardTags.clickEvent());
-                case "color" -> builder.resolver(StandardTags.color());
-                case "decorations" -> builder.resolver(StandardTags.decorations());
-                case "font" -> builder.resolver(StandardTags.font());
-                case "gradient" -> builder.resolver(StandardTags.gradient());
-                case "hover" -> builder.resolver(StandardTags.hoverEvent());
-                case "insertion" -> builder.resolver(StandardTags.insertion());
-                case "keybind" -> builder.resolver(StandardTags.keybind());
-                case "newline" -> builder.resolver(StandardTags.newline());
-                case "rainbow" -> builder.resolver(StandardTags.rainbow());
-                case "reset" -> builder.resolver(StandardTags.reset());
-                case "selector" -> builder.resolver(StandardTags.selector());
-                case "transition" -> builder.resolver(StandardTags.transition());
-                case "translatable" -> builder.resolver(StandardTags.translatable());
-                // Custom tags.
-                case "item" -> builder.resolver(Placeholder.component("item", Component.empty())); // NOTE: Dummy placeholder.
-                default -> throw new JsonDataException("Expected " + TagResolver.class.getName() + " at " + in.getPath() + " but found: " + nextString);
-            }
+            // Getting TagResolver from specified value.
+            final @Nullable TagResolver resolver = getResolverFromName(nextString);
+            // Throwing exception if TagResolver ended up being null, meaning unexpected value has been provided.
+            if (resolver == null)
+                throw new JsonDataException("Expected " + TagResolver.class.getName() + " at " + in.getPath() + " but found: " + nextString);
+            // Otherwise, adding TagResolver to the builder.
+            builder.resolver(resolver);
         }
+        // Ending JSON array.
         in.endArray();
-        // ...
+        // Building and returning TagResolver object.
         return builder.build();
     }
 
     @Override
     public void toJson(final @NotNull JsonWriter out, final @Nullable TagResolver value) {
         throw new UnsupportedOperationException("NOT IMPLEMENTED");
+    }
+
+    /**
+     * Returns instance of {@link TagResolver} from provided {@code name}, or {@code null} if not found.
+     */
+    private static @Nullable TagResolver getResolverFromName(final @NotNull String name) {
+        return switch (name) {
+            case "click"        -> StandardTags.clickEvent();
+            case "color"        -> StandardTags.color();
+            case "decorations"  -> StandardTags.decorations();
+            case "font"         -> StandardTags.font();
+            case "gradient"     -> StandardTags.gradient();
+            case "hover"        -> StandardTags.hoverEvent();
+            case "insertion"    -> StandardTags.insertion();
+            case "keybind"      -> StandardTags.keybind();
+            case "newline"      -> StandardTags.newline();
+            case "rainbow"      -> StandardTags.rainbow();
+            case "reset"        -> StandardTags.reset();
+            case "selector"     -> StandardTags.selector();
+            case "transition"   -> StandardTags.transition();
+            case "translatable" -> StandardTags.translatable();
+            // CUSTOM
+            case "item"         -> Placeholder.component("item", ComponentBuilder.EMPTY); // NOTE: Dummy placeholder.
+            // Anything unspecified above is null.
+            default -> null;
+        };
     }
 
 }

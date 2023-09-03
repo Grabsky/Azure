@@ -39,6 +39,7 @@ import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import lombok.AccessLevel;
@@ -201,10 +202,19 @@ public final class AzureUser implements User {
 
     @Override
     public boolean equals(final @Nullable Object other) {
+        // Comparing instances.
+        if (this == other)
+            return true;
+        // Comparing fields.
         return other instanceof AzureUser otherUser
                 && name.equals(otherUser.name)
                 && uniqueId.equals(otherUser.uniqueId)
                 && textures.equals(otherUser.textures);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, uniqueId, textures);
     }
 
 }

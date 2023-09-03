@@ -60,7 +60,6 @@ public final class PackCommand extends RootCommand {
     @Override
     public void onCommand(final @NotNull RootCommandContext context, final @NotNull ArgumentQueue arguments) throws CommandLogicException {
         switch (arguments.next(String.class).asOptional("help").toLowerCase()) {
-            default -> Message.of(PluginLocale.COMMAND_PACK_HELP).send(context.getExecutor().asCommandSender());
             case "apply" -> {
                 context.getExecutor().asPlayer().setResourcePack(
                         PluginConfig.RESOURCE_PACK_URL,
@@ -90,6 +89,8 @@ public final class PackCommand extends RootCommand {
                 }
                 Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
             }
+            // Showing help page when invalid argument is provided.
+            default -> Message.of(PluginLocale.COMMAND_PACK_HELP).send(context.getExecutor().asCommandSender());
         }
     }
 

@@ -142,7 +142,7 @@ public final class WorldCommand extends RootCommand {
                     final File[] files = plugin.getServer().getWorldContainer().listFiles();
                     // ...
                     if (files == null)
-                        yield  CompletionsProvider.EMPTY;
+                        yield CompletionsProvider.EMPTY;
                     // ...
                     yield CompletionsProvider.of(Stream.of(files)
                             .filter(dir -> dir.isDirectory() == true && new File(dir, "level.dat").exists() == true)
@@ -175,10 +175,11 @@ public final class WorldCommand extends RootCommand {
             case "unload" -> (index == 1) ? CompletionsProvider.of(World.class) : CompletionsProvider.EMPTY;
             case "weather" -> switch (index) {
                 case 1 -> CompletionsProvider.of(World.class);
-                case 2 -> CompletionsProvider.of("clear", "rain", "thunder"); // There is no weather "registry" or anything like that.
+                case 2 ->
+                        CompletionsProvider.of("clear", "rain", "thunder"); // There is no weather "registry" or anything like that.
                 default -> CompletionsProvider.EMPTY;
             };
-            // ...
+            // No completions by default.
             default -> CompletionsProvider.EMPTY;
         };
     }
@@ -186,9 +187,8 @@ public final class WorldCommand extends RootCommand {
     @Override
     public void onCommand(final @NotNull RootCommandContext context, final @NotNull ArgumentQueue arguments) throws CommandLogicException {
         if (arguments.hasNext() == false) {
-            Message.of(PluginLocale.COMMAND_WORLD_HELP).send(context.getExecutor().asCommandSender());
+            Message.of(PluginLocale.COMMAND_WORLD_HELP).send(context.getExecutor());
         } else switch (arguments.next(String.class).asRequired().toLowerCase()) {
-            default -> Message.of(PluginLocale.COMMAND_WORLD_HELP).send(context.getExecutor().asCommandSender());
             case "autoload" -> this.onWorldAutoload(context, arguments);
             case "create" -> this.onWorldCreate(context, arguments);
             case "delete" -> this.onWorldDelete(context, arguments);
@@ -203,13 +203,17 @@ public final class WorldCommand extends RootCommand {
             case "time" -> this.onWorldTime(context, arguments);
             case "unload" -> this.onWorldUnload(context, arguments);
             case "weather" -> this.onWorldWeather(context, arguments);
+            // Showing help page when invalid argument is provided.
+            default -> Message.of(PluginLocale.COMMAND_WORLD_HELP).send(context.getExecutor());
         }
     }
 
 
+    /* WORLD AUTOLOAD */
+
     private static final ExceptionHandler.Factory WORLD_AUTOLOAD_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)
-            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_AUTOLOAD_USAGE).send(context.getExecutor().asCommandSender());
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_AUTOLOAD_USAGE).send(context.getExecutor());
         // Let other exceptions be handled internally.
         return null;
     };
@@ -230,9 +234,11 @@ public final class WorldCommand extends RootCommand {
     }
 
 
+    /* WORLD CREATE */
+
     private static final ExceptionHandler.Factory WORLD_CREATE_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)
-            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_CREATE_USAGE).send(context.getExecutor().asCommandSender());
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_CREATE_USAGE).send(context.getExecutor());
         // Let other exceptions be handled internally.
         return null;
     };
@@ -256,7 +262,7 @@ public final class WorldCommand extends RootCommand {
                     Message.of(PluginLocale.COMMAND_WORLD_CREATE_FAILURE_ALREADY_EXISTS).placeholder("world", key).send(sender);
                 else if (e.getReason() == Reason.OTHER)
                     Message.of(PluginLocale.COMMAND_WORLD_CREATE_FAILURE_OTHER).placeholder("world", key).send(sender);
-            // Catch any RuntimeException, I'm tired of guessing what exceptions Bukkit can throw...
+                // Catch any RuntimeException, I'm tired of guessing what exceptions Bukkit can throw...
             } catch (final IOException | RuntimeException e) {
                 e.printStackTrace();
                 // Sending error message to command sender.
@@ -269,9 +275,11 @@ public final class WorldCommand extends RootCommand {
     }
 
 
+    /* WORLD DELETE */
+
     private static final ExceptionHandler.Factory WORLD_DELETE_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)
-            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_DELETE_USAGE).send(context.getExecutor().asCommandSender());
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_DELETE_USAGE).send(context.getExecutor());
         // Let other exceptions be handled internally.
         return null;
     };
@@ -310,9 +318,11 @@ public final class WorldCommand extends RootCommand {
     }
 
 
+    /* WORLD DESCRIPTION */
+
     private static final ExceptionHandler.Factory WORLD_DESCRIPTION_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)
-            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_DESCRIPTION_USAGE).send(context.getExecutor().asCommandSender());
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_DESCRIPTION_USAGE).send(context.getExecutor());
         // Let other exceptions be handled internally.
         return null;
     };
@@ -340,9 +350,11 @@ public final class WorldCommand extends RootCommand {
     }
 
 
+    /* WORLD GAMERULE */
+
     private static final ExceptionHandler.Factory WORLD_GAMERULE_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)
-            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_GAMERULE_USAGE).send(context.getExecutor().asCommandSender());
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_GAMERULE_USAGE).send(context.getExecutor());
         // Let other exceptions be handled internally.
         return null;
     };
@@ -374,9 +386,11 @@ public final class WorldCommand extends RootCommand {
     }
 
 
+    /* WORLD IMPORT */
+
     private static final ExceptionHandler.Factory WORLD_IMPORT_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)
-            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_IMPORT_USAGE).send(context.getExecutor().asCommandSender());
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_IMPORT_USAGE).send(context.getExecutor());
         // Let other exceptions be handled internally.
         return null;
     };
@@ -398,7 +412,7 @@ public final class WorldCommand extends RootCommand {
                     Message.of(PluginLocale.COMMAND_WORLD_IMPORT_FAILURE_NOT_FOUND).placeholder("world", key).send(sender);
                 else if (e.getReason() == Reason.OTHER)
                     Message.of(PluginLocale.COMMAND_WORLD_IMPORT_FAILURE_OTHER).placeholder("world", key).send(sender);
-            // Catch any RuntimeException, I'm tired of guessing what exceptions Bukkit can throw...
+                // Catch any RuntimeException, I'm tired of guessing what exceptions Bukkit can throw...
             } catch (final RuntimeException e) {
                 Message.of(PluginLocale.COMMAND_WORLD_IMPORT_FAILURE_OTHER).placeholder("world", key).send(sender);
             }
@@ -409,13 +423,15 @@ public final class WorldCommand extends RootCommand {
     }
 
 
+    /* WORLD INFO */
+
     private void onWorldInfo(final RootCommandContext context, final ArgumentQueue arguments) {
         final CommandSender sender = context.getExecutor().asCommandSender();
         // ...
         if (sender.hasPermission(this.getPermission() + ".info") == true) {
             final World world = arguments.next(World.class).asOptional(context.getExecutor().asPlayer().getWorld());
             // Getting spawn location of specified world.
-            final Location spawnLoc = world.getSpawnLocation();
+            final Location spawnLoc = worlds.getSpawnPoint(world);
             // Sending message to command sender.
             Message.of(PluginLocale.COMMAND_WORLD_INFO)
                     .placeholder("world_name", world.getName())
@@ -434,13 +450,39 @@ public final class WorldCommand extends RootCommand {
         Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
     }
 
+
+    /* WORLD LIST */
+
+    private void onWorldList(final RootCommandContext context, final ArgumentQueue arguments) {
+        final CommandSender sender = context.getExecutor().asCommandSender();
+        // ...
+        if (sender.hasPermission(this.getPermission() + ".list") == true) {
+            Message.of(PluginLocale.COMMAND_WORLD_LIST_HEADER).placeholder("worlds_count", plugin.getServer().getWorlds().size()).send(sender);
+            // ...
+            plugin.getServer().getWorlds().forEach(world -> {
+                final @Nullable String description = worlds.getDescription(world);
+                // ...
+                Message.of(description != null ? PluginLocale.COMMAND_WORLD_LIST_ENTRY : PluginLocale.COMMAND_WORLD_LIST_ENTRY_NO_DESCRIPTION)
+                        .replace("<world_key>", world.key().asString())
+                        .placeholder("description", requirePresent(description, "N/A"))
+                        .send(sender);
+            });
+            Message.of(PluginLocale.COMMAND_WORLD_LIST_FOOTER).send(sender);
+            return;
+        }
+        // Sending error message to command sender.
+        Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
+    }
+
+
+    /* WORLD LOAD */
+
     private static final ExceptionHandler.Factory WORLD_LOAD_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)
-            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_LOAD_USAGE).send(context.getExecutor().asCommandSender());
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_LOAD_USAGE).send(context.getExecutor());
         // Let other exceptions be handled internally.
         return null;
     };
-
 
     private void onWorldLoad(final RootCommandContext context, final ArgumentQueue arguments) {
         final CommandSender sender = context.getExecutor().asCommandSender();
@@ -462,7 +504,7 @@ public final class WorldCommand extends RootCommand {
                 e.printStackTrace();
                 // Sending error message to command sender.
                 Message.of(PluginLocale.COMMAND_WORLD_LOAD_FAILURE_OTHER).placeholder("world", key).send(sender);
-            // Catch any RuntimeException, I'm tired of guessing what exceptions Bukkit can throw...
+                // Catch any RuntimeException, I'm tired of guessing what exceptions Bukkit can throw...
             } catch (final RuntimeException e) {
                 Message.of(PluginLocale.COMMAND_WORLD_LOAD_FAILURE_OTHER).placeholder("world", key).send(sender);
             }
@@ -474,9 +516,11 @@ public final class WorldCommand extends RootCommand {
     }
 
 
+    /* WORLD SPAWNPOINT */
+
     private static final ExceptionHandler.Factory WORLD_SPAWNPOINT_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)
-            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_SPAWNPOINT_USAGE).send(context.getExecutor().asCommandSender());
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_SPAWNPOINT_USAGE).send(context.getExecutor());
         // Let other exceptions be handled internally.
         return null;
     };
@@ -508,9 +552,11 @@ public final class WorldCommand extends RootCommand {
     }
 
 
+    /* WORLD TELEPORT */
+
     private static final ExceptionHandler.Factory WORLD_TELEPORT_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)
-            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_TELEPORT_USAGE).send(context.getExecutor().asCommandSender());
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_TELEPORT_USAGE).send(context.getExecutor());
         // Let other exceptions be handled internally.
         return null;
     };
@@ -532,9 +578,11 @@ public final class WorldCommand extends RootCommand {
     }
 
 
+    /* WORLD TIME */
+
     private static final ExceptionHandler.Factory WORLD_TIME_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)
-            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_TIME_USAGE).send(context.getExecutor().asCommandSender());
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_TIME_USAGE).send(context.getExecutor());
         // Let other exceptions be handled internally.
         return null;
     };
@@ -562,9 +610,11 @@ public final class WorldCommand extends RootCommand {
     }
 
 
+    /* WORLD UNLOAD */
+
     private static final ExceptionHandler.Factory WORLD_UNLOAD_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)
-            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_UNLOAD_USAGE).send(context.getExecutor().asCommandSender());
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_UNLOAD_USAGE).send(context.getExecutor());
         // Let other exceptions be handled internally.
         return null;
     };
@@ -596,9 +646,11 @@ public final class WorldCommand extends RootCommand {
     }
 
 
+    /* WORLD WEATHER */
+
     private static final ExceptionHandler.Factory WORLD_WEATHER_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)
-            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_WEATHER_USAGE).send(context.getExecutor().asCommandSender());
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_WEATHER_USAGE).send(context.getExecutor());
         // Let other exceptions be handled internally.
         return null;
     };
@@ -631,28 +683,6 @@ public final class WorldCommand extends RootCommand {
             }
             // Sending success message to command sender.
             Message.of(PluginLocale.COMMAND_WORLD_WEATHER_SET_SUCCESS).placeholder("world", world).placeholder("weather", weather).send(sender);
-            return;
-        }
-        // Sending error message to command sender.
-        Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
-    }
-
-
-    private void onWorldList(final RootCommandContext context, final ArgumentQueue arguments) {
-        final CommandSender sender = context.getExecutor().asCommandSender();
-        // ...
-        if (sender.hasPermission(this.getPermission() + ".list") == true) {
-            Message.of(PluginLocale.COMMAND_WORLD_LIST_HEADER).placeholder("worlds_count", plugin.getServer().getWorlds().size()).send(sender);
-            // ...
-            plugin.getServer().getWorlds().forEach(world -> {
-                final @Nullable String description = worlds.getDescription(world);
-                // ...
-                Message.of(description != null ? PluginLocale.COMMAND_WORLD_LIST_ENTRY : PluginLocale.COMMAND_WORLD_LIST_ENTRY_NO_DESCRIPTION)
-                        .replace("<world_key>", world.key().asString())
-                        .placeholder("description", requirePresent(description, "N/A"))
-                        .send(sender);
-            });
-            Message.of(PluginLocale.COMMAND_WORLD_LIST_FOOTER).send(sender);
             return;
         }
         // Sending error message to command sender.
