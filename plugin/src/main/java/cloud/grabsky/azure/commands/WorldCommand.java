@@ -85,7 +85,7 @@ public final class WorldCommand extends RootCommand {
                         .toList()
         );
         // Getting the first literal (argument) of user input.
-        final String literal = input.at(1).toLowerCase();
+        final String literal = input.at(1, "").toLowerCase();
         // Returning empty completions provider when missing permission for that literal.
         if (sender.hasPermission(this.getPermission() + "." + literal) == false)
             return CompletionsProvider.EMPTY;
@@ -189,20 +189,20 @@ public final class WorldCommand extends RootCommand {
         if (arguments.hasNext() == false) {
             Message.of(PluginLocale.COMMAND_WORLD_HELP).send(context.getExecutor());
         } else switch (arguments.next(String.class).asRequired().toLowerCase()) {
-            case "autoload" -> this.onWorldAutoload(context, arguments);
-            case "create" -> this.onWorldCreate(context, arguments);
-            case "delete" -> this.onWorldDelete(context, arguments);
-            case "description" -> this.onWorldDescription(context, arguments);
-            case "gamerule" -> this.onWorldGamerule(context, arguments);
-            case "import" -> this.onWorldImport(context, arguments);
-            case "info" -> this.onWorldInfo(context, arguments);
-            case "list" -> this.onWorldList(context, arguments);
-            case "load" -> this.onWorldLoad(context, arguments);
-            case "spawnpoint" -> this.onWorldSpawnPoint(context, arguments);
-            case "teleport" -> this.onWorldTeleport(context, arguments);
-            case "time" -> this.onWorldTime(context, arguments);
-            case "unload" -> this.onWorldUnload(context, arguments);
-            case "weather" -> this.onWorldWeather(context, arguments);
+            case "autoload"     -> this.onWorldAutoload(context, arguments);
+            case "create"       -> this.onWorldCreate(context, arguments);
+            case "delete"       -> this.onWorldDelete(context, arguments);
+            case "description"  -> this.onWorldDescription(context, arguments);
+            case "gamerule"     -> this.onWorldGamerule(context, arguments);
+            case "import"       -> this.onWorldImport(context, arguments);
+            case "info"         -> this.onWorldInfo(context, arguments);
+            case "list"         -> this.onWorldList(context, arguments);
+            case "load"         -> this.onWorldLoad(context, arguments);
+            case "spawnpoint"   -> this.onWorldSpawnPoint(context, arguments);
+            case "teleport"     -> this.onWorldTeleport(context, arguments);
+            case "time"         -> this.onWorldTime(context, arguments);
+            case "unload"       -> this.onWorldUnload(context, arguments);
+            case "weather"      -> this.onWorldWeather(context, arguments);
             // Showing help page when invalid argument is provided.
             default -> Message.of(PluginLocale.COMMAND_WORLD_HELP).send(context.getExecutor());
         }
