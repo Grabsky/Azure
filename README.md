@@ -1,7 +1,7 @@
 # Azure
 <span>
-    <a href="#"><img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/Grabsky/Azure/gradle.yml?color=009999"></a>
-    <a href="#"><img alt="CodeFactor Grade" src="https://img.shields.io/codefactor/grade/github/Grabsky/Azure/main?color=009999"></a>
+    <a href="#"><img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/Grabsky/Azure/gradle.yml"></a>
+    <a href="#"><img alt="CodeFactor Grade" src="https://img.shields.io/codefactor/grade/github/Grabsky/Azure/main"></a>
 </span>
 <p></p>
 
