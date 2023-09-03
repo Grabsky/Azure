@@ -5,6 +5,4 @@ main: 'cloud.grabsky.azure.Azure'
 load: POSTWORLD
 dependencies:
   server:
-    LuckPerms:
-      load: BEFORE
-      required: true
+    LuckPerms: { load: BEFORE, required: true }
