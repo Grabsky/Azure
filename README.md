@@ -1,5 +1,11 @@
 # Azure
-Modern and clean, but opinionated multi-purpose plugin for [PaperMC/Paper](https://github.com/PaperMC/Paper) servers. Plugin is maintained for use on servers I develop for and no public release is planned as of now.
+<span>
+    <a href="#"><img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/Grabsky/Azure/gradle.yml?color=009999"></a>
+    <a href="#"><img alt="CodeFactor Grade" src="https://img.shields.io/codefactor/grade/github/Grabsky/Azure/main?color=009999"></a>
+</span>
+<p></p>
+
+Modern and clean, but opinionated multi-purpose plugin for [PaperMC/Paper](https://github.com/PaperMC/Paper) servers. Maintained for use on servers I develop for and no public release is planned as of now.
 
 <br />
 
