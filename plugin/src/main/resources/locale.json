@@ -238,6 +238,10 @@
         "invulnerable_usage": "<dark_gray>› <gray>Użycie: <gold>/invulnerable <gray>(player) (state)",
         "invulnerable_success": "<dark_gray>› <gray>Tryb nietykalności gracza <gold><player><gray>: <state>",
         "invulnerable_success_target": "<dark_gray>› <gray>Tryb nietykalności: <state>",
+        // Fly
+        "fly_usage": "<dark_gray>› <gray>Użycie: <gold>/fly <gray>(player) (state)",
+        "fly_success": "<dark_gray>› <gray>Tryb latania gracza <gold><player><gray>: <state>",
+        "fly_success_target": "<dark_gray>› <gray>Tryb latania: <state>",
         // Heal
         "heal_usage": "<dark_gray>› <gray>Użycie: <gold>/heal <gray>(player)",
         "heal_success": "<dark_gray>› <gray>Punkty zdrowia gracza <gold><player><gray> zostały uzupełnione.",

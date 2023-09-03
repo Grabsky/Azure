@@ -10,6 +10,7 @@ import cloud.grabsky.azure.commands.DebugCommand;
 import cloud.grabsky.azure.commands.DeleteCommand;
 import cloud.grabsky.azure.commands.EnderchestCommand;
 import cloud.grabsky.azure.commands.FeedCommand;
+import cloud.grabsky.azure.commands.FlyCommand;
 import cloud.grabsky.azure.commands.GameModeCommand;
 import cloud.grabsky.azure.commands.GiveCommand;
 import cloud.grabsky.azure.commands.HealCommand;
@@ -140,6 +141,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
                 .registerCommand(HealCommand.class)
                 .registerCommand(InventoryCommand.class)
                 .registerCommand(InvulnerableCommand.class)
+                .registerCommand(FlyCommand.class)
                 .registerCommand(KickCommand.class)
                 .registerCommand(MessageCommand.class)
                 .registerCommand(MuteCommand.class)

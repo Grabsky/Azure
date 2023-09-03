@@ -456,6 +456,17 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.invulnerable_success_target")
     public static String COMMAND_INVULNERABLE_SUCCESS_TARGET;
 
+    // Commands > Fly
+
+    @JsonPath("commands.fly_usage")
+    public static Component COMMAND_FLY_USAGE;
+
+    @JsonPath("commands.fly_success")
+    public static String COMMAND_FLY_SUCCESS;
+
+    @JsonPath("commands.fly_success_target")
+    public static String COMMAND_FLY_SUCCESS_TARGET;
+
     // Commands > Heal
 
     @JsonPath("commands.heal_usage")
