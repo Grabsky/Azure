@@ -1,6 +1,5 @@
 package cloud.grabsky.azure.commands;
 
-import cloud.grabsky.azure.api.user.User;
 import cloud.grabsky.azure.api.user.UserCache;
 import cloud.grabsky.azure.chat.ChatManager;
 import cloud.grabsky.azure.configuration.PluginLocale;
@@ -66,17 +65,18 @@ public final class ReplyCommand extends RootCommand {
         // Sending messages...
         Message.of(PluginLocale.COMMAND_REPLY_SUCCESS_TO).placeholder("target", target).placeholder("message", message).send(sender);
         Message.of(PluginLocale.COMMAND_REPLY_SUCCESS_FROM).placeholder("sender", sender).placeholder("message", message).send(target);
-        // Sending message to spies...
-        Bukkit.getOnlinePlayers().forEach(player -> {
-            // Prevent duplicated messages.
-            if (player.equals(sender) == true || player.equals(target) == true)
-                return;
-            // Getting User object...
-            final User user = userCache.getUser(player);
-            // Forwarding message to spying player. (IF CURRENTLY SPYING)
-            if (user.isSpying() == true)
-                Message.of(PluginLocale.COMMAND_SPY_MESSAGE_FORMAT).placeholder("sender", sender).placeholder("target", target).placeholder("message", message).send(player);
-        });
+        // Forwarding message to spies...
+        Message.of(PluginLocale.COMMAND_SPY_MESSAGE_FORMAT)
+                .placeholder("sender", sender)
+                .placeholder("target", target)
+                .placeholder("message", message)
+                .broadcast(player -> {
+                    // Preventing duplicated messages.
+                    if (player.equals(sender) == true || player.equals(target) == true)
+                        return false;
+                    // Returning false for players that are currently not spying.
+                    return userCache.getUser(player).isSpying() == true;
+                });
         // Sending message to the console...
         Message.of(PluginLocale.COMMAND_SPY_MESSAGE_FORMAT_CONSOLE).placeholder("sender", sender).placeholder("target", target).placeholder("message", message).send(Bukkit.getConsoleSender());
         // Updating recipients...
