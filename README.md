@@ -1,7 +1,7 @@
 # Azure
 <span>
-    <a href="#"><img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/Grabsky/Azure/gradle.yml"></a>
-    <a href="#"><img alt="CodeFactor Grade" src="https://img.shields.io/codefactor/grade/github/Grabsky/Azure/main"></a>
+    <a href=""><img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/Grabsky/Azure/gradle.yml?style=for-the-badge&logo=github&logoColor=white&label=%20"></a>
+    <a href=""><img alt="CodeFactor Grade" src="https://img.shields.io/codefactor/grade/github/Grabsky/Azure/main?style=for-the-badge&logo=codefactor&logoColor=white&label=%20"></a>
 </span>
 <p></p>
 
@@ -21,7 +21,7 @@ $ git clone https://github.com/Grabsky/Azure.git
 # Entering cloned repository
 $ cd ./Azure
 # Compiling
-$ ./gradlew clean aseemble
+$ ./gradlew clean assemble
 # Publishing API
 $ ./gradlew clean publishToMavenLocal
 ```

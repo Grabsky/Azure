@@ -2,13 +2,10 @@ plugins {
     id("maven-publish")
 }
 
-final Boolean isSnapshot = version.endsWith("-SNAPSHOT")
-final String hash7 = "git rev-parse --verify --short HEAD".execute().text.trim()
-
 publishing {
     repositories {
         maven {
-            url (isSnapshot == true ? "https://repo.grabsky.cloud/snapshots" : "https://repo.grabsky.cloud/releases")
+            url = "https://repo.grabsky.cloud/releases"
             credentials {
                 username = System.getenv("REPO_USERNAME")
                 password = System.getenv("REPO_SECRET")
@@ -16,10 +13,7 @@ publishing {
         }
     }
     publications {
-        maven(MavenPublication) {
-            version = (isSnapshot == true ? hash7 : version)
-            from components.java
-        }
+        maven(MavenPublication) { from components.java }
     }
 }
 
@@ -34,5 +28,5 @@ javadoc {
 
 gradle.buildFinished {
     println()
-    println("> " + (isSnapshot == true ? hash7 : project.version))
+    println("> " + rootProject.version)
 }
