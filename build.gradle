@@ -17,7 +17,7 @@ subprojects {
     repositories {
         mavenLocal()
         mavenCentral()
-        maven { url = "https://repo.grabsky.cloud/releases" }
+        maven { url = "https://repo.grabsky.cloud/releases/" }
         maven { url = "https://papermc.io/repo/repository/maven-public/" }
     }
 

@@ -5,10 +5,17 @@ plugins {
 publishing {
     repositories {
         maven {
-            url = "https://repo.grabsky.cloud/releases"
+            url = "https://repo.grabsky.cloud/releases/"
             credentials {
                 username = System.getenv("REPO_USERNAME")
                 password = System.getenv("REPO_SECRET")
+            }
+        }
+        maven {
+            url = "https://maven.pkg.github.com/Grabsky/Azure"
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
             }
         }
     }
