@@ -1,5 +1,6 @@
 # Azure
 <span>
+    <a href=""><img alt="Latest Published Version" src="https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Frepo.grabsky.cloud%2Freleases%2Fcloud%2Fgrabsky%2Fazure-api%2Fmaven-metadata.xml&style=for-the-badge&logo=gradle&label=%20"></a>
     <a href=""><img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/Grabsky/Azure/gradle.yml?style=for-the-badge&logo=github&logoColor=white&label=%20"></a>
     <a href=""><img alt="CodeFactor Grade" src="https://img.shields.io/codefactor/grade/github/Grabsky/Azure/main?style=for-the-badge&logo=codefactor&logoColor=white&label=%20"></a>
 </span>
@@ -21,7 +22,7 @@ $ git clone https://github.com/Grabsky/Azure.git
 # Entering cloned repository
 $ cd ./Azure
 # Compiling
-$ ./gradlew clean assemble
+$ ./gradlew clean shadowJar
 # Publishing API
 $ ./gradlew clean publishToMavenLocal
 ```
