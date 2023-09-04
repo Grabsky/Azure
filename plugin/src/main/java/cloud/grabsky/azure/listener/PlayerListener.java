@@ -159,6 +159,7 @@ public final class PlayerListener implements Listener {
 
     /* UNKNOWN COMMAND MESSAGE - Changes error message that is sent when player tries to execute invalid/unknown command. Configurable. */
 
+    @EventHandler
     public void onUnknownCommand(final @NotNull UnknownCommandEvent event) {
         if (PluginConfig.USE_BLOCKED_COMMAND_ERROR_MESSAGE_FOR_UNKNOWN_COMMAND == true)
             event.message(PluginConfig.BLOCKED_COMMAND_ERROR_MESSAGE);
