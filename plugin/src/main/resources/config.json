@@ -55,6 +55,10 @@
             "discord_webhook_url": ""
         }
     },
+    "punishment_settings": {
+        // Default reason to be be displayed in case nothing was provided by operator.
+        "default_reason": "N/A"
+    },
     // Command filter.
     "command_filter": {
         // Determines whether to enable command filtering.
@@ -72,10 +76,6 @@
             { "permission": "group.helper", "commands": ["kick", "mute", "unmute"] },
             { "permission": "group.moderator", "commands": ["ban", "unban"] }
         ]
-    },
-    "punishment_settings": {
-        // Default reason to be be displayed in case nothing was provided by operator.
-        "default_reason": "N/A"
     },
     "resource_pack": {
         // Whether resource pack should be send when player joins the server.
@@ -102,5 +102,7 @@
             // Text displayed above the BossBar.
             "text": "<white>Jesteś <yellow>niewidzialny<white>. Użyj <yellow>/vanish<white>, aby się ujawnić."
         }
-    }
+    },
+    // Recipes to be unregistered after plugin has successfully reloaded.
+    "disabled_recipes": []
 }

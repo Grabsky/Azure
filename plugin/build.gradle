@@ -9,7 +9,7 @@ dependencies {
     api project(":azure-api")
     // Libraries
     implementation("cloud.grabsky:commands:1.20.1-34")
-    implementation("cloud.grabsky:configuration-paper:1.20.1-42")
+    implementation("cloud.grabsky:configuration-paper:1.20.1-dev")
     // Other
     compileOnly("net.luckperms:api:5.4")
 }

@@ -34,6 +34,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Iterables {
 
+    // May be replaced with https://openjdk.org/jeps/431 (JDK 21)
     public static <T> List<T> reversed(final Collection<T> original) {
         // Creating a copy of provided collection.
         final List<T> reversed = new ArrayList<>(original);

@@ -35,15 +35,15 @@ public final class Enums {
     public static <T extends Enum<?>> @Nullable T findMatching(final @NotNull Class<T> clazz, final @Nullable String name) throws IllegalArgumentException {
         if (clazz.isEnum() == false)
             throw new IllegalArgumentException(clazz.getName() + " is not an enum.");
-        // Returning false if provided name is null.
+        // Returning null for null names.
         if (name == null)
             return null;
         // Iterating over all enum constants.
-        for (final var en : clazz.getEnumConstants())
-            // Returning true if enum name is equal to provided name. Case insensitive.
+        for (final T en : clazz.getEnumConstants())
+            // Returning enum if matches the name.
             if (en.toString().equalsIgnoreCase(name) == true)
                 return en;
-        // Returning false otherwise.
+        // Returning null in case no enum was found.
         return null;
     }
 

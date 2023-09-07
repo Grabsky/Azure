@@ -31,6 +31,8 @@ import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -149,13 +151,24 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonNullable @JsonPath("vanish.bossbar")
     public static BossBar VANISH_BOSS_BAR;
 
-    /* ON RELOAD */
+    // Disabled Recipes
+
+    @JsonPath("disabled_recipes")
+    public static List<NamespacedKey> DISABLED_RECIPES;
+
+
+    /* CONFIGURATION LIFECYCLE */
 
     @Override
     public void onReload() {
         ChatManager.CHAT_FORMATS_REVERSED = reversed(PluginConfig.CHAT_FORMATS_EXTRA);
         ChatManager.CHAT_TAGS_REVERSED = reversed(PluginConfig.CHAT_MESSAGE_TAGS_EXTRA);
+        // Iterating over disabled recipes list and removing them from the server. May not be the best place to do that.
+        DISABLED_RECIPES.forEach(Bukkit::removeRecipe);
+        // Updating recipes for all players.
+        Bukkit.updateRecipes();
     }
+
 
     /* SURROGATES */
 
