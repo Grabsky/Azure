@@ -63,6 +63,7 @@ import cloud.grabsky.azure.configuration.adapters.TagResolverAdapter;
 import cloud.grabsky.azure.features.ExtraItems;
 import cloud.grabsky.azure.features.FancyTooltips;
 import cloud.grabsky.azure.listener.PlayerListener;
+import cloud.grabsky.azure.resourcepack.ResourcePackManager;
 import cloud.grabsky.azure.user.AzureUserCache;
 import cloud.grabsky.azure.util.FileLogger;
 import cloud.grabsky.azure.world.AzureWorldManager;
@@ -106,6 +107,9 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
     private RootCommandManager commandManager;
 
     @Getter(AccessLevel.PUBLIC)
+    private ResourcePackManager resourcePackManager;
+
+    @Getter(AccessLevel.PUBLIC)
     private FileLogger punishmentsFileLogger;
 
     private ConfigurationMapper mapper;
@@ -121,8 +125,10 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
             moshi.add(DeleteButton.Position.class, new AbstractEnumJsonAdapter<>(DeleteButton.Position.class, false) { /* DEFAULT */ });
             moshi.add(BossBarAdapterFactory.INSTANCE);
         });
+        // ResourcePackManager Has to be initialized before configuration is reloaded.
+        this.resourcePackManager = new ResourcePackManager(this);
         // Reloading and stopping the server in case of failure.
-        if (this.reloadConfiguration() == false) {
+        if (this.onReload() == false) {
             this.getServer().shutdown();
         }
         // ...
@@ -138,7 +144,8 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
         try {
             this.worldManager.loadWorlds();
         } catch (final IOException e) {
-            e.printStackTrace();
+            this.getLogger().severe("An error occured while trying to load worlds.");
+            this.getLogger().severe("  " + e.getMessage());
         }
         // ...
         this.punishmentsFileLogger = new FileLogger(this, new File(new File(this.getDataFolder(), "logs"), "punishments.log"));
@@ -183,25 +190,17 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
                 .registerCommand(DebugCommand.class);
         // Registering events...
         this.getServer().getPluginManager().registerEvents(chatManager, this);
-        this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
+        this.getServer().getPluginManager().registerEvents(resourcePackManager, this);
         this.getServer().getPluginManager().registerEvents(new FancyTooltips(), this);
-        // Initializing extra items... (cloud boost, speed boots)
+        this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
+        // Initializing extra items... This is likely to be removed and implemented using LuaLink or similar.
         new ExtraItems(this).initialize();
         // Finalizing... (exposing instance to the API)
         AzureProvider.finalize(this);
     }
 
-    public boolean reloadConfiguration() {
-        try {
-            return this.onReload();
-        } catch (final IllegalStateException | ConfigurationMappingException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
     @Override
-    public boolean onReload() throws ConfigurationMappingException, IllegalStateException {
+    public boolean onReload() {
         try {
             final File locale = ensureResourceExistence(this, new File(this.getDataFolder(), "locale.json"));
             final File localeCommands = ensureResourceExistence(this, new File(this.getDataFolder(), "locale_commands.json"));
@@ -212,10 +211,13 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
                     ConfigurationHolder.of(PluginLocale.Commands.class, localeCommands),
                     ConfigurationHolder.of(PluginConfig.class, config)
             );
+            // Reloading ResourcePackManager.
+            resourcePackManager.reload();
             // Returning 'true' as reload finished without any exceptions.
             return true;
-        } catch (final IOException e) {
-            e.printStackTrace();
+        } catch (final IllegalStateException | ConfigurationMappingException | IOException e) {
+            this.getLogger().severe("An error occured while trying to reload plugin.");
+            this.getLogger().severe("  " + e.getMessage());
             return false;
         }
     }
