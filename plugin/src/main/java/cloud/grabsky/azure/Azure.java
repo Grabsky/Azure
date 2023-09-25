@@ -60,7 +60,6 @@ import cloud.grabsky.azure.configuration.PluginConfig.DeleteButton;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.azure.configuration.adapters.BossBarAdapterFactory;
 import cloud.grabsky.azure.configuration.adapters.TagResolverAdapter;
-import cloud.grabsky.azure.features.FancyTooltips;
 import cloud.grabsky.azure.listener.PlayerListener;
 import cloud.grabsky.azure.resourcepack.ResourcePackManager;
 import cloud.grabsky.azure.user.AzureUserCache;
@@ -190,7 +189,6 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
         // Registering events...
         this.getServer().getPluginManager().registerEvents(chatManager, this);
         this.getServer().getPluginManager().registerEvents(resourcePackManager, this);
-        this.getServer().getPluginManager().registerEvents(new FancyTooltips(), this);
         this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         // Finalizing... (exposing instance to the API)
         AzureProvider.finalize(this);
