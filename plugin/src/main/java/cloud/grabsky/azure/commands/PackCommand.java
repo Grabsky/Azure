@@ -67,7 +67,7 @@ public final class PackCommand extends RootCommand {
                     return;
                 }
                 plugin.getBedrockScheduler().run(1L, (task) -> context.getExecutor().asPlayer().setResourcePack(
-                        "http://localhost:" + PluginConfig.RESOURCE_PACK_PORT + "/" + plugin.getResourcePackManager().getToken(),
+                        "http://" + PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS + ":" + PluginConfig.RESOURCE_PACK_PORT + "/" + plugin.getResourcePackManager().getToken(),
                         plugin.getResourcePackManager().getHash(),
                         PluginConfig.RESOURCE_PACK_IS_REQUIRED,
                         PluginConfig.RESOURCE_PACK_PROMPT_MESSAGE

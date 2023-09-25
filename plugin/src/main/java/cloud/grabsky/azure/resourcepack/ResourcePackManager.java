@@ -44,9 +44,9 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.UUID;
 
 @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
@@ -67,27 +67,30 @@ public final class ResourcePackManager implements Listener, HttpHandler {
 
     public void reload() throws IOException {
         this.file = Path.of(plugin.getDataFolder().getPath(), ".public_resourcepack", PluginConfig.RESOURCE_PACK_FILE).toFile();
-        // ...
-        if (file.exists() == true)
+        // Hashing file.
+        if (file.exists() == true && file.isDirectory() == false)
             this.hash = Files.asByteSource(file).hash(Hashing.sha1()).toString();
-        // Starting internal web server... throws BindException in case port is already in use.
-        if (server == null) {
+        // Setting-up internal web server throws BindException in case port is already in use.
+        if (PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS.isBlank() == false && PluginConfig.RESOURCE_PACK_PORT > 0 && server == null) {
             this.server = HttpServer.create(new InetSocketAddress(PluginConfig.RESOURCE_PACK_PORT), 0);
-            this.server.createContext("/" + token, this);
-            this.server.createContext("/", HttpExchange::close);
-            this.server.start();
+            // Configuring the server to be accessible only at unique-per-runtime path.
+            server.createContext("/" + token, this);
+            // Configuring the server to automatically close connections at any other paths.
+            server.createContext("/", HttpExchange::close);
+            // Starting the server.
+            server.start();
             // ...
-            plugin.getLogger().info("Internal web server started on port " + PluginConfig.RESOURCE_PACK_PORT + " and can be accessed from " + token + ".");
+            plugin.getLogger().info("Internal web server started and should be accessible at http://" + PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS + ":" + PluginConfig.RESOURCE_PACK_PORT + "/" + token);
         }
     }
 
     @Override
     public void handle(final @NotNull HttpExchange exchange) throws IOException {
-        final byte[] host = exchange.getRemoteAddress().getAddress().getAddress();
-        // ...
-        if (plugin.getServer().getOnlinePlayers().stream().anyMatch(player -> Arrays.equals(player.getAddress().getAddress().getAddress(), host) == true) == false)
+        final InetAddress host = exchange.getRemoteAddress().getAddress();
+        // Refusing unknown connections.
+        if (plugin.getServer().getOnlinePlayers().stream().anyMatch(player -> player.getAddress().getAddress().equals(host) == true) == false)
             exchange.close();
-        // ...
+        // Opening FileInputStream for the resourcepack file.
         final FileInputStream in = new FileInputStream(file);
         // Reading all bytes.
         final byte[] bytes = in.readAllBytes();
@@ -111,7 +114,7 @@ public final class ResourcePackManager implements Listener, HttpHandler {
                 return;
             }
             plugin.getBedrockScheduler().run(1L, (task) -> event.getPlayer().setResourcePack(
-                    "http://localhost:" + PluginConfig.RESOURCE_PACK_PORT + "/" + token,
+                    "http://" + PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS + ":" + PluginConfig.RESOURCE_PACK_PORT + "/" + token,
                     hash,
                     PluginConfig.RESOURCE_PACK_IS_REQUIRED,
                     PluginConfig.RESOURCE_PACK_PROMPT_MESSAGE

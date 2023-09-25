@@ -128,6 +128,9 @@ public final class PluginConfig implements JsonConfiguration {
 
     // Resource Pack
 
+    @JsonPath("resource_pack.public_access_address")
+    public static String RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS;
+
     @JsonPath("resource_pack.port")
     public static int RESOURCE_PACK_PORT;
 
