@@ -55,7 +55,7 @@ public final class AzureCommand extends RootCommand {
             Message.of(PluginLocale.COMMAND_AZURE_HELP).send(sender);
             return;
         } else if (queue.next(String.class).asRequired().equalsIgnoreCase("reload") == true && sender.hasPermission(this.getPermission() + ".reload") == true) {
-            if (Azure.getInstance().reloadConfiguration() == true) {
+            if (Azure.getInstance().onReload() == true) {
                 // Sending success message to command sender.
                 Message.of(PluginLocale.RELOAD_SUCCESS).send(sender);
                 return;

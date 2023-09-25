@@ -61,12 +61,17 @@ public final class PackCommand extends RootCommand {
     public void onCommand(final @NotNull RootCommandContext context, final @NotNull ArgumentQueue arguments) throws CommandLogicException {
         switch (arguments.next(String.class).asOptional("help").toLowerCase()) {
             case "apply" -> {
-                context.getExecutor().asPlayer().setResourcePack(
-                        PluginConfig.RESOURCE_PACK_URL,
-                        PluginConfig.RESOURCE_PACK_HASH,
+                // Sending resource pack 1 tick after event is fired. (if enabled)
+                if (plugin.getResourcePackManager().getFile() == null || plugin.getResourcePackManager().getHash() == null) {
+                    plugin.getLogger().severe("Could not send resourcepack as it seems to be either non-existent or defined improperly.");
+                    return;
+                }
+                plugin.getBedrockScheduler().run(1L, (task) -> context.getExecutor().asPlayer().setResourcePack(
+                        "http://" + PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS + ":" + PluginConfig.RESOURCE_PACK_PORT + "/" + plugin.getResourcePackManager().getToken(),
+                        plugin.getResourcePackManager().getHash(),
                         PluginConfig.RESOURCE_PACK_IS_REQUIRED,
                         PluginConfig.RESOURCE_PACK_PROMPT_MESSAGE
-                );
+                ));
             }
             case "notify" -> {
                 final CommandSender sender = context.getExecutor().asCommandSender();

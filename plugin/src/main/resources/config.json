@@ -10,7 +10,6 @@
         // Determines whether to use $.blocked_command_error_message as unknown command message.
         "use_blocked_command_error_message_for_unknown_command": false
     },
-    // Chat settings.
     "chat_settings": {
         // Chat cooldown in milliseconds. Set to 0 to disable. Bypass: azure.plugin.chat.can_bypass_cooldown
         "cooldown": 1000,
@@ -35,7 +34,6 @@
                 ]
             }
         },
-        // Moderation features.
         "moderation": {
             // Message deletion. Messages can be deleted for 5 minutes after being sent.
             "message_deletion": {
@@ -59,7 +57,6 @@
         // Default reason to be be displayed in case nothing was provided by operator.
         "default_reason": "N/A"
     },
-    // Command filter.
     "command_filter": {
         // Determines whether to enable command filtering.
         "enabled": false,
@@ -78,20 +75,22 @@
         ]
     },
     "resource_pack": {
+        // Client must be able to access this address, otherwise resourcepack cannot be downloaded. This is NOT address that internal web server will be hosted at.
+        "public_access_address": "",
+        // Port to host web-server supplying resourcepack on.
+        "port": 25578,
+        // Compressed resourcepack file inside "plugins/Azure/.public_web_contents/".
+        "pack_file": "resourcepack.zip",
         // Whether resource pack should be send when player joins the server.
         "send_on_join": false,
         // Marks the resource pack as forced. Player won't be able to join the server without accepting it.
         "is_required": true,
-        // Direct downlod URL of the resource pack.
-        "pack_url": "",
-        // SHA1 checksum of the resource pack. Used for integrity and updates.
-        "pack_hash": "",
         // Server message shown in resource pack prompt.
         "prompt_message": "<red>Aby grać na naszym serwerze, musisz zaakceptować paczkę zasobów.",
         // Sound played when player is notified
         "notification_sound": { "key": "minecraft:block.note_block.bell", "source": "master", "volume": 1, "pitch": 0.5 }
     },
-    // Vanish settings. Hidden players are not removed from server list status. Consider setting 'hide-online-players' to 'true'. (server.properties)
+    // Hidden players are not removed from server list status. Consider setting 'hide-online-players' to 'true'. (server.properties)
     "vanish": {
         // BossBar to be displayed for vanished players. Can be null.
         "bossbar": {

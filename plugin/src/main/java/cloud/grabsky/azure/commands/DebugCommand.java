@@ -42,6 +42,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+
 @Command(name = "debug", permission = "azure.command.debug", usage = "/debug (...)")
 public final class DebugCommand extends RootCommand implements Listener {
 
@@ -91,8 +93,14 @@ public final class DebugCommand extends RootCommand implements Listener {
                         });
                     }
                 }
+                case "compress" -> {
+                    final File source = new File(plugin.getDataFolder(), "_rsc");
+                    final File target = new File(plugin.getDataFolder(), "_rsc.zip");
+                }
             }
         }
     }
+
+
 
 }

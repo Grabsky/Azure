@@ -128,17 +128,20 @@ public final class PluginConfig implements JsonConfiguration {
 
     // Resource Pack
 
+    @JsonPath("resource_pack.public_access_address")
+    public static String RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS;
+
+    @JsonPath("resource_pack.port")
+    public static int RESOURCE_PACK_PORT;
+
+    @JsonPath("resource_pack.pack_file")
+    public static String RESOURCE_PACK_FILE;
+
     @JsonPath("resource_pack.send_on_join")
     public static boolean RESOURCE_PACK_SEND_ON_JOIN;
 
     @JsonPath("resource_pack.is_required")
     public static boolean RESOURCE_PACK_IS_REQUIRED;
-
-    @JsonPath("resource_pack.pack_url")
-    public static String RESOURCE_PACK_URL;
-
-    @JsonPath("resource_pack.pack_hash")
-    public static String RESOURCE_PACK_HASH;
 
     @JsonPath("resource_pack.prompt_message")
     public static Component RESOURCE_PACK_PROMPT_MESSAGE;
