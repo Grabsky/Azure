@@ -51,7 +51,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-// TO-DO: Support for "@forever" selector which defaults to 0s, making the punishment permantent. (low priority)
+// TO-DO: Support for "@forever" selector which defaults to 0s, making the punishment permanent. (low priority)
 @Command(name = "ban", permission = "azure.command.ban", usage = "/ban (player) (duration) (reason)")
 public final class BanCommand extends RootCommand {
 
@@ -115,7 +115,7 @@ public final class BanCommand extends RootCommand {
     }
 
     private static void ban(final @NotNull CommandSender sender, final @NotNull OfflinePlayer target, final @NotNull User targetUser, final @Nullable String reason, final @NotNull Interval duration) {
-        // When duration is 0, punishment will be permantent - until manually removed.
+        // When duration is 0, punishment will be permanent - until manually removed.
         if (duration.as(Unit.MILLISECONDS) == 0) {
             // Banning the player. Player will be kicked manually for the sake of custimazble message.
             targetUser.ban(null, reason, sender);

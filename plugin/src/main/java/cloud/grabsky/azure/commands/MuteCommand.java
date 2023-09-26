@@ -52,7 +52,7 @@ import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.UUID;
 
-// TO-DO: Support for "@forever" selector which defaults to 0s, making the punishment permantent. (low priority)
+// TO-DO: Support for "@forever" selector which defaults to 0s, making the punishment permanent. (low priority)
 @Command(name = "mute", permission = "azure.command.mute", usage = "/mute (player) (duration) (reason)")
 public final class MuteCommand extends RootCommand {
 
@@ -119,7 +119,7 @@ public final class MuteCommand extends RootCommand {
     }
 
     private static void mute(final @NotNull CommandSender sender, final @NotNull User targetUser, final @Nullable String reason, final @NotNull Interval duration) {
-        // When duration is 0, punishment will be permantent - until manually removed.
+        // When duration is 0, punishment will be permanent - until manually removed.
         if (duration.as(Unit.MILLISECONDS) == 0) {
             // Muting the player.
             targetUser.mute(null, reason, sender);
