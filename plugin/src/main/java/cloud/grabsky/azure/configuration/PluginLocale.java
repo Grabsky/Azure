@@ -183,7 +183,7 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.inventory_usage")
     public static Component COMMAND_INVENTORY_USAGE;
 
-    // Commands > Inventory
+    // Commands > Enderchest
 
     @JsonPath("commands.enderchest_usage")
     public static Component COMMAND_ENDERCHEST_USAGE;

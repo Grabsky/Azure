@@ -39,13 +39,6 @@ import org.jetbrains.annotations.NotNull;
 @Command(name = "enderchest", permission = "azure.command.enderchest", usage = "/enderchest (player)")
 public final class EnderchestCommand extends RootCommand {
 
-    private static final ExceptionHandler.Factory ENDERCHEST_USAGE = (exception) -> {
-        if (exception instanceof MissingInputException)
-            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_ENDERCHEST_USAGE).send(context.getExecutor().asCommandSender());
-        // Let other exceptions be handled internally.
-        return null;
-    };
-
     @Override
     public @NotNull CompletionsProvider onTabComplete(final @NotNull RootCommandContext context, final int index) throws CommandLogicException {
         return switch (index) {
@@ -58,7 +51,7 @@ public final class EnderchestCommand extends RootCommand {
     public void onCommand(final @NotNull RootCommandContext context, final @NotNull ArgumentQueue arguments) throws CommandLogicException {
         final Player sender = context.getExecutor().asPlayer();
         // ...
-        final Player target = arguments.next(Player.class).asRequired(ENDERCHEST_USAGE);
+        final Player target = arguments.next(Player.class).asOptional(sender);
         // ...
         if (sender != target && sender.hasPermission(this.getPermission() + ".others") == false) {
             Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
