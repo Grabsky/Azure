@@ -82,6 +82,10 @@
         "inventory_usage": "<dark_gray>› <gray>Użycie: <gold>/inventory <white>(player)",
         // Enderchest
         "enderchest_usage": "<dark_gray>› <gray>Użycie: <gold>/enderchest <gray>(player)",
+        // Repair
+        "repair_success": "<dark_gray>› <gray>Przedmiot trzymany w ręce został naprawiony.",
+        "repair_failure_no_item_in_hand": "<dark_gray>› <red>Musisz trzymać w ręce jakiś przedmiot.",
+        "repair_failure_item_not_repairable": "<dark_gray>› <red>Tego przedmiotu nie da się naprawić.",
         // Gamemode
         "gamemode_usage": "<dark_gray>› <gray>Użycie: <gold>/gamemode <white>(player) <gray>(gamemode)",
         "gamemode_info": "<dark_gray>› <gray>Tryb gry gracza <gold><player><gray> to <gold><mode><gray>.",

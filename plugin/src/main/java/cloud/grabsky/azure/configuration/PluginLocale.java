@@ -188,6 +188,17 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.enderchest_usage")
     public static Component COMMAND_ENDERCHEST_USAGE;
 
+    // Commands > Repair
+
+    @JsonPath("commands.repair_success")
+    public static Component COMMAND_REPAIR_SUCCESS;
+
+    @JsonPath("commands.repair_failure_no_item_in_hand")
+    public static Component COMMAND_REPAIR_FAILURE_NO_ITEM_IN_HAND;
+
+    @JsonPath("commands.repair_failure_item_not_repairable")
+    public static Component COMMAND_REPAIR_FAILURE_ITEM_NOT_REPAIRABLE;
+
     // Commands > Gamemode
 
     @JsonPath("commands.gamemode_usage")
