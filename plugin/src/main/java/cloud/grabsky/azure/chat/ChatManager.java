@@ -34,10 +34,20 @@ import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.bedrock.util.Interval;
 import cloud.grabsky.bedrock.util.Interval.Unit;
+import club.minnced.discord.webhook.WebhookClient;
+import club.minnced.discord.webhook.send.AllowedMentions;
+import club.minnced.discord.webhook.send.WebhookEmbed;
+import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
+import club.minnced.discord.webhook.send.WebhookMessage;
+import club.minnced.discord.webhook.send.WebhookMessageBuilder;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.sun.nio.sctp.MessageInfo;
 import io.papermc.paper.event.player.AsyncChatDecorateEvent;
 import io.papermc.paper.event.player.AsyncChatEvent;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.chat.SignedMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickCallback.Options;
@@ -75,9 +85,11 @@ public final class ChatManager implements Listener {
     private final Azure plugin;
 
     private final UserManager luckPermsUserManager;
-    private final Cache<UUID, SignedMessage.Signature> signatureCache;
+    private final Cache<UUID, MessageInfo> signatureCache;
     private final Map<UUID, Long> chatCooldowns;
     private final Map<UUID, UUID> lastRecipients;
+
+    private WebhookClient webhook;
 
     private static final MiniMessage EMPTY_MINIMESSAGE = MiniMessage.builder().tags(TagResolver.empty()).build();
     private static final PlainTextComponentSerializer PLAIN_SERIALIZER = PlainTextComponentSerializer.plainText();
@@ -98,17 +110,23 @@ public final class ChatManager implements Listener {
                 .build();
         this.chatCooldowns = new HashMap<>();
         this.lastRecipients = new HashMap<>();
+        // ...
+        this.webhook = WebhookClient.withUrl(PluginConfig.CHAT_DISCORD_WEBHOOK_URL);
     }
 
     /**
      * Requests deletion of a message associated with provided {@link UUID} (signatureUUID).
      */
     public boolean deleteMessage(final UUID signatureUUID) {
-        final SignedMessage.Signature signature = signatureCache.getIfPresent(signatureUUID);
+        final @Nullable MessageInfo message = signatureCache.getIfPresent(signatureUUID);
         // ...
-        if (signature != null) {
+        if (message != null) {
             // Deleting the message for whole server, console *should* be exluded.
-            plugin.getServer().deleteMessage(signature);
+            plugin.getServer().deleteMessage(message.signature);
+            // Deleting from webhook.
+            if (PluginConfig.CHAT_DISCORD_WEBHOOK_ENABLED == true && message.discordMessageId != null)
+                webhook.get(message.discordMessageId).thenAccept(response -> webhook.edit(message.discordMessageId, "~~" + response.getContent() + "~~ *(deleted)*"));
+            // ...
             return true;
         }
         return false;
@@ -170,9 +188,9 @@ public final class ChatManager implements Listener {
         }
         // ...
         final UUID signatureUUID = (event.signedMessage().signature() != null) ? UUID.randomUUID() : null;
-        // ...
+        // Caching signatures...
         if (signatureUUID != null) {
-            signatureCache.put(signatureUUID, event.signedMessage().signature());
+            signatureCache.put(signatureUUID, new MessageInfo(event.signedMessage().signature()));
         }
         // Customizing renderer...
         event.renderer((source, sourceDisplayName, message, viewer) -> {
@@ -220,9 +238,24 @@ public final class ChatManager implements Listener {
             // Anything else...
             return message;
         });
-        // Forwarding a webhook...
+        // Forwarding message to webhook...
         if (PluginConfig.CHAT_DISCORD_WEBHOOK_ENABLED == true) {
-            // TO-DO: ...
+            // Updating client in case URL has changed.
+            if (webhook.getUrl().equals(PluginConfig.CHAT_DISCORD_WEBHOOK_URL) == false)
+                this.webhook = WebhookClient.withUrl(PluginConfig.CHAT_DISCORD_WEBHOOK_URL);
+            // Serializing Component to plain String.
+            final String plainMessage = PlainTextComponentSerializer.plainText().serialize(event.message());
+            // Constructing and sending message.
+            final WebhookMessage message = new WebhookMessageBuilder()
+                    .setUsername(player.getName())
+                    .setAvatarUrl("https://minotar.net/bust/" + player.getUniqueId() + "/100.png")
+                    .setContent(plainMessage)
+                    .setAllowedMentions(AllowedMentions.none())
+                    .build();
+            // Sending and adding message id to the cache.
+            webhook.send(message).thenAccept(response -> {
+                plugin.getBedrockScheduler().run(1L, (___) -> signatureCache.getIfPresent(signatureUUID).discordMessageId = response.getId());
+            });
         }
     }
 
@@ -249,6 +282,17 @@ public final class ChatManager implements Listener {
                 .map(FormatHolder::getFormat)
                 .findFirst()
                 .orElse(def);
+    }
+
+    @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
+    private static final class MessageInfo {
+
+        @Getter(AccessLevel.PUBLIC)
+        private final @NotNull SignedMessage.Signature signature;
+
+        @Getter(AccessLevel.PUBLIC)
+        private @Nullable Long discordMessageId;
+
     }
 
 }
