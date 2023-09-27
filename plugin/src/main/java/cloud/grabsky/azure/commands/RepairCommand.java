@@ -29,7 +29,6 @@ import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
 import cloud.grabsky.commands.annotation.Command;
-import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.exception.CommandLogicException;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -45,7 +44,7 @@ public final class RepairCommand extends RootCommand {
         // Checking if item in hand is not air.
         if (sender.getInventory().getItemInMainHand().getType() != Material.AIR) {
             // Checking if item in hand can be repaired.
-            if (sender.getInventory().getItemInMainHand() instanceof Damageable) {
+            if (sender.getInventory().getItemInMainHand().getType().getMaxDurability() > 1) {
                 // Reparing item and sending success message to the sender.
                 sender.getInventory().getItemInMainHand().editMeta(Damageable.class, (meta) -> meta.setDamage(0));
                 Message.of(PluginLocale.COMMAND_REPAIR_SUCCESS).send(sender);
