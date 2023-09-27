@@ -14,6 +14,11 @@ subprojects {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
 
+    ext {
+        BEDROCK_VERSION = "1.20.1-41"
+        KYORI_NBT_VERSION = "4.14.0"
+    }
+
     repositories {
         mavenLocal()
         mavenCentral()
@@ -28,9 +33,6 @@ subprojects {
         annotationProcessor("org.projectlombok:lombok:1.18.26")
         // Paper API
         compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
-        // Other
-        api("cloud.grabsky:bedrock:1.20.1-41")
-        api("net.kyori:adventure-nbt:4.14.0")
     }
 
 }

@@ -24,6 +24,11 @@ publishing {
     }
 }
 
+dependencies {
+    compileOnly("cloud.grabsky:bedrock:$BEDROCK_VERSION")
+    compileOnly("net.kyori:adventure-nbt:_$KYORI_NBT_VERSION")
+}
+
 java {
     withSourcesJar()
     withJavadocJar()
