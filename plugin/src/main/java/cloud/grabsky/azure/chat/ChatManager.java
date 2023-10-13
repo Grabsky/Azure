@@ -36,18 +36,12 @@ import cloud.grabsky.bedrock.util.Interval;
 import cloud.grabsky.bedrock.util.Interval.Unit;
 import club.minnced.discord.webhook.WebhookClient;
 import club.minnced.discord.webhook.send.AllowedMentions;
-import club.minnced.discord.webhook.send.WebhookEmbed;
-import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
 import club.minnced.discord.webhook.send.WebhookMessage;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.sun.nio.sctp.MessageInfo;
 import io.papermc.paper.event.player.AsyncChatDecorateEvent;
 import io.papermc.paper.event.player.AsyncChatEvent;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.chat.SignedMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickCallback.Options;
@@ -58,6 +52,7 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.luckperms.api.cacheddata.CachedMetaData;
 import net.luckperms.api.model.user.UserManager;
 import org.bukkit.NamespacedKey;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -72,6 +67,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import static cloud.grabsky.bedrock.helpers.Conditions.requirePresent;
 import static java.lang.System.currentTimeMillis;
@@ -117,7 +116,7 @@ public final class ChatManager implements Listener {
     /**
      * Requests deletion of a message associated with provided {@link UUID} (signatureUUID).
      */
-    public boolean deleteMessage(final UUID signatureUUID) {
+    public boolean deleteMessage(final @NotNull CommandSender operator, final @NotNull UUID signatureUUID) {
         final @Nullable MessageInfo message = signatureCache.getIfPresent(signatureUUID);
         // ...
         if (message != null) {
@@ -125,7 +124,7 @@ public final class ChatManager implements Listener {
             plugin.getServer().deleteMessage(message.signature);
             // Deleting from webhook.
             if (PluginConfig.CHAT_DISCORD_WEBHOOK_ENABLED == true && message.discordMessageId != null)
-                webhook.get(message.discordMessageId).thenAccept(response -> webhook.edit(message.discordMessageId, "~~" + response.getContent() + "~~ *(deleted)*"));
+                webhook.get(message.discordMessageId).thenAccept(response -> webhook.edit(message.discordMessageId, "~~" + response.getContent() + "~~ (deleted by " + operator.getName() +  ")"));
             // ...
             return true;
         }
@@ -226,7 +225,7 @@ public final class ChatManager implements Listener {
                 // Adding "DELETE MESSAGE" button for allowed viewers
                 if (PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_ENABLED == true && receiver.hasPermission(CHAT_MODERATION_PERMISSION) == true && source.hasPermission(CHAT_MODERATION_PERMISSION) == false) {
                     final Component button = PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_BUTTON.getText()
-                            .clickEvent(callback(audience -> this.deleteMessage(signatureUUID), Options.builder().uses(1).lifetime(Duration.ofMinutes(5)).build()))
+                            .clickEvent(callback(audience -> this.deleteMessage(event.getPlayer(), signatureUUID), Options.builder().uses(1).lifetime(Duration.ofMinutes(5)).build()))
                             .hoverEvent(showText(PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_BUTTON.getHover()));
                     // ...
                     return (PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_BUTTON.getPosition() == Position.BEFORE)
@@ -247,7 +246,7 @@ public final class ChatManager implements Listener {
             final String plainMessage = PlainTextComponentSerializer.plainText().serialize(event.message());
             // Constructing and sending message.
             final WebhookMessage message = new WebhookMessageBuilder()
-                    .setUsername(player.getName())
+                    .setUsername(player.getName() + " (" + player.getUniqueId() + ")")
                     .setAvatarUrl("https://minotar.net/bust/" + player.getUniqueId() + "/100.png")
                     .setContent(plainMessage)
                     .setAllowedMentions(AllowedMentions.none())

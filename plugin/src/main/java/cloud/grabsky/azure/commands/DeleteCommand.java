@@ -55,7 +55,7 @@ public final class DeleteCommand extends RootCommand {
     public void onCommand(final @NotNull RootCommandContext context, final @NotNull ArgumentQueue queue) throws CommandLogicException {
         final UUID uuid = queue.next(UUID.class).asRequired(DELETE_USAGE);
         // Requests message deletion and send error message on failure
-        if (chat.deleteMessage(uuid) == false)
+        if (chat.deleteMessage(context.getExecutor().asCommandSender(), uuid) == false)
             Message.of(PluginLocale.COMMAND_DELETE_FAILURE).send(context.getExecutor().asCommandSender());
     }
 
