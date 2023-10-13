@@ -23,6 +23,7 @@
  */
 package cloud.grabsky.azure.configuration;
 
+import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.chat.ChatManager;
 import cloud.grabsky.configuration.JsonConfiguration;
 import cloud.grabsky.configuration.JsonNullable;
@@ -167,7 +168,10 @@ public final class PluginConfig implements JsonConfiguration {
         ChatManager.CHAT_FORMATS_REVERSED = reversed(PluginConfig.CHAT_FORMATS_EXTRA);
         ChatManager.CHAT_TAGS_REVERSED = reversed(PluginConfig.CHAT_MESSAGE_TAGS_EXTRA);
         // Iterating over disabled recipes list and removing them from the server. May not be the best place to do that.
-        DISABLED_RECIPES.forEach(Bukkit::removeRecipe);
+        DISABLED_RECIPES.forEach(key -> {
+            if (Bukkit.removeRecipe(key) == false)
+                Azure.getInstance().getLogger().warning("Unknown recipe \"" + key.asString() + "\" could not be disabled.");
+        });
         // Updating recipes for all players.
         Bukkit.updateRecipes();
     }

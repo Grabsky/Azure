@@ -102,6 +102,6 @@
             "text": "<white>Jesteś <yellow>niewidzialny<white>. Użyj <yellow>/vanish<white>, aby się ujawnić."
         }
     },
-    // Recipes to be unregistered after plugin has successfully reloaded.
+    // Recipes to be unregistered after plugin has successfully reloaded. Keep in mind unregistered recipes are removed from players' recipe discovery list.
     "disabled_recipes": []
 }
