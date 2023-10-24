@@ -283,6 +283,7 @@
         "player_failure": "<dark_gray>› <red>Nie udało się uzyskać informacji na temat tego gracza.",
         // Message
         "message_usage": "<dark_gray>› <gray>Użycie: <gold>/message <white>(player) (message)",
+        "message_warning": "<dark_gray>› <gray>Wiadomości prywatne są moderowane przez administrację.",
         "message_success_to": "<dark_gray>(<gray>Ja<dark_gray> → <gold><target><dark_gray>): <gray><message>",
         "message_success_from": "<dark_gray>(<gold><sender><dark_gray> → <gray>Ja<dark_gray>): <gray><message>",
         "message_failure_recipient_must_not_be_sender": "<dark_gray>› <red>Nie możesz wysłać wiadomości do samego siebie.",

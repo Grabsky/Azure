@@ -38,6 +38,7 @@ import cloud.grabsky.commands.exception.CommandLogicException;
 import cloud.grabsky.commands.exception.MissingInputException;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
@@ -85,6 +86,12 @@ public final class ReplyCommand extends RootCommand {
         }
         // Getting the rest of user input as a message.
         final String message = arguments.next(String.class, StringArgument.GREEDY).asRequired(REPLY_USAGE);
+        // Sending warning to the sender, in case they did not see one before.
+        if (sender.getPersistentDataContainer().getOrDefault(MessageCommand.KEY_WARNING, PersistentDataType.BOOLEAN, false) == false) {
+            Message.of(PluginLocale.COMMAND_MESSAGE_WARNING).send(sender);
+            // Toggling state, so the message is shown only once.
+            sender.getPersistentDataContainer().set(MessageCommand.KEY_WARNING, PersistentDataType.BOOLEAN, true);
+        }
         // Sending messages...
         Message.of(PluginLocale.COMMAND_REPLY_SUCCESS_TO).placeholder("target", target).placeholder("message", message).send(sender);
         Message.of(PluginLocale.COMMAND_REPLY_SUCCESS_FROM).placeholder("sender", sender).placeholder("message", message).send(target);

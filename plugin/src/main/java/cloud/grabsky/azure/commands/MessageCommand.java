@@ -38,7 +38,9 @@ import cloud.grabsky.commands.component.ExceptionHandler;
 import cloud.grabsky.commands.exception.CommandLogicException;
 import cloud.grabsky.commands.exception.MissingInputException;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnknownNullability;
 
@@ -52,6 +54,8 @@ public final class MessageCommand extends RootCommand {
     @Dependency
     private @UnknownNullability UserCache userCache;
 
+
+    public static final NamespacedKey KEY_WARNING = new NamespacedKey("azure", "seen_private_message_warning");
 
     private static final ExceptionHandler.Factory MESSAGE_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)
@@ -82,6 +86,12 @@ public final class MessageCommand extends RootCommand {
         }
         // Getting the rest of user input as a message.
         final String message = arguments.next(String.class, StringArgument.GREEDY).asRequired(MESSAGE_USAGE);
+        // Sending warning to the sender, in case they did not see one before.
+        if (sender.getPersistentDataContainer().getOrDefault(KEY_WARNING, PersistentDataType.BOOLEAN, false) == false) {
+            Message.of(PluginLocale.COMMAND_MESSAGE_WARNING).send(sender);
+            // Toggling state, so the message is shown only once.
+            sender.getPersistentDataContainer().set(KEY_WARNING, PersistentDataType.BOOLEAN, true);
+        }
         // Sending messages...
         Message.of(PluginLocale.COMMAND_MESSAGE_SUCCESS_TO).placeholder("target", target).placeholder("message", message).send(sender);
         Message.of(PluginLocale.COMMAND_MESSAGE_SUCCESS_FROM).placeholder("sender", sender).placeholder("message", message).send(target);

@@ -547,6 +547,9 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.message_usage")
     public static Component COMMAND_MESSAGE_USAGE;
 
+    @JsonPath("commands.message_warning")
+    public static Component COMMAND_MESSAGE_WARNING;
+
     @JsonPath("commands.message_success_to")
     public static String COMMAND_MESSAGE_SUCCESS_TO;
 
