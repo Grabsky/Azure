@@ -238,7 +238,7 @@ public final class ChatManager implements Listener {
             return message;
         });
         // Forwarding message to webhook...
-        if (PluginConfig.CHAT_DISCORD_WEBHOOK_ENABLED == true) {
+        if (event.viewers().isEmpty() == false && PluginConfig.CHAT_DISCORD_WEBHOOK_ENABLED == true) {
             // Updating client in case URL has changed.
             if (webhook.getUrl().equals(PluginConfig.CHAT_DISCORD_WEBHOOK_URL) == false)
                 this.webhook = WebhookClient.withUrl(PluginConfig.CHAT_DISCORD_WEBHOOK_URL);
