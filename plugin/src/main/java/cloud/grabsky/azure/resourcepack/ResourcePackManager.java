@@ -32,9 +32,6 @@ import com.google.common.io.Files;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -44,10 +41,13 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.file.Path;
 import java.util.UUID;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
 public final class ResourcePackManager implements Listener, HttpHandler {
@@ -55,7 +55,7 @@ public final class ResourcePackManager implements Listener, HttpHandler {
     private final Azure plugin;
 
     @Getter(AccessLevel.PUBLIC)
-    private final String token = UUID.randomUUID().toString();
+    private @Nullable String token;
 
     @Getter(AccessLevel.PUBLIC)
     private @Nullable File file;
@@ -65,14 +65,17 @@ public final class ResourcePackManager implements Listener, HttpHandler {
 
     private @Nullable HttpServer server;
 
+
     public void reload() throws IOException {
         this.file = Path.of(plugin.getDataFolder().getPath(), ".public_resourcepack", PluginConfig.RESOURCE_PACK_FILE).toFile();
         // Hashing file.
         if (file.exists() == true && file.isDirectory() == false)
             this.hash = Files.asByteSource(file).hash(Hashing.sha1()).toString();
         // Setting-up internal web server throws BindException in case port is already in use.
-        if (PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS.isBlank() == false && PluginConfig.RESOURCE_PACK_PORT > 0 && server == null) {
+        if (PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS.isBlank() == false && PluginConfig.RESOURCE_PACK_PORT > 0 && this.server == null) {
             this.server = HttpServer.create(new InetSocketAddress(PluginConfig.RESOURCE_PACK_PORT), 0);
+            // Generating initial token.
+            this.token = UUID.randomUUID().toString();
             // Configuring the server to be accessible only at unique-per-runtime path.
             server.createContext("/" + token, this);
             // Configuring the server to automatically close connections at any other paths.
@@ -81,15 +84,26 @@ public final class ResourcePackManager implements Listener, HttpHandler {
             server.start();
             // ...
             plugin.getLogger().info("Internal web server started and should be accessible at http://" + PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS + ":" + PluginConfig.RESOURCE_PACK_PORT + "/" + token);
+            // Starting token rotation task.
+            plugin.getBedrockScheduler().repeat(1200L, 1200L, Long.MAX_VALUE, (task) -> {
+                if (this.server == null)
+                    return false;
+                // Genering new token.
+                final String newToken = UUID.randomUUID().toString();
+                // Configuring the server to be accessible at the new path.
+                server.createContext("/" + newToken, this);
+                // Removing HttpContext associated with previous token.
+                server.removeContext("/" + token);
+                // Replacing previous token with a new one.
+                this.token = newToken;
+                // Retunirng 'true' as to contiunue future executions of this task.
+                return true;
+            });
         }
     }
 
     @Override
     public void handle(final @NotNull HttpExchange exchange) throws IOException {
-        final InetAddress host = exchange.getRemoteAddress().getAddress();
-        // Refusing unknown connections.
-        if (plugin.getServer().getOnlinePlayers().stream().anyMatch(player -> player.getAddress().getAddress().equals(host) == true) == false)
-            exchange.close();
         // Opening FileInputStream for the resourcepack file.
         final FileInputStream in = new FileInputStream(file);
         // Reading all bytes.
