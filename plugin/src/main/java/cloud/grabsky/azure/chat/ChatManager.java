@@ -240,9 +240,13 @@ public final class ChatManager implements Listener {
                 this.webhook = WebhookClient.withUrl(PluginConfig.CHAT_DISCORD_WEBHOOK_URL);
             // Serializing Component to plain String.
             final String plainMessage = PlainTextComponentSerializer.plainText().serialize(event.message());
+            // Getting username and replacing placeholders.
+            final String username = PluginConfig.CHAT_DISCORD_WEBHOOK_USERNAME
+                    .replace("<player>", player.getName())
+                    .replace("<uuid>", player.getUniqueId().toString());
             // Constructing and sending message.
             final WebhookMessage message = new WebhookMessageBuilder()
-                    .setUsername(player.getName() + " (" + player.getUniqueId() + ")")
+                    .setUsername(username)
                     .setAvatarUrl("https://minotar.net/armor/bust/" + player.getUniqueId() + "/100.png")
                     .setContent(plainMessage)
                     .setAllowedMentions(AllowedMentions.none())

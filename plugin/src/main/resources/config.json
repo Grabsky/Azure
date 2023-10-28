@@ -49,6 +49,8 @@
         "discord_webhooks": {
             // Determinates whether chat messages are sent to the discord webhook.
             "enabled": false,
+            // Username to be displayed in a webhook. Supports <player> and <uuid> placeholders.
+            "discord_webhook_username": "<player>",
             // Discord webhook URL. Keep it secure.
             "discord_webhook_url": ""
         }

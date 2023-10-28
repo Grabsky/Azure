@@ -121,6 +121,9 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("chat_settings.discord_webhooks.enabled")
     public static boolean CHAT_DISCORD_WEBHOOK_ENABLED;
 
+    @JsonPath("chat_settings.discord_webhooks.discord_webhook_username")
+    public static String CHAT_DISCORD_WEBHOOK_USERNAME;
+
     @JsonPath("chat_settings.discord_webhooks.discord_webhook_url")
     public static String CHAT_DISCORD_WEBHOOK_URL;
 
