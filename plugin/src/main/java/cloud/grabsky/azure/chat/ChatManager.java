@@ -51,11 +51,10 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.luckperms.api.cacheddata.CachedMetaData;
 import net.luckperms.api.model.user.UserManager;
-import org.bukkit.NamespacedKey;
-import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -67,10 +66,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import static cloud.grabsky.bedrock.helpers.Conditions.requirePresent;
 import static java.lang.System.currentTimeMillis;
@@ -84,7 +79,7 @@ public final class ChatManager implements Listener {
     private final Azure plugin;
 
     private final UserManager luckPermsUserManager;
-    private final Cache<UUID, MessageInfo> signatureCache;
+    private final Cache<UUID, SignedMessage.Signature> signatureCache;
     private final Map<UUID, Long> chatCooldowns;
     private final Map<UUID, UUID> lastRecipients;
 
@@ -98,8 +93,6 @@ public final class ChatManager implements Listener {
 
     public static List<FormatHolder> CHAT_FORMATS_REVERSED;
     public static List<TagsHolder> CHAT_TAGS_REVERSED;
-
-    private static final NamespacedKey KEY_CAN_CHAT_AGAIN = new NamespacedKey("azure", "can_chat_again");
 
     public ChatManager(final Azure plugin) {
         this.plugin = plugin;
@@ -116,15 +109,12 @@ public final class ChatManager implements Listener {
     /**
      * Requests deletion of a message associated with provided {@link UUID} (signatureUUID).
      */
-    public boolean deleteMessage(final @NotNull CommandSender operator, final @NotNull UUID signatureUUID) {
-        final @Nullable MessageInfo message = signatureCache.getIfPresent(signatureUUID);
+    public boolean deleteMessage(final @NotNull UUID signatureUUID) {
+        final @Nullable SignedMessage.Signature signature = signatureCache.getIfPresent(signatureUUID);
         // ...
-        if (message != null) {
-            // Deleting the message for whole server, console *should* be exluded.
-            plugin.getServer().deleteMessage(message.signature);
-            // Deleting from webhook.
-            if (PluginConfig.CHAT_DISCORD_WEBHOOK_ENABLED == true && message.discordMessageId != null)
-                webhook.get(message.discordMessageId).thenAccept(response -> webhook.edit(message.discordMessageId, "~~" + response.getContent() + "~~ (deleted by " + operator.getName() +  ")"));
+        if (signature != null) {
+            // Deleting the message for the whole server, console *should* be exluded.
+            plugin.getServer().deleteMessage(signature);
             // ...
             return true;
         }
@@ -189,7 +179,7 @@ public final class ChatManager implements Listener {
         final UUID signatureUUID = (event.signedMessage().signature() != null) ? UUID.randomUUID() : null;
         // Caching signatures...
         if (signatureUUID != null) {
-            signatureCache.put(signatureUUID, new MessageInfo(event.signedMessage().signature()));
+            signatureCache.put(signatureUUID, event.signedMessage().signature());
         }
         // Customizing renderer...
         event.renderer((source, sourceDisplayName, message, viewer) -> {
@@ -225,7 +215,7 @@ public final class ChatManager implements Listener {
                 // Adding "DELETE MESSAGE" button for allowed viewers
                 if (PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_ENABLED == true && receiver.hasPermission(CHAT_MODERATION_PERMISSION) == true && source.hasPermission(CHAT_MODERATION_PERMISSION) == false) {
                     final Component button = PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_BUTTON.getText()
-                            .clickEvent(callback(audience -> this.deleteMessage(event.getPlayer(), signatureUUID), Options.builder().uses(1).lifetime(Duration.ofMinutes(5)).build()))
+                            .clickEvent(callback(audience -> this.deleteMessage(signatureUUID), Options.builder().uses(1).lifetime(Duration.ofMinutes(5)).build()))
                             .hoverEvent(showText(PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_BUTTON.getHover()));
                     // ...
                     return (PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_BUTTON.getPosition() == Position.BEFORE)
@@ -237,6 +227,12 @@ public final class ChatManager implements Listener {
             // Anything else...
             return message;
         });
+
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onChatForward(final AsyncChatEvent event) {
+        final Player player = event.getPlayer();
         // Forwarding message to webhook...
         if (event.viewers().isEmpty() == false && PluginConfig.CHAT_DISCORD_WEBHOOK_ENABLED == true) {
             // Updating client in case URL has changed.
@@ -247,14 +243,12 @@ public final class ChatManager implements Listener {
             // Constructing and sending message.
             final WebhookMessage message = new WebhookMessageBuilder()
                     .setUsername(player.getName() + " (" + player.getUniqueId() + ")")
-                    .setAvatarUrl("https://minotar.net/bust/" + player.getUniqueId() + "/100.png")
+                    .setAvatarUrl("https://minotar.net/armor/bust/" + player.getUniqueId() + "/100.png")
                     .setContent(plainMessage)
                     .setAllowedMentions(AllowedMentions.none())
                     .build();
-            // Sending and adding message id to the cache.
-            webhook.send(message).thenAccept(response -> {
-                plugin.getBedrockScheduler().run(1L, (___) -> signatureCache.getIfPresent(signatureUUID).discordMessageId = response.getId());
-            });
+            // Sending the message.
+            webhook.send(message);
         }
     }
 
@@ -281,17 +275,6 @@ public final class ChatManager implements Listener {
                 .map(FormatHolder::getFormat)
                 .findFirst()
                 .orElse(def);
-    }
-
-    @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
-    private static final class MessageInfo {
-
-        @Getter(AccessLevel.PUBLIC)
-        private final @NotNull SignedMessage.Signature signature;
-
-        @Getter(AccessLevel.PUBLIC)
-        private @Nullable Long discordMessageId;
-
     }
 
 }
