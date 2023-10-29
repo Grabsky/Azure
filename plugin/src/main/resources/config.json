@@ -7,7 +7,7 @@
         "respawn_on_primary_world_spawn": true,
         // Determinates whether new players should spawn on spawnpoint of the primary world.
         "teleport_new_players_to_primary_world_spawn": true,
-        // Determines whether to use $.blocked_command_error_message as unknown command message.
+        // Determines whether to use $.command_filter.blocked_command_error_message as unknown command message.
         "use_blocked_command_error_message_for_unknown_command": false
     },
     "chat_settings": {
@@ -81,7 +81,7 @@
         "public_access_address": "",
         // Port to host web-server supplying resourcepack on.
         "port": 25578,
-        // Compressed resourcepack file inside "plugins/Azure/.public_web_contents/".
+        // Compressed resourcepack file inside "plugins/Azure/.public_resourcepack/".
         "pack_file": "resourcepack.zip",
         // Whether resource pack should be send when player joins the server.
         "send_on_join": false,
