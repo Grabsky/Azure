@@ -120,6 +120,9 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("chat_settings.discord_webhooks.two_way_chat_format")
     public static String CHAT_DISCORD_WEBHOOK_TWO_WAY_CHAT_FORMAT;
 
+    @JsonPath("chat_settings.discord_webhooks.two_way_console_format")
+    public static String CHAT_DISCORD_WEBHOOK_TWO_WAY_CONSOLE_FORMAT;
+
     // Punishment Settings
 
     @JsonPath("punishment_settings.default_reason")

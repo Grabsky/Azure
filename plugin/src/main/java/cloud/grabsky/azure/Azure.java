@@ -82,7 +82,12 @@ import net.luckperms.api.LuckPermsProvider;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.javacord.api.DiscordApi;
+import org.javacord.api.DiscordApiBuilder;
+import org.javacord.api.entity.activity.ActivityType;
+import org.javacord.api.entity.intent.Intent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -96,6 +101,7 @@ import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 
 import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
 
@@ -124,6 +130,9 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
 
     @Getter(AccessLevel.PUBLIC)
     private FileLogger punishmentsFileLogger;
+
+    @Getter(AccessLevel.PUBLIC)
+    private @Nullable DiscordApi discord;
 
     private ConfigurationMapper mapper;
 
@@ -206,8 +215,25 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
         this.getServer().getPluginManager().registerEvents(chatManager, this);
         this.getServer().getPluginManager().registerEvents(resourcePackManager, this);
         this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
+        // Initializing Discord API, logging-in to the bot.
+        if (PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_COMMUNICATION == true && PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_TOKEN != null) {
+            this.discord = new DiscordApiBuilder()
+                    .setToken(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_TOKEN)
+                    .addIntents(Intent.MESSAGE_CONTENT)
+                    .addListener(chatManager)
+                    .login().join();
+        }
         // Finalizing... (exposing instance to the API)
         AzureProvider.finalize(this);
+    }
+
+    @Override @SneakyThrows
+    public void onDisable() {
+        super.onDisable();
+        // Disconnecting the bot.
+        if (discord != null)
+            // Waiting for disconnect to complete before continuing.
+            discord.disconnect().get();
     }
 
     @Override

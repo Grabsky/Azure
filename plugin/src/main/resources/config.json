@@ -59,8 +59,10 @@
             "two_way_discord_bot_token": "",
             // Channel ID to forward the messages from.
             "two_way_discord_channel_id": "",
-            // Message format.
-            "two_way_chat_format": "(Discord) (<username>): <message>"
+            // Message format used to send message to players.
+            "two_way_chat_format": "(Discord) (<username>): <message>",
+            // Message format used to send message to the console.
+            "two_way_console_format": "(Discord) (<username>): <message>"
         }
     },
     "punishment_settings": {

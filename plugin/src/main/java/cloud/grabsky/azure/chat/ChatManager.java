@@ -54,10 +54,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
-import org.javacord.api.DiscordApi;
-import org.javacord.api.DiscordApiBuilder;
-import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
+import org.javacord.api.entity.message.mention.AllowedMentions;
+import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
 import org.jetbrains.annotations.NotNull;
@@ -89,9 +88,6 @@ public final class ChatManager implements Listener, MessageCreateListener {
     private final Map<UUID, Long> chatCooldowns;
     private final Map<UUID, UUID> lastRecipients;
 
-    // TO-DO: Perform logout on onDisable call.
-    private final DiscordApi discord;
-
     private static final MiniMessage EMPTY_MINIMESSAGE = MiniMessage.builder().tags(TagResolver.empty()).build();
     private static final PlainTextComponentSerializer PLAIN_SERIALIZER = PlainTextComponentSerializer.plainText();
 
@@ -109,12 +105,6 @@ public final class ChatManager implements Listener, MessageCreateListener {
                 .build();
         this.chatCooldowns = new HashMap<>();
         this.lastRecipients = new HashMap<>();
-        // ...
-        this.discord = new DiscordApiBuilder()
-                .addIntents(Intent.MESSAGE_CONTENT)
-                .setToken(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_TOKEN)
-                .addListener(this)
-                .login().join();
     }
 
     /**
@@ -258,23 +248,30 @@ public final class ChatManager implements Listener, MessageCreateListener {
                     .setDisplayName(username)
                     .setDisplayAvatar(new URL("https://minotar.net/armor/bust/" + player.getUniqueId() + "/100.png"))
                     .setContent(plainMessage)
-                    .sendSilently(discord, PluginConfig.CHAT_DISCORD_WEBHOOK_URL);
+                    .setAllowedMentions(new AllowedMentionsBuilder().setMentionUsers(true).build())
+                    .sendSilently(plugin.getDiscord(), PluginConfig.CHAT_DISCORD_WEBHOOK_URL);
         }
     }
 
-    // TO-DO: Different foromat for console.
-    // TO-DO: Support for more placeholders?
     @Override
     public void onMessageCreate(final @NotNull MessageCreateEvent event) {
         if (event.getChannel().getIdAsString().equals(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_CHANNEL_ID) == true && event.getMessageAuthor().isRegularUser() == true) {
             // Getting the message components.
             final String username = event.getMessageAuthor().getName();
+            final String displayname = event.getMessageAuthor().getDisplayName();
             final String message = event.getReadableMessageContent();
-            // Sending the message.
+            // Sending message to the console.
+            Message.of(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_CONSOLE_FORMAT)
+                    .placeholder("username", username)
+                    .placeholder("displayname", displayname)
+                    .placeholder("message", message)
+                    .send(Bukkit.getConsoleSender());
+            // Sending message to all players.
             Message.of(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_CHAT_FORMAT)
                     .placeholder("username", username)
+                    .placeholder("displayname", displayname)
                     .placeholder("message", message)
-                    .broadcast();
+                    .send(Bukkit.getServer().filterAudience(audience -> audience instanceof Player));
         }
     }
 
