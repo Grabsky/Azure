@@ -89,6 +89,7 @@ public final class ChatManager implements Listener, MessageCreateListener {
     private final Map<UUID, Long> chatCooldowns;
     private final Map<UUID, UUID> lastRecipients;
 
+    // TO-DO: Perform logout on onDisable call.
     private final DiscordApi discord;
 
     private static final MiniMessage EMPTY_MINIMESSAGE = MiniMessage.builder().tags(TagResolver.empty()).build();
@@ -257,7 +258,6 @@ public final class ChatManager implements Listener, MessageCreateListener {
                     .setDisplayName(username)
                     .setDisplayAvatar(new URL("https://minotar.net/armor/bust/" + player.getUniqueId() + "/100.png"))
                     .setContent(plainMessage)
-                    .setAllowedMentions(null)
                     .sendSilently(discord, PluginConfig.CHAT_DISCORD_WEBHOOK_URL);
         }
     }
@@ -266,7 +266,7 @@ public final class ChatManager implements Listener, MessageCreateListener {
     // TO-DO: Support for more placeholders?
     @Override
     public void onMessageCreate(final @NotNull MessageCreateEvent event) {
-        if (event.getChannel().getIdAsString().equals(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_CHANNEL_ID) == true) {
+        if (event.getChannel().getIdAsString().equals(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_CHANNEL_ID) == true && event.getMessageAuthor().isRegularUser() == true) {
             // Getting the message components.
             final String username = event.getMessageAuthor().getName();
             final String message = event.getReadableMessageContent();
