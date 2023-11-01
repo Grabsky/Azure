@@ -85,25 +85,6 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("chat_settings.chat_format.tags.extra")
     public static List<TagsHolder> CHAT_MESSAGE_TAGS_EXTRA;
 
-    // Command Filter
-
-    @JsonPath("command_filter.enabled")
-    public static boolean COMMAND_FILTER_ENABLED;
-
-    @JsonPath("command_filter.use_as_blacklist")
-    public static boolean COMMAND_FILTER_USE_AS_BLACKLIST;
-
-    @JsonPath("command_filter.block_filtered_commands")
-    public static boolean COMMAND_FILTER_BLOCK_FILTERED_COMMANDS;
-
-    @JsonPath("command_filter.blocked_command_error_message")
-    public static Component BLOCKED_COMMAND_ERROR_MESSAGE;
-
-    @JsonPath("command_filter.default")
-    public static List<String> COMMAND_FILTER_DEFAULT;
-
-    @JsonPath("command_filter.extra")
-    public static List<CommandsHolder> COMMAND_FILTER_EXTRA;
 
     // Chat Settings > Moderation > Message Deletion
 
@@ -127,8 +108,42 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("chat_settings.discord_webhooks.discord_webhook_url")
     public static String CHAT_DISCORD_WEBHOOK_URL;
 
+    @JsonPath("chat_settings.discord_webhooks.two_way_communication")
+    public static boolean CHAT_DISCORD_WEBHOOK_TWO_WAY_COMMUNICATION;
+
+    @JsonPath("chat_settings.discord_webhooks.two_way_discord_bot_token")
+    public static String CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_TOKEN;
+
+    @JsonPath("chat_settings.discord_webhooks.two_way_discord_channel_id")
+    public static String CHAT_DISCORD_WEBHOOK_TWO_WAY_CHANNEL_ID;
+
+    @JsonPath("chat_settings.discord_webhooks.two_way_chat_format")
+    public static String CHAT_DISCORD_WEBHOOK_TWO_WAY_CHAT_FORMAT;
+
+    // Punishment Settings
+
     @JsonPath("punishment_settings.default_reason")
     public static String PUNISHMENT_SETTINGS_DEFAULT_REASON;
+
+    // Command Filter
+
+    @JsonPath("command_filter.enabled")
+    public static boolean COMMAND_FILTER_ENABLED;
+
+    @JsonPath("command_filter.use_as_blacklist")
+    public static boolean COMMAND_FILTER_USE_AS_BLACKLIST;
+
+    @JsonPath("command_filter.block_filtered_commands")
+    public static boolean COMMAND_FILTER_BLOCK_FILTERED_COMMANDS;
+
+    @JsonPath("command_filter.blocked_command_error_message")
+    public static Component BLOCKED_COMMAND_ERROR_MESSAGE;
+
+    @JsonPath("command_filter.default")
+    public static List<String> COMMAND_FILTER_DEFAULT;
+
+    @JsonPath("command_filter.extra")
+    public static List<CommandsHolder> COMMAND_FILTER_EXTRA;
 
     // Resource Pack
 

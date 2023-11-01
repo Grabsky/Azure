@@ -52,7 +52,15 @@
             // Username to be displayed in a webhook. Supports <player> and <uuid> placeholders.
             "discord_webhook_username": "<player>",
             // Discord webhook URL. Keep it secure.
-            "discord_webhook_url": ""
+            "discord_webhook_url": "",
+            // Whether messages sent on the specific channel should be forwarded to the in-game chat.
+            "two_way_communication": true,
+            // Required only when two-way communication is enabled.
+            "two_way_discord_bot_token": "",
+            // Channel ID to forward the messages from.
+            "two_way_discord_channel_id": "",
+            // Message format.
+            "two_way_chat_format": "(Discord) (<username>): <message>"
         }
     },
     "punishment_settings": {

@@ -34,10 +34,6 @@ import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.bedrock.util.Interval;
 import cloud.grabsky.bedrock.util.Interval.Unit;
-import club.minnced.discord.webhook.WebhookClient;
-import club.minnced.discord.webhook.send.AllowedMentions;
-import club.minnced.discord.webhook.send.WebhookMessage;
-import club.minnced.discord.webhook.send.WebhookMessageBuilder;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import io.papermc.paper.event.player.AsyncChatDecorateEvent;
@@ -51,21 +47,31 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.luckperms.api.cacheddata.CachedMetaData;
 import net.luckperms.api.model.user.UserManager;
+import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import org.javacord.api.DiscordApi;
+import org.javacord.api.DiscordApiBuilder;
+import org.javacord.api.entity.intent.Intent;
+import org.javacord.api.entity.message.WebhookMessageBuilder;
+import org.javacord.api.event.message.MessageCreateEvent;
+import org.javacord.api.listener.message.MessageCreateListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.net.URL;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+
+import lombok.SneakyThrows;
 
 import static cloud.grabsky.bedrock.helpers.Conditions.requirePresent;
 import static java.lang.System.currentTimeMillis;
@@ -74,7 +80,7 @@ import static net.kyori.adventure.text.event.ClickEvent.callback;
 import static net.kyori.adventure.text.event.HoverEvent.showText;
 import static net.kyori.adventure.text.format.NamedTextColor.WHITE;
 
-public final class ChatManager implements Listener {
+public final class ChatManager implements Listener, MessageCreateListener {
 
     private final Azure plugin;
 
@@ -83,7 +89,7 @@ public final class ChatManager implements Listener {
     private final Map<UUID, Long> chatCooldowns;
     private final Map<UUID, UUID> lastRecipients;
 
-    private WebhookClient webhook;
+    private final DiscordApi discord;
 
     private static final MiniMessage EMPTY_MINIMESSAGE = MiniMessage.builder().tags(TagResolver.empty()).build();
     private static final PlainTextComponentSerializer PLAIN_SERIALIZER = PlainTextComponentSerializer.plainText();
@@ -103,7 +109,11 @@ public final class ChatManager implements Listener {
         this.chatCooldowns = new HashMap<>();
         this.lastRecipients = new HashMap<>();
         // ...
-        this.webhook = WebhookClient.withUrl(PluginConfig.CHAT_DISCORD_WEBHOOK_URL);
+        this.discord = new DiscordApiBuilder()
+                .addIntents(Intent.MESSAGE_CONTENT)
+                .setToken(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_TOKEN)
+                .addListener(this)
+                .login().join();
     }
 
     /**
@@ -230,14 +240,12 @@ public final class ChatManager implements Listener {
 
     }
 
+    @SneakyThrows
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onChatForward(final AsyncChatEvent event) {
         final Player player = event.getPlayer();
         // Forwarding message to webhook...
-        if (event.viewers().isEmpty() == false && PluginConfig.CHAT_DISCORD_WEBHOOK_ENABLED == true) {
-            // Updating client in case URL has changed.
-            if (webhook.getUrl().equals(PluginConfig.CHAT_DISCORD_WEBHOOK_URL) == false)
-                this.webhook = WebhookClient.withUrl(PluginConfig.CHAT_DISCORD_WEBHOOK_URL);
+        if (event.viewers().isEmpty() == false && PluginConfig.CHAT_DISCORD_WEBHOOK_ENABLED == true && PluginConfig.CHAT_DISCORD_WEBHOOK_URL != null) {
             // Serializing Component to plain String.
             final String plainMessage = PlainTextComponentSerializer.plainText().serialize(event.message());
             // Getting username and replacing placeholders.
@@ -245,14 +253,28 @@ public final class ChatManager implements Listener {
                     .replace("<player>", player.getName())
                     .replace("<uuid>", player.getUniqueId().toString());
             // Constructing and sending message.
-            final WebhookMessage message = new WebhookMessageBuilder()
-                    .setUsername(username)
-                    .setAvatarUrl("https://minotar.net/armor/bust/" + player.getUniqueId() + "/100.png")
+            new WebhookMessageBuilder()
+                    .setDisplayName(username)
+                    .setDisplayAvatar(new URL("https://minotar.net/armor/bust/" + player.getUniqueId() + "/100.png"))
                     .setContent(plainMessage)
-                    .setAllowedMentions(AllowedMentions.none())
-                    .build();
+                    .setAllowedMentions(null)
+                    .sendSilently(discord, PluginConfig.CHAT_DISCORD_WEBHOOK_URL);
+        }
+    }
+
+    // TO-DO: Different foromat for console.
+    // TO-DO: Support for more placeholders?
+    @Override
+    public void onMessageCreate(final @NotNull MessageCreateEvent event) {
+        if (event.getChannel().getIdAsString().equals(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_CHANNEL_ID) == true) {
+            // Getting the message components.
+            final String username = event.getMessageAuthor().getName();
+            final String message = event.getReadableMessageContent();
             // Sending the message.
-            webhook.send(message);
+            Message.of(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_CHAT_FORMAT)
+                    .placeholder("username", username)
+                    .placeholder("message", message)
+                    .broadcast();
         }
     }
 
