@@ -54,7 +54,7 @@
             // Discord webhook URL. Keep it secure.
             "discord_webhook_url": "",
             // Whether messages sent on the specific channel should be forwarded to the in-game chat.
-            "two_way_communication": true,
+            "two_way_communication": false,
             // Required only when two-way communication is enabled.
             "two_way_discord_bot_token": "",
             // Channel ID to forward the messages from.
