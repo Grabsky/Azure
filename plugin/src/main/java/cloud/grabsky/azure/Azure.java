@@ -84,7 +84,6 @@ import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
-import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.intent.Intent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -101,7 +100,6 @@ import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 
 import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
 
@@ -216,24 +214,32 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
         this.getServer().getPluginManager().registerEvents(resourcePackManager, this);
         this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         // Initializing Discord API, logging-in to the bot.
-        if (PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_COMMUNICATION == true && PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_TOKEN != null) {
-            this.discord = new DiscordApiBuilder()
-                    .setToken(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_TOKEN)
-                    .addIntents(Intent.MESSAGE_CONTENT)
-                    .addListener(chatManager)
-                    .login().join();
+        if (PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_COMMUNICATION == true) {
+            // Logging error message when token is unspecified or empty.
+            if (PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_TOKEN == null || PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_TOKEN.isEmpty() == true)
+                this.getLogger().severe("Cannot establish connection with Discord API because specified token is incorrect.");
+            // Trying to connect to Discord API. Failure should not stop the server but instead log error to the console.
+            try {
+                this.discord = new DiscordApiBuilder()
+                        .setToken(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_TOKEN)
+                        .addIntents(Intent.MESSAGE_CONTENT)
+                        .addListener(chatManager)
+                        .login().join();
+            } catch (final RuntimeException e) {
+                this.getLogger().severe("Could not establish connection with Discord API.");
+                this.getLogger().severe("  " + e.getMessage());
+            }
         }
         // Finalizing... (exposing instance to the API)
         AzureProvider.finalize(this);
     }
 
-    @Override @SneakyThrows
+    @Override
     public void onDisable() {
         super.onDisable();
-        // Disconnecting the bot.
+        // Disconnecting from Discord API. Expected to be a blocking call.
         if (discord != null)
-            // Waiting for disconnect to complete before continuing.
-            discord.disconnect().get();
+            discord.disconnect().join();
     }
 
     @Override
