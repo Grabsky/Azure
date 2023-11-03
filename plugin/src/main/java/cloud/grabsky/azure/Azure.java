@@ -222,7 +222,10 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
             try {
                 this.discord = new DiscordApiBuilder()
                         .setToken(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_TOKEN)
-                        .addIntents(Intent.MESSAGE_CONTENT)
+                        .addIntents(Intent.MESSAGE_CONTENT, Intent.GUILD_MEMBERS)
+                        // For mentions to display properly.
+                        .setUserCacheEnabled(true)
+                        .setWaitForUsersOnStartup(true)
                         .addListener(chatManager)
                         .login().join();
             } catch (final RuntimeException e) {

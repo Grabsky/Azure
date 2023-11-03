@@ -55,7 +55,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
-import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
@@ -259,7 +258,7 @@ public final class ChatManager implements Listener, MessageCreateListener {
             // Getting the message components.
             final String username = event.getMessageAuthor().getName();
             final String displayname = event.getMessageAuthor().getDisplayName();
-            final String message = event.getReadableMessageContent();
+            final String message = event.getMessage().getReadableContent();
             // Sending message to the console.
             Message.of(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_CONSOLE_FORMAT)
                     .placeholder("username", username)
