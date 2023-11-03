@@ -34,6 +34,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.javacord.api.entity.activity.ActivityType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -113,6 +114,9 @@ public final class PluginConfig implements JsonConfiguration {
 
     @JsonPath("chat_settings.discord_webhooks.two_way_discord_bot_token")
     public static String CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_TOKEN;
+
+    @JsonPath("chat_settings.discord_webhooks.two_way_discord_bot_activity")
+    public static ActivityWrapper CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY;
 
     @JsonPath("chat_settings.discord_webhooks.two_way_discord_channel_id")
     public static String CHAT_DISCORD_WEBHOOK_TWO_WAY_CHANNEL_ID;
@@ -250,6 +254,18 @@ public final class PluginConfig implements JsonConfiguration {
 
         @Getter(AccessLevel.PUBLIC)
         private final Component hover;
+
+    }
+
+    // Moshi should be able to create instance of the object despite the constructor being private.
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class ActivityWrapper {
+
+        @Getter(AccessLevel.PUBLIC)
+        private final ActivityType type;
+
+        @Getter(AccessLevel.PUBLIC)
+        private final String state;
 
     }
 

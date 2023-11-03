@@ -57,6 +57,8 @@
             "two_way_communication": false,
             // Required only when two-way communication is enabled.
             "two_way_discord_bot_token": "",
+            // Activity to be displayed.
+            "two_way_discord_bot_activity": { "type": "LISTENING", "state": "server chat..." },
             // Channel ID to forward the messages from.
             "two_way_discord_channel_id": "",
             // Message format used to send message to players.

@@ -228,6 +228,9 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
                         .setWaitForUsersOnStartup(true)
                         .addListener(chatManager)
                         .login().join();
+                // Setting configured activity if specified.
+                if (PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getState().isEmpty() == false)
+                    discord.updateActivity(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getType(), PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getState());
             } catch (final RuntimeException e) {
                 this.getLogger().severe("Could not establish connection with Discord API.");
                 this.getLogger().severe("  " + e.getMessage());
@@ -259,6 +262,13 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
             );
             // Reloading ResourcePackManager.
             resourcePackManager.reload();
+            // Reloading discord bot custom activity.
+            if (discord != null)
+                if (PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getState().isEmpty() == false)
+                    // Setting configured activity.
+                    discord.updateActivity(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getType(), PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getState());
+                // Unsetting in case specified as empty.
+                else discord.unsetActivity();
             // Returning 'true' as reload finished without any exceptions.
             return true;
         } catch (final IllegalStateException | ConfigurationMappingException | IOException e) {
