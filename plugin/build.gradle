@@ -6,6 +6,10 @@ plugins {
 final buildsDirectory = (System.getenv("JVM_BUILDS") ?: null)
 final pluginsDirectory = (System.getenv("PLUGINS_DIR") ?: null)
 
+repositories {
+    maven { url = "https://repo.extendedclip.com/content/repositories/placeholderapi/" }
+}
+
 dependencies {
     api(project ":azure-api")
     // Libraries
@@ -21,6 +25,7 @@ dependencies {
     }
     // Plugin dependencies
     compileOnly("net.luckperms:api:5.4")
+    compileOnly("me.clip:placeholderapi:2.11.5")
 }
 
 tasks {
@@ -52,7 +57,8 @@ paper {
     apiVersion = "1.20"
     generateLibrariesJson = true
     serverDependencies {
-        "LuckPerms" { load = "BEFORE"; required = true }
+        "LuckPerms"      { load = "BEFORE"; required = true }
+        "PlaceholderAPI" { load = "BEFORE"; required = true }
     }
 }
 

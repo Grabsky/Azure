@@ -28,6 +28,7 @@ import cloud.grabsky.azure.chat.ChatManager;
 import cloud.grabsky.configuration.JsonConfiguration;
 import cloud.grabsky.configuration.JsonNullable;
 import cloud.grabsky.configuration.JsonPath;
+import com.squareup.moshi.Json;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
@@ -260,6 +261,10 @@ public final class PluginConfig implements JsonConfiguration {
     // Moshi should be able to create instance of the object despite the constructor being private.
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class ActivityWrapper {
+
+        @Json(name = "refresh_rate")
+        @Getter(AccessLevel.PUBLIC)
+        private final int refreshRate;
 
         @Getter(AccessLevel.PUBLIC)
         private final ActivityType type;
