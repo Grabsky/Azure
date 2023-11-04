@@ -235,15 +235,14 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
                 // Setting configured activity if specified.
                 if (PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getState().isEmpty() == false)
                     if (PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getRefreshRate() > 0)
-                        this.activityRefreshTask = this.getBedrockScheduler().repeat(
-                                PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getRefreshRate() * 20L,
-                                PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getRefreshRate() * 20L,
-                                Long.MAX_VALUE,
-                                (___) -> {
-                                    final String parsed = PlaceholderAPI.setPlaceholders(null, PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getState());
-                                    discord.updateActivity(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getType(), parsed);
-                                    return true;
-                                });
+                        this.activityRefreshTask = this.getBedrockScheduler().repeat(0L, PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getRefreshRate() * 20L, Long.MAX_VALUE, (___) -> {
+                            // Parsing string with PlaceholderAPI.
+                            final String parsed = PlaceholderAPI.setPlaceholders(null, PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getState());
+                            // Updating the activity.
+                            discord.updateActivity(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getType(), parsed);
+                            // Continuing with the task.
+                            return true;
+                        });
                     else discord.updateActivity(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getType(), PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getState());
 
             } catch (final RuntimeException e) {
@@ -285,15 +284,14 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
                 // Setting configured activity if specified.
                 if (PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getState().isEmpty() == false)
                     if (PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getRefreshRate() > 0)
-                        this.activityRefreshTask = this.getBedrockScheduler().repeat(
-                                PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getRefreshRate() * 20L,
-                                PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getRefreshRate() * 20L,
-                                Long.MAX_VALUE,
-                                (___) -> {
-                                    final String parsed = PlaceholderAPI.setPlaceholders(null, PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getState());
-                                    discord.updateActivity(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getType(), parsed);
-                                    return true;
-                                });
+                        this.activityRefreshTask = this.getBedrockScheduler().repeat(0L, PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getRefreshRate() * 20L, Long.MAX_VALUE, (___) -> {
+                            // Parsing string with PlaceholderAPI.
+                            final String parsed = PlaceholderAPI.setPlaceholders(null, PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getState());
+                            // Updating the activity.
+                            discord.updateActivity(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getType(), parsed);
+                            // Continuing with the task.
+                            return true;
+                        });
                     // Setting configured activity.
                     else discord.updateActivity(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getType(), PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getState());
                 // Unsetting in case specified as empty.
