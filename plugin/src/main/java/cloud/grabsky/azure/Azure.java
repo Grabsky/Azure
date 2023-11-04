@@ -80,6 +80,10 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.scheduler.BukkitTask;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.graph.Dependency;
@@ -105,7 +109,7 @@ import lombok.RequiredArgsConstructor;
 
 import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
 
-public final class Azure extends BedrockPlugin implements AzureAPI {
+public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
 
     @Getter(AccessLevel.PUBLIC)
     private static Azure instance;
@@ -214,6 +218,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
                 // Registering debug commands...
                 .registerCommand(DebugCommand.class);
         // Registering events...
+        this.getServer().getPluginManager().registerEvents(this, this);
         this.getServer().getPluginManager().registerEvents(chatManager, this);
         this.getServer().getPluginManager().registerEvents(resourcePackManager, this);
         this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
@@ -232,19 +237,6 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
                         .setWaitForUsersOnStartup(true)
                         .addListener(chatManager)
                         .login().join();
-                // Setting configured activity if specified.
-                if (PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getState().isEmpty() == false)
-                    if (PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getRefreshRate() > 0)
-                        this.activityRefreshTask = this.getBedrockScheduler().repeat(0L, PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getRefreshRate() * 20L, Long.MAX_VALUE, (___) -> {
-                            // Parsing string with PlaceholderAPI.
-                            final String parsed = PlaceholderAPI.setPlaceholders(null, PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getState());
-                            // Updating the activity.
-                            discord.updateActivity(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getType(), parsed);
-                            // Continuing with the task.
-                            return true;
-                        });
-                    else discord.updateActivity(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getType(), PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getState());
-
             } catch (final RuntimeException e) {
                 this.getLogger().severe("Could not establish connection with Discord API.");
                 this.getLogger().severe("  " + e.getMessage());
@@ -278,7 +270,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
             resourcePackManager.reload();
             // Reloading discord bot custom activity.
             if (discord != null) {
-                // Cancelling current task.
+                // Cancelling the current task.
                 if (activityRefreshTask != null && activityRefreshTask.isCancelled() == false)
                     activityRefreshTask.cancel();
                 // Setting configured activity if specified.
@@ -303,6 +295,31 @@ public final class Azure extends BedrockPlugin implements AzureAPI {
             this.getLogger().severe("An error occured while trying to reload plugin.");
             this.getLogger().severe("  " + e.getMessage());
             return false;
+        }
+    }
+
+    // Waiting for server to be fully enabled before updating discord activity. PlaceholderAPI extensions should be enabled by now.
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onServerLoad(final ServerLoadEvent event) {
+        // Setting configured activity if specified.
+        if (discord != null) {
+            // Cancelling the current task.
+            if (activityRefreshTask != null && activityRefreshTask.isCancelled() == false)
+                activityRefreshTask.cancel();
+            // Setting configured activity if specified.
+            if (PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getState().isEmpty() == false)
+                if (PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getRefreshRate() > 0)
+                    this.activityRefreshTask = this.getBedrockScheduler().repeat(100L, PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getRefreshRate() * 20L, Long.MAX_VALUE, (___) -> {
+                        // Parsing string with PlaceholderAPI.
+                        final String parsed = PlaceholderAPI.setPlaceholders(null, PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getState());
+                        // Updating the activity.
+                        discord.updateActivity(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getType(), parsed);
+                        // Continuing with the task.
+                        return true;
+                    });
+                    // Setting configured activity.
+                else
+                    discord.updateActivity(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getType(), PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getState());
         }
     }
 
