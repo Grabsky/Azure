@@ -82,7 +82,7 @@ public final class PlayerListener implements Listener {
             return;
         // Forwarding message to webhook...
         if (plugin.getUserCache().getUser(event.getPlayer()).isVanished() == false) {
-            // Serializing Component to plain String.
+            // Setting message placeholders.
             final String message = PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_JOIN_MESSAGE_FORMAT);
             // Creating new instance of WebhookMessageBuilder.
             final WebhookMessageBuilder builder = new WebhookMessageBuilder().setContent(message);
@@ -106,7 +106,7 @@ public final class PlayerListener implements Listener {
             return;
         // Forwarding message to webhook...
         if (plugin.getUserCache().getUser(event.getPlayer()).isVanished() == false) {
-            // Serializing Component to plain String.
+            // Setting message placeholders.
             final String message = PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_QUIT_MESSAGE_FORMAT);
             // Creating new instance of WebhookMessageBuilder.
             final WebhookMessageBuilder builder = new WebhookMessageBuilder().setContent(message);

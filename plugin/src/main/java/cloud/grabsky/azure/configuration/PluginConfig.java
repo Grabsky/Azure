@@ -211,6 +211,27 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("discord_integrations.join_and_quit_forwarding.quit_message_format")
     public static String DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_QUIT_MESSAGE_FORMAT;
 
+    // Discord Integrations > Start and Stop Forwarding
+
+    @JsonPath("discord_integrations.start_and_stop_forwarding.enabled")
+    public static boolean DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_ENABLED;
+
+    @JsonPath("discord_integrations.start_and_stop_forwarding.webhook_url")
+    public static String DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_URL;
+
+    @JsonPath("discord_integrations.start_and_stop_forwarding.webhook_username")
+    public static String DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_USERNAME;
+
+    @JsonPath("discord_integrations.start_and_stop_forwarding.webhook_avatar")
+    public static String DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_AVATAR;
+
+    @JsonPath("discord_integrations.start_and_stop_forwarding.start_message_format")
+    public static String DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_START_MESSAGE_FORMAT;
+
+    @JsonPath("discord_integrations.start_and_stop_forwarding.stop_message_format")
+    public static String DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_STOP_MESSAGE_FORMAT;
+
+
     // Discord Integrations > Punishment Logging
 
     @JsonPath("discord_integrations.punishment_logging.enabled")

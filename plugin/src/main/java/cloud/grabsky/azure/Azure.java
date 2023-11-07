@@ -91,6 +91,7 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.intent.Intent;
+import org.javacord.api.entity.message.WebhookMessageBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -98,6 +99,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -106,6 +108,7 @@ import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 
 import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
 
@@ -246,12 +249,29 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
         AzureProvider.finalize(this);
     }
 
-    @Override
+    @SneakyThrows @Override
     public void onDisable() {
         super.onDisable();
-        // Disconnecting from Discord API. Expected to be a blocking call.
-        if (discord != null)
+        // ...
+        if (discord != null) {
+            // Forwarding message to webhook...
+            if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_URL.isEmpty() == false) {
+                // Setting message placeholders.
+                final String message = PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_STOP_MESSAGE_FORMAT);
+                // Creating new instance of WebhookMessageBuilder.
+                final WebhookMessageBuilder builder = new WebhookMessageBuilder().setContent(message);
+                // Setting username if specified.
+                if (PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_USERNAME.isEmpty() == false)
+                    builder.setDisplayName(PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_USERNAME));
+                // Setting avatar if specified.
+                if (PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
+                    builder.setDisplayAvatar(new URL(PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_AVATAR)));
+                // Sending the message. Expected to be a blocking call.
+                builder.send(discord, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_URL).join();
+            }
+            // Disconnecting from Discord API. Expected to be a blocking call.
             discord.disconnect().join();
+        }
     }
 
     @Override
@@ -300,10 +320,25 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
     }
 
     // Waiting for server to be fully enabled before updating discord activity. PlaceholderAPI extensions should be enabled by now.
-    @EventHandler(priority = EventPriority.MONITOR)
+    @SneakyThrows @EventHandler(priority = EventPriority.MONITOR)
     public void onServerLoad(final ServerLoadEvent event) {
         // Setting configured activity if specified.
         if (discord != null) {
+            // Forwarding message to webhook...
+            if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_URL.isEmpty() == false) {
+                // Setting message placeholders.
+                final String message = PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_START_MESSAGE_FORMAT);
+                // Creating new instance of WebhookMessageBuilder.
+                final WebhookMessageBuilder builder = new WebhookMessageBuilder().setContent(message);
+                // Setting username if specified.
+                if (PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_USERNAME.isEmpty() == false)
+                    builder.setDisplayName(PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_USERNAME));
+                // Setting avatar if specified.
+                if (PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
+                    builder.setDisplayAvatar(new URL(PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_AVATAR)));
+                // Sending the message. Expected to be a blocking call.
+                builder.send(discord, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_URL).join();
+            }
             // Cancelling the current task.
             if (activityRefreshTask != null && activityRefreshTask.isCancelled() == false)
                 activityRefreshTask.cancel();
