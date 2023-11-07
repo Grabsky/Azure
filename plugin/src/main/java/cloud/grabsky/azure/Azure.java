@@ -91,6 +91,7 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.intent.Intent;
+import org.javacord.api.entity.message.WebhookMessageBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -98,6 +99,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -106,6 +108,7 @@ import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 
 import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
 
@@ -223,14 +226,14 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
         this.getServer().getPluginManager().registerEvents(resourcePackManager, this);
         this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         // Initializing Discord API, logging-in to the bot.
-        if (PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_COMMUNICATION == true) {
+        if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true) {
             // Logging error message when token is unspecified or empty.
-            if (PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_TOKEN == null || PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_TOKEN.isEmpty() == true)
+            if (PluginConfig.DISCORD_INTEGRATIONS_DISCORD_BOT_TOKEN == null || PluginConfig.DISCORD_INTEGRATIONS_DISCORD_BOT_TOKEN.isEmpty() == true)
                 this.getLogger().severe("Cannot establish connection with Discord API because specified token is incorrect.");
             // Trying to connect to Discord API. Failure should not stop the server but instead log error to the console.
             try {
                 this.discord = new DiscordApiBuilder()
-                        .setToken(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_TOKEN)
+                        .setToken(PluginConfig.DISCORD_INTEGRATIONS_DISCORD_BOT_TOKEN)
                         .addIntents(Intent.MESSAGE_CONTENT, Intent.GUILD_MEMBERS)
                         // For mentions to display properly.
                         .setUserCacheEnabled(true)
@@ -246,12 +249,29 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
         AzureProvider.finalize(this);
     }
 
-    @Override
+    @SneakyThrows @Override
     public void onDisable() {
         super.onDisable();
-        // Disconnecting from Discord API. Expected to be a blocking call.
-        if (discord != null)
+        // ...
+        if (discord != null) {
+            // Forwarding message to webhook...
+            if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_URL.isEmpty() == false) {
+                // Setting message placeholders.
+                final String message = PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_STOP_MESSAGE_FORMAT);
+                // Creating new instance of WebhookMessageBuilder.
+                final WebhookMessageBuilder builder = new WebhookMessageBuilder().setContent(message);
+                // Setting username if specified.
+                if (PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_USERNAME.isEmpty() == false)
+                    builder.setDisplayName(PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_USERNAME));
+                // Setting avatar if specified.
+                if (PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
+                    builder.setDisplayAvatar(new URL(PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_AVATAR)));
+                // Sending the message. Expected to be a blocking call.
+                builder.send(discord, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_URL).join();
+            }
+            // Disconnecting from Discord API. Expected to be a blocking call.
             discord.disconnect().join();
+        }
     }
 
     @Override
@@ -274,19 +294,19 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                 if (activityRefreshTask != null && activityRefreshTask.isCancelled() == false)
                     activityRefreshTask.cancel();
                 // Setting configured activity if specified.
-                if (PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getState().isEmpty() == false)
+                if (PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getState().isEmpty() == false)
                     // Scheduling a refreshing task if desired.
-                    if (PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getRefreshRate() > 0)
-                        this.activityRefreshTask = this.getBedrockScheduler().repeat(0L, PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getRefreshRate() * 20L, Long.MAX_VALUE, (___) -> {
+                    if (PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getRefreshRate() > 0)
+                        this.activityRefreshTask = this.getBedrockScheduler().repeat(0L, PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getRefreshRate() * 20L, Long.MAX_VALUE, (___) -> {
                             // Parsing string with PlaceholderAPI.
-                            final String parsed = PlaceholderAPI.setPlaceholders(null, PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getState());
+                            final String parsed = PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getState());
                             // Updating the activity.
-                            discord.updateActivity(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getType(), parsed);
+                            discord.updateActivity(PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getType(), parsed);
                             // Continuing with the task.
                             return true;
                         });
                         // Otherwise, just setting the activity.
-                    else discord.updateActivity(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getType(), PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getState());
+                    else discord.updateActivity(PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getType(), PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getState());
                 // Otherwise, unsetting the activity.
                 else discord.unsetActivity();
             }
@@ -300,27 +320,42 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
     }
 
     // Waiting for server to be fully enabled before updating discord activity. PlaceholderAPI extensions should be enabled by now.
-    @EventHandler(priority = EventPriority.MONITOR)
+    @SneakyThrows @EventHandler(priority = EventPriority.MONITOR)
     public void onServerLoad(final ServerLoadEvent event) {
         // Setting configured activity if specified.
         if (discord != null) {
+            // Forwarding message to webhook...
+            if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_URL.isEmpty() == false) {
+                // Setting message placeholders.
+                final String message = PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_START_MESSAGE_FORMAT);
+                // Creating new instance of WebhookMessageBuilder.
+                final WebhookMessageBuilder builder = new WebhookMessageBuilder().setContent(message);
+                // Setting username if specified.
+                if (PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_USERNAME.isEmpty() == false)
+                    builder.setDisplayName(PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_USERNAME));
+                // Setting avatar if specified.
+                if (PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
+                    builder.setDisplayAvatar(new URL(PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_AVATAR)));
+                // Sending the message. Expected to be a blocking call.
+                builder.send(discord, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_URL).join();
+            }
             // Cancelling the current task.
             if (activityRefreshTask != null && activityRefreshTask.isCancelled() == false)
                 activityRefreshTask.cancel();
             // Setting configured activity if specified.
-            if (PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getState().isEmpty() == false)
+            if (PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getState().isEmpty() == false)
                 // Scheduling a refreshing task if desired.
-                if (PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getRefreshRate() > 0)
-                    this.activityRefreshTask = this.getBedrockScheduler().repeat(100L, PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getRefreshRate() * 20L, Long.MAX_VALUE, (___) -> {
+                if (PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getRefreshRate() > 0)
+                    this.activityRefreshTask = this.getBedrockScheduler().repeat(100L, PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getRefreshRate() * 20L, Long.MAX_VALUE, (___) -> {
                         // Parsing string with PlaceholderAPI.
-                        final String parsed = PlaceholderAPI.setPlaceholders(null, PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getState());
+                        final String parsed = PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getState());
                         // Updating the activity.
-                        discord.updateActivity(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getType(), parsed);
+                        discord.updateActivity(PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getType(), parsed);
                         // Continuing with the task.
                         return true;
                     });
                 // Otherwise, just setting the activity.
-                else discord.updateActivity(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getType(), PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY.getState());
+                else discord.updateActivity(PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getType(), PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getState());
         }
     }
 

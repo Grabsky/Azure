@@ -38,6 +38,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import io.papermc.paper.event.player.AsyncChatDecorateEvent;
 import io.papermc.paper.event.player.AsyncChatEvent;
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.chat.SignedMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickCallback.Options;
@@ -48,6 +49,7 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.luckperms.api.cacheddata.CachedMetaData;
 import net.luckperms.api.model.user.UserManager;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -55,6 +57,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
+import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
@@ -95,6 +98,13 @@ public final class ChatManager implements Listener, MessageCreateListener {
 
     public static List<FormatHolder> CHAT_FORMATS_REVERSED;
     public static List<TagsHolder> CHAT_TAGS_REVERSED;
+
+    private static final AllowedMentions NO_MENTIONS = new AllowedMentionsBuilder()
+            .setMentionEveryoneAndHere(false)
+            .setMentionRepliedUser(false)
+            .setMentionUsers(false)
+            .setMentionRoles(false)
+            .build();
 
     public ChatManager(final Azure plugin) {
         this.plugin = plugin;
@@ -230,43 +240,47 @@ public final class ChatManager implements Listener, MessageCreateListener {
 
     }
 
-    @SneakyThrows
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @SneakyThrows @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onChatForward(final AsyncChatEvent event) {
-        final Player player = event.getPlayer();
+        // Skipping in case discord integrations are not enabled or misconfigured.
+        if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_URL.isEmpty() == true)
+            return;
         // Forwarding message to webhook...
-        if (event.viewers().isEmpty() == false && PluginConfig.CHAT_DISCORD_WEBHOOK_ENABLED == true && PluginConfig.CHAT_DISCORD_WEBHOOK_URL != null) {
+        if (event.viewers().isEmpty() == false) {
             // Serializing Component to plain String.
             final String plainMessage = PlainTextComponentSerializer.plainText().serialize(event.message());
-            // Getting username and replacing placeholders.
-            final String username = PluginConfig.CHAT_DISCORD_WEBHOOK_USERNAME
-                    .replace("<player>", player.getName())
-                    .replace("<uuid>", player.getUniqueId().toString());
-            // Constructing and sending message.
-            new WebhookMessageBuilder()
-                    .setDisplayName(username)
-                    .setDisplayAvatar(new URL("https://minotar.net/armor/bust/" + player.getUniqueId() + "/100.png"))
-                    .setContent(plainMessage)
-                    .setAllowedMentions(new AllowedMentionsBuilder().setMentionUsers(true).build())
-                    .sendSilently(plugin.getDiscord(), PluginConfig.CHAT_DISCORD_WEBHOOK_URL);
+            // Creating new instance of WebhookMessageBuilder.
+            final WebhookMessageBuilder builder = new WebhookMessageBuilder().setAllowedMentions(NO_MENTIONS).setContent(plainMessage);
+            // Setting username if specified.
+            if (PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_USERNAME.isEmpty() == false)
+                builder.setDisplayName(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_USERNAME));
+            // Setting avatar if specified.
+            if (PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
+                builder.setDisplayAvatar(new URL(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_AVATAR)));
+            // Sending the message.
+            builder.sendSilently(plugin.getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_URL);
         }
     }
 
-    @Override
+    @Override @SuppressWarnings("deprecation") // Suppressing @Deprecated method(s) as adventure seems to not provide an alternative for that.
     public void onMessageCreate(final @NotNull MessageCreateEvent event) {
-        if (event.getChannel().getIdAsString().equals(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_CHANNEL_ID) == true && event.getMessageAuthor().isRegularUser() == true) {
+        // Skipping in case chat returning is not enabled.
+        if (PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_ENABLED == false)
+            return;
+        // Skipping irrelevant channels and bot replies.
+        if (event.getChannel().getIdAsString().equals(PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_CHANNEL_ID) == true && event.getMessageAuthor().isRegularUser() == true) {
             // Getting the message components.
             final String username = event.getMessageAuthor().getName();
             final String displayname = event.getMessageAuthor().getDisplayName();
-            final String message = event.getMessage().getReadableContent();
+            final String message = ChatColor.stripColor(event.getMessage().getReadableContent());
             // Sending message to the console.
-            Message.of(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_CONSOLE_FORMAT)
+            Message.of(PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_CONSOLE_FORMAT)
                     .placeholder("username", username)
                     .placeholder("displayname", displayname)
                     .placeholder("message", message)
                     .send(Bukkit.getConsoleSender());
             // Sending message to all players.
-            Message.of(PluginConfig.CHAT_DISCORD_WEBHOOK_TWO_WAY_CHAT_FORMAT)
+            Message.of(PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_CHAT_FORMAT)
                     .placeholder("username", username)
                     .placeholder("displayname", displayname)
                     .placeholder("message", message)
