@@ -38,6 +38,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import io.papermc.paper.event.player.AsyncChatDecorateEvent;
 import io.papermc.paper.event.player.AsyncChatEvent;
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.chat.SignedMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickCallback.Options;
@@ -233,7 +234,7 @@ public final class ChatManager implements Listener, MessageCreateListener {
     @SneakyThrows @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onChatForward(final AsyncChatEvent event) {
         // Skipping in case discord integrations are not enabled or misconfigured.
-        if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_ENABLED == true || PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_URL != null)
+        if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_URL.isEmpty() == true)
             return;
         // ...
         final Player player = event.getPlayer();
@@ -241,16 +242,16 @@ public final class ChatManager implements Listener, MessageCreateListener {
         if (event.viewers().isEmpty() == false) {
             // Serializing Component to plain String.
             final String plainMessage = PlainTextComponentSerializer.plainText().serialize(event.message());
-            // Getting username and replacing placeholders.
-            final String username = PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_USERNAME
-                    .replace("<player>", player.getName())
-                    .replace("<uuid>", player.getUniqueId().toString());
+            // Getting username and setting placeholders.
+            final String username = PlaceholderAPI.setPlaceholders(player, PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_USERNAME);
+            // Resolving avatar URL and setting placeholders.
+            final URL avatar = new URL(PlaceholderAPI.setPlaceholders(player, PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_AVATAR));
             // Constructing and sending message.
             new WebhookMessageBuilder()
                     .setDisplayName(username)
-                    .setDisplayAvatar(new URL("https://minotar.net/armor/bust/" + player.getUniqueId() + "/100.png"))
+                    .setDisplayAvatar(avatar)
                     .setContent(plainMessage)
-                    .setAllowedMentions(new AllowedMentionsBuilder().setMentionUsers(true).build())
+                    .setAllowedMentions(new AllowedMentionsBuilder().build())
                     .sendSilently(plugin.getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_URL);
         }
     }

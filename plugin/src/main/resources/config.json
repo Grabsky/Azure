@@ -122,7 +122,7 @@
         // Simple punishment logging. Embed format is not configurable.
         "punishment_logging": {
             // Whether to enable punishment logging to Discord server.
-            "enabled": true,
+            "enabled": false,
             // Discord channel ID to use for punishment logging.
             "channel_id": ""
         }
