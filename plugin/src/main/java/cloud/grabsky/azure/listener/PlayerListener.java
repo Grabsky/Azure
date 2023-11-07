@@ -26,9 +26,11 @@ package cloud.grabsky.azure.listener;
 import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.bedrock.components.Message;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.command.UnknownCommandEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -36,10 +38,15 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerCommandSendEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.javacord.api.entity.message.WebhookMessageBuilder;
 import org.jetbrains.annotations.NotNull;
 
+import java.net.URL;
 import java.util.HashSet;
+
+import lombok.SneakyThrows;
 
 public final class PlayerListener implements Listener {
 
@@ -56,7 +63,6 @@ public final class PlayerListener implements Listener {
         final Player player = event.getPlayer();
         // Teleporting new players to spawn. (if enabled)
         if (player.hasPlayedBefore() == false && PluginConfig.GENERAL_TELEPORT_NEW_PLAYERS_TO_PRIMARY_WORLD_SPAWN == true) {
-            System.out.println("Executing...");
             // Getting the primary world.
             final World primaryWorld = plugin.getWorldManager().getPrimaryWorld();
             // Setting the respawn location.
@@ -65,7 +71,54 @@ public final class PlayerListener implements Listener {
         // Clearing title. (if enabled)
         if (PluginConfig.GENERAL_CLEAR_TITLE_ON_JOIN == true)
             player.clearTitle();
+    }
 
+    /* DISCORD INTEGRATIONS - FORWARDING JOIN MESSAGE TO DISCORD SERVER */
+
+    @SneakyThrows @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerJoinForward(final @NotNull PlayerJoinEvent event) {
+        // Skipping in case discord integrations are not enabled or misconfigured.
+        if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_URL.isEmpty() == true)
+            return;
+        // Forwarding message to webhook...
+        if (plugin.getUserCache().getUser(event.getPlayer()).isVanished() == false) {
+            // Serializing Component to plain String.
+            final String message = PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_JOIN_MESSAGE_FORMAT);
+            // Creating new instance of WebhookMessageBuilder.
+            final WebhookMessageBuilder builder = new WebhookMessageBuilder().setContent(message);
+            // Setting username if specified.
+            if (PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_USERNAME.isEmpty() == false)
+                builder.setDisplayName(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_USERNAME));
+            // Setting avatar if specified.
+            if (PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
+                builder.setDisplayAvatar(new URL(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_AVATAR)));
+            // Sending the message.
+            builder.sendSilently(plugin.getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_URL);
+        }
+    }
+
+    /* DISCORD INTEGRATIONS - FORWARDING QUIT MESSAGE TO DISCORD SERVER */
+
+    @SneakyThrows @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerQuitForward(final @NotNull PlayerQuitEvent event) {
+        // Skipping in case discord integrations are not enabled or misconfigured.
+        if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_URL.isEmpty() == true)
+            return;
+        // Forwarding message to webhook...
+        if (plugin.getUserCache().getUser(event.getPlayer()).isVanished() == false) {
+            // Serializing Component to plain String.
+            final String message = PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_QUIT_MESSAGE_FORMAT);
+            // Creating new instance of WebhookMessageBuilder.
+            final WebhookMessageBuilder builder = new WebhookMessageBuilder().setContent(message);
+            // Setting username if specified.
+            if (PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_USERNAME.isEmpty() == false)
+                builder.setDisplayName(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_USERNAME));
+            // Setting avatar if specified.
+            if (PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
+                builder.setDisplayAvatar(new URL(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_AVATAR)));
+            // Sending the message.
+            builder.sendSilently(plugin.getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_URL);
+        }
     }
 
     @EventHandler

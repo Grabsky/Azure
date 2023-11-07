@@ -168,6 +168,8 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("discord_integrations.discord_bot_activity")
     public static ActivityWrapper DISCORD_INTEGRATIONS_BOT_ACTIVITY;
 
+    // Discord Integrations > Chat Forwarding
+
     @JsonPath("discord_integrations.chat_forwarding.enabled")
     public static boolean DISCORD_INTEGRATIONS_CHAT_FORWARDING_ENABLED;
 
@@ -188,6 +190,31 @@ public final class PluginConfig implements JsonConfiguration {
 
     @JsonPath("discord_integrations.chat_forwarding.console_format")
     public static String DISCORD_INTEGRATIONS_CHAT_FORWARDING_CONSOLE_FORMAT;
+
+    // Discord Integrations > Join and Quit Forwarding
+
+    @JsonPath("discord_integrations.join_and_quit_forwarding.enabled")
+    public static boolean DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_ENABLED;
+
+    @JsonPath("discord_integrations.join_and_quit_forwarding.channel_id")
+    public static String DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_CHANNEL_ID;
+
+    @JsonPath("discord_integrations.join_and_quit_forwarding.webhook_url")
+    public static String DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_URL;
+
+    @JsonPath("discord_integrations.join_and_quit_forwarding.webhook_username")
+    public static String DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_USERNAME;
+
+    @JsonPath("discord_integrations.join_and_quit_forwarding.webhook_avatar")
+    public static String DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_AVATAR;
+
+    @JsonPath("discord_integrations.join_and_quit_forwarding.join_message_format")
+    public static String DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_JOIN_MESSAGE_FORMAT;
+
+    @JsonPath("discord_integrations.join_and_quit_forwarding.quit_message_format")
+    public static String DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_QUIT_MESSAGE_FORMAT;
+
+    // Discord Integrations > Punishment Logging
 
     @JsonPath("discord_integrations.punishment_logging.enabled")
     public static boolean DISCORD_INTEGRATIONS_PUNISHMENT_LOGGING_ENABLED;

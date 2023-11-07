@@ -56,7 +56,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
-import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
 import org.jetbrains.annotations.NotNull;
@@ -236,23 +235,20 @@ public final class ChatManager implements Listener, MessageCreateListener {
         // Skipping in case discord integrations are not enabled or misconfigured.
         if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_URL.isEmpty() == true)
             return;
-        // ...
-        final Player player = event.getPlayer();
         // Forwarding message to webhook...
         if (event.viewers().isEmpty() == false) {
             // Serializing Component to plain String.
             final String plainMessage = PlainTextComponentSerializer.plainText().serialize(event.message());
-            // Getting username and setting placeholders.
-            final String username = PlaceholderAPI.setPlaceholders(player, PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_USERNAME);
-            // Resolving avatar URL and setting placeholders.
-            final URL avatar = new URL(PlaceholderAPI.setPlaceholders(player, PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_AVATAR));
-            // Constructing and sending message.
-            new WebhookMessageBuilder()
-                    .setDisplayName(username)
-                    .setDisplayAvatar(avatar)
-                    .setContent(plainMessage)
-                    .setAllowedMentions(new AllowedMentionsBuilder().build())
-                    .sendSilently(plugin.getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_URL);
+            // Creating new instance of WebhookMessageBuilder.
+            final WebhookMessageBuilder builder = new WebhookMessageBuilder().setContent(plainMessage);
+            // Setting username if specified.
+            if (PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_USERNAME.isEmpty() == false)
+                builder.setDisplayName(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_USERNAME));
+            // Setting avatar if specified.
+            if (PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
+                builder.setDisplayAvatar(new URL(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_AVATAR)));
+            // Sending the message.
+            builder.sendSilently(plugin.getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_URL);
         }
     }
 

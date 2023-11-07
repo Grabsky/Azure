@@ -119,6 +119,21 @@
             // Chat format used to end message the console. Placeholders: [username, displayname, message]
             "console_format": "(Discord) (<username>): <message>"
         },
+        "join_and_quit_forwarding": {
+            "enabled": false,
+            // Discord channel ID to use for message forwarding.
+            "channel_id": "",
+            // Discord webhook URL. Keep it secure.
+            "webhook_url": "",
+            // Discord webhook username. Supports PlaceholderAPI.
+            "webhook_username": "",
+            // Discord webhook avatar URL. Supports PlaceholderAPI.
+            "webhook_avatar": "",
+            // Join message format.
+            "join_message_format": "Player **%player_name%** has joined the server.",
+            // Quit message format.
+            "quit_message_format": "Player **%player_name%** has left the server."
+        },
         // Simple punishment logging. Embed format is not configurable.
         "punishment_logging": {
             // Whether to enable punishment logging to Discord server.
