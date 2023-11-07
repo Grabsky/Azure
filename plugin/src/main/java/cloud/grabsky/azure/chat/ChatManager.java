@@ -49,6 +49,7 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.luckperms.api.cacheddata.CachedMetaData;
 import net.luckperms.api.model.user.UserManager;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -252,7 +253,7 @@ public final class ChatManager implements Listener, MessageCreateListener {
         }
     }
 
-    @Override
+    @Override @SuppressWarnings("deprecation") // Suppressing @Deprecated method(s) as adventure seems to not provide an alternative for that.
     public void onMessageCreate(final @NotNull MessageCreateEvent event) {
         // Skipping in case chat returning is not enabled.
         if (PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_ENABLED == false)
@@ -262,7 +263,7 @@ public final class ChatManager implements Listener, MessageCreateListener {
             // Getting the message components.
             final String username = event.getMessageAuthor().getName();
             final String displayname = event.getMessageAuthor().getDisplayName();
-            final String message = event.getMessage().getReadableContent();
+            final String message = ChatColor.stripColor(event.getMessage().getReadableContent());
             // Sending message to the console.
             Message.of(PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_CONSOLE_FORMAT)
                     .placeholder("username", username)
