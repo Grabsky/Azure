@@ -44,27 +44,6 @@
                 // Message delete button styling. Position can either be BEFORE or AFTER.
                 "button": { "position": "BEFORE", "text": "<gray>×", "hover": "<gray>Naciśnij, aby usunąć wiadomość." }
             }
-        },
-        // Discord webhooks. Forwards chat messages to Discord server using configured webhook.
-        "discord_webhooks": {
-            // Determinates whether chat messages are sent to the discord webhook.
-            "enabled": false,
-            // Username to be displayed in a webhook. Supports <player> and <uuid> placeholders.
-            "discord_webhook_username": "<player>",
-            // Discord webhook URL. Keep it secure.
-            "discord_webhook_url": "",
-            // Whether messages sent on the specific channel should be forwarded to the in-game chat.
-            "two_way_communication": false,
-            // Required only when two-way communication is enabled.
-            "two_way_discord_bot_token": "",
-            // Activity to be displayed. Supports PlaceholderAPI,
-            "two_way_discord_bot_activity": { "refresh_rate": 0, "type": "LISTENING", "state": "server chat..." },
-            // Channel ID to forward the messages from.
-            "two_way_discord_channel_id": "",
-            // Message format used to send message to players.
-            "two_way_chat_format": "(Discord) (<username>): <message>",
-            // Message format used to send message to the console.
-            "two_way_console_format": "(Discord) (<username>): <message>"
         }
     },
     "punishment_settings": {
@@ -114,6 +93,38 @@
             "color": "YELLOW",
             // Text displayed above the BossBar.
             "text": "<white>Jesteś <yellow>niewidzialny<white>. Użyj <yellow>/vanish<white>, aby się ujawnić."
+        }
+    },
+    "discord_integrations": {
+        // Whether to enable discord integrations or not.
+        "enabled": false,
+        // Discord bot token. Keep it secure.
+        "discord_bot_token": "",
+        // Discord bot activity to be displayed.
+        "discord_bot_activity": { "refresh_rate": 0, "type": "LISTENING", "state": "server chat..." },
+        // Chat forwarding creates a bridge between Minecraft and Discord servers.
+        "chat_forwarding": {
+            // Whether to enable chat forwarding bridge between Minecraft and Discord.
+            "enabled": false,
+            // Discord channel ID to use for message forwarding.
+            "channel_id": "",
+            // Discord webhook URL. Keep it secure.
+            "webhook_url": "",
+            // Discord webhook username. Supports PlaceholderAPI.
+            "webhook_username": "%player_name%",
+            // Discord webhook avatar URL. Supports PlaceholderAPI.
+            "webhook_avatar": "https://minotar.net/armor/bust/%player_uuid%/100.png",
+            // Chat format used to send message to players. Placeholders: [username, displayname, message]
+            "chat_format": "(Discord) (<username>): <message>",
+            // Chat format used to end message the console. Placeholders: [username, displayname, message]
+            "console_format": "(Discord) (<username>): <message>"
+        },
+        // Simple punishment logging. Embed format is not configurable.
+        "punishment_logging": {
+            // Whether to enable punishment logging to Discord server.
+            "enabled": true,
+            // Discord channel ID to use for punishment logging.
+            "channel_id": ""
         }
     },
     // Recipes to be unregistered after plugin has successfully reloaded. Keep in mind unregistered recipes are removed from players' recipe discovery list.

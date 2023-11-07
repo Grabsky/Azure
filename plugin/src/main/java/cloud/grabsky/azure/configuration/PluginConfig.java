@@ -99,39 +99,12 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("chat_settings.moderation.message_deletion.button")
     public static DeleteButton CHAT_MODERATION_MESSAGE_DELETION_BUTTON;
 
-    // Chat Settings > Discord Webhooks
-
-    @JsonPath("chat_settings.discord_webhooks.enabled")
-    public static boolean CHAT_DISCORD_WEBHOOK_ENABLED;
-
-    @JsonPath("chat_settings.discord_webhooks.discord_webhook_username")
-    public static String CHAT_DISCORD_WEBHOOK_USERNAME;
-
-    @JsonPath("chat_settings.discord_webhooks.discord_webhook_url")
-    public static String CHAT_DISCORD_WEBHOOK_URL;
-
-    @JsonPath("chat_settings.discord_webhooks.two_way_communication")
-    public static boolean CHAT_DISCORD_WEBHOOK_TWO_WAY_COMMUNICATION;
-
-    @JsonPath("chat_settings.discord_webhooks.two_way_discord_bot_token")
-    public static String CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_TOKEN;
-
-    @JsonPath("chat_settings.discord_webhooks.two_way_discord_bot_activity")
-    public static ActivityWrapper CHAT_DISCORD_WEBHOOK_TWO_WAY_BOT_ACTIVITY;
-
-    @JsonPath("chat_settings.discord_webhooks.two_way_discord_channel_id")
-    public static String CHAT_DISCORD_WEBHOOK_TWO_WAY_CHANNEL_ID;
-
-    @JsonPath("chat_settings.discord_webhooks.two_way_chat_format")
-    public static String CHAT_DISCORD_WEBHOOK_TWO_WAY_CHAT_FORMAT;
-
-    @JsonPath("chat_settings.discord_webhooks.two_way_console_format")
-    public static String CHAT_DISCORD_WEBHOOK_TWO_WAY_CONSOLE_FORMAT;
 
     // Punishment Settings
 
     @JsonPath("punishment_settings.default_reason")
     public static String PUNISHMENT_SETTINGS_DEFAULT_REASON;
+
 
     // Command Filter
 
@@ -152,6 +125,7 @@ public final class PluginConfig implements JsonConfiguration {
 
     @JsonPath("command_filter.extra")
     public static List<CommandsHolder> COMMAND_FILTER_EXTRA;
+
 
     // Resource Pack
 
@@ -176,10 +150,51 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonNullable @JsonPath("resource_pack.notification_sound")
     public static @Nullable Sound RESOURCE_PACK_NOTIFICATION_SOUND;
 
+
     // Vanish
 
     @JsonNullable @JsonPath("vanish.bossbar")
     public static BossBar VANISH_BOSS_BAR;
+
+
+    // Discord Integrations
+
+    @JsonPath("discord_integrations.enabled")
+    public static boolean DISCORD_INTEGRATIONS_ENABLED;
+
+    @JsonPath("discord_integrations.discord_bot_token")
+    public static String DISCORD_INTEGRATIONS_DISCORD_BOT_TOKEN;
+
+    @JsonPath("discord_integrations.discord_bot_activity")
+    public static ActivityWrapper DISCORD_INTEGRATIONS_BOT_ACTIVITY;
+
+    @JsonPath("discord_integrations.chat_forwarding.enabled")
+    public static boolean DISCORD_INTEGRATIONS_CHAT_FORWARDING_ENABLED;
+
+    @JsonPath("discord_integrations.chat_forwarding.channel_id")
+    public static String DISCORD_INTEGRATIONS_CHAT_FORWARDING_CHANNEL_ID;
+
+    @JsonPath("discord_integrations.chat_forwarding.webhook_url")
+    public static String DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_URL;
+
+    @JsonPath("discord_integrations.chat_forwarding.webhook_username")
+    public static String DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_USERNAME;
+
+    @JsonPath("discord_integrations.chat_forwarding.webhook_avatar")
+    public static String DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_AVATAR;
+
+    @JsonPath("discord_integrations.chat_forwarding.chat_format")
+    public static String DISCORD_INTEGRATIONS_CHAT_FORWARDING_CHAT_FORMAT;
+
+    @JsonPath("discord_integrations.chat_forwarding.console_format")
+    public static String DISCORD_INTEGRATIONS_CHAT_FORWARDING_CONSOLE_FORMAT;
+
+    @JsonPath("discord_integrations.punishment_logging.enabled")
+    public static boolean DISCORD_INTEGRATIONS_PUNISHMENT_LOGGING_ENABLED;
+
+    @JsonPath("discord_integrations.punishment_logging.channel_id")
+    public static String DISCORD_INTEGRATIONS_PUNISHMENT_LOGGING_CHANNEL_ID;
+
 
     // Disabled Recipes
 
