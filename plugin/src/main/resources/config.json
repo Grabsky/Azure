@@ -121,8 +121,6 @@
         },
         "join_and_quit_forwarding": {
             "enabled": false,
-            // Discord channel ID to use for message forwarding.
-            "channel_id": "",
             // Discord webhook URL. Keep it secure.
             "webhook_url": "",
             // Discord webhook username. Supports PlaceholderAPI.

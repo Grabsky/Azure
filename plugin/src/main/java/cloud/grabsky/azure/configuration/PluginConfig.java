@@ -196,9 +196,6 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("discord_integrations.join_and_quit_forwarding.enabled")
     public static boolean DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_ENABLED;
 
-    @JsonPath("discord_integrations.join_and_quit_forwarding.channel_id")
-    public static String DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_CHANNEL_ID;
-
     @JsonPath("discord_integrations.join_and_quit_forwarding.webhook_url")
     public static String DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_URL;
 
