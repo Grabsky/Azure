@@ -57,6 +57,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
+import org.javacord.api.entity.message.mention.AllowedMentions;
+import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
 import org.jetbrains.annotations.NotNull;
@@ -96,6 +98,13 @@ public final class ChatManager implements Listener, MessageCreateListener {
 
     public static List<FormatHolder> CHAT_FORMATS_REVERSED;
     public static List<TagsHolder> CHAT_TAGS_REVERSED;
+
+    private static final AllowedMentions NO_MENTIONS = new AllowedMentionsBuilder()
+            .setMentionEveryoneAndHere(false)
+            .setMentionRepliedUser(false)
+            .setMentionUsers(false)
+            .setMentionRoles(false)
+            .build();
 
     public ChatManager(final Azure plugin) {
         this.plugin = plugin;
@@ -241,7 +250,7 @@ public final class ChatManager implements Listener, MessageCreateListener {
             // Serializing Component to plain String.
             final String plainMessage = PlainTextComponentSerializer.plainText().serialize(event.message());
             // Creating new instance of WebhookMessageBuilder.
-            final WebhookMessageBuilder builder = new WebhookMessageBuilder().setContent(plainMessage);
+            final WebhookMessageBuilder builder = new WebhookMessageBuilder().setAllowedMentions(NO_MENTIONS).setContent(plainMessage);
             // Setting username if specified.
             if (PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_USERNAME.isEmpty() == false)
                 builder.setDisplayName(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_USERNAME));
