@@ -35,10 +35,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.javacord.api.entity.message.embed.Embed;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -153,6 +156,11 @@ public final class AzureUser implements User {
         });
         // Logging...
         Azure.getInstance().getPunishmentsFileLogger().log("Player " + this.getName() + " (" + this.getUniqueId() + ") has been BANNED (" + (mostRecentBan.isPermanent() == false ? mostRecentBan.getDuration() : "permanent") + ") by " + mostRecentBan.getIssuer() + " with a reason: " + mostRecentBan.getReason());
+        // Logging to Discord...
+        final EmbedBuilder embed = DiscordLogger.constructBan(this, mostRecentBan);
+        Azure.getInstance().getDiscord().getChannelById(PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENT_LOGGING_CHANNEL_ID).ifPresent(channel -> {
+            channel.asTextChannel().get().sendMessage(embed);
+        });
         // Returning new (and now current) punishment.
         return mostRecentBan;
     }
@@ -215,6 +223,25 @@ public final class AzureUser implements User {
     @Override
     public int hashCode() {
         return Objects.hash(name, uniqueId, textures);
+    }
+
+
+    private static final class DiscordLogger {
+
+        private static EmbedBuilder constructCommon() {
+            return new EmbedBuilder()
+                    .setColor(Color.RED)
+                    .setTimestampToNow();
+        }
+
+        public static EmbedBuilder constructBan(final User user, final @NotNull Punishment punishment) {
+            return constructCommon()
+                    .setTitle(user.getName() + " has been BANNED")
+                    .addInlineField("Duration", punishment.isPermanent() == false ? punishment.getDurationLeft().toString() : "Permanent")
+                    .addInlineField("Reason", punishment.getReason())
+                    .addInlineField("Issuer", punishment.getIssuer());
+        }
+
     }
 
 }
