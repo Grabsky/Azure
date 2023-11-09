@@ -42,6 +42,7 @@ import cloud.grabsky.commands.exception.MissingInputException;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.group.Group;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
@@ -113,7 +114,7 @@ public final class KickCommand extends RootCommand {
                 .placeholder("player", target)
                 .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
                 // Sending to all players with specific permission.
-                .broadcast(receiver -> receiver.hasPermission("azure.command.kick") == true);
+                .broadcast(receiver -> receiver instanceof ConsoleCommandSender || receiver.hasPermission("azure.command.ban") == true);
         // Logging...
         plugin.getPunishmentsFileLogger().log("Player " + target.getName() + " (" + target.getUniqueId() + ") has been KICKED by " + sender.getName() + " with a reason: " + reason);
         // Forwarding to Discord...

@@ -45,6 +45,7 @@ import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.group.Group;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -136,11 +137,11 @@ public final class MuteCommand extends RootCommand {
         targetUser.mute(duration, reason, sender);
         // Sending success message to the sender.
         Message.of(PluginLocale.COMMAND_MUTE_SUCCESS)
-                .placeholder("player", targetUser.getName())
+                .placeholder("player", targetUser)
                 .placeholder("duration_left", duration)
                 .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
                 // Sending to all players with specific permission.
-                .broadcast(receiver -> receiver.hasPermission("azure.command.mute") == true);
+                .broadcast(receiver -> receiver instanceof ConsoleCommandSender || receiver.hasPermission("azure.command.mute") == true);
     }
 
 }

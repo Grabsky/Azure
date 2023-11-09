@@ -38,6 +38,7 @@ import cloud.grabsky.commands.exception.CommandLogicException;
 import cloud.grabsky.commands.exception.MissingInputException;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnknownNullability;
 
@@ -76,7 +77,9 @@ public final class UnmuteCommand extends RootCommand {
                 // Unmuting the player.
                 targetUser.unmute(sender);
                 // Sending success message to the sender.
-                Message.of(PluginLocale.COMMAND_UNMUTE_SUCCESS).placeholder("player", targetUser.getName()).send(sender);
+                Message.of(PluginLocale.COMMAND_UNMUTE_SUCCESS)
+                        .placeholder("player", targetUser)
+                        .broadcast(receiver -> receiver instanceof ConsoleCommandSender || receiver.hasPermission("azure.command.ban") == true);
                 return;
             }
             // Sending failure message to the sender.
