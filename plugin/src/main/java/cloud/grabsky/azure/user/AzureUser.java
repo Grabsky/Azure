@@ -35,10 +35,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.javacord.api.entity.message.WebhookMessageBuilder;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.Color;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -153,6 +156,13 @@ public final class AzureUser implements User {
         });
         // Logging...
         Azure.getInstance().getPunishmentsFileLogger().log("Player " + this.getName() + " (" + this.getUniqueId() + ") has been BANNED (" + (mostRecentBan.isPermanent() == false ? mostRecentBan.getDuration() : "permanent") + ") by " + mostRecentBan.getIssuer() + " with a reason: " + mostRecentBan.getReason());
+        // Forwarding to Discord...
+        if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_WEBHOOK_URL.isEmpty() == false) {
+            // Constructing type-specific embed.
+            final EmbedBuilder embed = DiscordLogger.constructBan(this, mostRecentBan);
+            // Forwarding the message through configured webhook.
+            new WebhookMessageBuilder().addEmbed(embed).sendSilently(Azure.getInstance().getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_WEBHOOK_URL);
+        }
         // Returning new (and now current) punishment.
         return mostRecentBan;
     }
@@ -167,6 +177,13 @@ public final class AzureUser implements User {
         });
         // Logging...
         Azure.getInstance().getPunishmentsFileLogger().log("Player " + this.getName() + " (" + this.getUniqueId() + ") has been UNBANNED by " + issuer.getName());
+        // Forwarding to Discord...
+        if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_WEBHOOK_URL.isEmpty() == false) {
+            // Constructing type-specific embed.
+            final EmbedBuilder embed = DiscordLogger.constructUnban(this, issuer);
+            // Forwarding the message through configured webhook.
+            new WebhookMessageBuilder().addEmbed(embed).sendSilently(Azure.getInstance().getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_WEBHOOK_URL);
+        }
     }
 
     @Override
@@ -184,6 +201,13 @@ public final class AzureUser implements User {
         });
         // Logging...
         Azure.getInstance().getPunishmentsFileLogger().log("Player " + this.getName() + " (" + this.getUniqueId() + ") has been MUTED (" + (mostRecentMute.isPermanent() == false ? mostRecentMute.getDuration() : "permanent") + ") by " + mostRecentMute.getIssuer() + " with a reason: " + mostRecentMute.getReason());
+        // Forwarding to Discord...
+        if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_WEBHOOK_URL.isEmpty() == false) {
+            // Constructing type-specific embed.
+            final EmbedBuilder embed = DiscordLogger.constructMute(this, mostRecentMute);
+            // Forwarding the message through configured webhook.
+            new WebhookMessageBuilder().addEmbed(embed).sendSilently(Azure.getInstance().getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_WEBHOOK_URL);
+        }
         // Returning new (and now current) punishment.
         return mostRecentMute;
     }
@@ -198,6 +222,13 @@ public final class AzureUser implements User {
         });
         // Logging...
         Azure.getInstance().getPunishmentsFileLogger().log("Player " + this.getName() + " (" + this.getUniqueId() + ") has been UNMUTED by " + issuer.getName());
+        // Forwarding to Discord...
+        if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_WEBHOOK_URL.isEmpty() == false) {
+            // Constructing type-specific embed.
+            final EmbedBuilder embed = DiscordLogger.constructUnmute(this, issuer);
+            // Forwarding the message through configured webhook.
+            new WebhookMessageBuilder().addEmbed(embed).sendSilently(Azure.getInstance().getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_WEBHOOK_URL);
+        }
     }
 
     @Override
@@ -215,6 +246,55 @@ public final class AzureUser implements User {
     @Override
     public int hashCode() {
         return Objects.hash(name, uniqueId, textures);
+    }
+
+
+    // Utility class to help constructing punishments integration embeds.
+    public static final class DiscordLogger {
+
+        // Common for all punishment types.
+        private static EmbedBuilder constructCommon() {
+            return new EmbedBuilder()
+                    .setColor(new Color(255, 85, 85))
+                    .setTimestampToNow();
+        }
+
+        private static EmbedBuilder constructBan(final @NotNull User user, final @NotNull Punishment punishment) {
+            return constructCommon()
+                    .setDescription("**" + user.getName() + "** has been banned by **" + punishment.getIssuer() + "**.\n** **\n** **")
+                    .addField("Identifier", user.getUniqueId().toString())
+                    .addField("Punishment Duration", punishment.isPermanent() == false ? punishment.getDuration().toString() : "Permanent")
+                    .addField("Punishment Reason", punishment.getReason() + "\n** **\n** **");
+        }
+
+        private static EmbedBuilder constructUnban(final @NotNull User user, final @NotNull CommandSender issuer) {
+            return constructCommon()
+                    .setDescription("**" + user.getName() + "** has been unbanned by **" + issuer.getName() + "**.\n** **\n** **")
+                    .addField("Identifier", user.getUniqueId() + "\n** **\n** **");
+        }
+
+        private static EmbedBuilder constructMute(final @NotNull User user, final @NotNull Punishment punishment) {
+            return constructCommon()
+                    .setDescription("**" + user.getName() + "** has been muted by **" + punishment.getIssuer() + "**.\n** **\n** **")
+                    .addField("Identifier", user.getUniqueId().toString())
+                    .addField("Punishment Duration", punishment.isPermanent() == false ? punishment.getDuration().toString() : "Permanent")
+                    .addField("Punishment Reason", punishment.getReason() + "\n** **\n** **");
+        }
+
+        private static EmbedBuilder constructUnmute(final @NotNull User user, final @NotNull CommandSender issuer) {
+            return constructCommon()
+                    .setDescription("**" + user.getName() + "** has been unmuted by **" + issuer.getName() + "**.\n** **\n** **")
+                    .addField("Identifier", user.getUniqueId() + "\n** **\n** **");
+        }
+
+        // Public as this is must be called from the command directly.
+        public static EmbedBuilder constructKick(final @NotNull User user, final @NotNull CommandSender sender, final @NotNull String reason) {
+            return constructCommon()
+                    .setDescription("**" + user.getName() + "** has been kicked by **" + sender.getName() + "**.\n** **\n** **")
+                    .addField("Identifier", user.getUniqueId().toString())
+                    .addField("Punishment Reason", reason + "\n** **\n** **");
+        }
+
     }
 
 }

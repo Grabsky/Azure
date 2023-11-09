@@ -232,13 +232,13 @@ public final class PluginConfig implements JsonConfiguration {
     public static String DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_STOP_MESSAGE_FORMAT;
 
 
-    // Discord Integrations > Punishment Logging
+    // Discord Integrations > Punishments Fowarding
 
-    @JsonPath("discord_integrations.punishment_logging.enabled")
-    public static boolean DISCORD_INTEGRATIONS_PUNISHMENT_LOGGING_ENABLED;
+    @JsonPath("discord_integrations.punishments_forwarding.enabled")
+    public static boolean DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_ENABLED;
 
-    @JsonPath("discord_integrations.punishment_logging.channel_id")
-    public static String DISCORD_INTEGRATIONS_PUNISHMENT_LOGGING_CHANNEL_ID;
+    @JsonPath("discord_integrations.punishments_forwarding.webhook_url")
+    public static String DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_WEBHOOK_URL;
 
 
     // Disabled Recipes
