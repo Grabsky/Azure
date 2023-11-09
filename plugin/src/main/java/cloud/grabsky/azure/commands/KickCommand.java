@@ -26,6 +26,8 @@ package cloud.grabsky.azure.commands;
 import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.configuration.PluginLocale;
+import cloud.grabsky.azure.user.AzureUser;
+import cloud.grabsky.azure.user.AzureUser.DiscordLogger;
 import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
@@ -41,6 +43,8 @@ import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.group.Group;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.javacord.api.entity.message.WebhookMessageBuilder;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
@@ -112,6 +116,13 @@ public final class KickCommand extends RootCommand {
                 .broadcast(receiver -> receiver.hasPermission("azure.command.kick") == true);
         // Logging...
         plugin.getPunishmentsFileLogger().log("Player " + target.getName() + " (" + target.getUniqueId() + ") has been KICKED by " + sender.getName() + " with a reason: " + reason);
+        // Forwarding to Discord...
+        if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_WEBHOOK_URL.isEmpty() == false) {
+            // Constructing type-specific embed.
+            final EmbedBuilder embed = DiscordLogger.constructKick(plugin.getUserCache().getUser(target), sender, (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON);
+            // Forwarding the message through configured webhook.
+            new WebhookMessageBuilder().addEmbed(embed).sendSilently(Azure.getInstance().getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_WEBHOOK_URL);
+        }
 
     }
 

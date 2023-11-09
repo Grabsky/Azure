@@ -149,12 +149,12 @@
             // Quit message format. Supports PlaceholderAPI.
             "stop_message_format": "Server is now online..."
         },
-        // Punishment messages forwarding to Discord server. Not implemented yet.
-        "punishment_logging": {
+        // Punishment messages forwarding to Discord server. Embeds are not configurable.
+        "punishments_forwarding": {
             // Whether to enable punishment logging to Discord server.
             "enabled": false,
-            // Discord channel ID to use for punishment logging.
-            "channel_id": ""
+            // Discord webhook URL. Keep it secure.
+            "webhook_url": ""
         }
     },
     // Recipes to be unregistered after plugin has successfully reloaded. Keep in mind unregistered recipes are removed from players' recipe discovery list.
