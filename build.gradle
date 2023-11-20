@@ -15,7 +15,7 @@ subprojects {
     targetCompatibility = JavaVersion.VERSION_17
 
     ext {
-        BEDROCK_VERSION = "1.20.1-41"
+        BEDROCK_VERSION = "1.20.1-47"
         KYORI_NBT_VERSION = "4.14.0"
     }
 
