@@ -47,7 +47,7 @@
         }
     },
     "punishment_settings": {
-        // Default reason to be be displayed in case nothing was provided by operator.
+        // Default reason to be displayed in case nothing was provided by operator.
         "default_reason": "N/A"
     },
     "command_filter": {
