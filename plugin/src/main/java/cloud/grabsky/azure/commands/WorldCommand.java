@@ -46,6 +46,7 @@ import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
+import org.bukkit.WorldBorder;
 import org.bukkit.WorldType;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -56,6 +57,7 @@ import org.jetbrains.annotations.UnknownNullability;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.stream.Stream;
 
 import static cloud.grabsky.azure.world.AzureWorldManager.WorldOperationException;
@@ -73,6 +75,8 @@ public final class WorldCommand extends RootCommand {
     @Dependency
     private @UnknownNullability AzureWorldManager worlds;
 
+    private static final DecimalFormat COORD_FORMAT = new DecimalFormat("#,###.##");
+
 
     @Override
     public @NotNull CompletionsProvider onTabComplete(final @NotNull RootCommandContext context, final int index) {
@@ -80,7 +84,7 @@ public final class WorldCommand extends RootCommand {
         final RootCommandInput input = context.getInput();
         // Returning list of sub-commands when no argument was specified in the input.
         if (index == 0) return CompletionsProvider.of(
-                Stream.of("autoload", "create", "delete", "description", "gamerule", "import", "info", "list", "load", "spawnpoint", "teleport", "time", "unload", "weather")
+                Stream.of("autoload", "border", "create", "delete", "description", "gamerule", "import", "info", "list", "load", "spawnpoint", "teleport", "time", "unload", "weather")
                         .filter(literal -> sender.hasPermission(this.getPermission() + "." + literal) == true)
                         .toList()
         );
@@ -94,6 +98,14 @@ public final class WorldCommand extends RootCommand {
             case "autoload" -> switch (index) {
                 case 1 -> CompletionsProvider.of(World.class);
                 case 2 -> CompletionsProvider.of(Boolean.class);
+                default -> CompletionsProvider.EMPTY;
+            };
+            case "border" -> switch (index) {
+                case 1 -> CompletionsProvider.of(World.class);
+                case 2 -> CompletionsProvider.of("@x @y @z");
+                case 3 -> CompletionsProvider.of("@y @z");
+                case 4 -> CompletionsProvider.of("@z");
+                case 5 -> CompletionsProvider.of("-1", "1000", "2500", "5000");
                 default -> CompletionsProvider.EMPTY;
             };
             case "create" -> switch (index) {
@@ -190,6 +202,7 @@ public final class WorldCommand extends RootCommand {
             Message.of(PluginLocale.COMMAND_WORLD_HELP).send(context.getExecutor());
         } else switch (arguments.next(String.class).asRequired().toLowerCase()) {
             case "autoload"     -> this.onWorldAutoload(context, arguments);
+            case "border"       -> this.onWorldBorder(context, arguments);
             case "create"       -> this.onWorldCreate(context, arguments);
             case "delete"       -> this.onWorldDelete(context, arguments);
             case "description"  -> this.onWorldDescription(context, arguments);
@@ -227,6 +240,44 @@ public final class WorldCommand extends RootCommand {
             // Trying to unload the world...
             worlds.setAutoLoad(world, state);
             Message.of(state == true ? PluginLocale.COMMAND_WORLD_AUTOLOAD_SUCCESS_ON : PluginLocale.COMMAND_WORLD_AUTOLOAD_SUCCESS_OFF).placeholder("world", world).send(sender);
+            return;
+        }
+        // Sending error message to command sender.
+        Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
+    }
+
+
+    /* WORLD BORDER */
+
+    private static final ExceptionHandler.Factory WORLD_BORDER_USAGE = (exception) -> {
+        if (exception instanceof MissingInputException)
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_WORLD_BORDER_USAGE).send(context.getExecutor());
+        // Let other exceptions be handled internally.
+        return null;
+    };
+
+    @SuppressWarnings("UnstableApiUsage")
+    private void onWorldBorder(final RootCommandContext context, final ArgumentQueue arguments) {
+        final CommandSender sender = context.getExecutor().asCommandSender();
+        // ...
+        if (sender.hasPermission(this.getPermission() + ".border") == true) {
+            final World world = arguments.next(World.class).asRequired(WORLD_BORDER_USAGE);
+            final Position position = arguments.next(Position.class).asRequired(WORLD_BORDER_USAGE);
+            final float radius = arguments.next(Float.class).asRequired(WORLD_BORDER_USAGE);
+            // When radius is lower than 0, border is removed.
+            if (radius < 0) {
+                // Resetting the world border.
+                world.getWorldBorder().reset();
+                // Sending message to the sender.
+                Message.of(PluginLocale.COMMANDS_WORLD_BORDER_RESET).placeholder("world", world).send(sender);
+                return;
+            }
+            // Setting the new border.
+            world.getWorldBorder().setCenter(position.blockX() + 0.5, position.blockZ() + 0.5);
+            world.getWorldBorder().setSize(radius * 2);
+            System.out.println(radius * 2);
+            // Sending message to the sender.
+            Message.of(PluginLocale.COMMAND_WORLD_BORDER_SET_SUCCESS).placeholder("world", world).send(sender);
             return;
         }
         // Sending error message to command sender.
@@ -432,17 +483,22 @@ public final class WorldCommand extends RootCommand {
             final World world = arguments.next(World.class).asOptional(context.getExecutor().asPlayer().getWorld());
             // Getting spawn location of specified world.
             final Location spawnLoc = worlds.getSpawnPoint(world);
+            final WorldBorder border = world.getWorldBorder();
             // Sending message to command sender.
             Message.of(PluginLocale.COMMAND_WORLD_INFO)
                     .placeholder("world_name", world.getName())
-                    .placeholder("world_key", world.key())
-                    .placeholder("world_autoload", worlds.getAutoLoad(world))
+                    .placeholder("world_key", world)
+                    .placeholder("world_autoload", PluginLocale.getBooleanShort(worlds.getAutoLoad(world)))
                     .placeholder("world_seed", world.getSeed())
                     .placeholder("world_environment", world.getEnvironment().name())
                     .placeholder("world_online", world.getPlayerCount())
-                    .placeholder("spawn_x", spawnLoc.x())
-                    .placeholder("spawn_y", spawnLoc.y())
-                    .placeholder("spawn_z", spawnLoc.z())
+                    .placeholder("spawn_x", COORD_FORMAT.format(spawnLoc.x()))
+                    .placeholder("spawn_y", COORD_FORMAT.format(spawnLoc.y()))
+                    .placeholder("spawn_z", COORD_FORMAT.format(spawnLoc.z()))
+                    .placeholder("border_x", COORD_FORMAT.format(border.getCenter().x()))
+                    .placeholder("border_z", COORD_FORMAT.format(border.getCenter().z()))
+                    .placeholder("border_size", COORD_FORMAT.format(border.getSize()))
+                    .placeholder("border_radius", COORD_FORMAT.format(border.getSize() / 2))
                     .send(sender);
             return;
         }

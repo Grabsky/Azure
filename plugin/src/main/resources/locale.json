@@ -130,6 +130,7 @@
         "world_help": [
             "",
             "<dark_gray>› <gold>/world autoload <white>(world) (true/false)",
+            "<dark_gray>› <gold>/world border <white>(world) (x) (y) (z) (radius)",
             "<dark_gray>› <gold>/world create <white>(name) (env) (type) (seed)",
             "<dark_gray>› <gold>/world delete <white>(world) <gray>(--confirm)",
             "<dark_gray>› <gold>/world description <white>(world) <gray>(description)",
@@ -148,6 +149,10 @@
         "world_autoload_success_on": "<dark_gray>› <gray>Automatyczne ładowanie świata <gold><world><gray> zostało włączone.",
         "world_autoload_success_off": "<dark_gray>› <gray>Automatyczne ładowanie świata <gold><world><gray> zostało wyłączone.",
         "world_autoload_failure": "<dark_gray>› <red>Nie udało się zmienić wartości automatycznego ładowania świata.",
+        // World > Border
+        "world_border_usage": "<dark_gray>› <gray>Użycie: <gold>/world border <white>(world) (x) (y) (z) (radius)",
+        "world_border_set_success": "<dark_gray>› <gray>Granica świata <gold><world><gray> została zaktualizowana.",
+        "world_border_reset": "<dark_gray>› <gray>Granica świata <gold><world><gray> została zresetowana.",
         // World > Create
         "world_create_usage": "<dark_gray>› <gray>Użycie: <gold>/world create <white>(name) (env) (type) (seed)",
         "world_create_confirm": [
@@ -189,6 +194,7 @@
             "<dark_gray>› <gray>Świat: <gold><world_key> <dark_gray>/ <gray>Aut. ładowanie: <gold><world_autoload>",
             "<dark_gray>› <gray>Środowisko: <gold><world_environment> <dark_gray>/ <gray>Seed: <gold><world_seed>",
             "<dark_gray>› <gray>Spawn: <gold><spawn_x><gray>, <gold><spawn_y><gray>, <gold><spawn_z> <dark_gray>/ <gray>Liczba graczy: <gold><world_online>",
+            "<dark_gray>› <gray>Środek granicy: <gold><border_x><gray>, <gold><border_z> <dark_gray>/ <gray>Promień granicy: <gold><border_radius>",
             ""
         ],
         // World > Description

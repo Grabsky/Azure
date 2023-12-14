@@ -289,6 +289,18 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.world_autoload_failure")
     public static String COMMAND_WORLD_AUTOLOAD_FAILURE;
 
+    // commands > World > Border
+
+    @JsonPath("commands.world_border_usage")
+    public static Component COMMAND_WORLD_BORDER_USAGE;
+
+    @JsonPath("commands.world_border_set_success")
+    public static String COMMAND_WORLD_BORDER_SET_SUCCESS;
+
+    @JsonPath("commands.world_border_reset")
+    public static String COMMANDS_WORLD_BORDER_RESET;
+
+
     // Commands > World > Create
 
     @JsonPath("commands.world_create_usage")
