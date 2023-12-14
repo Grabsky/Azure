@@ -261,7 +261,7 @@
         "feed_success": "<dark_gray>› <gray>Punkty głodu gracza <gold><player><gray> zostały uzupełnione.",
         "feed_success_target": "<dark_gray>› <gray>Twoje punkty głodu zostały uzupełnione.",
         // Player
-        "player_usage": "<dark_gray>› <gray>Użycie: <gold>/player <gray>(player)",
+        "player_usage": "<dark_gray>› <gray>Użycie: <gold>/player <white>(player)",
         "player_hidden_entry": "<white>ᴜᴋʀʏᴛᴇ",
         "player_success_online": [
             "",
