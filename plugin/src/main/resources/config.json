@@ -1,11 +1,11 @@
 // This JSON configuration file is lenient but keep an eye where you leave trailing commas as they tend to cause issues.
 {
     "general_settings": {
-        // Determinates whether titles should be cleared on join.
+        // Determinate whether titles should be cleared on join.
         "clear_title_on_join": false,
-        // Determinates whether player should respawn on spawnpoint of the primary world.
+        // Determinate whether player should respawn on spawn-point of the primary world.
         "respawn_on_primary_world_spawn": true,
-        // Determinates whether new players should spawn on spawnpoint of the primary world.
+        // Determinate whether new players should spawn on spawn-point of the primary world.
         "teleport_new_players_to_primary_world_spawn": true,
         // Determines whether to use $.command_filter.blocked_command_error_message as unknown command message.
         "use_blocked_command_error_message_for_unknown_command": false
@@ -37,9 +37,9 @@
         "moderation": {
             // Message deletion. Messages can be deleted for 5 minutes after being sent.
             "message_deletion": {
-                // Determinates whether player messages are allowed to be deleted by moderators.
+                // Determinate whether player messages are allowed to be deleted by moderators.
                 "enabled": true,
-                // Determinates how long message signature should be stored for. In seconds.
+                // Determinate how long message signature should be stored for. In seconds.
                 "cache_expiration_rate": 300,
                 // Message delete button styling. Position can either be BEFORE or AFTER.
                 "button": { "position": "BEFORE", "text": "<gray>×", "hover": "<gray>Naciśnij, aby usunąć wiadomość." }
@@ -68,11 +68,11 @@
         ]
     },
     "resource_pack": {
-        // Client must be able to access this address, otherwise resourcepack cannot be downloaded. This is NOT address that internal web server will be hosted at.
+        // Client must be able to access this address, otherwise resource-pack cannot be downloaded. This is NOT address that internal web server will be hosted at.
         "public_access_address": "",
-        // Port to host web-server supplying resourcepack on.
+        // Port to host web-server supplying resource-pack on.
         "port": 25578,
-        // Compressed resourcepack file inside "plugins/Azure/.public_resourcepack/".
+        // Compressed resource-pack file inside "plugins/Azure/.public_resource-pack/".
         "pack_file": "resourcepack.zip",
         // Whether resource pack should be send when player joins the server.
         "send_on_join": false,

@@ -88,7 +88,7 @@ public final class ResourcePackManager implements Listener, HttpHandler {
             plugin.getBedrockScheduler().repeat(1200L, 1200L, Long.MAX_VALUE, (task) -> {
                 if (this.server == null)
                     return false;
-                // Genering new token.
+                // Generating new token.
                 final String newToken = UUID.randomUUID().toString();
                 // Configuring the server to be accessible at the new path.
                 server.createContext("/" + newToken, this);
@@ -96,7 +96,7 @@ public final class ResourcePackManager implements Listener, HttpHandler {
                 server.removeContext("/" + token);
                 // Replacing previous token with a new one.
                 this.token = newToken;
-                // Retunirng 'true' as to contiunue future executions of this task.
+                // Returning 'true' as to continue future executions of this task.
                 return true;
             });
         }
@@ -104,13 +104,13 @@ public final class ResourcePackManager implements Listener, HttpHandler {
 
     @Override
     public void handle(final @NotNull HttpExchange exchange) throws IOException {
-        // Opening FileInputStream for the resourcepack file.
+        // Opening FileInputStream for the resource-pack file.
         final FileInputStream in = new FileInputStream(file);
         // Reading all bytes.
         final byte[] bytes = in.readAllBytes();
         // Closing the FileInputStream.
         in.close();
-        // Repsonding with code 200 and bytes length.
+        // Responding with code 200 and bytes length.
         exchange.sendResponseHeaders(200, bytes.length);
         // Writing bytes (file) to the response.
         exchange.getResponseBody().write(bytes);
@@ -124,7 +124,7 @@ public final class ResourcePackManager implements Listener, HttpHandler {
         // Sending resource pack 1 tick after event is fired. (if enabled)
         if (PluginConfig.RESOURCE_PACK_SEND_ON_JOIN == true) {
             if (file == null || hash == null) {
-                plugin.getLogger().severe("Could not send resourcepack as it seems to be either non-existent or defined improperly.");
+                plugin.getLogger().severe("Could not send resource-pack as it seems to be either non-existent or defined improperly.");
                 return;
             }
             plugin.getBedrockScheduler().run(1L, (task) -> event.getPlayer().setResourcePack(
