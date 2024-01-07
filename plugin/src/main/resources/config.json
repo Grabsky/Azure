@@ -80,7 +80,7 @@
         // Marks resource-packs as forced. Player won't be able to join the server without accepting them.
         "is_required": true,
         // Server message shown in the resource-pack prompt.
-        "prompt_message": "<red>Aby grać na naszym serwerze, musisz zaakceptować paczkę zasobów.",
+        "prompt_message": "\n<gray>Nasz serwer <red>wymaga<gray> akceptacji paczki zasobów.\n\n\n<gray>Listę zasobów, w tym zasobów <red>3rd-party<gray>, wraz z <red>autorami i licencjami<gray> znajdziesz w ustawieniach gry.",
         // Sound played when player is notified about resource-packs update.
         "notification_sound": { "key": "minecraft:block.note_block.bell", "source": "master", "volume": 1, "pitch": 0.5 }
     },
