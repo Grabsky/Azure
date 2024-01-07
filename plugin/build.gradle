@@ -3,8 +3,8 @@ plugins {
     id "net.minecrell.plugin-yml.paper"  version "0.6.0"
 }
 
-final buildsDirectory = (System.getenv("JVM_BUILDS") ?: null)
-final pluginsDirectory = (System.getenv("PLUGINS_DIR") ?: null)
+final buildsDirectory = (System.getenv("WORKSPACE_BUILDS") ?: null)
+final pluginsDirectory = (System.getenv("WORKSPACE_PLUGINS") ?: null)
 
 repositories {
     maven { url = "https://repo.extendedclip.com/content/repositories/placeholderapi/" }
