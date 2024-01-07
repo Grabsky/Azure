@@ -69,16 +69,15 @@
     },
     "resource_pack": {
         // Client must be able to access this address, otherwise resource-pack cannot be downloaded. This is NOT address that internal web server will be hosted at.
+        // Set to "" to disable the web-server functionality.
         "public_access_address": "",
         // Port to host web-server supplying resource-packs on.
         "port": 25578,
-        // Compressed resource-pack files inside "plugins/Azure/.public/".
-        "pack_files": [
-            "resourcepack.zip"
-        ],
+        // Names of compressed resource-pack files inside "plugins/Azure/.public/".
+        "pack_files": [],
         // Whether resource-pack should be send when player joins the server.
         "send_on_join": false,
-        // Marks the resource-packs as forced. Player won't be able to join the server without accepting it.
+        // Marks resource-packs as forced. Player won't be able to join the server without accepting them.
         "is_required": true,
         // Server message shown in the resource-pack prompt.
         "prompt_message": "<red>Aby grać na naszym serwerze, musisz zaakceptować paczkę zasobów.",
