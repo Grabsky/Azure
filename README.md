@@ -10,8 +10,13 @@ Modern and clean, but opinionated multi-purpose plugin for [PaperMC/Paper](https
 
 <br />
 
+> [!IMPORTANT]
+> Default configuration and translations are in Polish language, making the plugin not suitable for external use. This is something I may work on in the future, but no promises. Contributions are always welcome.
+
+<br />
+
 ## Requirements
-Requires **Java 17** (or higher) and **Paper 1.20.1** (or higher).
+Requires **Java 17** (or higher) and **Paper 1.20.4** (or higher).
 
 <br />
 
@@ -22,7 +27,7 @@ $ git clone https://github.com/Grabsky/Azure.git
 # Entering cloned repository
 $ cd ./Azure
 # Compiling
-$ ./gradlew clean shadowJar
+$ ./gradlew clean build
 # Publishing API
 $ ./gradlew clean publishToMavenLocal
 ```
