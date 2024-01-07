@@ -113,7 +113,7 @@ public final class AzureWorldManager implements WorldManager {
         if (dir.exists() == false)
             throw new WorldOperationException(Reason.DOES_NOT_EXIST, "An error occurred while trying to load the world. No directory named " + key.value() + " was found.");
         // Reading PDC.
-        final CompoundBinaryTag compound = BinaryTagIO.reader().read(new File(dir, "level.dat").toPath(), BinaryTagIO.Compression.GZIP).getCompound("Data").getCompound("BukkitValues");
+        final CompoundBinaryTag compound = BinaryTagIO.reader(Long.MAX_VALUE).read(new File(dir, "level.dat").toPath(), BinaryTagIO.Compression.GZIP).getCompound("Data").getCompound("BukkitValues");
         // Skipping worlds that should not be loaded automatically.
         if (force == false && compound.getBoolean(KEY_AUTO_LOAD.asString(), false) == false)
             return null;
