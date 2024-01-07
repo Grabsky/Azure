@@ -70,17 +70,19 @@
     "resource_pack": {
         // Client must be able to access this address, otherwise resource-pack cannot be downloaded. This is NOT address that internal web server will be hosted at.
         "public_access_address": "",
-        // Port to host web-server supplying resource-pack on.
+        // Port to host web-server supplying resource-packs on.
         "port": 25578,
-        // Compressed resource-pack file inside "plugins/Azure/.public_resource-pack/".
-        "pack_file": "resourcepack.zip",
-        // Whether resource pack should be send when player joins the server.
+        // Compressed resource-pack files inside "plugins/Azure/.public/".
+        "pack_files": [
+            "resourcepack.zip"
+        ],
+        // Whether resource-pack should be send when player joins the server.
         "send_on_join": false,
-        // Marks the resource pack as forced. Player won't be able to join the server without accepting it.
+        // Marks the resource-packs as forced. Player won't be able to join the server without accepting it.
         "is_required": true,
-        // Server message shown in resource pack prompt.
+        // Server message shown in the resource-pack prompt.
         "prompt_message": "<red>Aby grać na naszym serwerze, musisz zaakceptować paczkę zasobów.",
-        // Sound played when player is notified
+        // Sound played when player is notified about resource-packs update.
         "notification_sound": { "key": "minecraft:block.note_block.bell", "source": "master", "volume": 1, "pitch": 0.5 }
     },
     // Hidden players are not removed from server list status. Consider setting 'hide-online-players' to 'true'. (server.properties)

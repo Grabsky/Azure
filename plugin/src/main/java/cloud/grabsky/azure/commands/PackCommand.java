@@ -59,44 +59,7 @@ public final class PackCommand extends RootCommand {
 
     @Override
     public void onCommand(final @NotNull RootCommandContext context, final @NotNull ArgumentQueue arguments) throws CommandLogicException {
-        switch (arguments.next(String.class).asOptional("help").toLowerCase()) {
-            case "apply" -> {
-                // Sending resource pack 1 tick after event is fired. (if enabled)
-                if (plugin.getResourcePackManager().getFile() == null || plugin.getResourcePackManager().getHash() == null) {
-                    plugin.getLogger().severe("Could not send resourcepack as it seems to be either non-existent or defined improperly.");
-                    return;
-                }
-                plugin.getBedrockScheduler().run(1L, (task) -> context.getExecutor().asPlayer().setResourcePack(
-                        "http://" + PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS + ":" + PluginConfig.RESOURCE_PACK_PORT + "/" + plugin.getResourcePackManager().getToken(),
-                        plugin.getResourcePackManager().getHash(),
-                        PluginConfig.RESOURCE_PACK_IS_REQUIRED,
-                        PluginConfig.RESOURCE_PACK_PROMPT_MESSAGE
-                ));
-            }
-            case "notify" -> {
-                final CommandSender sender = context.getExecutor().asCommandSender();
-                // ...
-                if (sender.hasPermission(this.getPermission() + ".notify") == true) {
-                    final boolean isConfirm = arguments.next(String.class).asOptional("").equalsIgnoreCase("--confirm");
-                    // Checking for --confirm flag.
-                    if (isConfirm == true) {
-                        // Getting the server audience.
-                        final Server server = plugin.getServer();
-                        // Playing notification sound.
-                        if (PluginConfig.RESOURCE_PACK_NOTIFICATION_SOUND != null)
-                            server.playSound(PluginConfig.RESOURCE_PACK_NOTIFICATION_SOUND);
-                        // Sending notification message.
-                        Message.of(PluginLocale.COMMAND_PACK_NOTIFICATION).send(server);
-                        return;
-                    }
-                    Message.of(PluginLocale.COMMAND_PACK_NOTIFY_CONFIRM).replace("<input>", context.getInput().toString()).send(sender);
-                    return;
-                }
-                Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
-            }
-            // Showing help page when invalid argument is provided.
-            default -> Message.of(PluginLocale.COMMAND_PACK_HELP).send(context.getExecutor().asCommandSender());
-        }
+        throw new UnsupportedOperationException();
     }
 
 }
