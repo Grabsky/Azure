@@ -26,7 +26,6 @@ package cloud.grabsky.azure.commands;
 import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.configuration.PluginLocale;
-import cloud.grabsky.azure.user.AzureUser;
 import cloud.grabsky.azure.user.AzureUser.DiscordLogger;
 import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.commands.ArgumentQueue;

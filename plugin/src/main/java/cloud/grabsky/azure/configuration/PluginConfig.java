@@ -135,8 +135,8 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("resource_pack.port")
     public static int RESOURCE_PACK_PORT;
 
-    @JsonPath("resource_pack.pack_file")
-    public static String RESOURCE_PACK_FILE;
+    @JsonPath("resource_pack.pack_files")
+    public static List<String> RESOURCE_PACK_FILES;
 
     @JsonPath("resource_pack.send_on_join")
     public static boolean RESOURCE_PACK_SEND_ON_JOIN;

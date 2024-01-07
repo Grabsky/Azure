@@ -46,19 +46,20 @@ import org.jetbrains.annotations.NotNull;
 import java.net.URL;
 import java.util.HashSet;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
+@RequiredArgsConstructor(access = AccessLevel.PUBLIC)
 public final class PlayerListener implements Listener {
 
-    private final Azure plugin;
+    private final @NotNull Azure plugin;
 
+    // Players with this permission are excluded from command filtering logic.
     private static final String PERMISSION_BYPASS_COMMAND_FILTER = "azure.plugin.bypass_command_filter";
 
-    public PlayerListener(final @NotNull Azure plugin) {
-        this.plugin = plugin;
-    }
 
-    @EventHandler // NOTE: Some resource pack sending changes might be necessary once 1.20.2 is live. (see 23w31a)
+    @EventHandler
     public void onPlayerJoin(final @NotNull PlayerJoinEvent event) {
         final Player player = event.getPlayer();
         // Teleporting new players to spawn. (if enabled)
@@ -71,6 +72,19 @@ public final class PlayerListener implements Listener {
         // Clearing title. (if enabled)
         if (PluginConfig.GENERAL_CLEAR_TITLE_ON_JOIN == true)
             player.clearTitle();
+    }
+
+    /* WORLD RESPAWN - Respawns players on spawn-point of the main world. */
+
+    @EventHandler
+    public void onPlayerRespawn(final @NotNull PlayerRespawnEvent event) {
+        // Setting respawn location to spawn point of the primary world. (if enabled)
+        if (PluginConfig.GENERAL_RESPAWN_ON_PRIMARY_WORLD_SPAWN == true) {
+            // Getting the primary world.
+            final World primaryWorld = plugin.getWorldManager().getPrimaryWorld();
+            // Setting the respawn location.
+            event.setRespawnLocation(plugin.getWorldManager().getSpawnPoint(primaryWorld));
+        }
     }
 
     /* DISCORD INTEGRATIONS - FORWARDING JOIN MESSAGE TO DISCORD SERVER */
@@ -121,26 +135,15 @@ public final class PlayerListener implements Listener {
         }
     }
 
-    @EventHandler
-    public void onPlayerRespawn(final @NotNull PlayerRespawnEvent event) {
-        // Setting respawn location to spawn point of the primary world. (if enabled)
-        if (PluginConfig.GENERAL_RESPAWN_ON_PRIMARY_WORLD_SPAWN == true) {
-            // Getting the primary world.
-            final World primaryWorld = plugin.getWorldManager().getPrimaryWorld();
-            // Setting the respawn location.
-            event.setRespawnLocation(plugin.getWorldManager().getSpawnPoint(primaryWorld));
-        }
-    }
-
     /* INVULNERABLE PLAYERS - Enables void damage and prevents hunger loss for invulnerable players. */
 
-    @EventHandler(ignoreCancelled = true) // Enables void damge to invulnerable players.
+    @EventHandler(ignoreCancelled = true)
     public void onVoidDamage(final @NotNull EntityDamageEvent event) {
         if (event.getEntity() instanceof Player player && player.isInvulnerable() == true && event.getCause() != EntityDamageEvent.DamageCause.VOID)
             event.setCancelled(true);
     }
 
-    @EventHandler(ignoreCancelled = true) // Disables hunger loss of invulnerable players.
+    @EventHandler(ignoreCancelled = true)
     public void onHungerLoss(final @NotNull FoodLevelChangeEvent event) {
         if (event.getEntity().getFoodLevel() > event.getFoodLevel() && event.getEntity() instanceof Player player && player.isInvulnerable() == true)
             event.setCancelled(true);
@@ -167,7 +170,7 @@ public final class PlayerListener implements Listener {
         event.getCommands().removeIf(it -> commands.contains(it) == PluginConfig.COMMAND_FILTER_USE_AS_BLACKLIST);
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onCommandPreprocess(final @NotNull PlayerCommandPreprocessEvent event) {
         // Exiting if disabled or player has bypass permission.
         if (PluginConfig.COMMAND_FILTER_ENABLED == false || PluginConfig.COMMAND_FILTER_BLOCK_FILTERED_COMMANDS == false || event.getPlayer().hasPermission(PERMISSION_BYPASS_COMMAND_FILTER) == true)

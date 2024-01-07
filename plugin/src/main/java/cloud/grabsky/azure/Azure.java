@@ -99,6 +99,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -312,7 +313,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
             }
             // Returning 'true' as reload finished without any exceptions.
             return true;
-        } catch (final IllegalStateException | ConfigurationMappingException | IOException e) {
+        } catch (final IllegalStateException | ConfigurationMappingException | IOException | URISyntaxException e) {
             this.getLogger().severe("An error occured while trying to reload plugin.");
             this.getLogger().severe("  " + e.getMessage());
             return false;
