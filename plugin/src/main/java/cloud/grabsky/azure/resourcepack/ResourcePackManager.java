@@ -33,6 +33,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import net.kyori.adventure.resource.ResourcePackInfo;
 import net.kyori.adventure.resource.ResourcePackRequest;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -59,23 +60,30 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
 public final class ResourcePackManager implements Listener {
 
-    private final Azure plugin;
+    private final @NotNull Azure plugin;
 
+    // Internal web-server, always listens on all available interfaces.
     private @Nullable HttpServer server;
 
-    private final List<ResourcePackHolder> holders = new ArrayList<>();
+    // Holds information about resource-packs, such as their UUID and hash. URI is generated on-demand, when requested.
+    private List<ResourcePackHolder> holders = new ArrayList<>();
 
 
+    /**
+     * Reloads resource-packs from configuration and starts internal web-server if necessary.
+     */
     @SuppressWarnings("deprecation") // Providing SHA-1 is required by the client, despite it being insecure.
     public void reload() throws IOException, URISyntaxException {
+        // Clearing previously cached information.
         holders.clear();
-        // Re-calculating hashes...
+        // Converting files to ResourcePackHolder objects.
         for (final String filename : PluginConfig.RESOURCE_PACK_FILES) {
             final File file = Path.of(plugin.getDataFolder().getPath(), ".public", filename).toFile();
-            // Hashing file.
+            // Checking whether file exists and is not a directory.
             if (file.exists() == true && file.isDirectory() == false) {
+                // Generating resource-pack UUID from the file name.
                 final UUID uniqueId = UUID.nameUUIDFromBytes(file.getName().getBytes(StandardCharsets.UTF_8));
-                // ...
+                // Generating SHA-1 hash and adding new ResourcePackHolder object to the cache.
                 holders.add(new ResourcePackHolder(uniqueId, file, Files.asByteSource(file).hash(Hashing.sha1()).toString()));
             }
         }
@@ -91,49 +99,67 @@ public final class ResourcePackManager implements Listener {
         }
     }
 
+    /**
+     * Sends configured resource-packs to the specified {@link Player}.
+     */
+    public void sendResourcePacks(final @NotNull Player player) {
+        player.sendResourcePacks(ResourcePackRequest.resourcePackRequest()
+                .replace(true)
+                .required(PluginConfig.RESOURCE_PACK_IS_REQUIRED)
+                .prompt(PluginConfig.RESOURCE_PACK_PROMPT_MESSAGE)
+                .packs(holders.stream().map(holder -> {
+                    final String secret = UUID.randomUUID().toString();
+                    // Creating new context at the generated secret.
+                    server.createContext("/" + secret, (exchange) -> {
+                        // Removing the context, preventing anyone else from using it and (hopefully) releasing resources.
+                        exchange.getHttpContext().getServer().removeContext("/" + secret);
+                        // Opening FileInputStream for the resource-pack file.
+                        final FileInputStream in = new FileInputStream(holder.file);
+                        // Reading all bytes.
+                        final byte[] bytes = in.readAllBytes();
+                        // Closing the FileInputStream.
+                        in.close();
+                        // Responding with code 200 and bytes length.
+                        exchange.sendResponseHeaders(200, bytes.length);
+                        // Writing bytes (file) to the response.
+                        exchange.getResponseBody().write(bytes);
+                        // Closing the response.
+                        exchange.getResponseBody().close();
+                    });
+                    // Creating on-demand URI with the generated secret.
+                    final @Nullable URI uri = toURI("http://" + PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS + ":" + PluginConfig.RESOURCE_PACK_PORT + "/" + secret);
+                    // Logging an error in case URI happened to be null, likely due to a syntax error.
+                    if (uri == null) {
+                        plugin.getLogger().severe("Could not create URI: " + "http://" + PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS + ":" + PluginConfig.RESOURCE_PACK_PORT + "/" + secret);
+                        plugin.getLogger().severe("  Resource-pack " + holder.file.getName() + " will be excluded from the request.");
+                        return null;
+                    }
+                    // Wrapping and returning as ResourcePackInfo object.
+                    return ResourcePackInfo.resourcePackInfo(holder.uniqueId, uri, holder.hash);
+                }).filter(Objects::nonNull).toList()).build()
+        );
+    }
+
     // NOTE: This is likely to be moved onto configuration event once available. (1.20.2)
     @EventHandler(ignoreCancelled = true)
-    public void onPlayerJoin(final @NotNull PlayerJoinEvent event) throws URISyntaxException {
+    public void onPlayerJoin(final @NotNull PlayerJoinEvent event) {
         // Sending resource pack 1 tick after event is fired. (if enabled)
         if (PluginConfig.RESOURCE_PACK_SEND_ON_JOIN == true && this.server != null) {
-            // ...
-            plugin.getBedrockScheduler().run(1L, (task) -> event.getPlayer().sendResourcePacks(ResourcePackRequest.resourcePackRequest()
-                    .required(PluginConfig.RESOURCE_PACK_IS_REQUIRED)
-                    .prompt(PluginConfig.RESOURCE_PACK_PROMPT_MESSAGE)
-                    .packs(holders.stream().map(holder -> {
-                        final String secret = UUID.randomUUID().toString();
-                        // ...
-                        server.createContext("/" + secret, (exchange) -> {
-                            // Removing the exchange, preventing anyone else from using it.
-                            exchange.getHttpContext().getServer().removeContext("/" + secret);
-                            // Opening FileInputStream for the resource-pack file.
-                            final FileInputStream in = new FileInputStream(holder.file);
-                            // Reading all bytes.
-                            final byte[] bytes = in.readAllBytes();
-                            // Closing the FileInputStream.
-                            in.close();
-                            // Responding with code 200 and bytes length.
-                            exchange.sendResponseHeaders(200, bytes.length);
-                            // Writing bytes (file) to the response.
-                            exchange.getResponseBody().write(bytes);
-                            // Closing the response.
-                            exchange.getResponseBody().close();
-                        });
-                        // ...
-                        final @Nullable URI uri = toURI("http://" + PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS + ":" + PluginConfig.RESOURCE_PACK_PORT + "/" + secret);
-                        // ...
-                        if (uri == null) {
-                            plugin.getLogger().severe("Could not create URI: " + "http://" + PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS + ":" + PluginConfig.RESOURCE_PACK_PORT + "/" + secret);
-                            plugin.getLogger().severe("  Resource-pack " + holder.file.getName() + " will not be excluded from the request.");
-                            return null;
-                        }
-                        // ...
-                        return ResourcePackInfo.resourcePackInfo(holder.uniqueId, uri, holder.hash);
-                    }).filter(Objects::nonNull).toList()).build()
-            ));
+            // Sending resource-packs to the player. (next tick)
+            plugin.getBedrockScheduler().run(1L, (task) -> sendResourcePacks(event.getPlayer()));
         }
     }
 
+    /**
+     * Returns {@link URI} from specified {@link String}, or {@code null} in case syntax error has been caught.
+     */
+    public static @Nullable URI toURI(final @NotNull String uri) {
+        try {
+            return new URI(uri);
+        } catch (final URISyntaxException ___) {
+            return null;
+        }
+    }
 
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     private static final class ResourcePackHolder {
@@ -147,14 +173,6 @@ public final class ResourcePackManager implements Listener {
         @Getter(AccessLevel.PUBLIC)
         private final String hash;
 
-    }
-
-    public static @Nullable URI toURI(final @NotNull String uri) {
-        try {
-            return new URI(uri);
-        } catch (final URISyntaxException ___) {
-            return null;
-        }
     }
 
 }

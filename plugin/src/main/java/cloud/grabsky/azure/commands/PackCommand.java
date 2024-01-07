@@ -36,6 +36,7 @@ import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.exception.CommandLogicException;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnknownNullability;
 
@@ -59,7 +60,37 @@ public final class PackCommand extends RootCommand {
 
     @Override
     public void onCommand(final @NotNull RootCommandContext context, final @NotNull ArgumentQueue arguments) throws CommandLogicException {
-        throw new UnsupportedOperationException();
+        switch (arguments.next(String.class).asOptional("help").toLowerCase()) {
+            case "apply" -> {
+                // Getting command sender as player.
+                final Player sender = context.getExecutor().asPlayer();
+                // Sending resource-packs to the player. (immediately)
+                plugin.getResourcePackManager().sendResourcePacks(sender);
+            }
+            case "notify" -> {
+                final CommandSender sender = context.getExecutor().asCommandSender();
+                // ...
+                if (sender.hasPermission(this.getPermission() + ".notify") == true) {
+                    final boolean isConfirm = arguments.next(String.class).asOptional("").equalsIgnoreCase("--confirm");
+                    // Checking for --confirm flag.
+                    if (isConfirm == true) {
+                        // Getting the server audience.
+                        final Server server = plugin.getServer();
+                        // Playing notification sound.
+                        if (PluginConfig.RESOURCE_PACK_NOTIFICATION_SOUND != null)
+                            server.playSound(PluginConfig.RESOURCE_PACK_NOTIFICATION_SOUND);
+                        // Sending notification message.
+                        Message.of(PluginLocale.COMMAND_PACK_NOTIFICATION).send(server);
+                        return;
+                    }
+                    Message.of(PluginLocale.COMMAND_PACK_NOTIFY_CONFIRM).replace("<input>", context.getInput().toString()).send(sender);
+                    return;
+                }
+                Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
+            }
+            // Showing help page when invalid argument is provided.
+            default -> Message.of(PluginLocale.COMMAND_PACK_HELP).send(context.getExecutor().asCommandSender());
+        }
     }
 
 }
