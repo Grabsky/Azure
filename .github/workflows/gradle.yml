@@ -22,7 +22,7 @@ jobs:
           distribution: "temurin"
         env:
           # GitHub Packages
-          GPR_ACTOR: ${{ secrets.GPR_TOKEN }}
+          GPR_ACTOR: ${{ secrets.GPR_ACTOR }}
           GPR_TOKEN: ${{ secrets.GPR_TOKEN }}
       # Building
       - name: Build
