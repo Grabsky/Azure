@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "cloud.grabsky"
-version = "1.20.4-${System.getenv("GITHUB_RUN_NUMBER") ?: "dev"}"
+version = "1.20.4-${System.getenv("GITHUB_RUN_NUMBER") ?: "DEV"}"
 
 subprojects {
     apply(plugin: "java-library")
@@ -15,6 +15,10 @@ subprojects {
     targetCompatibility = JavaVersion.VERSION_17
 
     ext {
+        // Environment-specific variables...
+        WORKSPACE_BUILDS = System.getenv("WORKSPACE_BUILDS") ?: null
+        WORKSPACE_PLUGINS = System.getenv("WORKSPACE_PLUGINS") ?: null
+        // Dependency versions...
         BEDROCK_VERSION = "1.20.1-47"
         KYORI_NBT_VERSION = "4.15.0"
     }
@@ -22,8 +26,29 @@ subprojects {
     repositories {
         mavenLocal()
         mavenCentral()
-        maven { url = "https://repo.grabsky.cloud/releases/" }
+        // Repository for the Paper API.
         maven { url = "https://papermc.io/repo/repository/maven-public/" }
+        // Repository containing the 'bedrock' dependency.
+        maven { url = "https://maven.pkg.github.com/grabsky/bedrock"
+            credentials {
+                username = findProperty("gpr.actor") ?: System.getenv("GITHUB_ACTOR")
+                password = findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+        // Repository containing the 'configuration' dependency.
+        maven { url = "https://maven.pkg.github.com/grabsky/configuration"
+            credentials {
+                username = findProperty("gpr.actor") ?: System.getenv("GITHUB_ACTOR")
+                password = findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+        // Repository containing the 'commands' dependency.
+        maven { url = "https://maven.pkg.github.com/grabsky/commands"
+            credentials {
+                username = findProperty("gpr.actor") ?: System.getenv("GITHUB_ACTOR")
+                password = findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
     }
 
     dependencies {

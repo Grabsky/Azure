@@ -16,17 +16,18 @@ Requires **Java 17** (or higher) and **Paper 1.20.1** (or higher).
 <br />
 
 ## Building (Linux)
+Some dependencies use [GitHub Gradle Registry]() and thus may require [extra configuration steps]() for the project to build properly.
+
 ```shell
-# Cloning repository
+# Cloning the repository.
 $ git clone https://github.com/Grabsky/Azure.git
-# Entering cloned repository
+# Entering cloned repository.
 $ cd ./Azure
-# Compiling
-$ ./gradlew clean shadowJar
-# Publishing API
+# Compiling and building artifacts.
+$ ./gradlew clean build
+# Publishing the API to local repository.
 $ ./gradlew clean publishToMavenLocal
 ```
-Some dependencies, namely - [Grabsky/configuration](https://github.com/Grabsky/configuration), [Grabsky/commands](https://github.com/Grabsky/commands) and [Grabsky/bedrock](https://github.com/Grabsky/bedrock) - may need to be published to local repository first.
 
 <br />
 

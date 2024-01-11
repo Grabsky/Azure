@@ -68,6 +68,8 @@ public final class ResourcePackManager implements Listener {
     // Holds information about resource-packs, such as their UUID and hash. URI is generated on-demand, when requested.
     private List<ResourcePackHolder> holders = new ArrayList<>();
 
+    // Holds resource-pack file names in order reverse to specified inside configuration. Filled by the PluginConfig#onReload method.
+    public static List<String> RESOURCE_PACK_FILES_REVERSED;
 
     /**
      * Reloads resource-packs from configuration and starts internal web-server if necessary.
@@ -76,8 +78,8 @@ public final class ResourcePackManager implements Listener {
     public void reload() throws IOException, URISyntaxException {
         // Clearing previously cached information.
         holders.clear();
-        // Converting files to ResourcePackHolder objects.
-        for (final String filename : PluginConfig.RESOURCE_PACK_FILES) {
+        // Converting files to ResourcePackHolder objects. Doing so in reverse order as to
+        for (final String filename : RESOURCE_PACK_FILES_REVERSED) {
             final File file = Path.of(plugin.getDataFolder().getPath(), ".public", filename).toFile();
             // Checking whether file exists and is not a directory.
             if (file.exists() == true && file.isDirectory() == false) {
