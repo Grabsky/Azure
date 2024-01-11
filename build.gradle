@@ -31,22 +31,22 @@ subprojects {
         // Repository containing the 'bedrock' dependency.
         maven { url = "https://maven.pkg.github.com/grabsky/bedrock"
             credentials {
-                username = findProperty("gpr.actor") ?: System.getenv("GPR_ACTOR")
-                password = findProperty("gpr.token") ?: System.getenv("GPR_TOKEN")
+                username = findProperty("gpr.actor") ?: System.getenv("GITHUB_ACTOR")
+                password = findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
             }
         }
         // Repository containing the 'configuration' dependency.
         maven { url = "https://maven.pkg.github.com/grabsky/configuration"
             credentials {
-                username = findProperty("gpr.actor") ?: System.getenv("GPR_ACTOR")
-                password = findProperty("gpr.token") ?: System.getenv("GPR_TOKEN")
+                username = findProperty("gpr.actor") ?: System.getenv("GITHUB_ACTOR")
+                password = findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
             }
         }
         // Repository containing the 'commands' dependency.
         maven { url = "https://maven.pkg.github.com/grabsky/commands"
             credentials {
-                username = findProperty("gpr.actor") ?: System.getenv("GPR_ACTOR")
-                password = findProperty("gpr.token") ?: System.getenv("GPR_TOKEN")
+                username = findProperty("gpr.actor") ?: System.getenv("GITHUB_ACTOR")
+                password = findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
             }
         }
     }
