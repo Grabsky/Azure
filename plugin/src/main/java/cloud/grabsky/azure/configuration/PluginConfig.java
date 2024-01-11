@@ -25,6 +25,7 @@ package cloud.grabsky.azure.configuration;
 
 import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.chat.ChatManager;
+import cloud.grabsky.azure.resourcepack.ResourcePackManager;
 import cloud.grabsky.configuration.JsonConfiguration;
 import cloud.grabsky.configuration.JsonNullable;
 import cloud.grabsky.configuration.JsonPath;
@@ -253,6 +254,7 @@ public final class PluginConfig implements JsonConfiguration {
     public void onReload() {
         ChatManager.CHAT_FORMATS_REVERSED = reversed(PluginConfig.CHAT_FORMATS_EXTRA);
         ChatManager.CHAT_TAGS_REVERSED = reversed(PluginConfig.CHAT_MESSAGE_TAGS_EXTRA);
+        ResourcePackManager.RESOURCE_PACK_FILES_REVERSED = reversed(PluginConfig.RESOURCE_PACK_FILES);
         // Iterating over disabled recipes list and removing them from the server. May not be the best place to do that.
         DISABLED_RECIPES.forEach(key -> {
             if (Bukkit.removeRecipe(key) == false)
