@@ -5,8 +5,8 @@ on:
     branches: ["main", "dev/build-environment"]
 
 permissions:
-  contents: ["read"]
-  packages: ["read", "write"]
+  contents: "read"
+  packages: "read|write"
 
 jobs:
   build:
