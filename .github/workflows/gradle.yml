@@ -2,7 +2,7 @@ name: Gradle CI + Publish
 
 on:
   push:
-    branches: ["main", "dev/build-environment"]
+    branches: ["main"]
 
 permissions:
   contents: read
