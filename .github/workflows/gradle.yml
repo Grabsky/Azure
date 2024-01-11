@@ -20,15 +20,14 @@ jobs:
         with:
           java-version: "17"
           distribution: "temurin"
-        env:
-          # GitHub Packages
-          GPR_ACTOR: ${{ secrets.GPR_ACTOR }}
-          GPR_TOKEN: ${{ secrets.GPR_TOKEN }}
       # Building
       - name: Build
         uses: gradle/gradle-build-action@v2
         with:
           arguments: clean shadowJar
+        env:
+          # GitHub Packages
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # Uploading artifact(s)
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
