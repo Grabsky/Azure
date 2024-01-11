@@ -10,16 +10,21 @@ Modern and clean, but opinionated multi-purpose plugin for [PaperMC/Paper](https
 
 <br />
 
+> [!IMPORTANT]
+> Default configuration and translations are in Polish language, making the plugin not suitable for external use. This is something I may work on in the future, but no promises. Contributions are always welcome.
+
+<br />
+
 ## Requirements
-Requires **Java 17** (or higher) and **Paper 1.20.1** (or higher).
+Requires **Java 17** (or higher) and **Paper 1.20.4** (or higher).
 
 <br />
 
 ## Building (Linux)
-Some dependencies use [GitHub Gradle Registry]() and thus may require [extra configuration steps]() for the project to build properly.
+Some dependencies use [GitHub Gradle Registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry) and thus may require extra configuration steps for the project to build properly.
 
 ```shell
-# Cloning the repository.
+# Cloning repository.
 $ git clone https://github.com/Grabsky/Azure.git
 # Entering cloned repository.
 $ cd ./Azure
