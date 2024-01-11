@@ -3,33 +3,33 @@ plugins {
     id "net.minecrell.plugin-yml.paper"  version "0.6.0"
 }
 
-final buildsDirectory = (System.getenv("WORKSPACE_BUILDS") ?: null)
-final pluginsDirectory = (System.getenv("WORKSPACE_PLUGINS") ?: null)
-
 repositories {
     maven { url = "https://repo.extendedclip.com/content/repositories/placeholderapi/" }
 }
 
 dependencies {
     api(project ":azure-api")
-    // Libraries
-    paperLibrary("cloud.grabsky:bedrock:$BEDROCK_VERSION")
-    paperLibrary("cloud.grabsky:commands:1.20.1-34")
-    paperLibrary("cloud.grabsky:configuration-paper:1.20.1-42")
-    //paperLibrary("club.minnced:discord-webhooks:0.8.4")
-    paperLibrary("net.kyori:adventure-nbt:$KYORI_NBT_VERSION")
-    // For some reason doesn't work with paper library loader.
+    // Must share version between 'plugin' and 'api' modules.
+    implementation("cloud.grabsky:bedrock:$BEDROCK_VERSION")
+    implementation("cloud.grabsky:commands:1.20.1-34")
+    implementation("cloud.grabsky:configuration-paper:1.20.1-42")
+    // Must share version between 'plugin' and 'api' modules.
+    implementation("net.kyori:adventure-nbt:$KYORI_NBT_VERSION")
+    // Moshi and Okio are already in the classpath.
     implementation("org.javacord:javacord:3.8.0") {
         exclude group: "com.squareup.moshi"
         exclude group: "com.squareup.okio"
     }
-    // Plugin dependencies
+    // Plugin dependencies, should be present in the classpath as required per 'paper-plugin.yml' file.
     compileOnly("net.luckperms:api:5.4")
     compileOnly("me.clip:placeholderapi:2.11.5")
 }
 
 tasks {
-    shadowJar { archiveFileName = "${rootProject.name}-${project.version}.jar" }
+    shadowJar {
+        // Changing name of the artifact.
+        archiveFileName = "${rootProject.name}-${project.version}.jar"
+    }
     compileJava {
         options.fork = true
         // Setting compatibility to Java 17 (above should work too).
@@ -41,21 +41,19 @@ tasks {
 tasks.register("deploy") {
     dependsOn(shadowJar)
     doLast {
-        // Copying to the builds directory specified by 'JVM_BUILDS' environment variable.
-        if (buildsDirectory != null)
-            copy { from(shadowJar) into(buildsDirectory) }
-        // Copying to the plugins directory specified by 'PLUGINS_DIR' environment variable.
-        if (pluginsDirectory != null)
-            copy { from(shadowJar) into(pluginsDirectory) }
+        // Copying to the builds directory specified by 'WORKSPACE_BUILDS' environment variable.
+        if (WORKSPACE_BUILDS != null)
+            copy { from(shadowJar) into(WORKSPACE_BUILDS) }
+        // Copying to the plugins directory specified by 'WORKSPACE_PLUGINS' environment variable.
+        if (WORKSPACE_PLUGINS != null)
+            copy { from(shadowJar) into(WORKSPACE_PLUGINS) }
     }
 }
 
 paper {
     name = "Azure"
     main = "cloud.grabsky.azure.Azure"
-    loader = "cloud.grabsky.azure.Azure\$PluginLoader"
     apiVersion = "1.20"
-    generateLibrariesJson = true
     serverDependencies {
         "LuckPerms"      { load = "BEFORE"; required = true }
         "PlaceholderAPI" { load = "BEFORE"; required = true }

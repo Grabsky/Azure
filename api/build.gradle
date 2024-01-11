@@ -5,13 +5,6 @@ plugins {
 publishing {
     repositories {
         maven {
-            url = "https://repo.grabsky.cloud/releases/"
-            credentials {
-                username = System.getenv("REPO_USERNAME")
-                password = System.getenv("REPO_SECRET")
-            }
-        }
-        maven {
             url = "https://maven.pkg.github.com/Grabsky/Azure"
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
@@ -25,7 +18,9 @@ publishing {
 }
 
 dependencies {
+    // Must share version between 'plugin' and 'api' modules.
     compileOnly("cloud.grabsky:bedrock:$BEDROCK_VERSION")
+    // Must share version between 'plugin' and 'api' modules.
     compileOnly("net.kyori:adventure-nbt:$KYORI_NBT_VERSION")
 }
 
