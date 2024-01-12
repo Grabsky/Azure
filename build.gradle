@@ -1,5 +1,5 @@
 plugins {
-    id("java-library")
+    id "java-library"
 }
 
 group = "cloud.grabsky"
@@ -16,8 +16,8 @@ subprojects {
 
     ext {
         // Environment-specific variables...
-        WORKSPACE_BUILDS = System.getenv("WORKSPACE_BUILDS") ?: null
-        WORKSPACE_PLUGINS = System.getenv("WORKSPACE_PLUGINS") ?: null
+        WORKSPACE_BUILDS = System.getenv("WORKSPACE_BUILDS")
+        WORKSPACE_PLUGINS = System.getenv("WORKSPACE_PLUGINS")
         // Dependency versions...
         BEDROCK_VERSION = "1.20.1-47"
         KYORI_NBT_VERSION = "4.15.0"

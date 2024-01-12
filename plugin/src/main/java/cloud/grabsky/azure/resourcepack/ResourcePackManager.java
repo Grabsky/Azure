@@ -27,6 +27,7 @@ package cloud.grabsky.azure.resourcepack;
 
 import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.configuration.PluginConfig;
+import cloud.grabsky.azure.util.Iterables;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
 import com.sun.net.httpserver.HttpExchange;
@@ -87,6 +88,8 @@ public final class ResourcePackManager implements Listener {
                 holders.add(new ResourcePackHolder(uniqueId, file, Files.asByteSource(file).hash(Hashing.sha1()).toString()));
             }
         }
+        // Reversing the list to keep the resource-pack priority how it is defined in the config.
+        this.holders = Iterables.reversed(holders);
         // Setting-up internal web server throws BindException in case port is already in use.
         if (PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS.isBlank() == false && PluginConfig.RESOURCE_PACK_PORT > 0 && this.server == null) {
             this.server = HttpServer.create(new InetSocketAddress(PluginConfig.RESOURCE_PACK_PORT), 0);
@@ -140,7 +143,7 @@ public final class ResourcePackManager implements Listener {
         );
     }
 
-    // NOTE: This is likely to be moved onto configuration event once available. (1.20.2)
+    // NOTE: This is likely to be moved into configuration event once available. (1.20.2)
     @EventHandler(ignoreCancelled = true)
     public void onPlayerJoin(final @NotNull PlayerJoinEvent event) {
         // Sending resource pack 1 tick after event is fired. (if enabled)

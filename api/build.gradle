@@ -1,11 +1,10 @@
 plugins {
-    id("maven-publish")
+    id "maven-publish"
 }
 
 publishing {
     repositories {
-        maven {
-            url = "https://maven.pkg.github.com/Grabsky/Azure"
+        maven { url = "https://maven.pkg.github.com/Grabsky/Azure"
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")
@@ -31,9 +30,4 @@ java {
 
 javadoc {
     (options as CoreJavadocOptions).addStringOption("Xdoclint:none", "-quiet")
-}
-
-gradle.buildFinished {
-    println()
-    println("> " + rootProject.version)
 }
