@@ -39,11 +39,12 @@ import cloud.grabsky.commands.exception.MissingInputException;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
+
+import java.util.UUID;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
-
-import java.util.UUID;
 
 // TO-DO: Disallow spying on players with higher group weight.
 @Command(name = "reply", aliases = "r", permission = "azure.command.reply", usage = "/reply (message)")

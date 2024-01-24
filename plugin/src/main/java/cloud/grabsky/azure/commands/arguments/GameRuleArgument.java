@@ -32,10 +32,11 @@ import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.exception.ArgumentParseException;
 import cloud.grabsky.commands.exception.MissingInputException;
 import org.bukkit.GameRule;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.stream.Stream;
+
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("rawtypes")
 public enum GameRuleArgument implements ArgumentParser<GameRule>, CompletionsProvider {

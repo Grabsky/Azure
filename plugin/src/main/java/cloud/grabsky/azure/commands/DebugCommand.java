@@ -40,9 +40,10 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+
+import org.jetbrains.annotations.NotNull;
 
 @Command(name = "debug", permission = "azure.command.debug", usage = "/debug (...)")
 public final class DebugCommand extends RootCommand implements Listener {

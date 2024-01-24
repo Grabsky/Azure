@@ -35,6 +35,7 @@ import cloud.grabsky.commands.component.ExceptionHandler;
 import cloud.grabsky.commands.exception.CommandLogicException;
 import cloud.grabsky.commands.exception.MissingInputException;
 import org.bukkit.entity.Player;
+
 import org.jetbrains.annotations.NotNull;
 
 @Command(name = "speed", permission = "azure.command.speed", usage = "/speed (player) (speed)")

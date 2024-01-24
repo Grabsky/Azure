@@ -42,12 +42,13 @@ import com.google.gson.JsonElement;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.UnknownNullability;
 
 import java.io.IOException;
 import java.util.Base64;
 import java.util.regex.Pattern;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnknownNullability;
 
 @Command(name = "skull", permission = "azure.command.skull", usage = "/skull (texture)")
 public final class SkullCommand extends RootCommand {

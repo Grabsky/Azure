@@ -35,6 +35,7 @@ import cloud.grabsky.commands.exception.CommandLogicException;
 import cloud.grabsky.commands.exception.MissingInputException;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
 import org.jetbrains.annotations.NotNull;
 
 @Command(name = "feed", permission = "azure.command.feed", usage = "/feed (player)")

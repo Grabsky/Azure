@@ -32,9 +32,10 @@ import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.exception.ArgumentParseException;
 import cloud.grabsky.commands.exception.MissingInputException;
 import org.bukkit.World;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+
+import org.jetbrains.annotations.NotNull;
 
 public enum WorldEnvironmentArgument implements ArgumentParser<World.Environment>, CompletionsProvider {
     /* SINGLETON */ INSTANCE;

@@ -30,10 +30,11 @@ import cloud.grabsky.commands.component.ArgumentParser;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.exception.ArgumentParseException;
 import cloud.grabsky.commands.exception.MissingInputException;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Random;
+
+import org.jetbrains.annotations.NotNull;
 
 public enum WorldSeedArgument implements ArgumentParser<Long>, CompletionsProvider {
     /* SINGLETON */ INSTANCE;

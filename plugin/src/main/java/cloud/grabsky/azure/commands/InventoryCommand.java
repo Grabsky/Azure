@@ -34,6 +34,7 @@ import cloud.grabsky.commands.component.ExceptionHandler;
 import cloud.grabsky.commands.exception.CommandLogicException;
 import cloud.grabsky.commands.exception.MissingInputException;
 import org.bukkit.entity.Player;
+
 import org.jetbrains.annotations.NotNull;
 
 @Command(name = "inventory", permission = "azure.command.inventory", usage = "/inventory (player)")

@@ -36,9 +36,10 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.javacord.api.entity.activity.ActivityType;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+
+import org.jetbrains.annotations.Nullable;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

@@ -44,9 +44,10 @@ import cloud.grabsky.commands.argument.WorldArgument;
 import cloud.grabsky.commands.exception.IncompatibleSenderException;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
+
+import org.jetbrains.annotations.NotNull;
 
 public enum CommandExceptionTemplate implements Consumer<RootCommandManager> {
     /* SINGLETON */ INSTANCE;

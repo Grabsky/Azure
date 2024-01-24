@@ -35,9 +35,10 @@ import org.bukkit.GameMode;
 import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.WorldType;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
+
+import org.jetbrains.annotations.NotNull;
 
 public enum CommandArgumentTemplate implements Consumer<RootCommandManager> {
     /* SINGLETON */ INSTANCE;

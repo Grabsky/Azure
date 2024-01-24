@@ -41,10 +41,11 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
-import org.jetbrains.annotations.NotNull;
 
 import java.net.URL;
 import java.util.HashSet;
+
+import org.jetbrains.annotations.NotNull;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

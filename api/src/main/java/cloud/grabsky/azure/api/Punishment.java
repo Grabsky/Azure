@@ -25,6 +25,7 @@ package cloud.grabsky.azure.api;
 
 import cloud.grabsky.bedrock.util.Interval;
 import cloud.grabsky.bedrock.util.Interval.Unit;
+
 import org.jetbrains.annotations.NotNull;
 
 public interface Punishment {

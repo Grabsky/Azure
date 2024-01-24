@@ -47,10 +47,11 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 // TO-DO: Support for "@forever" selector which defaults to 0s, making the punishment permanent. (low priority)
 @Command(name = "ban", permission = "azure.command.ban", usage = "/ban (player) (duration) (reason)")

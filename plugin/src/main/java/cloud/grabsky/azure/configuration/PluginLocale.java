@@ -29,6 +29,7 @@ import cloud.grabsky.configuration.JsonPath;
 import cloud.grabsky.configuration.paper.adapter.StringComponentAdapter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnknownNullability;
 

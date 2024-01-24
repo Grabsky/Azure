@@ -32,6 +32,7 @@ import cloud.grabsky.commands.annotation.Command;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.exception.CommandLogicException;
 import org.bukkit.entity.Player;
+
 import org.jetbrains.annotations.NotNull;
 
 @Command(name = "enderchest", permission = "azure.command.enderchest", usage = "/enderchest (player)")

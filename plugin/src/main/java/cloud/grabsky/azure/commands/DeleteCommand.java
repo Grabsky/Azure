@@ -34,9 +34,10 @@ import cloud.grabsky.commands.annotation.Dependency;
 import cloud.grabsky.commands.component.ExceptionHandler;
 import cloud.grabsky.commands.exception.CommandLogicException;
 import cloud.grabsky.commands.exception.MissingInputException;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
+
+import org.jetbrains.annotations.NotNull;
 
 @Command(name = "delete", permission = "azure.command.delete", usage = "/delete (signature_uuid)")
 public final class DeleteCommand extends RootCommand {

@@ -37,10 +37,11 @@ import cloud.grabsky.commands.exception.CommandLogicException;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.stream.Stream;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnknownNullability;
 
 @Command(name = "pack", permission = "azure.command.pack", usage = "/pack (...)")
 public final class PackCommand extends RootCommand {

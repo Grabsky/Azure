@@ -47,11 +47,12 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.UUID;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
-
-import java.util.UUID;
 
 // TO-DO: Support for "@forever" selector which defaults to 0s, making the punishment permanent. (low priority)
 @Command(name = "mute", permission = "azure.command.mute", usage = "/mute (player) (duration) (reason)")

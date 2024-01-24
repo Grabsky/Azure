@@ -33,6 +33,7 @@ import cloud.grabsky.commands.annotation.Command;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.exception.CommandLogicException;
 import org.bukkit.command.CommandSender;
+
 import org.jetbrains.annotations.NotNull;
 
 @Command(name = "azure", permission = "azure.command.azure", usage = "/azure (...)")

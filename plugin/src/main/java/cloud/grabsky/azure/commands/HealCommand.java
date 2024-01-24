@@ -36,6 +36,7 @@ import cloud.grabsky.commands.exception.MissingInputException;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
 import org.jetbrains.annotations.NotNull;
 
 @Command(name = "heal", permission = "azure.command.heal", usage = "/heal (player)")
