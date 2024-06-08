@@ -163,7 +163,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
         try {
             this.worldManager.loadWorlds();
         } catch (final IOException e) {
-            this.getLogger().severe("An error occured while trying to load worlds.");
+            this.getLogger().severe("An error occurred while trying to load worlds.");
             this.getLogger().severe("  " + e.getMessage());
         }
         // ...
@@ -301,7 +301,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
             // Returning 'true' as reload finished without any exceptions.
             return true;
         } catch (final IllegalStateException | ConfigurationMappingException | IOException | URISyntaxException e) {
-            this.getLogger().severe("An error occured while trying to reload plugin.");
+            this.getLogger().severe("An error occurred while trying to reload plugin.");
             this.getLogger().severe("  " + e.getMessage());
             return false;
         }
