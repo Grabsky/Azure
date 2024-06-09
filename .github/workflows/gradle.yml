@@ -53,5 +53,3 @@ jobs:
         with:
           name: "${{ env.PROJECT_RELEASE_NAME }}"
           tag: "${{ env.PROJECT_TAG }}"
-          artifacts: "*.jar"
-          prerelease: true

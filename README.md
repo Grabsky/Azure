@@ -1,12 +1,9 @@
 # Azure
-<span>
-    <a href=""><img alt="Latest Published Version" src="https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Frepo.grabsky.cloud%2Freleases%2Fcloud%2Fgrabsky%2Fazure-api%2Fmaven-metadata.xml&style=for-the-badge&logo=gradle&label=%20"></a>
-    <a href=""><img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/Grabsky/Azure/gradle.yml?style=for-the-badge&logo=github&logoColor=white&label=%20"></a>
-    <a href=""><img alt="CodeFactor Grade" src="https://img.shields.io/codefactor/grade/github/Grabsky/Azure/main?style=for-the-badge&logo=codefactor&logoColor=white&label=%20"></a>
-</span>
-<p></p>
+![Latest Release](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.github.com%2Frepos%2FGrabsky%2FAzure%2Freleases%2Flatest&query=tag_name&logo=gradle&style=for-the-badge&label=%20&labelColor=%231C2128&color=%23454F5A)
+![Build Status](https://img.shields.io/github/actions/workflow/status/Grabsky/Azure/gradle.yml?style=for-the-badge&logo=github&logoColor=white&label=%20)
+![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/Grabsky/Azure/main?style=for-the-badge&logo=codefactor&logoColor=white&label=%20)
 
-Modern and clean, but opinionated multi-purpose plugin for [PaperMC/Paper](https://github.com/PaperMC/Paper) servers. Maintained for use on servers I develop for and no public release is planned as of now.
+Modern and clean, but opinionated multi-purpose plugin for **[Paper](https://github.com/PaperMC/Paper)** servers. Maintained for use on servers I develop for and no public release is planned as of now.
 
 <br />
 
@@ -21,7 +18,7 @@ Requires **Java 17** (or higher) and **Paper 1.20.4** (or higher).
 <br />
 
 ## Building (Linux)
-Some dependencies use [GitHub Gradle Registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry) and thus may require extra configuration steps for the project to build properly.
+Some dependencies use **[GitHub Gradle Registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry)** and thus may require extra configuration steps for the project to build properly.
 
 ```shell
 # Cloning repository.
