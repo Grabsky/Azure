@@ -61,3 +61,11 @@ subprojects {
     }
 
 }
+
+tasks.register("release") {
+    print("${version.toString().split('-')[0]} #${System.getenv("GITHUB_RUN_NUMBER")}")
+}
+
+tasks.register("tag") {
+    print(version)
+}

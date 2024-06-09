@@ -41,3 +41,17 @@ jobs:
         env:
           # GitHub Packages
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Expose Release Name
+      - name: Expose Release Name
+        run: echo "PROJECT_RELEASE_NAME=$( ./gradlew release -q --no-rebuild )" >> $GITHUB_ENV
+      # Expose Tag
+      - name: Expose Tag
+        run: echo "PROJECT_TAG=$( ./gradlew tag -q --no-rebuild )" >> $GITHUB_ENV
+      # Release
+      - name: Release
+        uses: ncipollo/release-action@v1
+        with:
+          name: "${{ env.PROJECT_RELEASE_NAME }}"
+          tag: "${{ env.PROJECT_TAG }}"
+          artifacts: "*.jar"
+          prerelease: true
