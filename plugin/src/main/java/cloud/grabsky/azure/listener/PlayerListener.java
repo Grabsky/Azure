@@ -43,7 +43,6 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
 
 import java.net.URI;
-import java.net.URL;
 import java.util.HashSet;
 
 import org.jetbrains.annotations.NotNull;
