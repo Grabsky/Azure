@@ -12,7 +12,9 @@ publishing {
         }
     }
     publications {
-        maven(MavenPublication) { from components.java }
+        register("maven", MavenPublication.class) {
+            from components.java
+        }
     }
 }
 
@@ -21,13 +23,4 @@ dependencies {
     compileOnly("cloud.grabsky:bedrock:$BEDROCK_VERSION")
     // Must share version between 'plugin' and 'api' modules.
     compileOnly("net.kyori:adventure-nbt:$KYORI_NBT_VERSION")
-}
-
-java {
-    withSourcesJar()
-    withJavadocJar()
-}
-
-javadoc {
-    (options as CoreJavadocOptions).addStringOption("Xdoclint:none", "-quiet")
 }

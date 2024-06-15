@@ -75,7 +75,7 @@ public final class ResourcePackManager implements Listener {
      * Reloads resource-packs from configuration and starts internal web-server if necessary.
      */
     @SuppressWarnings("deprecation") // Providing SHA-1 is required by the client, despite it being insecure.
-    public void reload() throws IOException, URISyntaxException {
+    public void reload() throws IOException {
         // Clearing previously cached information.
         holders.clear();
         // Converting files to ResourcePackHolder objects.

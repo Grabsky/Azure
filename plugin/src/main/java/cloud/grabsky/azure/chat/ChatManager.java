@@ -62,6 +62,7 @@ import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
 
+import java.net.URI;
 import java.net.URL;
 import java.time.Duration;
 import java.util.HashMap;
@@ -124,7 +125,7 @@ public final class ChatManager implements Listener, MessageCreateListener {
         final @Nullable SignedMessage.Signature signature = signatureCache.getIfPresent(signatureUUID);
         // ...
         if (signature != null) {
-            // Deleting the message for the whole server, console *should* be exluded.
+            // Deleting the message for the whole server, console *should* be excluded.
             plugin.getServer().deleteMessage(signature);
             // ...
             return true;
@@ -241,7 +242,8 @@ public final class ChatManager implements Listener, MessageCreateListener {
 
     }
 
-    @SneakyThrows @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @SneakyThrows
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onChatForward(final AsyncChatEvent event) {
         // Skipping in case discord integrations are not enabled or misconfigured.
         if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_URL.isEmpty() == true)
@@ -257,7 +259,7 @@ public final class ChatManager implements Listener, MessageCreateListener {
                 builder.setDisplayName(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_USERNAME));
             // Setting avatar if specified.
             if (PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
-                builder.setDisplayAvatar(new URL(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_AVATAR)));
+                builder.setDisplayAvatar(new URI(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_AVATAR)).toURL());
             // Sending the message.
             builder.sendSilently(plugin.getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_URL);
         }

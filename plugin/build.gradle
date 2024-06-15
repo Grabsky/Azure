@@ -30,24 +30,6 @@ tasks {
         // Changing name of the artifact.
         archiveFileName = "${rootProject.name}-${project.version}.jar"
     }
-    compileJava {
-        options.fork = true
-        // Setting compatibility to Java 17 (above should work too).
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-}
-
-tasks.register("deploy") {
-    dependsOn(shadowJar)
-    doLast {
-        // Copying to the builds directory specified by 'WORKSPACE_BUILDS' environment variable.
-        if (WORKSPACE_BUILDS != null)
-            copy { from(shadowJar) into(WORKSPACE_BUILDS) }
-        // Copying to the plugins directory specified by 'WORKSPACE_PLUGINS' environment variable.
-        if (WORKSPACE_PLUGINS != null)
-            copy { from(shadowJar) into(WORKSPACE_PLUGINS) }
-    }
 }
 
 paper {

@@ -315,7 +315,7 @@ public final class WorldCommand extends RootCommand {
                 else if (e.getReason() == Reason.OTHER)
                     Message.of(PluginLocale.COMMAND_WORLD_CREATE_FAILURE_OTHER).placeholder("world", key).send(sender);
                 // Catch any RuntimeException, I'm tired of guessing what exceptions Bukkit can throw...
-            } catch (final IOException | RuntimeException e) {
+            } catch (final RuntimeException e) {
                 e.printStackTrace();
                 // Sending error message to command sender.
                 Message.of(PluginLocale.COMMAND_WORLD_CREATE_FAILURE_OTHER).placeholder("world", key).send(sender);
@@ -718,7 +718,7 @@ public final class WorldCommand extends RootCommand {
         if (sender.hasPermission(this.getPermission() + ".weather") == true) {
             final World world = arguments.next(World.class).asRequired(WORLD_WEATHER_USAGE);
             final String weather = arguments.next(String.class).asRequired(WORLD_WEATHER_USAGE);
-            // Chaging the weather based on input...
+            // Changing the weather based on input...
             switch (weather.toLowerCase()) {
                 case "clear" -> {
                     world.setStorm(false);

@@ -104,7 +104,7 @@ public final class SkullCommand extends RootCommand {
         // Getting the value. It should be either name of an offline player or base64 value.
         final String value = arguments.next(String.class).asRequired(SKULL_USAGE);
 
-        // Wrapping onto asynchronous task as further instructions may involve blocking oprations.
+        // Wrapping onto asynchronous task as further instructions may involve blocking operations.
         plugin.getBedrockScheduler().runAsync(0L, (task) -> {
 
             // Matching value with valid username regex.

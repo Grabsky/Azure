@@ -33,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
 /**
- * {@link UserCache} is repsonsible for caching some information about players.
+ * {@link UserCache} is responsible for caching some information about players.
  */
 public interface UserCache {
 

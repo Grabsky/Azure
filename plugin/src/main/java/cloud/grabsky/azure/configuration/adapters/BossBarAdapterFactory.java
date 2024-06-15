@@ -56,7 +56,7 @@ public final class BossBarAdapterFactory implements JsonAdapter.Factory {
         // ...
         final JsonAdapter<BossBarSurrogate> adapter = moshi.adapter(BossBarSurrogate.class);
         // ...
-        return new JsonAdapter<BossBar>() {
+        return new JsonAdapter<>() {
 
             @Override
             public BossBar fromJson(final @NotNull JsonReader in) throws IOException {

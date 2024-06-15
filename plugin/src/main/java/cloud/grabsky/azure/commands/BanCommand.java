@@ -119,7 +119,7 @@ public final class BanCommand extends RootCommand {
     private static void ban(final @NotNull CommandSender sender, final @NotNull OfflinePlayer target, final @NotNull User targetUser, final @Nullable String reason, final @NotNull Interval duration) {
         // When duration is 0, punishment will be permanent - until manually removed.
         if (duration.as(Unit.MILLISECONDS) == 0) {
-            // Banning the player. Player will be kicked manually for the sake of custimazble message.
+            // Banning the player. Player will be kicked manually for the sake of customizable message.
             targetUser.ban(null, reason, sender);
             // Kicking with custom message.
             if (target.isOnline() && target instanceof Player onlineTarget) {
@@ -138,7 +138,7 @@ public final class BanCommand extends RootCommand {
             // Exiting the command block.
             return;
         }
-        // Banning the player temporarily. Player will be kicked manually for the sake of custimazble message.
+        // Banning the player temporarily. Player will be kicked manually for the sake of customizable message.
         targetUser.ban(duration, reason, sender);
         // Kicking with custom message.
         if (target.isOnline() && target instanceof Player onlineTarget) {

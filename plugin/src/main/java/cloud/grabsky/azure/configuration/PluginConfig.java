@@ -233,7 +233,7 @@ public final class PluginConfig implements JsonConfiguration {
     public static String DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_STOP_MESSAGE_FORMAT;
 
 
-    // Discord Integrations > Punishments Fowarding
+    // Discord Integrations > Punishments Forwarding
 
     @JsonPath("discord_integrations.punishments_forwarding.enabled")
     public static boolean DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_ENABLED;

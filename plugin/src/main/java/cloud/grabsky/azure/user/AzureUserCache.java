@@ -54,6 +54,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Base64;
 import java.util.Collection;
@@ -133,7 +135,7 @@ public final class AzureUserCache implements UserCache, Listener {
             }
         }
         // Printing "summary" message to the console.
-        plugin.getLogger().info("Succesfully loaded " + loadedUsers + " out of " + totalUsers + " user(s) total.");
+        plugin.getLogger().info("Successfully loaded " + loadedUsers + " out of " + totalUsers + " user(s) total.");
     }
 
     public @NotNull AzureUser readUser(final @NotNull File file) throws IOException, IllegalStateException {
@@ -299,7 +301,7 @@ public final class AzureUserCache implements UserCache, Listener {
         });
         // Hiding vanished players. This was previously handled inside PlayerListener, until we migrated state storage from PDC to User JSON data.
         // NOTE: Handling that inside PlayerJoinEvent event may result in vanished player being exposed until he is hidden.
-        // NOTE: Here and everywhere else (I believe) - vanished players of the same group weight can see eachother.
+        // NOTE: Here and everywhere else (I believe) - vanished players of the same group weight can see each-other.
         if (thisUser.isVanished() == true) {
             // Removing the join message, this should be configurable in the future.
             event.joinMessage(null);
@@ -350,7 +352,7 @@ public final class AzureUserCache implements UserCache, Listener {
         if (cacheDirectory.isDirectory() == false) {
             if (cacheDirectory.delete() == false)
                 throw new IllegalStateException("File " + cacheDirectory.getPath() + " is not a directory and could not be deleted. Please delete or rename it manually.");
-            // Calling (self) after deleting non-directory file. This should not lead to inifnite recursion.
+            // Calling (self) after deleting non-directory file. This should not lead to infinite recursion.
             ensureCacheDirectoryExists();
         }
     }
@@ -381,7 +383,7 @@ public final class AzureUserCache implements UserCache, Listener {
         maxRetries = maxRetries + 1;
         // ...
         try {
-            final URL uri = new URL(API_URL + address);
+            final URL uri = new URI(API_URL + address).toURL();
             // ...
             while (maxRetries != 0) {
                 // Sending request to an API.
@@ -396,7 +398,7 @@ public final class AzureUserCache implements UserCache, Listener {
                 }
                 maxRetries--;
             }
-        } catch (final MalformedURLException e) {
+        } catch (final URISyntaxException e) {
             plugin.getLogger().severe("Malformed URI = " + API_URL + "[_REDACTED_ADDRESS_]");
         } catch (final IOException e) {
             plugin.getLogger().severe("An error occurred while trying to send request to '" + API_URL + "[_REDACTED_ADDRESS_]'... retrying...");

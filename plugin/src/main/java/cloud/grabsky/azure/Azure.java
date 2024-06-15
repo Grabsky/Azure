@@ -89,6 +89,7 @@ import org.javacord.api.entity.message.WebhookMessageBuilder;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -237,7 +238,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
         AzureProvider.finalize(this);
     }
 
-    @SneakyThrows @Override
+    @Override @SneakyThrows
     public void onDisable() {
         super.onDisable();
         // ...
@@ -253,7 +254,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                     builder.setDisplayName(PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_USERNAME));
                 // Setting avatar if specified.
                 if (PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
-                    builder.setDisplayAvatar(new URL(PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_AVATAR)));
+                    builder.setDisplayAvatar(new URI(PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_AVATAR)).toURL());
                 // Sending the message. Expected to be a blocking call.
                 builder.send(discord, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_URL).join();
             }
@@ -300,7 +301,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
             }
             // Returning 'true' as reload finished without any exceptions.
             return true;
-        } catch (final IllegalStateException | ConfigurationMappingException | IOException | URISyntaxException e) {
+        } catch (final IllegalStateException | ConfigurationMappingException | IOException e) {
             this.getLogger().severe("An error occurred while trying to reload plugin.");
             this.getLogger().severe("  " + e.getMessage());
             return false;
@@ -308,7 +309,8 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
     }
 
     // Waiting for server to be fully enabled before updating discord activity. PlaceholderAPI extensions should be enabled by now.
-    @SneakyThrows @EventHandler(priority = EventPriority.MONITOR)
+    @SneakyThrows
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onServerLoad(final ServerLoadEvent event) {
         // Setting configured activity if specified.
         if (discord != null) {
@@ -323,7 +325,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                     builder.setDisplayName(PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_USERNAME));
                 // Setting avatar if specified.
                 if (PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
-                    builder.setDisplayAvatar(new URL(PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_AVATAR)));
+                    builder.setDisplayAvatar(new URI(PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_AVATAR)).toURL());
                 // Sending the message. Expected to be a blocking call.
                 builder.send(discord, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_URL).join();
             }

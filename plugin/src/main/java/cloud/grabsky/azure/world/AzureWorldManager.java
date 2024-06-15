@@ -70,7 +70,7 @@ public final class AzureWorldManager implements WorldManager {
     /**
      * Creates a world using specified parameters.
      */
-    public @NotNull World createWorld(final @NotNull NamespacedKey key, final @NotNull World.Environment environment, final @NotNull WorldType type, final @Nullable Long seed) throws IOException, WorldOperationException {
+    public @NotNull World createWorld(final @NotNull NamespacedKey key, final @NotNull World.Environment environment, final @NotNull WorldType type, final @Nullable Long seed) throws WorldOperationException {
         final File worldDir = new File(plugin.getServer().getWorldContainer(), key.getKey());
         // Throwing an exception in case world already exists.
         if (worldDir.exists() == true)
@@ -155,13 +155,13 @@ public final class AzureWorldManager implements WorldManager {
     }
 
     /**
-     * Unloads the world. Can ocassionally fail, according to Bukkit API. This has the same effect as {@link Bukkit#unloadWorld}.
+     * Unloads the world. Can occasionally fail, according to Bukkit API. This has the same effect as {@link Bukkit#unloadWorld}.
      */
     public boolean unloadWorld(final @NotNull World world) throws WorldOperationException {
         if (this.getPrimaryWorld().equals(world) == true)
             throw new WorldOperationException(Reason.PRIMARY_WORLD, "An error occurred while trying to unload a world. Default world cannot be unloaded.");
         // Moving all players to spawn of the main world.
-        world.getPlayers().forEach(player -> player.teleport(this.getSpawnPoint(this.getPrimaryWorld()))); // Not async to prevent next call from failiing.
+        world.getPlayers().forEach(player -> player.teleport(this.getSpawnPoint(this.getPrimaryWorld()))); // Not async to prevent next call from failing.
         // Setting PDC values.
         world.getPersistentDataContainer().set(KEY_AUTO_LOAD, PersistentDataType.BOOLEAN, false); // Unloaded worlds shouldn't be loaded automatically until requested.
         // Returning 'true' if unloading was successful.
@@ -169,7 +169,7 @@ public final class AzureWorldManager implements WorldManager {
     }
 
     /**
-     * Deletes the world. Can ocassionally fail, according to Bukkit API.
+     * Deletes the world. Can occasionally fail, according to Bukkit API.
      */
     public boolean deleteWorld(final @NotNull World world) throws WorldOperationException {
         if (this.getPrimaryWorld().equals(world) == true)

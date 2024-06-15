@@ -251,7 +251,11 @@ public final class PlayerCommand extends RootCommand {
 
     private String getVersionFromProtocol(final int protocolVersion) {
         return switch (protocolVersion) {
-            case 763 -> "1.20(.1)"; // 1.20 and 1.20.1 are both using the same protocol.
+            case 763 -> "1.20(.1)"; // 1.20 and 1.20.1 are both using the same protocol version.
+            case 764 -> "1.20.2";
+            case 765 -> "1.20.3(+1)"; // 1.20.3 and 1.20.4 are both using the same protocol version.
+            case 766 -> "1.20.5(+1)"; // 1.20.5 and 1.20.6 are both using the same protocol version.
+            case 767 -> "1.21";
             default -> "N/A";
         };
     }

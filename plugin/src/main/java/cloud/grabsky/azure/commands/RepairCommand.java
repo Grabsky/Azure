@@ -46,7 +46,7 @@ public final class RepairCommand extends RootCommand {
         if (sender.getInventory().getItemInMainHand().getType() != Material.AIR) {
             // Checking if item in hand can be repaired.
             if (sender.getInventory().getItemInMainHand().getType().getMaxDurability() > 1) {
-                // Reparing item and sending success message to the sender.
+                // Repairing item and sending success message to the sender.
                 sender.getInventory().getItemInMainHand().editMeta(Damageable.class, (meta) -> meta.setDamage(0));
                 Message.of(PluginLocale.COMMAND_REPAIR_SUCCESS).send(sender);
                 return;

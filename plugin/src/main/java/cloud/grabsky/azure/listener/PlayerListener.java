@@ -42,6 +42,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
 
+import java.net.URI;
 import java.net.URL;
 import java.util.HashSet;
 
@@ -90,7 +91,8 @@ public final class PlayerListener implements Listener {
 
     /* DISCORD INTEGRATIONS - FORWARDING JOIN MESSAGE TO DISCORD SERVER */
 
-    @SneakyThrows @EventHandler(priority = EventPriority.MONITOR)
+    @SneakyThrows
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerJoinForward(final @NotNull PlayerJoinEvent event) {
         // Skipping in case discord integrations are not enabled or misconfigured.
         if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_URL.isEmpty() == true)
@@ -106,7 +108,7 @@ public final class PlayerListener implements Listener {
                 builder.setDisplayName(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_USERNAME));
             // Setting avatar if specified.
             if (PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
-                builder.setDisplayAvatar(new URL(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_AVATAR)));
+                builder.setDisplayAvatar(new URI(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_AVATAR)).toURL());
             // Sending the message.
             builder.sendSilently(plugin.getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_URL);
         }
@@ -114,7 +116,8 @@ public final class PlayerListener implements Listener {
 
     /* DISCORD INTEGRATIONS - FORWARDING QUIT MESSAGE TO DISCORD SERVER */
 
-    @SneakyThrows @EventHandler(priority = EventPriority.MONITOR)
+    @SneakyThrows
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerQuitForward(final @NotNull PlayerQuitEvent event) {
         // Skipping in case discord integrations are not enabled or misconfigured.
         if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_URL.isEmpty() == true)
@@ -130,7 +133,7 @@ public final class PlayerListener implements Listener {
                 builder.setDisplayName(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_USERNAME));
             // Setting avatar if specified.
             if (PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
-                builder.setDisplayAvatar(new URL(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_AVATAR)));
+                builder.setDisplayAvatar(new URI(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_AVATAR)).toURL());
             // Sending the message.
             builder.sendSilently(plugin.getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_URL);
         }

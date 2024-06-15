@@ -98,7 +98,7 @@ public final class UnifiedLocation {
         return new Location(world,x, y, z, yaw, pitch);
     }
 
-    public static PersistentDataType<PersistentDataContainer, UnifiedLocation> PERSISTENT_DATA_TYPE = new PersistentDataType<>() {
+    public static final PersistentDataType<PersistentDataContainer, UnifiedLocation> PERSISTENT_DATA_TYPE = new PersistentDataType<>() {
 
         @Override
         public @NotNull Class<PersistentDataContainer> getPrimitiveType() {

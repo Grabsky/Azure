@@ -3,16 +3,13 @@ plugins {
 }
 
 group = "cloud.grabsky"
-version = "1.20.4-${System.getenv("GITHUB_RUN_NUMBER") ?: "DEV"}"
+version = "1.21-${System.getenv("GITHUB_RUN_NUMBER") ?: "DEV"}"
 
 subprojects {
     apply(plugin: "java-library")
 
     group = rootProject.group
     version = rootProject.version
-
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
 
     ext {
         // Environment-specific variables...
@@ -27,7 +24,7 @@ subprojects {
         mavenLocal()
         mavenCentral()
         // Repository for the Paper API.
-        maven { url = "https://papermc.io/repo/repository/maven-public/" }
+        maven { url = "https://repo.papermc.io/repository/maven-public/" }
         // Repository containing the 'bedrock' dependency.
         maven { url = "https://maven.pkg.github.com/grabsky/bedrock"
             credentials {
@@ -54,10 +51,26 @@ subprojects {
     dependencies {
         compileOnly("org.jetbrains:annotations:24.0.1")
         // Lombok
-        compileOnly("org.projectlombok:lombok:1.18.26")
-        annotationProcessor("org.projectlombok:lombok:1.18.26")
+        compileOnly("org.projectlombok:lombok:1.18.32")
+        annotationProcessor("org.projectlombok:lombok:1.18.32")
         // Paper API
-        compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
+        compileOnly("io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT")
+    }
+
+    compileJava {
+        options.fork = true
+        // Setting compatibility to Java 17 (above should work too).
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+
+    java {
+        withSourcesJar()
+        withJavadocJar()
+    }
+
+    javadoc {
+        (options as CoreJavadocOptions).addStringOption("Xdoclint:none", "-quiet")
     }
 
 }
