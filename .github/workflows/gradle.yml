@@ -4,13 +4,17 @@ on:
   push:
     branches: ["main"]
 
+
+# Permissions
 permissions:
-  contents: write
-  packages: write
+  contents: read
 
 jobs:
-  build:
+  build_and_publish:
     runs-on: ubuntu-latest
+    # Permissions
+    permissions:
+      packages: write
     steps:
       # Checking out
       - uses: actions/checkout@v3
@@ -24,7 +28,7 @@ jobs:
       - name: Build
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: clean shadowJar
+          arguments: clean shadowJar publish --no-daemon
         env:
           # GitHub Packages
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -33,20 +37,18 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           path: plugin/build/libs
-      # Publishing
-      - name: Publish
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: publish
-        env:
-          # GitHub Packages
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  create_release:
+    runs-on: ubuntu-latest
+    # Permissions
+    permissions:
+      contents: write
+    steps:
       # Expose Release Name
       - name: Expose Release Name
-        run: echo "PROJECT_RELEASE_NAME=$( ./gradlew release -q --no-rebuild )" >> $GITHUB_ENV
+        run: echo "PROJECT_RELEASE_NAME=$( ./gradlew release -q --no-daemon )" >> $GITHUB_ENV
       # Expose Tag
       - name: Expose Tag
-        run: echo "PROJECT_TAG=$( ./gradlew tag -q --no-rebuild )" >> $GITHUB_ENV
+        run: echo "PROJECT_TAG=$( ./gradlew tag -q --no-daemon )" >> $GITHUB_ENV
       # Release
       - name: Release
         uses: ncipollo/release-action@v1

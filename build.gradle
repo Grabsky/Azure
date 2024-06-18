@@ -1,9 +1,12 @@
 plugins {
-    id "java-library"
+    id("java-library")
 }
 
+final String VERSION = "1.21"
+final String RUN_NUMBER = System.getenv("GITHUB_RUN_NUMBER") ?: "DEV"
+
 group = "cloud.grabsky"
-version = "1.21-${System.getenv("GITHUB_RUN_NUMBER") ?: "DEV"}"
+version = "$VERSION-$RUN_NUMBER"
 
 subprojects {
     apply(plugin: "java-library")
@@ -12,12 +15,8 @@ subprojects {
     version = rootProject.version
 
     ext {
-        // Environment-specific variables...
-        WORKSPACE_BUILDS = System.getenv("WORKSPACE_BUILDS")
-        WORKSPACE_PLUGINS = System.getenv("WORKSPACE_PLUGINS")
-        // Dependency versions...
         BEDROCK_VERSION = "1.20.1-47"
-        KYORI_NBT_VERSION = "4.15.0"
+        KYORI_NBT_VERSION = "4.17.0"
     }
 
     repositories {
@@ -26,26 +25,11 @@ subprojects {
         // Repository for the Paper API.
         maven { url = "https://repo.papermc.io/repository/maven-public/" }
         // Repository containing the 'bedrock' dependency.
-        maven { url = "https://maven.pkg.github.com/grabsky/bedrock"
-            credentials {
-                username = findProperty("gpr.actor") ?: System.getenv("GITHUB_ACTOR")
-                password = findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
-            }
-        }
+        maven { url = "https://maven.pkg.github.com/grabsky/bedrock"; fillCredentials(it) }
         // Repository containing the 'configuration' dependency.
-        maven { url = "https://maven.pkg.github.com/grabsky/configuration"
-            credentials {
-                username = findProperty("gpr.actor") ?: System.getenv("GITHUB_ACTOR")
-                password = findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
-            }
-        }
+        maven { url = "https://maven.pkg.github.com/grabsky/configuration"; fillCredentials(it) }
         // Repository containing the 'commands' dependency.
-        maven { url = "https://maven.pkg.github.com/grabsky/commands"
-            credentials {
-                username = findProperty("gpr.actor") ?: System.getenv("GITHUB_ACTOR")
-                password = findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
-            }
-        }
+        maven { url = "https://maven.pkg.github.com/grabsky/commands"; fillCredentials(it) }
     }
 
     dependencies {
@@ -69,16 +53,25 @@ subprojects {
         withJavadocJar()
     }
 
-    javadoc {
-        (options as CoreJavadocOptions).addStringOption("Xdoclint:none", "-quiet")
-    }
-
 }
 
+/* FOR GITHUB ACTIONS */
+
 tasks.register("release") {
-    print("${version.toString().split('-')[0]} #${System.getenv("GITHUB_RUN_NUMBER")}")
+    doLast { print("$VERSION #$RUN_NUMBER") }
+
 }
 
 tasks.register("tag") {
-    print(version)
+    doLast { print("$VERSION-$RUN_NUMBER") }
+}
+
+
+/* UTILITY METHODS */
+
+private final def fillCredentials(final MavenArtifactRepository repository) {
+    repository.credentials {
+        username = findProperty("gpr.actor") ?: System.getenv("GITHUB_ACTOR")
+        password = findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
+    }
 }
