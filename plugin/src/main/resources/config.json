@@ -158,6 +158,10 @@
             "webhook_url": ""
         }
     },
+    // Server links.
+    "server_links": [
+        // { "name": "Website", "url": "https://example.com" }
+    ],
     // Recipes to be unregistered after plugin has successfully reloaded. Keep in mind unregistered recipes are removed from players' recipe discovery list.
     "disabled_recipes": []
 }

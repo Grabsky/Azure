@@ -37,6 +37,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.javacord.api.entity.activity.ActivityType;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
@@ -241,6 +243,11 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("discord_integrations.punishments_forwarding.webhook_url")
     public static String DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_WEBHOOK_URL;
 
+    // Server Links
+
+    @JsonPath("server_links")
+    public static List<ServerLinkWrapper> SERVER_LINKS;
+
 
     // Disabled Recipes
 
@@ -250,7 +257,7 @@ public final class PluginConfig implements JsonConfiguration {
 
     /* CONFIGURATION LIFECYCLE */
 
-    @Override
+    @Override @SuppressWarnings("UnstableApiUsage")
     public void onReload() {
         ChatManager.CHAT_FORMATS_REVERSED = reversed(PluginConfig.CHAT_FORMATS_EXTRA);
         ChatManager.CHAT_TAGS_REVERSED = reversed(PluginConfig.CHAT_MESSAGE_TAGS_EXTRA);
@@ -261,6 +268,19 @@ public final class PluginConfig implements JsonConfiguration {
         });
         // Updating recipes for all players.
         Bukkit.updateRecipes();
+        // Removing server links currently stored within the server.
+        Bukkit.getServerLinks().getLinks().forEach(it -> {
+            Bukkit.getServerLinks().removeLink(it);
+        });
+        // Adding new links.
+        SERVER_LINKS.forEach(it -> {
+            try {
+                Bukkit.getServerLinks().addLink(it.name, new URI(it.url));
+            } catch (final URISyntaxException e) {
+                Bukkit.getLogger().severe("Conversion of server link URI failed due to following error(s):");
+                Bukkit.getLogger().severe(" (1) " + e.getClass().getSimpleName() + ": " + e.getMessage());
+            }
+        });
     }
 
 
@@ -332,6 +352,19 @@ public final class PluginConfig implements JsonConfiguration {
 
         @Getter(AccessLevel.PUBLIC)
         private final String state;
+
+    }
+
+    // Moshi should be able to create instance of the object despite the constructor being private.
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class ServerLinkWrapper {
+
+        @Getter(AccessLevel.PUBLIC)
+        private final Component name;
+
+        @Getter(AccessLevel.PUBLIC)
+        private final String url;
+
 
     }
 
