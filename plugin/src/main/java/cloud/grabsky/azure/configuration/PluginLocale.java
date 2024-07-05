@@ -93,6 +93,9 @@ public final class PluginLocale implements JsonConfiguration {
 
     // Chat
 
+    @JsonPath("chat.invalid_characters")
+    public static Component CHAT_INVALID_CHARACTERS;
+
     @JsonPath("chat.on_cooldown")
     public static Component CHAT_ON_COOLDOWN;
 

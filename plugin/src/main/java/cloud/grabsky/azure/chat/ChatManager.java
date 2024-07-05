@@ -186,6 +186,12 @@ public final class ChatManager implements Listener, MessageCreateListener {
             // ...setting cooldown
             chatCooldowns.put(player.getUniqueId(), currentTimeMillis());
         }
+        // Cancelling messages with invalid characters. Mostly to ensure players are not using resource-pack characters.
+        if (PluginConfig.CHAT_DISALLOW_INVALID_CHARACTERS == true && PlainTextComponentSerializer.plainText().serialize(event.message()).chars().anyMatch(code -> code > 13056) == true) {
+            event.setCancelled(true);
+            Message.of(PluginLocale.CHAT_INVALID_CHARACTERS).send(player);
+            return;
+        }
         // ...
         final UUID signatureUUID = (event.signedMessage().signature() != null) ? UUID.randomUUID() : null;
         // Caching signatures...

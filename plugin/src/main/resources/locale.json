@@ -15,6 +15,7 @@
     "survival": "Przetrwanie",
     // ...
     "chat": {
+        "invalid_characters": "<dark_gray>› <red>Twoja wiadomość zawiera niedozwolone znaki.",
         "on_cooldown": "<dark_gray>› <red>Musisz chwilę poczekać...",
         "muted": "<dark_gray>› <gray>Jesteś wyciszony przez kolejne <red><duration_left><gray>.",
         "muted_permanent": "<dark_gray>› <gray>Jesteś <red>permanentnie<gray> wyciszony."
