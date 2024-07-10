@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -74,13 +75,13 @@ public final class ResourcePackManager implements Listener {
     // Holds information about resource-packs, such as their UUID and hash. URI is generated on-demand, when requested.
     private List<ResourcePackHolder> holders = new ArrayList<>();
 
-    // Holds information about each tokens created by each player.
+    // Holds information about each tokens created by each player. Map is never cleared but it should not be an issue.
     private final Map<UUID, String> secrets = new HashMap<>();
 
     /**
      * Reloads resource-packs from configuration and starts internal web-server if necessary.
      */
-    @SuppressWarnings("deprecation") // Providing SHA-1 is required by the client, despite it being insecure.
+    @SuppressWarnings("deprecation") // Providing SHA-1 is required by the client for comparing checksums. Warning can be safely ignored.
     public void reload() throws IOException {
         // Clearing previously cached information.
         holders.clear();
@@ -104,7 +105,7 @@ public final class ResourcePackManager implements Listener {
             server.createContext("/", HttpExchange::close);
             // Starting the server.
             server.start();
-            // ...
+            // Logging...
             plugin.getLogger().info("Internal web server started and should be accessible at http://" + PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS + ":" + PluginConfig.RESOURCE_PACK_PORT);
         }
     }
@@ -117,11 +118,22 @@ public final class ResourcePackManager implements Listener {
         // Adding secret to the map. This can be later used for context removal.
         secrets.put(player.getUniqueId(), secret);
         // ...
+        final long requestStart = System.nanoTime();
+        final AtomicInteger requests = new AtomicInteger(0);
+        // ...
         player.sendResourcePacks(ResourcePackRequest.resourcePackRequest()
                 .replace(true)
                 .required(PluginConfig.RESOURCE_PACK_IS_REQUIRED)
                 .prompt(PluginConfig.RESOURCE_PACK_PROMPT_MESSAGE)
                 .packs(holders.stream().map(holder -> {
+                    // Creating on-demand URI with the generated secret.
+                    final @Nullable URI uri = toURI("http://" + PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS + ":" + PluginConfig.RESOURCE_PACK_PORT + "/" + secret + "/" + holder.uniqueId);
+                    // Logging an error in case URI happened to be null, likely due to a syntax error.
+                    if (uri == null) {
+                        plugin.getLogger().severe("Could not create URI: " + "http://" + PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS + ":" + PluginConfig.RESOURCE_PACK_PORT + "/" + secret + "/" + holder.uniqueId);
+                        plugin.getLogger().severe("  Resource-pack " + holder.file.getName() + " will be excluded from the request.");
+                        return null;
+                    }
                     // Creating new context at path '/{SECRET}/{RESOURCE_PACK_UUID}' which points to a downloadable file.
                     server.createContext("/" + secret + "/" + holder.uniqueId, (exchange) -> {
                         // Opening FileInputStream for the resource-pack file.
@@ -139,21 +151,20 @@ public final class ResourcePackManager implements Listener {
                         // Closing the exchange.
                         exchange.close();
                     });
-                    // Creating on-demand URI with the generated secret.
-                    final @Nullable URI uri = toURI("http://" + PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS + ":" + PluginConfig.RESOURCE_PACK_PORT + "/" + secret + "/" + holder.uniqueId);
-                    // Logging an error in case URI happened to be null, likely due to a syntax error.
-                    if (uri == null) {
-                        plugin.getLogger().severe("Could not create URI: " + "http://" + PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS + ":" + PluginConfig.RESOURCE_PACK_PORT + "/" + secret);
-                        plugin.getLogger().severe("  Resource-pack " + holder.file.getName() + " will be excluded from the request.");
-                        return null;
-                    }
+                    // Incrementing requests count.
+                    requests.incrementAndGet();
                     // Wrapping and returning as ResourcePackInfo object.
                     return ResourcePackInfo.resourcePackInfo(holder.uniqueId, uri, holder.hash);
                 }).filter(Objects::nonNull).toList()).build()
         );
+        // Measuring operation time...
+        final double requestMeasuredTime = (System.nanoTime() - requestStart) / 1000000.0D;
+        // Logging...
+        plugin.getLogger().info("Resource-packs requested by '" + player.getUniqueId() + "' and total of " + requests + " contexts has been created with secret '" + secret + "'... " + requestMeasuredTime + "ms");
     }
 
     // NOTE: This is likely to be moved into configuration event once available. (1.20.2)
+    // NOTE: We're at 1.21 and API for that does not exist yet...
     @EventHandler(ignoreCancelled = true)
     public void onPlayerJoin(final @NotNull PlayerJoinEvent event) {
         // Sending resource pack 1 tick after event is fired. (if enabled)
