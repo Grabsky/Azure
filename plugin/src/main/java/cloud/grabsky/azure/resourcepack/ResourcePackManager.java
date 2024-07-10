@@ -38,6 +38,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerResourcePackStatusEvent;
+import org.bukkit.event.player.PlayerResourcePackStatusEvent.Status;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -48,7 +50,9 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -70,6 +74,8 @@ public final class ResourcePackManager implements Listener {
     // Holds information about resource-packs, such as their UUID and hash. URI is generated on-demand, when requested.
     private List<ResourcePackHolder> holders = new ArrayList<>();
 
+    // Holds information about each tokens created by each player.
+    private final Map<UUID, String> secrets = new HashMap<>();
 
     /**
      * Reloads resource-packs from configuration and starts internal web-server if necessary.
@@ -107,16 +113,17 @@ public final class ResourcePackManager implements Listener {
      * Sends configured resource-packs to the specified {@link Player}.
      */
     public void sendResourcePacks(final @NotNull Player player) {
+        final String secret = UUID.randomUUID().toString();
+        // Adding secret to the map. This can be later used for context removal.
+        secrets.put(player.getUniqueId(), secret);
+        // ...
         player.sendResourcePacks(ResourcePackRequest.resourcePackRequest()
                 .replace(true)
                 .required(PluginConfig.RESOURCE_PACK_IS_REQUIRED)
                 .prompt(PluginConfig.RESOURCE_PACK_PROMPT_MESSAGE)
                 .packs(holders.stream().map(holder -> {
-                    final String secret = UUID.randomUUID().toString();
-                    // Creating new context at the generated secret.
-                    server.createContext("/" + secret, (exchange) -> {
-                        // Removing the context, preventing anyone else from using it and (hopefully) releasing resources.
-                        exchange.getHttpContext().getServer().removeContext("/" + secret);
+                    // Creating new context at path '/{SECRET}/{RESOURCE_PACK_UUID}' which points to a downloadable file.
+                    server.createContext("/" + secret + "/" + holder.uniqueId, (exchange) -> {
                         // Opening FileInputStream for the resource-pack file.
                         final FileInputStream in = new FileInputStream(holder.file);
                         // Reading all bytes.
@@ -129,9 +136,11 @@ public final class ResourcePackManager implements Listener {
                         exchange.getResponseBody().write(bytes);
                         // Closing the response.
                         exchange.getResponseBody().close();
+                        // Closing the exchange.
+                        exchange.close();
                     });
                     // Creating on-demand URI with the generated secret.
-                    final @Nullable URI uri = toURI("http://" + PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS + ":" + PluginConfig.RESOURCE_PACK_PORT + "/" + secret);
+                    final @Nullable URI uri = toURI("http://" + PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS + ":" + PluginConfig.RESOURCE_PACK_PORT + "/" + secret + "/" + holder.uniqueId);
                     // Logging an error in case URI happened to be null, likely due to a syntax error.
                     if (uri == null) {
                         plugin.getLogger().severe("Could not create URI: " + "http://" + PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS + ":" + PluginConfig.RESOURCE_PACK_PORT + "/" + secret);
@@ -152,6 +161,14 @@ public final class ResourcePackManager implements Listener {
             // Sending resource-packs to the player. (next tick)
             plugin.getBedrockScheduler().run(1L, (task) -> sendResourcePacks(event.getPlayer()));
         }
+    }
+
+    @EventHandler
+    public void onResourcePackStatus(final @NotNull PlayerResourcePackStatusEvent event) {
+        if (PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS.isBlank() == false && this.server != null)
+            // Removing http contexts when no longer needed. Condition might be confusing but is a bit shorter when handled that way.
+            if (event.getStatus() != Status.ACCEPTED && event.getStatus() != Status.SUCCESSFULLY_LOADED)
+                server.removeContext("/" + secrets.get(event.getPlayer().getUniqueId()) + "/" + event.getID());
     }
 
     /**
