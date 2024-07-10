@@ -32,6 +32,7 @@ import cloud.grabsky.azure.configuration.PluginConfig.FormatHolder;
 import cloud.grabsky.azure.configuration.PluginConfig.TagsHolder;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.bedrock.components.Message;
+import cloud.grabsky.bedrock.helpers.Conditions;
 import cloud.grabsky.bedrock.util.Interval;
 import cloud.grabsky.bedrock.util.Interval.Unit;
 import com.google.common.cache.Cache;
@@ -187,7 +188,7 @@ public final class ChatManager implements Listener, MessageCreateListener {
             chatCooldowns.put(player.getUniqueId(), currentTimeMillis());
         }
         // Cancelling messages with invalid characters. Mostly to ensure players are not using resource-pack characters.
-        if (PluginConfig.CHAT_DISALLOW_INVALID_CHARACTERS == true && PlainTextComponentSerializer.plainText().serialize(event.message()).chars().anyMatch(code -> code > 13056) == true) {
+        if (PluginConfig.CHAT_DISALLOW_INVALID_CHARACTERS == true && PlainTextComponentSerializer.plainText().serialize(event.message()).chars().anyMatch(it -> Conditions.inRange(it, 57344, 63743) == true) == true) {
             event.setCancelled(true);
             Message.of(PluginLocale.CHAT_INVALID_CHARACTERS).send(player);
             return;

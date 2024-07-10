@@ -93,7 +93,6 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("chat_settings.chat_format.tags.extra")
     public static List<TagsHolder> CHAT_MESSAGE_TAGS_EXTRA;
 
-
     // Chat Settings > Moderation > Message Deletion
 
     @JsonPath("chat_settings.moderation.message_deletion.enabled")
