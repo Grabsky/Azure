@@ -30,6 +30,7 @@ import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
+import cloud.grabsky.commands.RootCommandInput;
 import cloud.grabsky.commands.annotation.Command;
 import cloud.grabsky.commands.annotation.Dependency;
 import cloud.grabsky.commands.component.CompletionsProvider;
@@ -52,11 +53,30 @@ public final class PackCommand extends RootCommand {
 
     @Override
     public @NotNull CompletionsProvider onTabComplete(final @NotNull RootCommandContext context, final int index) throws CommandLogicException {
-        return (index == 0)
-                ? CompletionsProvider.of(Stream.of("apply", "notify").filter(it -> context.getExecutor().asCommandSender().hasPermission(this.getPermission() + "." + it) == true).toList())
-                : (context.getInput().at(1).equalsIgnoreCase("notify") == true)
-                        ? CompletionsProvider.of("--confirm")
+        final CommandSender sender = context.getExecutor().asCommandSender();
+        final RootCommandInput input = context.getInput();
+        // Returning list of sub-commands when no argument was specified in the input.
+        if (index == 0) return CompletionsProvider.of(
+                Stream.of("apply", "notify")
+                        .filter(literal -> sender.hasPermission(this.getPermission() + "." + literal) == true)
+                        .toList()
+        );
+        // Getting the first literal (argument) of user input.
+        final String literal = input.at(1, "").toLowerCase();
+        // Returning empty completions provider when missing permission for that literal.
+        if (sender.hasPermission(this.getPermission() + "." + literal) == false)
+            return CompletionsProvider.EMPTY;
+        // Returning sub-command-aware completions provider.
+        return switch (literal) {
+            case "apply" -> {
+                yield (sender.hasPermission(this.getPermission() + ".apply.others") == true)
+                        ? CompletionsProvider.of(Player.class)
                         : CompletionsProvider.EMPTY;
+            }
+            case "notify" -> CompletionsProvider.of("--confirm");
+            // No completions by default.
+            default -> CompletionsProvider.EMPTY;
+        };
     }
 
     @Override
@@ -65,8 +85,14 @@ public final class PackCommand extends RootCommand {
             case "apply" -> {
                 // Getting command sender as player.
                 final Player sender = context.getExecutor().asPlayer();
-                // Sending resource-packs to the player. (immediately)
-                plugin.getResourcePackManager().sendResourcePacks(sender);
+                // Getting the target.
+                final @NotNull Player target = arguments.next(Player.class).asOptional(sender);
+                // Checking if command sender can target other players.
+                if (sender != target && sender.hasPermission(this.getPermission() + ".apply.others") == false) {
+                    Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
+                    return;
+                }
+                plugin.getResourcePackManager().sendResourcePacks(target);
             }
             case "notify" -> {
                 final CommandSender sender = context.getExecutor().asCommandSender();
