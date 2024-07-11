@@ -35,7 +35,7 @@ tasks {
 paper {
     name = "Azure"
     main = "cloud.grabsky.azure.Azure"
-    apiVersion = "1.20"
+    apiVersion = "1.21"
     serverDependencies {
         "LuckPerms"      { load = "BEFORE"; required = true }
         "PlaceholderAPI" { load = "BEFORE"; required = true }
