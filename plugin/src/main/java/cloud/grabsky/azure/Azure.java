@@ -300,8 +300,11 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
             // Returning 'true' as reload finished without any exceptions.
             return true;
         } catch (final IllegalStateException | ConfigurationMappingException | IOException e) {
-            this.getLogger().severe("An error occurred while trying to reload plugin.");
-            this.getLogger().severe("  " + e.getMessage());
+            this.getLogger().severe("Reloading of the plugin failed due to following error(s):");
+            this.getLogger().severe(" (1) " + e.getClass().getSimpleName() + ": " + e.getMessage());
+            if (e.getCause() != null)
+                this.getLogger().severe(" (2) " + e.getCause().getClass().getSimpleName() + ": " + e.getCause().getMessage());
+            // Returning false, as plugin has failed to reload.
             return false;
         }
     }
