@@ -13,8 +13,17 @@
     "chat_settings": {
         // Chat cooldown in milliseconds. Set to 0 to disable. Bypass: azure.plugin.chat.can_bypass_cooldown
         "cooldown": 1000,
-        // Whether characters considered as invalid should be disallowed.
-        "disallow_invalid_characters": true,
+        // Chat filtering settings.
+        "filtering": {
+            // Whether characters considered as invalid should be disallowed.
+            "disallow_invalid_characters": true,
+            // Whether inappropriate words should be disallowed.
+            "disallow_inappropriate_words": true,
+            // Console commands to execute message contains any word marked as INAPPROPRIATE.
+            "punishment_commands": [
+                "mute <player> 10s Używanie nieodpowiednich słów."
+            ]
+        },
         // Chat formats. Supports MiniMessage tags and some placeholders.
         "chat_format": {
             // Default chat format used as a fallback. Placeholders: [signature_uuid, player, displayname, group, prefix, suffix, message]

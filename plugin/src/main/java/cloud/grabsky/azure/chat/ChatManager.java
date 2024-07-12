@@ -37,6 +37,9 @@ import cloud.grabsky.bedrock.util.Interval;
 import cloud.grabsky.bedrock.util.Interval.Unit;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.squareup.moshi.JsonReader;
+import com.squareup.moshi.Moshi;
+import com.squareup.moshi.Types;
 import io.papermc.paper.event.player.AsyncChatDecorateEvent;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import me.clip.placeholderapi.PlaceholderAPI;
@@ -63,11 +66,17 @@ import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
 
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -77,11 +86,14 @@ import org.jetbrains.annotations.Nullable;
 import lombok.SneakyThrows;
 
 import static cloud.grabsky.bedrock.helpers.Conditions.requirePresent;
+import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
 import static java.lang.System.currentTimeMillis;
 import static net.kyori.adventure.text.Component.empty;
 import static net.kyori.adventure.text.event.ClickEvent.callback;
 import static net.kyori.adventure.text.event.HoverEvent.showText;
 import static net.kyori.adventure.text.format.NamedTextColor.WHITE;
+import static okio.Okio.buffer;
+import static okio.Okio.source;
 
 public final class ChatManager implements Listener, MessageCreateListener {
 
@@ -92,6 +104,9 @@ public final class ChatManager implements Listener, MessageCreateListener {
     private final Map<UUID, Long> chatCooldowns;
     private final Map<UUID, UUID> lastRecipients;
 
+    // Contains list of inappropriate words that are not allowed in chat.
+    private Set<String> inappropriateWords;
+
     private static final MiniMessage EMPTY_MINIMESSAGE = MiniMessage.builder().tags(TagResolver.empty()).build();
     private static final PlainTextComponentSerializer PLAIN_SERIALIZER = PlainTextComponentSerializer.plainText();
 
@@ -100,6 +115,9 @@ public final class ChatManager implements Listener, MessageCreateListener {
 
     public static List<FormatHolder> CHAT_FORMATS_REVERSED;
     public static List<TagsHolder> CHAT_TAGS_REVERSED;
+
+    // Raw type of Set<String> used for deserialization with Moshi.
+    private static final Type LIST_STRING_TYPE = Types.newParameterizedType(Set.class, String.class);
 
     private static final AllowedMentions NO_MENTIONS = new AllowedMentionsBuilder()
             .setMentionEveryoneAndHere(false)
@@ -116,6 +134,35 @@ public final class ChatManager implements Listener, MessageCreateListener {
                 .build();
         this.chatCooldowns = new HashMap<>();
         this.lastRecipients = new HashMap<>();
+        this.inappropriateWords = new HashSet<>();
+    }
+
+    /**
+     * Loads list of inappropriate words.
+     */
+    @SuppressWarnings("unchecked")
+    public void loadInappropriateWords() {
+        final File file = new File(plugin.getDataFolder(), "inappropriate_words.json");
+        try {
+            // Ensuring the file exists.
+            ensureResourceExistence(plugin, file);
+            // Creating a JsonReader from provided file.
+            final JsonReader reader = JsonReader.of(buffer(source(file)));
+            // Reading the JSON file.
+            final Set<String> set = (Set<String>) new Moshi.Builder().build().adapter(LIST_STRING_TYPE).fromJson(reader);
+            // Closing the reader.
+            reader.close();
+            // Throwing exception in case list ended up being null. Unlikely to happen, but possible.
+            if (set == null)
+                throw new IllegalStateException("Deserialization of " + file.getPath() + " failed: " + null);
+            // Updating the filtered words list.
+            inappropriateWords = Collections.unmodifiableSet(set);
+        } catch (final IllegalStateException | IOException e) {
+            plugin.getLogger().severe("Reloading of '" + file.getName() + "' failed due to following error(s):");
+            plugin.getLogger().severe(" (1) " + e.getClass().getSimpleName() + ": " + e.getMessage());
+            if (e.getCause() != null)
+                plugin.getLogger().severe(" (2) " + e.getCause().getClass().getSimpleName() + ": " + e.getCause().getMessage());
+        }
     }
 
     /**
@@ -123,14 +170,13 @@ public final class ChatManager implements Listener, MessageCreateListener {
      */
     public boolean deleteMessage(final @NotNull UUID signatureUUID) {
         final @Nullable SignedMessage.Signature signature = signatureCache.getIfPresent(signatureUUID);
-        // ...
-        if (signature != null) {
-            // Deleting the message for the whole server, console *should* be excluded.
-            plugin.getServer().deleteMessage(signature);
-            // ...
-            return true;
-        }
-        return false;
+        // Returning 'false' if signature for this message is not set.
+        if (signature == null)
+            return false;
+        // Requesting deletion of this message.
+        plugin.getServer().deleteMessage(signature);
+        // Returning 'true' as message deletion has been requested.
+        return true;
     }
 
     @EventHandler @SuppressWarnings({"UnstableApiUsage", "DataFlowIssue"})
@@ -187,11 +233,31 @@ public final class ChatManager implements Listener, MessageCreateListener {
             // ...setting cooldown
             chatCooldowns.put(player.getUniqueId(), currentTimeMillis());
         }
-        // Cancelling messages with invalid characters. Mostly to ensure players are not using resource-pack characters.
-        if (PluginConfig.CHAT_DISALLOW_INVALID_CHARACTERS == true && PlainTextComponentSerializer.plainText().serialize(event.message()).chars().anyMatch(it -> Conditions.inRange(it, 57344, 63743) == true) == true) {
+        final String messsage = PlainTextComponentSerializer.plainText().serialize(event.message());
+        // Cancelling messages containing invalid characters. Mostly to ensure players are not using resource-pack-reserved characters in chat. (E000-F8FF)
+        if (PluginConfig.CHAT_FILTERING_DISALLOW_INVALID_CHARACTERS == true && messsage.chars().anyMatch(it -> Conditions.inRange(it, 57344, 63743) == true) == true) {
             event.setCancelled(true);
-            Message.of(PluginLocale.CHAT_INVALID_CHARACTERS).send(player);
+            Message.of(PluginLocale.CHAT_MESSAGE_CONTAINS_INVALID_CHARACTERS).send(player);
             return;
+        }
+        // Cancelling messages containing inappropriate words.
+        if (PluginConfig.CHAT_FILTERING_DISALLOW_INAPPROPRIATE_WORDS == true && inappropriateWords != null && inappropriateWords.isEmpty() == false) {
+            final String[] words = messsage.split(" ");
+            // Iterating over all words in a message.
+            for (final String word : words) {
+                // Cancelling message if the current word is in the list of inappropriate words.
+                if (inappropriateWords.contains(word) == true) {
+                    event.setCancelled(true);
+                    Message.of(PluginLocale.CHAT_MESSAGE_CONTAINS_INAPPROPRIATE_WORDS).send(player);
+                    // Executing punishment commands.
+                    if (PluginConfig.CHAT_FILTERING_PUNISHMENT_COMMANDS.isEmpty() == false)
+                        plugin.getBedrockScheduler().run(1L, (___) -> {
+                            PluginConfig.CHAT_FILTERING_PUNISHMENT_COMMANDS.forEach(it -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), it.replace("<player>", player.getName())));
+                        });
+                    // Returning...
+                    return;
+                }
+            }
         }
         // ...
         final UUID signatureUUID = (event.signedMessage().signature() != null) ? UUID.randomUUID() : null;

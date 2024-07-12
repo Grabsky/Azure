@@ -71,8 +71,16 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("chat_settings.cooldown")
     public static Long CHAT_COOLDOWN;
 
-    @JsonPath("chat_settings.disallow_invalid_characters")
-    public static boolean CHAT_DISALLOW_INVALID_CHARACTERS;
+    // Chat Settings > Filtering
+
+    @JsonPath("chat_settings.filtering.disallow_invalid_characters")
+    public static boolean CHAT_FILTERING_DISALLOW_INVALID_CHARACTERS;
+
+    @JsonPath("chat_settings.filtering.disallow_inappropriate_words")
+    public static boolean CHAT_FILTERING_DISALLOW_INAPPROPRIATE_WORDS;
+
+    @JsonPath("chat_settings.filtering.punishment_commands")
+    public static List<String> CHAT_FILTERING_PUNISHMENT_COMMANDS;
 
     // Chat Settings > Chat Format
 

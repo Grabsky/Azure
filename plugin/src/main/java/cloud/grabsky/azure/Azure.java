@@ -143,20 +143,23 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
             moshi.add(DeleteButton.Position.class, new AbstractEnumJsonAdapter<>(DeleteButton.Position.class, false) { /* DEFAULT */ });
             moshi.add(BossBarAdapterFactory.INSTANCE);
         });
-        // ResourcePackManager Has to be initialized before configuration is reloaded.
+        // ResourcePackManager has to be initialized before configuration is reloaded.
         this.resourcePackManager = new ResourcePackManager(this);
         // Reloading and stopping the server in case of failure.
         if (this.onReload() == false) {
             this.getServer().shutdown();
         }
-        // ...
+        // Creating new instance of UserCache.
         this.userCache = new AzureUserCache(this);
+        /// Registering event listeners defined inside AzureUserCache class.
         this.getServer().getPluginManager().registerEvents((AzureUserCache) userCache, this);
-        // ...
+        // Getting LuckPerms API from the provider.
         this.luckPerms = LuckPermsProvider.get();
-        // ...
+        // Creating new instance of ChatManager.
         this.chatManager = new ChatManager(this);
-        // ...
+        // Loading list of inappropriate words.
+        chatManager.loadInappropriateWords();
+        // Creating new instance of WorldManager.
         this.worldManager = new AzureWorldManager(this);
         // Loading worlds with autoLoad == true
         try {
@@ -275,6 +278,9 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
             );
             // Reloading ResourcePackManager.
             resourcePackManager.reload();
+            // Reloading filtered words.
+            if (this.chatManager != null)
+                chatManager.loadInappropriateWords();
             // Reloading discord bot custom activity.
             if (discord != null) {
                 // Cancelling the current task.
