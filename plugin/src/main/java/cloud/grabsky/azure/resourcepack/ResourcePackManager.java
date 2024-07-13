@@ -40,6 +40,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent.Status;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -55,7 +56,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -117,11 +117,13 @@ public final class ResourcePackManager implements Listener {
         final String secret = UUID.randomUUID().toString();
         // Adding secret to the map. This can be later used for context removal.
         secrets.put(player.getUniqueId(), secret);
-        // ...
+        // Clearing list of loaded resource-packs. This is mainly for ease of use with other plugins.
+        player.setMetadata("sent_resource-packs", new FixedMetadataValue(plugin, 0));
+        player.setMetadata("loaded_resource-packs", new FixedMetadataValue(plugin, 0));
+        // Measuring request time for debug purposes.
         final long requestStart = System.nanoTime();
-        final AtomicInteger requests = new AtomicInteger(0);
-        // ...
-        player.sendResourcePacks(ResourcePackRequest.resourcePackRequest()
+        // Creating the ResourcePackRequest instance.
+        final ResourcePackRequest request = ResourcePackRequest.resourcePackRequest()
                 .replace(true)
                 .required(PluginConfig.RESOURCE_PACK_IS_REQUIRED)
                 .prompt(PluginConfig.RESOURCE_PACK_PROMPT_MESSAGE)
@@ -151,16 +153,19 @@ public final class ResourcePackManager implements Listener {
                         // Closing the exchange.
                         exchange.close();
                     });
-                    // Incrementing requests count.
-                    requests.incrementAndGet();
+                    // Setting meta-data so other plugins can easily tell when player loaded all packs.
+                    final int count = player.getMetadata("sent_resource-packs").getFirst().asInt();
+                    player.setMetadata("sent_resource-packs", new FixedMetadataValue(plugin, count + 1));
                     // Wrapping and returning as ResourcePackInfo object.
                     return ResourcePackInfo.resourcePackInfo(holder.uniqueId, uri, holder.hash);
-                }).filter(Objects::nonNull).toList()).build()
-        );
-        // Measuring operation time...
+                }).filter(Objects::nonNull).toList()).build();
+
+        // Sending resource-packs to the player.
+        player.sendResourcePacks(request);
+        // Measuring request time for debug purposes. Part 2.
         final double requestMeasuredTime = (System.nanoTime() - requestStart) / 1000000.0D;
         // Logging...
-        plugin.getLogger().info("Resource-packs requested by '" + player.getUniqueId() + "' and total of " + requests + " contexts has been created with secret '" + secret + "'... " + requestMeasuredTime + "ms");
+        plugin.getLogger().info("Resource-packs requested by '" + player.getUniqueId() + "' and total of " + request.packs().size() + " contexts has been created with secret '" + secret + "'... " + requestMeasuredTime + "ms");
     }
 
     // NOTE: This is likely to be moved into configuration event once available. (1.20.2)
@@ -176,10 +181,16 @@ public final class ResourcePackManager implements Listener {
 
     @EventHandler
     public void onResourcePackStatus(final @NotNull PlayerResourcePackStatusEvent event) {
-        if (PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS.isBlank() == false && this.server != null)
+        if (PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS.isBlank() == false && this.server != null) {
             // Removing http contexts when no longer needed. Condition might be confusing but is a bit shorter when handled that way.
             if (event.getStatus() != Status.ACCEPTED && event.getStatus() != Status.SUCCESSFULLY_LOADED)
                 server.removeContext("/" + secrets.get(event.getPlayer().getUniqueId()) + "/" + event.getID());
+            // Adding loaded resource-pack to the list.
+            if (event.getStatus() == Status.SUCCESSFULLY_LOADED) {
+                final int count = event.getPlayer().getMetadata("loaded_resource-packs").getFirst().asInt();
+                event.getPlayer().setMetadata("loaded_resource-packs", new FixedMetadataValue(plugin, count + 1));
+            }
+        }
     }
 
     /**
