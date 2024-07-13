@@ -117,7 +117,7 @@ public final class ResourcePackManager implements Listener {
         final String secret = UUID.randomUUID().toString();
         // Adding secret to the map. This can be later used for context removal.
         secrets.put(player.getUniqueId(), secret);
-        // Clearing list of loaded resource-packs. This is mainly for ease of use with other plugins.
+        // Resetting number of loaded resource-packs. This is mainly for ease of use with other plugins.
         player.setMetadata("sent_resource-packs", new FixedMetadataValue(plugin, 0));
         player.setMetadata("loaded_resource-packs", new FixedMetadataValue(plugin, 0));
         // Measuring request time for debug purposes.
@@ -172,6 +172,8 @@ public final class ResourcePackManager implements Listener {
     // NOTE: We're at 1.21 and API for that does not exist yet...
     @EventHandler(ignoreCancelled = true)
     public void onPlayerJoin(final @NotNull PlayerJoinEvent event) {
+        // Setting total number of resource-packs loaded by this player to 0. This is mainly for ease of use with other plugins.
+        event.getPlayer().setMetadata("total_loaded_resource-packs", new FixedMetadataValue(plugin, 0));
         // Sending resource pack 1 tick after event is fired. (if enabled)
         if (PluginConfig.RESOURCE_PACK_SEND_ON_JOIN == true && this.server != null) {
             // Sending resource-packs to the player. (next tick)
@@ -182,13 +184,18 @@ public final class ResourcePackManager implements Listener {
     @EventHandler
     public void onResourcePackStatus(final @NotNull PlayerResourcePackStatusEvent event) {
         if (PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS.isBlank() == false && this.server != null) {
+            final Player player = event.getPlayer();
             // Removing http contexts when no longer needed. Condition might be confusing but is a bit shorter when handled that way.
             if (event.getStatus() != Status.ACCEPTED && event.getStatus() != Status.SUCCESSFULLY_LOADED)
-                server.removeContext("/" + secrets.get(event.getPlayer().getUniqueId()) + "/" + event.getID());
-            // Adding loaded resource-pack to the list.
+                server.removeContext("/" + secrets.get(player.getUniqueId()) + "/" + event.getID());
+            // Setting resource-pack related meta-data. This is mainly for ease of use with other plugins.
             if (event.getStatus() == Status.SUCCESSFULLY_LOADED) {
-                final int count = event.getPlayer().getMetadata("loaded_resource-packs").getFirst().asInt();
+                // Increasing number of resource-packs loaded by this player since the last time they were sent.
+                final int count = player.getMetadata("loaded_resource-packs").getFirst().asInt();
                 event.getPlayer().setMetadata("loaded_resource-packs", new FixedMetadataValue(plugin, count + 1));
+                // Increasing total number of resource-packs loaded by this player since they logged in.
+                final int totalCount = player.getMetadata("total_loaded_resource-packs").getFirst().asInt();
+                event.getPlayer().setMetadata("total_loaded_resource-packs", new FixedMetadataValue(plugin, totalCount + 1));
             }
         }
     }
