@@ -71,6 +71,12 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("chat_settings.cooldown")
     public static Long CHAT_COOLDOWN;
 
+    @JsonPath("chat_settings.server_join_message")
+    public static String CHAT_SERVER_JOIN_MESSAGE;
+
+    @JsonPath("chat_settings.server_quit_message")
+    public static String CHAT_SERVER_QUIT_MESSAGE;
+
     // Chat Settings > Filtering
 
     @JsonPath("chat_settings.filtering.disallow_invalid_characters")

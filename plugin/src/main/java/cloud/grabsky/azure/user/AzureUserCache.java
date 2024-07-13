@@ -47,7 +47,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -302,8 +301,6 @@ public final class AzureUserCache implements UserCache, Listener {
         // NOTE: Handling that inside PlayerJoinEvent event may result in vanished player being exposed until he is hidden.
         // NOTE: Here and everywhere else (I believe) - vanished players of the same group weight can see each-other.
         if (thisUser.isVanished() == true) {
-            // Removing the join message, this should be configurable in the future.
-            event.joinMessage(null);
             // Showing BossBar.
             thisPlayer.showBossBar(PluginConfig.VANISH_BOSS_BAR);
         }
@@ -330,14 +327,6 @@ public final class AzureUserCache implements UserCache, Listener {
                 }
             }
         });
-    }
-
-    @EventHandler
-    public void onUserQuit(final @NotNull PlayerQuitEvent event) {
-        // Removing the quit message, this should be configurable in the future.
-        if (this.getUser(event.getPlayer()).isVanished() == true) {
-            event.quitMessage(null);
-        }
     }
 
     /**

@@ -27,6 +27,7 @@ import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.bedrock.components.Message;
 import me.clip.placeholderapi.PlaceholderAPI;
+import net.luckperms.api.cacheddata.CachedMetaData;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -51,6 +52,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
+import static cloud.grabsky.bedrock.helpers.Conditions.requirePresent;
+
 @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
 public final class PlayerListener implements Listener {
 
@@ -60,7 +63,7 @@ public final class PlayerListener implements Listener {
     private static final String PERMISSION_BYPASS_COMMAND_FILTER = "azure.plugin.bypass_command_filter";
 
 
-    @EventHandler
+    @EventHandler // We need to somehow ensure this is called AFTER AzureUserCache#onPlayerJoin(...) listener. I guess registration order is enough?
     public void onPlayerJoin(final @NotNull PlayerJoinEvent event) {
         final Player player = event.getPlayer();
         // Teleporting new players to spawn. (if enabled)
@@ -73,6 +76,41 @@ public final class PlayerListener implements Listener {
         // Clearing title. (if enabled)
         if (PluginConfig.GENERAL_CLEAR_TITLE_ON_JOIN == true)
             player.clearTitle();
+        // Setting join message to null because it needs to be handled manually.
+        event.joinMessage(null);
+        // Sending join message to audience that can see the player associated with the event.
+        if (PluginConfig.CHAT_SERVER_JOIN_MESSAGE.isBlank() == false) {
+            // Getting LuckPerms' cached meta-data. This should never be null despite the warning.
+            final CachedMetaData metaData = plugin.getLuckPerms().getUserManager().getUser(player.getUniqueId()).getCachedData().getMetaData();
+            // Sending join message to the audience.
+            Message.of(PluginConfig.CHAT_SERVER_JOIN_MESSAGE)
+                    .placeholder("player", player)
+                    .placeholder("group", requirePresent(metaData.getPrimaryGroup(), ""))
+                    .replace("<prefix>", requirePresent(metaData.getPrefix(), ""))
+                    .replace("<suffix>", requirePresent(metaData.getSuffix(), ""))
+                    .placeholder("displayname", player.displayName())
+                    .broadcast(audience -> audience.canSee(player) == true);
+        }
+    }
+
+    @EventHandler // We need to somehow ensure this is called AFTER AzureUserCache#onPlayerJoin(...) listener. I guess registration order is enough?
+    public void onPlayerQuit(final @NotNull PlayerQuitEvent event) {
+        final Player player = event.getPlayer();
+        // Setting quit message to null because it needs to be handled manually.
+        event.quitMessage(null);
+        // Sending quit message to audience that can see the player associated with the event.
+        if (PluginConfig.CHAT_SERVER_JOIN_MESSAGE.isBlank() == false) {
+            // Getting LuckPerms' cached meta-data. This should never be null despite the warning.
+            final CachedMetaData metaData = plugin.getLuckPerms().getUserManager().getUser(player.getUniqueId()).getCachedData().getMetaData();
+            // Sending quit message to the audience.
+            Message.of(PluginConfig.CHAT_SERVER_QUIT_MESSAGE)
+                    .placeholder("player", player)
+                    .placeholder("group", requirePresent(metaData.getPrimaryGroup(), ""))
+                    .replace("<prefix>", requirePresent(metaData.getPrefix(), ""))
+                    .replace("<suffix>", requirePresent(metaData.getSuffix(), ""))
+                    .placeholder("displayname", player.displayName())
+                    .broadcast(audience -> audience.canSee(player) == true);
+        }
     }
 
     /* WORLD RESPAWN - Respawns players on spawn-point of the main world. */

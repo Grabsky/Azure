@@ -13,6 +13,10 @@
     "chat_settings": {
         // Chat cooldown in milliseconds. Set to 0 to disable. Bypass: azure.plugin.chat.can_bypass_cooldown
         "cooldown": 1000,
+        // Message to be sent when player joins the server.
+        "server_join_message": "<dark_gray>› <gray><suffix><player><gray> dołączył do gry.",
+        // Message to be sent when player leaves the server.
+        "server_quit_message": "<dark_gray>› <gray><suffix><player><gray> wyszedł z gry.",
         // Chat filtering settings.
         "filtering": {
             // Whether characters considered as invalid should be disallowed.
