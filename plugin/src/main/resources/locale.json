@@ -306,7 +306,6 @@
         "skull_success_base64": "<dark_gray>› <gray>Otrzymałes zakodowaną głowę nieznanego gracza.",
         "skull_failure": "<dark_gray>› <red>Argument musi być <gold>nickiem gracza<red> lub <gold>zakodowanym skinem<red>.",
         // Nick
-        "nick_usage": "<dark_gray>› <gray>Użycie: <gold>/nick <gray>(player) (nick)",
         "nick_success_set": "<dark_gray>› <gray>Nick gracza <gold><player><gray> został ustawiony na: <nick>",
         "nick_success_set_target": "<dark_gray>› <gray>Twój nick został ustawiony na: <nick>",
         "nick_success_reset": "<dark_gray>› <gray>Nick gracza <gold><target><gray> został zresetowany.",
