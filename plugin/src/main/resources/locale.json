@@ -304,6 +304,22 @@
         "skull_usage": "<dark_gray>› <gray>Użycie: <gold>/skull <gray>(texture)",
         "skull_success_player": "<dark_gray>› <gray>Otrzymałeś głowę gracza <gold><player><gray>.",
         "skull_success_base64": "<dark_gray>› <gray>Otrzymałes zakodowaną głowę nieznanego gracza.",
-        "skull_failure": "<dark_gray>› <red>Argument musi być <gold>nickiem gracza<red> lub <gold>zakodowanym skinem<red>."
+        "skull_failure": "<dark_gray>› <red>Argument musi być <gold>nickiem gracza<red> lub <gold>zakodowanym skinem<red>.",
+        // Nick
+        "nick_usage": "<dark_gray>› <gray>Użycie: <gold>/nick <gray>(player) (nick)",
+        "nick_success_set": "<dark_gray>› <gray>Nick gracza <gold><player><gray> został ustawiony na: <nick>",
+        "nick_success_set_target": "<dark_gray>› <gray>Twój nick został ustawiony na: <nick>",
+        "nick_success_reset": "<dark_gray>› <gray>Nick gracza <gold><target><gray> został zresetowany.",
+        "nick_success_reset_target": "<dark_gray>› <gray>Twój nick został zresetowany.",
+        "nick_failure_invalid_format": [
+            "",
+            "<dark_gray>› <red>Nieprawidłowy format. Zobacz przykłady poniżej:",
+            "",
+            "<dark_gray>›   <gray>1. <#D1DBE4>\\<green><green><player>",
+            "<dark_gray>›   <gray>2. <#D1DBE4>\\<#D9042B><#D9042B><player>",
+            "<dark_gray>›   <gray>3. <#D1DBE4>\\<rainbow><rainbow><player>",
+            "<dark_gray>›   <gray>4. <#D1DBE4>\\<gradient:red:gold><gradient:red:gold><player>",
+            ""
+        ]
     }
 }

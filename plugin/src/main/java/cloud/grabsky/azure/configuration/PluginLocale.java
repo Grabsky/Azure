@@ -606,6 +606,25 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.skull_failure")
     public static String COMMAND_SKULL_FAILURE;
 
+    // Commands > Nick
+
+
+    @JsonPath("commands.nick_success_set")
+    public static String COMMAND_NICK_SUCCESS_SET;
+
+    @JsonPath("commands.nick_success_set_target")
+    public static String COMMAND_NICK_SUCCESS_SET_TARGET;
+
+    @JsonPath("commands.nick_success_reset")
+    public static String COMMAND_NICK_SUCCESS_RESET;
+
+    @JsonPath("commands.nick_success_reset_target")
+    public static String COMMAND_NICK_SUCCESS_RESET_TARGET;
+
+    @JsonPath("commands.nick_failure_invalid_format")
+    @JsonAdapter(fromJson = StringComponentAdapter.class)
+    public static String COMMAND_NICK_FAILURE_INVALID_FORMAT;
+
 
     public static final class Commands implements JsonConfiguration {
 
