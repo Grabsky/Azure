@@ -33,6 +33,7 @@ import cloud.grabsky.azure.configuration.adapters.UUIDAdapter;
 import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.bedrock.util.Interval;
 import cloud.grabsky.bedrock.util.Interval.Unit;
+import cloud.grabsky.configuration.paper.adapter.ComponentAdapter;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.JsonReader;
 import com.squareup.moshi.JsonWriter;
@@ -68,6 +69,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 import org.jetbrains.annotations.Unmodifiable;
 
+import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
 import static okio.Okio.buffer;
 import static okio.Okio.sink;
 import static okio.Okio.source;
@@ -87,6 +89,7 @@ public final class AzureUserCache implements UserCache, Listener {
         // ...
         this.adapter = new Moshi.Builder()
                 .add(UUID.class, UUIDAdapter.INSTANCE)
+                .add(Component.class, ComponentAdapter.INSTANCE)
                 .add(Interval.class, new JsonAdapter<Interval>() {
 
                     @Override
@@ -203,6 +206,7 @@ public final class AzureUserCache implements UserCache, Listener {
             final AzureUser user = new AzureUser(
                     player.getName(),
                     uniqueId,
+                    null,
                     (skin != null) ? encodeTextures(skin) : "",
                     (address != null) ? address : "N/A",
                     "N/A", // Country code is fetched asynchronously in the next step.
@@ -276,6 +280,7 @@ public final class AzureUserCache implements UserCache, Listener {
             final AzureUser computeUser = new AzureUser(
                     thisPlayer.getName(),
                     uniqueId,
+                    (existingUser != null) ? existingUser.getDisplayName() : null,
                     (skin != null) ? encodeTextures(skin) : "",
                     (thisPlayer.getAddress() != null) ? thisPlayer.getAddress().getHostString() : "N/A",
                     "N/A", // Country code is fetched asynchronously in the next step.
@@ -327,6 +332,9 @@ public final class AzureUserCache implements UserCache, Listener {
                 }
             }
         });
+        // Setting display name.
+        if (thisUser.getDisplayName() != null)
+            thisPlayer.displayName(miniMessage().deserialize(thisUser.getDisplayName()));
     }
 
     /**

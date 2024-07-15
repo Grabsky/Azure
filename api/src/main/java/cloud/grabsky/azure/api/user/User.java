@@ -28,6 +28,7 @@ import cloud.grabsky.azure.api.Punishment;
 import cloud.grabsky.bedrock.util.Interval;
 import net.kyori.adventure.nbt.BinaryTagIO;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -54,6 +55,16 @@ public interface User {
      * Returns unique identifier {@link UUID} of this {@link User}.
      */
     @NotNull UUID getUniqueId();
+
+    /**
+     * Returns display name of this {@link User}.
+     */
+    @Nullable String getDisplayName();
+
+    /**
+     * Sets display name of this {@link User}.
+     */
+    void setDisplayName(final @Nullable String displayName, final @Nullable Component displayNameComponent);
 
     /**
      * Returns skin textures of this {@link User} encoded with Base64.

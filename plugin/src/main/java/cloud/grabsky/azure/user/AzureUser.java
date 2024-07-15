@@ -29,6 +29,7 @@ import cloud.grabsky.azure.api.user.User;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.bedrock.util.Interval;
 import cloud.grabsky.bedrock.util.Interval.Unit;
+import net.kyori.adventure.text.Component;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.group.Group;
 import org.bukkit.Bukkit;
@@ -61,6 +62,9 @@ public final class AzureUser implements User {
     private final @NotNull UUID uniqueId;
 
     @Getter(AccessLevel.PUBLIC)
+    private @Nullable String displayName;
+
+    @Getter(AccessLevel.PUBLIC)
     private final @NotNull String textures;
 
     @Getter(AccessLevel.PUBLIC)
@@ -89,6 +93,21 @@ public final class AzureUser implements User {
     @Override
     public @Nullable Punishment getMostRecentMute() {
         return mostRecentMute;
+    }
+
+    @Override
+    public void setDisplayName(final @Nullable String displayName, final @Nullable Component displayNameComponent) {
+        final @Nullable Player thisPlayer = this.toPlayer();
+        // Setting the display name.
+        this.displayName = displayName;
+        // Saving User data to the filesystem.
+        ((AzureUserCache) Azure.getInstance().getUserCache()).saveUser(this).thenAccept(isSuccess -> {
+            Azure.getInstance().getLogger().info("Saving data of " + this.name + " in the background... " + (isSuccess == true ? "OK" : "ERROR"));
+            // Updating display name of an online player.
+            if (thisPlayer != null && thisPlayer.isOnline() == true) Azure.getInstance().getBedrockScheduler().run(1L, (___) -> {
+                thisPlayer.displayName(displayNameComponent);
+            });
+        });
     }
 
     @Override

@@ -23,12 +23,14 @@
  */
 package cloud.grabsky.azure.commands;
 
+import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.commands.ArgumentQueue;
 import cloud.grabsky.commands.RootCommand;
 import cloud.grabsky.commands.RootCommandContext;
 import cloud.grabsky.commands.annotation.Command;
+import cloud.grabsky.commands.annotation.Dependency;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.exception.CommandLogicException;
 import net.kyori.adventure.text.Component;
@@ -40,11 +42,16 @@ import org.bukkit.entity.Player;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 
 import static net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText;
 
 @Command(name = "nick", permission = "azure.command.nick", usage = "/nick (player) (nick)")
 public final class NickCommand extends RootCommand {
+
+    @Dependency
+    private @UnknownNullability Azure plugin;
+
 
     private static final MiniMessage MINI_MESSAGE = MiniMessage.builder().tags(
             TagResolver.resolver(
@@ -83,7 +90,7 @@ public final class NickCommand extends RootCommand {
             if (sender != target)
                 Message.of(PluginLocale.COMMAND_NICK_SUCCESS_RESET).placeholder("player", target).send(sender);
             // Resetting target's display name.
-            target.displayName(null);
+            plugin.getUserCache().getUser(target).setDisplayName(null, null);
             // Sending message to the target.
             Message.of(PluginLocale.COMMAND_NICK_SUCCESS_RESET_TARGET).send(sender);
             return;
@@ -96,7 +103,7 @@ public final class NickCommand extends RootCommand {
             return;
         }
         // Setting target's display-name.
-        target.displayName(displayName);
+        plugin.getUserCache().getUser(target).setDisplayName(nick, displayName);
         // Sending message to the sender. If applicable.
         if (sender != target)
             Message.of(PluginLocale.COMMAND_NICK_SUCCESS_SET).placeholder("player", target).send(sender);
