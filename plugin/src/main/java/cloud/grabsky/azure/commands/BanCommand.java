@@ -131,7 +131,7 @@ public final class BanCommand extends RootCommand {
             }
             // Sending success message to the sender.
             Message.of(PluginLocale.COMMAND_BAN_SUCCESS_PERMANENT)
-                    .placeholder("player", targetUser)
+                    .placeholder("player", targetUser.getName())
                     .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
                     // Sending to all players with specific permission.
                     .broadcast(receiver -> receiver instanceof ConsoleCommandSender || receiver.hasPermission("azure.command.ban") == true);
@@ -152,7 +152,7 @@ public final class BanCommand extends RootCommand {
         }
         // Sending success message to the sender.
         Message.of(PluginLocale.COMMAND_BAN_SUCCESS)
-                .placeholder("player", targetUser)
+                .placeholder("player", targetUser.getName())
                 .placeholder("duration_left", duration.toString())
                 .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
                 // Sending to all players with specific permission.

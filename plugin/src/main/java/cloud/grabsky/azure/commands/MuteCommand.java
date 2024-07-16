@@ -138,7 +138,7 @@ public final class MuteCommand extends RootCommand {
         targetUser.mute(duration, reason, sender);
         // Sending success message to the sender.
         Message.of(PluginLocale.COMMAND_MUTE_SUCCESS)
-                .placeholder("player", targetUser)
+                .placeholder("player", targetUser.getName())
                 .placeholder("duration_left", duration)
                 .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
                 // Sending to all players with specific permission.
