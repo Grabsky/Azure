@@ -130,7 +130,7 @@ public final class MuteCommand extends RootCommand {
                     .placeholder("player", targetUser.getName())
                     .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
                     // Sending to all players with specific permission.
-                    .broadcast(receiver -> receiver.hasPermission("azure.command.mute") == true);
+                    .broadcast(receiver -> receiver instanceof ConsoleCommandSender || receiver.hasPermission("azure.command.mute") == true);
             // Exiting the command block.
             return;
         }
