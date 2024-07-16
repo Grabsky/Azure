@@ -160,9 +160,9 @@
             "webhook_username": "",
             // Discord webhook avatar URL. Supports PlaceholderAPI.
             "webhook_avatar": "",
-            // Join message format. Supports PlaceholderAPI.
+            // Start message format. Supports PlaceholderAPI.
             "start_message_format": "Server is shutting down...",
-            // Quit message format. Supports PlaceholderAPI.
+            // Stoop message format. Supports PlaceholderAPI.
             "stop_message_format": "Server is now online..."
         },
         // Punishment messages forwarding to Discord server. Embeds are not configurable.
