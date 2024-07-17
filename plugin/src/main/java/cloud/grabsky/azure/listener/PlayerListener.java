@@ -36,6 +36,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.command.UnknownCommandEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerCommandSendEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -252,6 +254,22 @@ public final class PlayerListener implements Listener {
     public void onUnknownCommand(final @NotNull UnknownCommandEvent event) {
         if (PluginConfig.USE_BLOCKED_COMMAND_ERROR_MESSAGE_FOR_UNKNOWN_COMMAND == true)
             event.message(PluginConfig.BLOCKED_COMMAND_ERROR_MESSAGE);
+    }
+
+    /* HIDE DEATH MESSAGES */
+
+    @EventHandler
+    public void onPlayerDeath(final @NotNull PlayerDeathEvent event) {
+        if (PluginConfig.CHAT_SERVER_HIDE_DEATH_MESSAGES == true)
+            event.deathMessage(null);
+    }
+
+    /* HIDE ACHIEVEMENT MESSAGES */
+
+    @EventHandler
+    public void onAdvancementDone(final @NotNull PlayerAdvancementDoneEvent event) {
+        if (PluginConfig.CHAT_SERVER_HIDE_ADVANCEMENT_MESSAGES == true)
+            event.message(null);
     }
 
 }
