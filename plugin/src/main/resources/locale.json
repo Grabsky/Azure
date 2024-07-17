@@ -319,6 +319,14 @@
             "<dark_gray>›   <gray>3. <#D1DBE4>\\<rainbow><rainbow><player>",
             "<dark_gray>›   <gray>4. <#D1DBE4>\\<gradient:red:gold><gradient:red:gold><player>",
             ""
-        ]
+        ],
+        // Defeat
+        "defeat_confirm": [
+            "",
+            "<dark_gray>› <gray>Czy na pewno chcesz się poddać? Odrodzisz się na spawnie.",
+            "<dark_gray>› <hover:show_text:'<red><b>UWAGA:</b> Poniesiesz natychmiastową śmierć.'><click:run_command:'/<input> --confirm'><red>Kliknij tutaj, aby potwierdzić.</click>",
+            ""
+        ],
+        "defeat_success": "<dark_gray>› <gray>Poddałeś się... Kliknij <red>[<lang:deathScreen.respawn>]<gray>, aby się odrodzić."
     }
 }

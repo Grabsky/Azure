@@ -608,7 +608,6 @@ public final class PluginLocale implements JsonConfiguration {
 
     // Commands > Nick
 
-
     @JsonPath("commands.nick_success_set")
     public static String COMMAND_NICK_SUCCESS_SET;
 
@@ -624,6 +623,15 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.nick_failure_invalid_format")
     @JsonAdapter(fromJson = StringComponentAdapter.class)
     public static String COMMAND_NICK_FAILURE_INVALID_FORMAT;
+
+    // Commands > Defeat
+
+    @JsonPath("commands.defeat_confirm")
+    @JsonAdapter(fromJson = StringComponentAdapter.class)
+    public static String COMMAND_DEFEAT_CONFIRM;
+
+    @JsonPath("commands.defeat_success")
+    public static Component COMMAND_DEFEAT_SUCCESS;
 
 
     public static final class Commands implements JsonConfiguration {

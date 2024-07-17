@@ -30,6 +30,7 @@ import cloud.grabsky.azure.chat.ChatManager;
 import cloud.grabsky.azure.commands.AzureCommand;
 import cloud.grabsky.azure.commands.BanCommand;
 import cloud.grabsky.azure.commands.DebugCommand;
+import cloud.grabsky.azure.commands.DefeatCommand;
 import cloud.grabsky.azure.commands.DeleteCommand;
 import cloud.grabsky.azure.commands.EnderchestCommand;
 import cloud.grabsky.azure.commands.FeedCommand;
@@ -185,6 +186,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                 // Registering commands...
                 .registerCommand(AzureCommand.class)
                 .registerCommand(BanCommand.class)
+                .registerCommand(DefeatCommand.class)
                 .registerCommand(DeleteCommand.class)
                 .registerCommand(EnderchestCommand.class)
                 .registerCommand(FeedCommand.class)
