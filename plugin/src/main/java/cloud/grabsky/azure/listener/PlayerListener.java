@@ -258,10 +258,10 @@ public final class PlayerListener implements Listener {
 
     /* HIDE DEATH MESSAGES */
 
-    @EventHandler
+    @EventHandler @SuppressWarnings("deprecation") // Cancelling death message using 'PlayerDeathEvent#deathMessage(null)' was not working, hence why deprecated method is used.
     public void onPlayerDeath(final @NotNull PlayerDeathEvent event) {
         if (PluginConfig.CHAT_SERVER_HIDE_DEATH_MESSAGES == true)
-            event.deathMessage(null);
+            event.setDeathMessage(null);
     }
 
     /* HIDE ACHIEVEMENT MESSAGES */
