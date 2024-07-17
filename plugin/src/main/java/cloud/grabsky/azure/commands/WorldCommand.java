@@ -276,7 +276,6 @@ public final class WorldCommand extends RootCommand {
             // Setting the new border.
             world.getWorldBorder().setCenter(position.blockX() + 0.5, position.blockZ() + 0.5);
             world.getWorldBorder().setSize(radius * 2);
-            System.out.println(radius * 2);
             // Sending message to the sender.
             Message.of(PluginLocale.COMMAND_WORLD_BORDER_SET_SUCCESS).placeholder("world", world).send(sender);
             return;
