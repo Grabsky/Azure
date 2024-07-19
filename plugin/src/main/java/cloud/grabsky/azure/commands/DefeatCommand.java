@@ -31,8 +31,6 @@ import cloud.grabsky.commands.RootCommandContext;
 import cloud.grabsky.commands.annotation.Command;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.exception.CommandLogicException;
-import org.bukkit.damage.DamageSource;
-import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Player;
 
 import org.jetbrains.annotations.NotNull;
@@ -59,7 +57,7 @@ public final class DefeatCommand extends RootCommand {
             return;
         }
         // Killing the sender.
-        sender.damage(999, DamageSource.builder(DamageType.GENERIC_KILL).build());
+        sender.setHealth(0.0);
         // Sending success message to the sender.
         Message.of(PluginLocale.COMMAND_DEFEAT_SUCCESS).send(sender);
     }
