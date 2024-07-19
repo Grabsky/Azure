@@ -260,7 +260,7 @@ public final class PlayerListener implements Listener {
 
     @EventHandler @SuppressWarnings("deprecation") // Cancelling death message using 'PlayerDeathEvent#deathMessage(null)' was not working, hence why deprecated method is used.
     public void onPlayerDeath(final @NotNull PlayerDeathEvent event) {
-        if (PluginConfig.CHAT_SERVER_HIDE_DEATH_MESSAGES == true)
+        if (PluginConfig.CHAT_HIDE_DEATH_MESSAGES == true)
             event.setDeathMessage(null);
     }
 
@@ -268,8 +268,21 @@ public final class PlayerListener implements Listener {
 
     @EventHandler
     public void onAdvancementDone(final @NotNull PlayerAdvancementDoneEvent event) {
-        if (PluginConfig.CHAT_SERVER_HIDE_ADVANCEMENT_MESSAGES == true)
+        if (PluginConfig.CHAT_HIDE_ADVANCEMENT_MESSAGES == true) {
             event.message(null);
+            return;
+        }
+        if (PluginConfig.CHAT_ADVANCEMENT_MESSAGE_FORMAT.isBlank() == false) {
+            final Player player = event.getPlayer();
+            final Message<String> message = Message.of(PluginConfig.CHAT_ADVANCEMENT_MESSAGE_FORMAT)
+                    .placeholder("player", player)
+                    .placeholder("displayname", player.displayName())
+                    .placeholder("advancement", event.getAdvancement().displayName());
+            // ...
+            if (PluginConfig.CHAT_ADVANCEMENT_MESSAGE_SEND_GLOBAL == true)
+                message.broadcast();
+            else message.send(player);
+        }
     }
 
 }

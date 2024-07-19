@@ -20,7 +20,11 @@
         // Whether death messages should be hidden.
         "hide_death_messages": true,
         // Whether advancement messages should be hidden.
-        "hide_advancement_messages": true,
+        "hide_advancement_messages": false,
+        // Whether advancement message should be global. Must also be enabled with setting above.
+        "advancement_message_send_global": false,
+        // Advancement message format. Set to "" to use vanilla message. Placeholders: [player, displayname, advancement]
+        "advancement_message_format": "<dark_gray>› <green>Gratulacje! <gray>Odblokowałeś osiągnięcie <advancement><gray>...",
         // Chat filtering settings.
         "filtering": {
             // Whether characters considered as invalid should be disallowed.

@@ -78,10 +78,16 @@ public final class PluginConfig implements JsonConfiguration {
     public static String CHAT_SERVER_QUIT_MESSAGE;
 
     @JsonPath("chat_settings.hide_death_messages")
-    public static boolean CHAT_SERVER_HIDE_DEATH_MESSAGES;
+    public static boolean CHAT_HIDE_DEATH_MESSAGES;
 
     @JsonPath("chat_settings.hide_advancement_messages")
-    public static boolean CHAT_SERVER_HIDE_ADVANCEMENT_MESSAGES;
+    public static boolean CHAT_HIDE_ADVANCEMENT_MESSAGES;
+
+    @JsonPath("chat_settings.advancement_message_send_global")
+    public static boolean CHAT_ADVANCEMENT_MESSAGE_SEND_GLOBAL;
+
+    @JsonPath("chat_settings.advancement_message_format")
+    public static String CHAT_ADVANCEMENT_MESSAGE_FORMAT;
 
     // Chat Settings > Filtering
 
