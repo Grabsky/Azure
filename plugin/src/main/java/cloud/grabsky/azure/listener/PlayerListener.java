@@ -273,6 +273,9 @@ public final class PlayerListener implements Listener {
             return;
         }
         if (PluginConfig.CHAT_ADVANCEMENT_MESSAGE_FORMAT.isBlank() == false) {
+            // Cancelling vanilla message.
+            event.message(null);
+            // ...
             final Player player = event.getPlayer();
             final Message<String> message = Message.of(PluginConfig.CHAT_ADVANCEMENT_MESSAGE_FORMAT)
                     .placeholder("player", player)
