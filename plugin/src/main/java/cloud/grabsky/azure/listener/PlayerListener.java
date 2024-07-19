@@ -272,7 +272,7 @@ public final class PlayerListener implements Listener {
             event.message(null);
             return;
         }
-        if (PluginConfig.CHAT_ADVANCEMENT_MESSAGE_FORMAT.isBlank() == false) {
+        if (event.getAdvancement().getDisplay() != null && event.getAdvancement().getDisplay().doesAnnounceToChat() == true && PluginConfig.CHAT_ADVANCEMENT_MESSAGE_FORMAT.isBlank() == false) {
             // Cancelling vanilla message.
             event.message(null);
             // ...
