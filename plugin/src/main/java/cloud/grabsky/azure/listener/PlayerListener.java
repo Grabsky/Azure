@@ -120,7 +120,7 @@ public final class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerRespawn(final @NotNull PlayerRespawnEvent event) {
         // Setting respawn location to spawn point of the primary world. (if enabled)
-        if (PluginConfig.GENERAL_RESPAWN_ON_PRIMARY_WORLD_SPAWN == true) {
+        if (PluginConfig.GENERAL_RESPAWN_ON_PRIMARY_WORLD_SPAWN == true && event.isBedSpawn() == false && event.isAnchorSpawn() == false) {
             // Getting the primary world.
             final World primaryWorld = plugin.getWorldManager().getPrimaryWorld();
             // Setting the respawn location.
