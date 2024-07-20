@@ -273,7 +273,7 @@ public final class ChatManager implements Listener, MessageCreateListener {
             if (viewer instanceof ConsoleCommandSender) {
                 return MiniMessage.miniMessage().deserialize(
                         PluginConfig.CHAT_FORMATS_CONSOLE,
-                        Placeholder.unparsed("signature_uuid", signatureUUID.toString()),
+                        Placeholder.unparsed("signature_uuid", (signatureUUID == null) ? signatureUUID.toString() : "N/A"),
                         Placeholder.unparsed("player", source.getName()),
                         Placeholder.unparsed("group", requirePresent(metaData.getPrimaryGroup(), "")),
                         Placeholder.parsed("prefix", requirePresent(metaData.getPrefix(), "")),
