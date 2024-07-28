@@ -30,6 +30,8 @@ import cloud.grabsky.configuration.paper.adapter.StringComponentAdapter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
 
+import java.util.Map;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnknownNullability;
 
@@ -90,6 +92,14 @@ public final class PluginLocale implements JsonConfiguration {
             case SURVIVAL -> PluginLocale.SURVIVAL;
         };
     }
+
+    // Death
+
+    @JsonPath("death_messages.default")
+    public static String DEATH_MESSAGES_DEFAULT;
+
+    @JsonPath("death_messages")
+    public static Map<String, String> DEATH_MESSAGES;
 
     // Chat
 

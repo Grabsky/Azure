@@ -25,8 +25,12 @@ package cloud.grabsky.azure.listener;
 
 import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.configuration.PluginConfig;
+import cloud.grabsky.azure.configuration.PluginLocale;
+import cloud.grabsky.bedrock.components.ComponentBuilder;
 import cloud.grabsky.bedrock.components.Message;
 import me.clip.placeholderapi.PlaceholderAPI;
+import net.kyori.adventure.text.TranslatableComponent;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.luckperms.api.cacheddata.CachedMetaData;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -256,12 +260,56 @@ public final class PlayerListener implements Listener {
             event.message(PluginConfig.BLOCKED_COMMAND_ERROR_MESSAGE);
     }
 
-    /* HIDE DEATH MESSAGES */
+    /* DEATH MESSAGES */
 
-    @EventHandler @SuppressWarnings("deprecation") // Cancelling death message using 'PlayerDeathEvent#deathMessage(null)' was not working, hence why deprecated method is used.
+    @SneakyThrows
+    @EventHandler @SuppressWarnings({"deprecation", "UnstableApiUsage"}) // Cancelling death message using 'PlayerDeathEvent#deathMessage(null)' was not working, hence why deprecated method is used.
     public void onPlayerDeath(final @NotNull PlayerDeathEvent event) {
-        if (PluginConfig.CHAT_HIDE_DEATH_MESSAGES == true)
+        // Hiding death messages if enabled.
+        if (PluginConfig.CHAT_HIDE_DEATH_MESSAGES == true) {
             event.setDeathMessage(null);
+            return;
+        }
+        // Using plugin death messages if enabled.
+        if (PluginConfig.CHAT_USE_PLUGIN_DEATH_MESSAGES == true && plugin.getUserCache().getUser(event.getPlayer()).isVanished() == false) {
+            if (event.deathMessage() instanceof TranslatableComponent translatable) {
+                final String text = PluginLocale.DEATH_MESSAGES.getOrDefault(translatable.key(), PluginLocale.DEATH_MESSAGES_DEFAULT);
+                // Preparing the message.
+                final Message.StringMessage message = Message.of(text)
+                        .placeholder("victim", event.getPlayer())
+                        .placeholder("victim_displayname", event.getPlayer().displayName())
+                        .placeholder("attacker", (event.getDamageSource().getCausingEntity() != null) ? event.getDamageSource().getCausingEntity().getName() : "N/A")
+                        .placeholder("attacker_displayname", (event.getDamageSource().getCausingEntity() != null && event.getDamageSource().getCausingEntity() instanceof Player attacker) ? attacker.displayName() : ComponentBuilder.EMPTY);
+                // Broadcasting the message.
+                // NOTE: Displayed twice in the console due to a bug in bedrock lib.
+                message.broadcast();
+                // Discord integration... Must be handled here because we're cancelling the death message right after this event is called.
+                if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_DEATH_MESSAGE_FORWARDING_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_DEATH_MESSAGE_FORWARDING_WEBHOOK_URL.isEmpty() == true)
+                    return;
+                // Forwarding message to webhook...
+                if (plugin.getUserCache().getUser(event.getPlayer()).isVanished() == false) {
+                    // Setting message placeholders.
+                    final String webhookMessage = MiniMessage.miniMessage().stripTags(text)
+                            .replace("› ", "") // Very dirty workaround but this had to be done ASAP; Will be improved in the future.
+                            .replace("<victim>", "**" + event.getPlayer().getName() + "**")
+                            .replace("<victim_displayname>", "**" + event.getPlayer().getName() + "**")
+                            .replace("<attacker>", "**" + (event.getDamageSource().getCausingEntity() != null ? event.getDamageSource().getCausingEntity().getName() : "") + "**")
+                            .replace("<attacker_displayname>", "**" + (event.getDamageSource().getCausingEntity() != null ? event.getDamageSource().getCausingEntity().getName() : "") + "**");
+                    // Creating new instance of WebhookMessageBuilder.
+                    final WebhookMessageBuilder builder = new WebhookMessageBuilder().setContent(webhookMessage);
+                    // Setting username if specified.
+                    if (PluginConfig.DISCORD_INTEGRATIONS_DEATH_MESSAGE_FORWARDING_WEBHOOK_USERNAME.isEmpty() == false)
+                        builder.setDisplayName(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_DEATH_MESSAGE_FORWARDING_WEBHOOK_USERNAME));
+                    // Setting avatar if specified.
+                    if (PluginConfig.DISCORD_INTEGRATIONS_DEATH_MESSAGE_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
+                        builder.setDisplayAvatar(new URI(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_DEATH_MESSAGE_FORWARDING_WEBHOOK_AVATAR)).toURL());
+                    // Sending the message.
+                    builder.sendSilently(plugin.getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_DEATH_MESSAGE_FORWARDING_WEBHOOK_URL);
+                }
+            }
+            // Preventing vanilla death message from appearing in chat.
+            event.setDeathMessage(null);
+        }
     }
 
     /* HIDE ACHIEVEMENT MESSAGES */

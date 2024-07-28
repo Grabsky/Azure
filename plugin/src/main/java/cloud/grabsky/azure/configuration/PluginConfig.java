@@ -80,6 +80,9 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("chat_settings.hide_death_messages")
     public static boolean CHAT_HIDE_DEATH_MESSAGES;
 
+    @JsonPath("chat_settings.use_plugin_death_messages")
+    public static boolean CHAT_USE_PLUGIN_DEATH_MESSAGES;
+
     @JsonPath("chat_settings.hide_advancement_messages")
     public static boolean CHAT_HIDE_ADVANCEMENT_MESSAGES;
 
@@ -262,6 +265,19 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("discord_integrations.start_and_stop_forwarding.stop_message_format")
     public static String DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_STOP_MESSAGE_FORMAT;
 
+    // Discord Integrations > Death Message Forwarding
+
+    @JsonPath("discord_integrations.death_message_forwarding.enabled")
+    public static boolean DISCORD_INTEGRATIONS_DEATH_MESSAGE_FORWARDING_ENABLED;
+
+    @JsonPath("discord_integrations.death_message_forwarding.webhook_url")
+    public static String DISCORD_INTEGRATIONS_DEATH_MESSAGE_FORWARDING_WEBHOOK_URL;
+
+    @JsonPath("discord_integrations.death_message_forwarding.webhook_username")
+    public static String DISCORD_INTEGRATIONS_DEATH_MESSAGE_FORWARDING_WEBHOOK_USERNAME;
+
+    @JsonPath("discord_integrations.death_message_forwarding.webhook_avatar")
+    public static String DISCORD_INTEGRATIONS_DEATH_MESSAGE_FORWARDING_WEBHOOK_AVATAR;
 
     // Discord Integrations > Punishments Forwarding
 

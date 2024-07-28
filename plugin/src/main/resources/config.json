@@ -18,7 +18,9 @@
         // Message to be sent when player leaves the server.
         "server_quit_message": "<dark_gray>› <gray><suffix><player><gray> wyszedł z gry.",
         // Whether death messages should be hidden.
-        "hide_death_messages": true,
+        "hide_death_messages": false,
+        // Whether to use plugin death messages. Must also be enabled with setting above.
+        "use_plugin_death_messages": false,
         // Whether advancement messages should be hidden.
         "hide_advancement_messages": false,
         // Whether advancement message should be global. Must also be enabled with setting above.
@@ -172,6 +174,17 @@
             "start_message_format": "Server is shutting down...",
             // Stoop message format. Supports PlaceholderAPI.
             "stop_message_format": "Server is now online..."
+        },
+        // Player JOIN and QUIT messages forwarding to Discord server.
+        "death_message_forwarding": {
+            // Whether to enable this integration.
+            "enabled": false,
+            // Discord webhook URL. Keep it secure.
+            "webhook_url": "",
+            // Discord webhook username. Supports PlaceholderAPI.
+            "webhook_username": "",
+            // Discord webhook avatar URL. Supports PlaceholderAPI.
+            "webhook_avatar": ""
         },
         // Punishment messages forwarding to Discord server. Embeds are not configurable.
         "punishments_forwarding": {
