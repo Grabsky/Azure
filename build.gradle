@@ -15,7 +15,7 @@ subprojects {
     version = rootProject.version
 
     ext {
-        BEDROCK_VERSION = "1.20.1-47"
+        BEDROCK_VERSION = "1.21-63"
         KYORI_NBT_VERSION = "4.17.0"
     }
 
