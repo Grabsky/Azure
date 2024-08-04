@@ -31,6 +31,7 @@ import cloud.grabsky.azure.configuration.PluginConfig.DeleteButton.Position;
 import cloud.grabsky.azure.configuration.PluginConfig.FormatHolder;
 import cloud.grabsky.azure.configuration.PluginConfig.TagsHolder;
 import cloud.grabsky.azure.configuration.PluginLocale;
+import cloud.grabsky.bedrock.components.ComponentBuilder;
 import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.bedrock.helpers.Conditions;
 import cloud.grabsky.bedrock.util.Interval;
@@ -54,6 +55,7 @@ import net.luckperms.api.cacheddata.CachedMetaData;
 import net.luckperms.api.model.user.UserManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -192,7 +194,9 @@ public final class ChatManager implements Listener, MessageCreateListener {
         final TagResolver matchingResolvers = this.findSuitableTagsCollection(event.player(), PluginConfig.CHAT_MESSAGE_TAGS_DEFAULT);
         // ...
         final Component result = (matchingResolvers.has("item") == true)
-                ? EMPTY_MINIMESSAGE.deserialize(message, matchingResolvers, Placeholder.component("item", empty().color(WHITE).append(item.displayName()).hoverEvent(item.asHoverEvent()) ))
+                ? (item.isEmpty() == false && item.getType() != Material.AIR)
+                        ? EMPTY_MINIMESSAGE.deserialize(message, matchingResolvers, Placeholder.component("item", empty().color(WHITE).append(item.displayName()).hoverEvent(item.asHoverEvent())))
+                        : EMPTY_MINIMESSAGE.deserialize(message, matchingResolvers, Placeholder.component("item", ComponentBuilder.of("", WHITE).append("[").appendTranslation("block.minecraft.air").append("]").build()))
                 : EMPTY_MINIMESSAGE.deserialize(message, matchingResolvers);
         // Setting result, the rest is handled within AsyncChatEvent
         event.result(result);
