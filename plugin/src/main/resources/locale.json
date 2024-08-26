@@ -124,7 +124,8 @@
         "message_contains_inappropriate_words": "<dark_gray>› <red>Twoja wiadomość zawiera nieodpowiednie słowa.",
         "on_cooldown": "<dark_gray>› <red>Musisz chwilę poczekać...",
         "muted": "<dark_gray>› <gray>Jesteś wyciszony przez kolejne <red><duration_left><gray>.",
-        "muted_permanent": "<dark_gray>› <gray>Jesteś <red>permanentnie<gray> wyciszony."
+        "muted_permanent": "<dark_gray>› <gray>Jesteś <red>permanentnie<gray> wyciszony.",
+        "attachment": "(\uD83D\uDCCE Załącznik)"
     },
     // ...
     "commands": {

@@ -76,9 +76,13 @@ import cloud.grabsky.configuration.adapter.AbstractEnumJsonAdapter;
 import cloud.grabsky.configuration.exception.ConfigurationMappingException;
 import cloud.grabsky.configuration.paper.PaperConfigurationMapper;
 import me.clip.placeholderapi.PlaceholderAPI;
+import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -92,11 +96,14 @@ import org.javacord.api.entity.message.WebhookMessageBuilder;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.time.temporal.ChronoUnit;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
 import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
@@ -241,6 +248,8 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
         }
         // Finalizing... (exposing instance to the API)
         AzureProvider.finalize(this);
+        // Registering PAPI placeholders...
+        Placeholders.INSTANCE.register();
     }
 
     @Override @SneakyThrows
@@ -307,6 +316,11 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                 // Otherwise, unsetting the activity.
                 else discord.unsetActivity();
             }
+            // Unregistering PAPI expansion if already registered.
+            if (Placeholders.INSTANCE.isRegistered() == true)
+                Placeholders.INSTANCE.unregister();
+            // Registering the expansion again.
+            Placeholders.INSTANCE.register();
             // Returning 'true' as reload finished without any exceptions.
             return true;
         } catch (final IllegalStateException | ConfigurationMappingException | IOException e) {
@@ -358,6 +372,36 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                 // Otherwise, just setting the activity.
                 else discord.updateActivity(PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getType(), PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getState());
         }
+    }
+
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class Placeholders extends PlaceholderExpansion {
+        public static final Placeholders INSTANCE = new Placeholders(); // SINGLETON
+
+        @Override
+        public @NotNull String getAuthor() {
+            return "Grabsky";
+        }
+
+        @Override
+        public @NotNull String getIdentifier() {
+            return "azure";
+        }
+
+        @Override
+        public @NotNull String getVersion() {
+            return Azure.getInstance().getPluginMeta().getVersion();
+        }
+
+        @Override
+        public String onRequest(final @NotNull OfflinePlayer player, final @NotNull String params) {
+            if (params.equalsIgnoreCase("is_idle") == true && player instanceof Player onlinePlayer && onlinePlayer.isOnline() == true) {
+                final boolean isIdle = onlinePlayer.getIdleDuration().get(ChronoUnit.SECONDS) >= (long) Bukkit.getIdleTimeout() * 60;
+                return String.valueOf(isIdle);
+            }
+            return null;
+        }
+
     }
 
 }

@@ -329,7 +329,9 @@ public final class ChatManager implements Listener, MessageCreateListener {
             // Serializing Component to plain String.
             final String plainMessage = PlainTextComponentSerializer.plainText().serialize(event.message());
             // Creating new instance of WebhookMessageBuilder.
-            final WebhookMessageBuilder builder = new WebhookMessageBuilder().setAllowedMentions(NO_MENTIONS).setContent(plainMessage);
+            final WebhookMessageBuilder builder = new WebhookMessageBuilder()
+                    .setAllowedMentions(NO_MENTIONS)
+                    .setContent(plainMessage.startsWith("xaero-waypoint:") == true ? "[Xaero's Waypoint]" : plainMessage);
             // Setting username if specified.
             if (PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_USERNAME.isEmpty() == false)
                 builder.setDisplayName(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_USERNAME));
@@ -352,17 +354,23 @@ public final class ChatManager implements Listener, MessageCreateListener {
             final String username = event.getMessageAuthor().getName();
             final String displayname = event.getMessageAuthor().getDisplayName();
             final String message = ChatColor.stripColor(event.getMessage().getReadableContent());
+            // ...
+            final String finalMessage = (event.getMessage().getAttachments().isEmpty() == false)
+                    ? (message.isBlank() == false)
+                            ? message + " " + PluginLocale.CHAT_ATTACHMENT
+                            : PluginLocale.CHAT_ATTACHMENT
+                    : message;
             // Sending message to the console.
             Message.of(PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_CONSOLE_FORMAT)
                     .placeholder("username", username)
                     .placeholder("displayname", displayname)
-                    .placeholder("message", message)
+                    .placeholder("message", finalMessage)
                     .send(Bukkit.getConsoleSender());
             // Sending message to all players.
             Message.of(PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_CHAT_FORMAT)
                     .placeholder("username", username)
                     .placeholder("displayname", displayname)
-                    .placeholder("message", message)
+                    .placeholder("message", finalMessage)
                     .send(Bukkit.getServer().filterAudience(audience -> audience instanceof Player));
         }
     }
