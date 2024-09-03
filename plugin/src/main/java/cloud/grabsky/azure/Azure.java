@@ -25,6 +25,7 @@ package cloud.grabsky.azure;
 
 import cloud.grabsky.azure.api.AzureAPI;
 import cloud.grabsky.azure.api.AzureProvider;
+import cloud.grabsky.azure.api.user.User;
 import cloud.grabsky.azure.api.user.UserCache;
 import cloud.grabsky.azure.chat.ChatManager;
 import cloud.grabsky.azure.commands.AzureCommand;
@@ -400,7 +401,11 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
             if (params.equalsIgnoreCase("is_idle") == true && player instanceof Player onlinePlayer && onlinePlayer.isOnline() == true) {
                 final boolean isIdle = onlinePlayer.getIdleDuration().get(ChronoUnit.SECONDS) >= (long) Bukkit.getIdleTimeout() * 60;
                 return String.valueOf(isIdle);
-            }
+            } else if (params.equalsIgnoreCase("displayname") == true && Azure.getInstance() != null && Azure.getInstance().getUserCache() != null)
+                if (Azure.getInstance().getUserCache().hasUser(player.getUniqueId()) == true) {
+                    final User user = Azure.getInstance().getUserCache().getUser(player.getUniqueId());
+                    return (user.getDisplayName() != null) ? user.getDisplayName() : user.getName();
+                }
             return null;
         }
 
