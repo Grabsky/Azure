@@ -105,7 +105,7 @@ public final class PlayerListener implements Listener {
         // Setting quit message to null because it needs to be handled manually.
         event.quitMessage(null);
         // Sending quit message to audience that can see the player associated with the event.
-        if (PluginConfig.CHAT_SERVER_JOIN_MESSAGE.isBlank() == false) {
+        if (PluginConfig.CHAT_SERVER_QUIT_MESSAGE.isBlank() == false) {
             // Getting LuckPerms' cached meta-data. This should never be null despite the warning.
             final CachedMetaData metaData = plugin.getLuckPerms().getUserManager().getUser(player.getUniqueId()).getCachedData().getMetaData();
             // Sending quit message to the audience.
