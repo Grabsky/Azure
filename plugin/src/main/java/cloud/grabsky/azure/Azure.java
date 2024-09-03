@@ -37,6 +37,7 @@ import cloud.grabsky.azure.commands.FeedCommand;
 import cloud.grabsky.azure.commands.FlyCommand;
 import cloud.grabsky.azure.commands.GameModeCommand;
 import cloud.grabsky.azure.commands.GiveCommand;
+import cloud.grabsky.azure.commands.HatCommand;
 import cloud.grabsky.azure.commands.HealCommand;
 import cloud.grabsky.azure.commands.InventoryCommand;
 import cloud.grabsky.azure.commands.InvulnerableCommand;
@@ -199,6 +200,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                 .registerCommand(FeedCommand.class)
                 .registerCommand(GameModeCommand.class)
                 .registerCommand(GiveCommand.class)
+                .registerCommand(HatCommand.class)
                 .registerCommand(HealCommand.class)
                 .registerCommand(InventoryCommand.class)
                 .registerCommand(InvulnerableCommand.class)
