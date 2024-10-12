@@ -44,12 +44,14 @@ import com.squareup.moshi.Types;
 import io.papermc.paper.event.player.AsyncChatDecorateEvent;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import me.clip.placeholderapi.PlaceholderAPI;
+import net.fellbaum.jemoji.EmojiManager;
 import net.kyori.adventure.chat.SignedMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickCallback.Options;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.luckperms.api.cacheddata.CachedMetaData;
 import net.luckperms.api.model.user.UserManager;
@@ -343,6 +345,9 @@ public final class ChatManager implements Listener, MessageCreateListener {
         }
     }
 
+    // Strict MiniMessage instance used for deserialization of translatable components and colors appended internally in Discord -> Minecraft chat forwarding.
+    private static final MiniMessage STRICT_MINI_MESSAGE = MiniMessage.builder().tags(TagResolver.resolver(StandardTags.translatable(), StandardTags.color())).build();
+
     @Override @SuppressWarnings("deprecation") // Suppressing @Deprecated method(s) as adventure seems to not provide an alternative for that.
     public void onMessageCreate(final @NotNull MessageCreateEvent event) {
         // Skipping in case chat returning is not enabled.
@@ -353,13 +358,19 @@ public final class ChatManager implements Listener, MessageCreateListener {
             // Getting the message components.
             final String username = event.getMessageAuthor().getName();
             final String displayname = event.getMessageAuthor().getDisplayName();
-            final String message = ChatColor.stripColor(event.getMessage().getReadableContent());
-            // ...
-            final String finalMessage = (event.getMessage().getAttachments().isEmpty() == false)
+            // Getting the message and stripping all tags and formatting. Not final because it's modified in the next step.
+            // NOTE: MessageCreateEvent#getReadableMessageContent is VERY slow and should be replaced with an alternative method ASAP.
+            String message = MiniMessage.miniMessage().stripTags(ChatColor.stripColor(event.getReadableMessageContent()));
+            // Replacing all emojis in this message with a translatable component.
+            message = EmojiManager.replaceAllEmojis(message, (emoji) -> "<white><lang:'" + emoji.getDiscordAliases().getFirst() + "'></white>");
+            // Appending '(Attachment)' or similar string to the message if it contains an attachment like image etc.
+            message = (event.getMessage().getAttachments().isEmpty() == false)
                     ? (message.isBlank() == false)
                             ? message + " " + PluginLocale.CHAT_ATTACHMENT
                             : PluginLocale.CHAT_ATTACHMENT
                     : message;
+            // Parsing the message using MiniMessage, with just the translatable and color tags enabled.
+            final Component finalMessage = STRICT_MINI_MESSAGE.deserialize(message);
             // Sending message to the console.
             Message.of(PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_CONSOLE_FORMAT)
                     .placeholder("username", username)
@@ -373,6 +384,7 @@ public final class ChatManager implements Listener, MessageCreateListener {
                     .placeholder("message", finalMessage)
                     .send(Bukkit.getServer().filterAudience(audience -> audience instanceof Player));
         }
+
     }
 
     public void setLastRecipients(final @NotNull UUID first, final @NotNull UUID second) {

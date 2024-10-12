@@ -20,6 +20,8 @@ dependencies {
         exclude group: "com.squareup.moshi"
         exclude group: "com.squareup.okio"
     }
+    // JEmoji
+    implementation("net.fellbaum:jemoji:1.5.2")
     // Plugin dependencies, should be present in the classpath as required per 'paper-plugin.yml' file.
     compileOnly("net.luckperms:api:5.4")
     compileOnly("me.clip:placeholderapi:2.11.5")
