@@ -1,6 +1,6 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "8.1.1"
-    id "net.minecrell.plugin-yml.paper"  version "0.6.0"
+    id "net.minecrell.plugin-yml.paper" version "0.6.0"
+    id "com.gradleup.shadow" version "8.3.3"
 }
 
 repositories {
@@ -8,11 +8,11 @@ repositories {
 }
 
 dependencies {
-    api(project ":azure-api")
+    api(project(":azure-api"))
     // Must share version between 'plugin' and 'api' modules.
     implementation("cloud.grabsky:bedrock:$BEDROCK_VERSION")
     implementation("cloud.grabsky:commands:1.20.1-38")
-    implementation("cloud.grabsky:configuration-paper:1.20.1-42")
+    implementation("cloud.grabsky:configuration-paper:1.20.1-43")
     // Must share version between 'plugin' and 'api' modules.
     implementation("net.kyori:adventure-nbt:$KYORI_NBT_VERSION")
     // Moshi and Okio are already in the classpath.
@@ -35,7 +35,7 @@ tasks {
 paper {
     name = "Azure"
     main = "cloud.grabsky.azure.Azure"
-    apiVersion = "1.21"
+    apiVersion = "1.21.1"
     serverDependencies {
         "LuckPerms"      { load = "BEFORE"; required = true }
         "PlaceholderAPI" { load = "BEFORE"; required = true }
