@@ -64,9 +64,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
 import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
+import org.javacord.api.entity.permission.Role;
+import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
 
@@ -83,6 +86,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -122,6 +127,12 @@ public final class ChatManager implements Listener, MessageCreateListener {
 
     // Raw type of Set<String> used for deserialization with Moshi.
     private static final Type LIST_STRING_TYPE = Types.newParameterizedType(Set.class, String.class);
+
+    // Strict MiniMessage instance used for deserialization of translatable components and colors appended internally in Discord -> Minecraft chat forwarding.
+    private static final MiniMessage STRICT_MINI_MESSAGE = MiniMessage.builder().tags(TagResolver.resolver(StandardTags.translatable(), StandardTags.color())).build();
+
+    // Slightly less complex REGEX which (1) does not take backslashes into account (2) possibly breaks other edge-cases.
+    private static final Pattern MENTION_REGEX = Pattern.compile("(<@!?(\\d+)>|<@&(\\d+)>|<#(\\d+)>|<a?:(\\w+):(\\d+)>)");
 
     private static final AllowedMentions NO_MENTIONS = new AllowedMentionsBuilder()
             .setMentionEveryoneAndHere(false)
@@ -345,9 +356,6 @@ public final class ChatManager implements Listener, MessageCreateListener {
         }
     }
 
-    // Strict MiniMessage instance used for deserialization of translatable components and colors appended internally in Discord -> Minecraft chat forwarding.
-    private static final MiniMessage STRICT_MINI_MESSAGE = MiniMessage.builder().tags(TagResolver.resolver(StandardTags.translatable(), StandardTags.color())).build();
-
     @Override @SuppressWarnings("deprecation") // Suppressing @Deprecated method(s) as adventure seems to not provide an alternative for that.
     public void onMessageCreate(final @NotNull MessageCreateEvent event) {
         // Skipping in case chat returning is not enabled.
@@ -359,8 +367,7 @@ public final class ChatManager implements Listener, MessageCreateListener {
             final String username = event.getMessageAuthor().getName();
             final String displayname = event.getMessageAuthor().getDisplayName();
             // Getting the message and stripping all tags and formatting. Not final because it's modified in the next step.
-            // NOTE: MessageCreateEvent#getReadableMessageContent is VERY slow and should be replaced with an alternative method ASAP.
-            String message = MiniMessage.miniMessage().stripTags(ChatColor.stripColor(event.getReadableMessageContent()));
+            String message = replaceMentions(event.getMessageContent(), event.getServer().get(), true);
             // Replacing all emojis in this message with a translatable component.
             message = EmojiManager.replaceAllEmojis(message, (emoji) -> "<white><lang:'" + emoji.getDiscordAliases().getFirst() + "'></white>");
             // Appending '(Attachment)' or similar string to the message if it contains an attachment like image etc.
@@ -368,6 +375,9 @@ public final class ChatManager implements Listener, MessageCreateListener {
                     ? (message.isBlank() == false)
                             ? message + " " + PluginLocale.CHAT_ATTACHMENT
                             : PluginLocale.CHAT_ATTACHMENT
+                    : message;
+            message = (event.getMessage().getReferencedMessage().isPresent() == true)
+                    ? "<#848484>(Re: <#A89468>" + event.getMessage().getReferencedMessage().map(ref -> ref.getAuthor().getName()).orElse("N/A") + "</#A89468>)</#848484> " + message
                     : message;
             // Parsing the message using MiniMessage, with just the translatable and color tags enabled.
             final Component finalMessage = STRICT_MINI_MESSAGE.deserialize(message);
@@ -410,6 +420,51 @@ public final class ChatManager implements Listener, MessageCreateListener {
                 .map(FormatHolder::getFormat)
                 .findFirst()
                 .orElse(def);
+    }
+
+    /* UTILITY METHODS */
+
+    // Less complex and more performant alternative to Message#getReadableContent.
+    private static String replaceMentions(String text, final Server server, boolean stripTags) {
+        // Stripping legacy chat colors and tags if specified.
+        if (stripTags == true)
+            text = MiniMessage.miniMessage().stripTags(ChatColor.stripColor(text));
+        // Creating new instance of Matcher from compiled pattern (above) and specified text.
+        final Matcher matcher = MENTION_REGEX.matcher(text);
+        // Preparing a result StringBuilder which will be filled by the code below.
+        final StringBuilder result = new StringBuilder();
+        // Matching...
+        while (matcher.find() == true) {
+            // Matching all possible mentions using groups.
+            final String userId = matcher.group(2);
+            final String roleId = matcher.group(3);
+            final String channelId = matcher.group(4);
+            final String emojiName = matcher.group(5);
+            final String emojiId = matcher.group(6);
+            // Creating replacement variable which defaults to the original text.
+            String replacement = matcher.group(0);
+            // User ID '<@1234567890>'
+            if (userId != null)
+                replacement = "<#A89468>@" + server.getApi().getCachedUserById(userId).map(org.javacord.api.entity.user.User::getName).orElse("invalid-user") + "</#A89468>";
+                // Role ID '<@&123456780>'
+            else if (roleId != null)
+                replacement = "<#A89468>@" + server.getApi().getRoleById(roleId).map(Role::getName).orElse("invalid-role") + "</#A89468>";
+                // Channel ID '<#1234567890>'
+            else if (channelId != null)
+                replacement =  "<#A89468>#" + server.getApi().getServerChannelById(channelId).map(ServerChannel::getName).orElse("invalid-channel") + "</#A89468>";
+                // Emoji name '<:[NAME]:[ID]>'
+            else if (emojiName != null)
+                replacement = ":" + emojiName + ":";
+            // If the replacement is null, keep the original mention.
+            if (replacement == null)
+                replacement = matcher.group(0);
+            // Appending replacement (or original string) to the result.
+            matcher.appendReplacement(result, replacement);
+        }
+        // Appending the rest of the matcher to the result.
+        matcher.appendTail(result);
+        // Building and returning the result, with all mentions replaced.
+        return result.toString();
     }
 
 }
