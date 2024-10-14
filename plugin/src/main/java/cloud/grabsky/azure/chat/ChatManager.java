@@ -376,6 +376,7 @@ public final class ChatManager implements Listener, MessageCreateListener {
                             ? message + " " + PluginLocale.CHAT_ATTACHMENT
                             : PluginLocale.CHAT_ATTACHMENT
                     : message;
+            // Appending '(Re: User)' in front of the message if it's a reply.
             message = (event.getMessage().getReferencedMessage().isPresent() == true)
                     ? "<#848484>(Re: <#A89468>" + event.getMessage().getReferencedMessage().map(ref -> ref.getAuthor().getName()).orElse("N/A") + "</#A89468>)</#848484> " + message
                     : message;
