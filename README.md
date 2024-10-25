@@ -13,7 +13,7 @@ Modern and clean, but opinionated multi-purpose plugin for **[Paper](https://git
 <br />
 
 ## Requirements
-Requires **Java 17** (or higher) and **Paper 1.20.4** (or higher).
+Requires **Java 21** (or higher) and **Paper 1.21.3** (or higher).
 
 <br />
 
