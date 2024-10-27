@@ -64,6 +64,9 @@ public final class AzureUser implements User {
     @Getter(AccessLevel.PUBLIC)
     private @Nullable String displayName;
 
+    @Getter(AccessLevel.PUBLIC) @Setter(value = AccessLevel.PUBLIC)
+    private @Nullable String discordId;
+
     @Getter(AccessLevel.PUBLIC)
     private final @NotNull String textures;
 

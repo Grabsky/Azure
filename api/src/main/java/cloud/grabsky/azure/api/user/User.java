@@ -57,6 +57,16 @@ public interface User {
     @NotNull UUID getUniqueId();
 
     /**
+     * Returns Discord identifier of this {@link User}.
+     */
+    @Nullable String getDiscordId();
+
+    /**
+     * Sets Discord identifier of this {@link User}.
+     */
+    void setDiscordId(final @Nullable String identifier);
+
+    /**
      * Returns display name of this {@link User}.
      */
     @Nullable String getDisplayName();

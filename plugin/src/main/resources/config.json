@@ -128,6 +128,23 @@
         "discord_bot_token": "",
         // Discord bot activity to be displayed.
         "discord_bot_activity": { "refresh_rate": 0, "type": "LISTENING", "state": "server chat..." },
+        // Discord server ID.
+        "discord_server_id": "",
+        // Verification.
+        "verification": {
+            // Whether to enable any integrations.
+            "enabled": false,
+            // Button label. Max 80 characters.
+            "button_label": "Zweryfikuj",
+            // Button type. [PRIMARY, SECONDARY, SUCCESS, DANGER, LINK]
+            "button_style": "SUCCESS",
+            // Modal label.
+            "modal_label": "Weryfikacja",
+            // Modal input label.
+            "modal_input_label": "WPISZ WYGENEROWANY KOD (XXX-XXX)",
+            // Role ID. Granted upon successful verification.
+            "role_id": ""
+        },
         // Chat forwarding creates a bridge between Minecraft and Discord servers.
         "chat_forwarding": {
             // Whether to enable this integration.

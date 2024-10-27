@@ -93,6 +93,17 @@ public final class PluginLocale implements JsonConfiguration {
         };
     }
 
+    // Discord
+
+    @JsonPath("discord_verification_success")
+    public static String DISCORD_VERIFICATION_SUCCESS;
+
+    @JsonPath("discord_verification_failure_invalid_code")
+    public static String DISCORD_VERIFICATION_FAILURE_INVALID_CODE;
+
+    @JsonPath("discord_verification_failure_already_verified")
+    public static String DISCORD_VERIFICATION_FAILURE_VERIFIED;
+
     // Death
 
     @JsonPath("death_messages.default")
@@ -650,6 +661,35 @@ public final class PluginLocale implements JsonConfiguration {
 
     @JsonPath("commands.defeat_success")
     public static Component COMMAND_DEFEAT_SUCCESS;
+
+    // Commands > Verify
+
+    @JsonPath("commands.verify_prompt")
+    @JsonAdapter(fromJson = StringComponentAdapter.class)
+    public static String COMMAND_VERIFY_PROMPT;
+
+    @JsonPath("commands.verify_success")
+    public static Component COMMAND_VERIFY_SUCCESS;
+
+    @JsonPath("commands.verify_failure_already_verified")
+    public static Component COMMAND_VERIFY_FAILURE_ALREADY_VERIFIED;
+
+    @JsonPath("commands.verify_failure_not_enabled")
+    public static Component COMMAND_VERIFY_FAILURE_NOT_ENABLED;
+
+    @JsonPath("commands.verify_failure_send_component_failure_invalid_channel")
+    public static String COMMAND_VERIFY_FAILURE_SEND_COMPONENT_FAILURE_INVALID_CHANNEL;
+
+    // Commands > Unverify
+
+    @JsonPath("commands.unverify_success")
+    public static Component COMMAND_UNVERIFY_SUCCESS;
+
+    @JsonPath("commands.unverify_failure_not_verified")
+    public static Component COMMAND_UNVERIFY_FAILURE_NOT_VERIFIED;
+
+    @JsonPath("commands.unverify_failure_not_enabled")
+    public static Component COMMAND_UNVERIFY_FAILURE_NOT_ENABLED;
 
 
     public static final class Commands implements JsonConfiguration {

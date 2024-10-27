@@ -36,6 +36,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.javacord.api.entity.activity.ActivityType;
+import org.javacord.api.entity.message.component.ButtonStyle;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -202,6 +203,30 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("discord_integrations.discord_bot_activity")
     public static ActivityWrapper DISCORD_INTEGRATIONS_BOT_ACTIVITY;
 
+    @JsonPath("discord_integrations.discord_server_id")
+    public static String DISCORD_INTEGRATIONS_DISCORD_SERVER_ID;
+
+    // Discord Integrations > Verification
+
+    @JsonPath("discord_integrations.verification.enabled")
+    public static boolean DISCORD_INTEGRATIONS_VERIFICATION_ENABLED;
+
+    @JsonPath("discord_integrations.verification.button_label")
+    public static String DISCORD_INTEGRATIONS_VERIFICATION_BUTTON_LABEL;
+
+    @JsonPath("discord_integrations.verification.button_style")
+    public static ButtonStyle DISCORD_INTEGRATIONS_VERIFICATION_BUTTON_STYLE;
+
+    @JsonPath("discord_integrations.verification.modal_label")
+    public static String DISCORD_INTEGRATIONS_VERIFICATION_MODAL_LABEL;
+
+    @JsonPath("discord_integrations.verification.modal_input_label")
+    public static String DISCORD_INTEGRATIONS_VERIFICATION_MODAL_INPUT_LABEL;
+
+    @JsonPath("discord_integrations.verification.role_id")
+    public static String DISCORD_INTEGRATIONS_VERIFICATION_ROLE_ID;
+
+    
     // Discord Integrations > Chat Forwarding
 
     @JsonPath("discord_integrations.chat_forwarding.enabled")

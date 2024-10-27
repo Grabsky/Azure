@@ -28,6 +28,7 @@ import org.bukkit.entity.Player;
 import java.util.Collection;
 import java.util.UUID;
 
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
@@ -66,5 +67,10 @@ public interface UserCache {
      * Returns {@code true} if user with provided {@link String} (name) is currently in cache.
      */
     boolean hasUser(final @NotNull String name);
+
+    @Internal
+    default <T extends UserCache> T as(final Class<T> clazz) {
+        return (T) this;
+    }
 
 }

@@ -56,7 +56,9 @@ import cloud.grabsky.azure.commands.SpyCommand;
 import cloud.grabsky.azure.commands.TeleportCommand;
 import cloud.grabsky.azure.commands.UnbanCommand;
 import cloud.grabsky.azure.commands.UnmuteCommand;
+import cloud.grabsky.azure.commands.UnverifyCommand;
 import cloud.grabsky.azure.commands.VanishCommand;
+import cloud.grabsky.azure.commands.VerifyCommand;
 import cloud.grabsky.azure.commands.WorldCommand;
 import cloud.grabsky.azure.commands.templates.CommandArgumentTemplate;
 import cloud.grabsky.azure.commands.templates.CommandExceptionTemplate;
@@ -65,6 +67,7 @@ import cloud.grabsky.azure.configuration.PluginConfig.DeleteButton;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.azure.configuration.adapters.BossBarAdapterFactory;
 import cloud.grabsky.azure.configuration.adapters.TagResolverAdapter;
+import cloud.grabsky.azure.discord.VerificationManager;
 import cloud.grabsky.azure.listener.PlayerListener;
 import cloud.grabsky.azure.resourcepack.ResourcePackManager;
 import cloud.grabsky.azure.user.AzureUserCache;
@@ -134,6 +137,9 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
     private ResourcePackManager resourcePackManager;
 
     @Getter(AccessLevel.PUBLIC)
+    private VerificationManager verificationManager;
+
+    @Getter(AccessLevel.PUBLIC)
     private FileLogger punishmentsFileLogger;
 
     @Getter(AccessLevel.PUBLIC)
@@ -162,7 +168,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
         }
         // Creating new instance of UserCache.
         this.userCache = new AzureUserCache(this);
-        /// Registering event listeners defined inside AzureUserCache class.
+        // Registering event listeners defined inside AzureUserCache class.
         this.getServer().getPluginManager().registerEvents((AzureUserCache) userCache, this);
         // Getting LuckPerms API from the provider.
         this.luckPerms = LuckPermsProvider.get();
@@ -222,6 +228,8 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                 .registerCommand(SkullCommand.class)
                 .registerCommand(RepairCommand.class)
                 .registerCommand(NickCommand.class)
+                .registerCommand(VerifyCommand.class)
+                .registerCommand(UnverifyCommand.class)
                 // Registering debug commands...
                 .registerCommand(DebugCommand.class);
         // Registering events...
@@ -244,6 +252,9 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                         .setWaitForUsersOnStartup(true)
                         .addListener(chatManager)
                         .login().join();
+                // Creating new instance of VerificationManager, which also register two listeners.
+                // At this point we know that 'this.discord' is not null. No extra check required.
+                this.verificationManager = new VerificationManager(this, discord);
             } catch (final RuntimeException e) {
                 this.getLogger().severe("Could not establish connection with Discord API.");
                 this.getLogger().severe("  " + e.getMessage());
@@ -401,10 +412,15 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
             if (params.equalsIgnoreCase("is_idle") == true && player instanceof Player onlinePlayer && onlinePlayer.isOnline() == true) {
                 final boolean isIdle = onlinePlayer.getIdleDuration().get(ChronoUnit.SECONDS) >= (long) Bukkit.getIdleTimeout() * 60;
                 return String.valueOf(isIdle);
-            } else if (params.equalsIgnoreCase("displayname") == true && Azure.getInstance() != null && Azure.getInstance().getUserCache() != null)
+            } else if (params.equalsIgnoreCase("displayname") == true && Azure.getInstance() != null && Azure.getInstance().getUserCache() != null) {
                 if (Azure.getInstance().getUserCache().hasUser(player.getUniqueId()) == true) {
                     final User user = Azure.getInstance().getUserCache().getUser(player.getUniqueId());
                     return (user.getDisplayName() != null) ? user.getDisplayName() : user.getName();
+                }
+            } else if (params.equalsIgnoreCase("is_verified") == true && Azure.getInstance() != null && Azure.getInstance().getUserCache() != null)
+                if (Azure.getInstance().getUserCache().hasUser(player.getUniqueId()) == true) {
+                    final User user = Azure.getInstance().getUserCache().getUser(player.getUniqueId());
+                    return String.valueOf(user.getDiscordId() != null);
                 }
             return null;
         }

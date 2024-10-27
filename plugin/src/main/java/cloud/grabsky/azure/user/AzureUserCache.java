@@ -48,6 +48,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.javacord.api.entity.permission.Role;
+import org.javacord.api.entity.server.Server;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -207,6 +209,7 @@ public final class AzureUserCache implements UserCache, Listener {
                     player.getName(),
                     uniqueId,
                     null,
+                    null,
                     (skin != null) ? encodeTextures(skin) : "",
                     (address != null) ? address : "N/A",
                     "N/A", // Country code is fetched asynchronously in the next step.
@@ -281,6 +284,7 @@ public final class AzureUserCache implements UserCache, Listener {
                     thisPlayer.getName(),
                     uniqueId,
                     (existingUser != null) ? existingUser.getDisplayName() : null,
+                    (existingUser != null) ? existingUser.getDiscordId() : null,
                     (skin != null) ? encodeTextures(skin) : "",
                     (thisPlayer.getAddress() != null) ? thisPlayer.getAddress().getHostString() : "N/A",
                     "N/A", // Country code is fetched asynchronously in the next step.
@@ -335,6 +339,27 @@ public final class AzureUserCache implements UserCache, Listener {
         // Setting display name.
         if (thisUser.getDisplayName() != null)
             thisPlayer.displayName(miniMessage().deserialize(thisUser.getDisplayName()));
+        // Removing role and associated Discord ID if user is not on the server anymore.
+        if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_ENABLED == true && plugin.getDiscord() != null) {
+            // Getting configured server.
+            final @Nullable Server server = plugin.getDiscord().getServerById(PluginConfig.DISCORD_INTEGRATIONS_DISCORD_SERVER_ID).orElse(null);
+            // Throwing IllegalStateException if configured server is inaccessible.
+            if (server == null)
+                throw new IllegalStateException("Server is inaccessible: " + PluginConfig.DISCORD_INTEGRATIONS_DISCORD_SERVER_ID);
+            // Checking if user is still on the server.
+            if (server.getMemberById(thisUser.getDiscordId()).isPresent() == false) {
+                // Getting verification role.
+                final @Nullable Role role = server.getRoleById(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_ROLE_ID).orElse(null);
+                // If the role exists, it is now being removed from the user.
+                if (role != null)
+                    plugin.getDiscord().getUserById(thisUser.getDiscordId()).thenAccept(it -> server.removeRoleFromUser(it, role));
+                // Removing associated ID.
+                thisUser.setDiscordId(null);
+                // Saving... Hopefully this won't cause any CME or data loss due to the fact we're saving file earlier too.
+                // I think in the worst case scenario either this or country info would be lost.
+                this.saveUser(thisUser);
+            }
+        }
     }
 
     /**

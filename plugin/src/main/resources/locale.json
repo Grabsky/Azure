@@ -14,6 +14,10 @@
     "spectator": "Obserwator",
     "survival": "Przetrwanie",
     // ...
+    "discord_verification_success": "Twoje konto zostało pomyślnie zweryfikowane.",
+    "discord_verification_failure_invalid_code": "Podany kod jest nieprawidłowy lub upłynął czas na weryfikację.",
+    "discord_verification_failure_already_verified": "Twoje konto jest już zweryfikowane. Wpisz komendę **/unverify** w grze, aby cofnąć weryfikację.\n\nJeżeli nie masz dostępu do konta, skontaktuj się z administracją serwera.",
+    // ...
     "death_messages": {
         // Default death message is used when specialzied message cannot be found.
         "default": "<dark_gray>› <gray>Gracz <victim_displayname><gray> zginął.",
@@ -435,6 +439,26 @@
             "<dark_gray>› <hover:show_text:'<red><b>UWAGA:</b> Poniesiesz natychmiastową śmierć.'><click:run_command:'/<input> --confirm'><red>Kliknij tutaj, aby potwierdzić.</click>",
             ""
         ],
-        "defeat_success": "<dark_gray>› <gray>Poddałeś się... Kliknij <red>[<lang:deathScreen.respawn>]<gray>, aby się odrodzić."
+        "defeat_success": "<dark_gray>› <gray>Poddałeś się... Kliknij <red>[<lang:deathScreen.respawn>]<gray>, aby się odrodzić.",
+        // Verify
+        "verify_prompt": [
+            "",
+            "<dark_gray>› <gray>Rozpoczęto weryfikację. Dokończ w trzech krokach poniżej:",
+            "",
+            "  <gold>1. <gray>Dołącz do naszego serwera Discord. <click:open_url:'https://example.com'><hover:show_text:'<gray>Kliknij, aby otworzyć link w przeglądarce.'><#848484>(Kliknij)</hover></click>",
+            "  <gold>2. <gray>Na kanale <gold>#weryfikacja<gray>, naciśnij przycisk <#57F287>Zweryfikuj<gray>.",
+            "  <gold>3. <gray>Wpisz kod <gold><code><gray> i zaakceptuj formularz. <click:copy_to_clipboard:'<code>'><hover:show_text:'<gray>Kliknij, aby skopiować kod do schowka'><#848484>(Skopiuj)</hover></click>",
+            "",
+            "<dark_gray>› <gray>To wszystko! Kod będzie aktywny przez 5 minut.",
+            ""
+        ],
+        "verify_success": "<dark_gray>› <gray>Twoje konto zostało pomyślnie zweryfikowane.",
+        "verify_failure_already_verified": "<dark_gray>› <red>Twoje konto już jest zweryfikowane. Wpisz <gold>/unverify<red>, aby cofnąć weryfikację.",
+        "verify_failure_not_enabled": "<dark_gray>› <red>Integracja jest tymczasowo wyłączona. Skontaktuj się z administracją serwera.",
+        "verify_failure_send_component_failure_invalid_channel": "<dark_gray>› <red>Wskazany kanał nie istnieje lub jest niedostępny.",
+        // Unverify
+        "unverify_success": "<dark_gray>› <gray>Pomyślnie cofnąłeś weryfikację konta.",
+        "unverify_failure_not_verified": "<dark_gray>› <red>Nie jesteś zweryfikowany. Wpisz <gold>/verify<red>, aby rozpocząć.",
+        "unverify_failure_not_enabled": "<dark_gray>› <red>Integracja jest tymczasowo wyłączona. Skontaktuj się z administracją serwera."
     }
 }
