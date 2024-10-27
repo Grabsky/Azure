@@ -107,7 +107,7 @@ public final class AzureUser implements User {
         ((AzureUserCache) Azure.getInstance().getUserCache()).saveUser(this).thenAccept(isSuccess -> {
             Azure.getInstance().getLogger().info("Saving data of " + this.name + " in the background... " + (isSuccess == true ? "OK" : "ERROR"));
             // Updating display name of an online player.
-            if (thisPlayer != null && thisPlayer.isOnline() == true) Azure.getInstance().getBedrockScheduler().run(1L, (___) -> {
+            if (thisPlayer != null && thisPlayer.isOnline() == true) Azure.getInstance().getBedrockScheduler().run(1L, (_) -> {
                 thisPlayer.displayName(displayNameComponent);
             });
         });

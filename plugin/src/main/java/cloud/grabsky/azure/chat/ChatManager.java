@@ -268,7 +268,7 @@ public final class ChatManager implements Listener, MessageCreateListener {
                     Message.of(PluginLocale.CHAT_MESSAGE_CONTAINS_INAPPROPRIATE_WORDS).send(player);
                     // Executing punishment commands.
                     if (PluginConfig.CHAT_FILTERING_PUNISHMENT_COMMANDS.isEmpty() == false)
-                        plugin.getBedrockScheduler().run(1L, (___) -> {
+                        plugin.getBedrockScheduler().run(1L, (_) -> {
                             PluginConfig.CHAT_FILTERING_PUNISHMENT_COMMANDS.forEach(it -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), it.replace("<player>", player.getName())));
                         });
                     // Returning...

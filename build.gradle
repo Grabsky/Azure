@@ -43,6 +43,7 @@ subprojects {
 
     compileJava {
         options.fork = true
+        options.compilerArgs += "--enable-preview"
         // Setting compatibility to Java 21 and above.
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21

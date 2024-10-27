@@ -200,7 +200,7 @@ public final class AzureUserCache implements UserCache, Listener {
     public @NotNull User getUser(final @NotNull Player player) {
         final UUID uniqueId = player.getUniqueId();
         // Returning existing user from cache or computing new one, if absent.
-        return internalUserMap.computeIfAbsent(uniqueId, (___) -> {
+        return internalUserMap.computeIfAbsent(uniqueId, (_) -> {
             final @Nullable URL skin = player.getPlayerProfile().getTextures().getSkin();
             // ...
             final @Nullable String address = (player.getAddress() != null) ? player.getAddress().getHostString() : null;
@@ -224,7 +224,7 @@ public final class AzureUserCache implements UserCache, Listener {
                 // ...
                 if (countryCode != null)
                     user.setLastCountryCode(countryCode);
-            }).thenCompose(_void -> this.saveUser(user));
+            }).thenCompose(_ -> this.saveUser(user));
             // Returning the User instance.
             return user;
         });
@@ -299,7 +299,7 @@ public final class AzureUserCache implements UserCache, Listener {
                 // ...
                 if (countryCode != null)
                     computeUser.setLastCountryCode(countryCode);
-            }).thenCompose(_void -> this.saveUser(computeUser));
+            }).thenCompose(_ -> this.saveUser(computeUser));
             // Saving if modified.
             if (existingUser == null || computeUser.equals(existingUser) == false)
                 this.saveUser(computeUser);
