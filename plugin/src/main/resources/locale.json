@@ -19,7 +19,7 @@
     "discord_verification_failure_already_verified": "Twoje konto jest już zweryfikowane. Wpisz komendę **/unverify** w grze, aby cofnąć weryfikację.\n\nJeżeli nie masz dostępu do konta, skontaktuj się z administracją serwera.",
     // ...
     "death_messages": {
-        // Default death message is used when specialzied message cannot be found.
+        // Default death message is used when specialized message cannot be found.
         "default": "<dark_gray>› <gray>Gracz <victim_displayname><gray> zginął.",
         // Specialized death messages.
         "death.attack.anvil": "<dark_gray>› <gray>Gracz <victim_displayname><gray> został zmiażdżony przez spadające kowadło.",
