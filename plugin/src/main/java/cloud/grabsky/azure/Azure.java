@@ -97,18 +97,20 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
+import org.javacord.api.entity.user.UserStatus;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.time.temporal.ChronoUnit;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
 import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
@@ -246,7 +248,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
             try {
                 this.discord = new DiscordApiBuilder()
                         .setToken(PluginConfig.DISCORD_INTEGRATIONS_DISCORD_BOT_TOKEN)
-                        .addIntents(Intent.MESSAGE_CONTENT, Intent.GUILD_MEMBERS)
+                        .addIntents(Intent.MESSAGE_CONTENT, Intent.GUILD_MEMBERS, Intent.GUILD_PRESENCES)
                         // For mentions to display properly.
                         .setUserCacheEnabled(true)
                         .setWaitForUsersOnStartup(true)
@@ -388,9 +390,36 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
         }
     }
 
-    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class Placeholders extends PlaceholderExpansion {
-        public static final Placeholders INSTANCE = new Placeholders(); // SINGLETON
+        /* SINGLETON */ public static final Placeholders INSTANCE = new Placeholders();
+
+        // This is the number of currently online members on configured Discord server.
+        private final static AtomicLong ONLINE_MEMBERS = new AtomicLong(0);
+
+        // This task updates online members count every minute.
+        private static BukkitTask COUNTER_TASK = null;
+
+        public Placeholders() {
+            // Cancelling the task if already running.
+            if (COUNTER_TASK != null) {
+                // Cancelling the task.
+                COUNTER_TASK.cancel();
+                // Setting the task to null.
+                COUNTER_TASK = null;
+            }
+            // Starting a task.
+            COUNTER_TASK = Azure.getInstance().getBedrockScheduler().repeatAsync(0L, 1200L, Long.MAX_VALUE, (_) -> {
+                // Skipping if plugin instance has not been finalized, or integrations aren't enabled (yet?), or server with configured id is inaccessible.
+                if (Azure.getInstance() == null || Azure.getInstance().getDiscord() == null || Azure.getInstance().getDiscord().getServerById(PluginConfig.DISCORD_INTEGRATIONS_DISCORD_SERVER_ID).isEmpty() == true)
+                    return true;
+                // Getting set containing all members that are on the server.
+                final Set<org.javacord.api.entity.user.User> users = Azure.getInstance().getDiscord().getServerById(PluginConfig.DISCORD_INTEGRATIONS_DISCORD_SERVER_ID).get().getMembers();
+                // Filtering based on status, counting elements and updating the online members count.
+                ONLINE_MEMBERS.set(users.stream().filter(user -> user.getStatus() != UserStatus.OFFLINE).count());
+                // ...
+                return true;
+            });
+        }
 
         @Override
         public @NotNull String getAuthor() {
@@ -417,11 +446,13 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                     final User user = Azure.getInstance().getUserCache().getUser(player.getUniqueId());
                     return (user.getDisplayName() != null) ? user.getDisplayName() : user.getName();
                 }
-            } else if (params.equalsIgnoreCase("is_verified") == true && Azure.getInstance() != null && Azure.getInstance().getUserCache() != null)
+            } else if (params.equalsIgnoreCase("is_verified") == true && Azure.getInstance() != null && Azure.getInstance().getUserCache() != null) {
                 if (Azure.getInstance().getUserCache().hasUser(player.getUniqueId()) == true) {
                     final User user = Azure.getInstance().getUserCache().getUser(player.getUniqueId());
                     return String.valueOf(user.getDiscordId() != null);
                 }
+            } else if (params.equalsIgnoreCase("discord_online") == true && Azure.getInstance() != null && Azure.getInstance().getDiscord() != null)
+                return ONLINE_MEMBERS.toString();
             return null;
         }
 
