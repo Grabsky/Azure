@@ -451,16 +451,6 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                     final User user = Azure.getInstance().getUserCache().getUser(player.getUniqueId());
                     return String.valueOf(user.getDiscordId() != null);
                 }
-            } else if (params.equalsIgnoreCase("total_experience") == true && Azure.getInstance() != null && Azure.getInstance().getUserCache() != null) {
-                if (Azure.getInstance().getUserCache().hasUser(player.getUniqueId()) == true) {
-                    final User user = Azure.getInstance().getUserCache().getUser(player.getUniqueId());
-                    return String.valueOf(user.getTotalExperience());
-                }
-            } else if (params.equalsIgnoreCase("total_level") == true && Azure.getInstance() != null && Azure.getInstance().getUserCache() != null) {
-                if (Azure.getInstance().getUserCache().hasUser(player.getUniqueId()) == true) {
-                    final User user = Azure.getInstance().getUserCache().getUser(player.getUniqueId());
-                    return String.valueOf(user.getTotalLevel());
-                }
             } else if (params.equalsIgnoreCase("discord_online") == true && Azure.getInstance() != null && Azure.getInstance().getDiscord() != null)
                 return ONLINE_MEMBERS.toString();
             return null;

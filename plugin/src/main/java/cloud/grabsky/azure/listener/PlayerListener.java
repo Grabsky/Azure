@@ -26,11 +26,8 @@ package cloud.grabsky.azure.listener;
 import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.configuration.PluginLocale;
-import cloud.grabsky.azure.user.AzureUser;
-import cloud.grabsky.azure.user.AzureUserCache;
 import cloud.grabsky.bedrock.components.ComponentBuilder;
 import cloud.grabsky.bedrock.components.Message;
-import com.destroystokyo.paper.event.player.PlayerPickupExperienceEvent;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -338,18 +335,5 @@ public final class PlayerListener implements Listener {
             else message.send(player);
         }
     }
-
-    /* STORING TOTAL EXPERIENCE LEVELS */
-
-    @EventHandler(ignoreCancelled = true)
-    public void onExperiencePickup(final @NotNull PlayerPickupExperienceEvent event) {
-        // Getting the AzureUser instance of player associated with the event.
-        final AzureUser user = (AzureUser) plugin.getUserCache().as(AzureUserCache.class).getUser(event.getPlayer());
-        // Updating total experience.
-        user.setTotalExperience(user.getTotalExperience() + event.getExperienceOrb().getExperience());
-        // Marking user as modified. Immediate save might be a bad choice because of (high) frequency of this event.
-        user.setModified(true);
-    }
-
 
 }

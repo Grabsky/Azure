@@ -92,25 +92,6 @@ public interface User {
     @NotNull String getLastCountryCode();
 
     /**
-     * Returns total experience player have collected.
-     */
-    float getTotalExperience();
-
-    /**
-     * Returns total experience player have collected, calculated to levels.
-     */
-    default int getTotalLevel() {
-        // Levels 0-16
-        if (this.getTotalExperience() <= 352)
-            return (int) Math.floor(Math.sqrt(this.getTotalExperience() + 9) - 3);
-        // Levels 17-31
-        else if (this.getTotalExperience() <= 1507)
-            return (int) Math.floor(8.1 + Math.sqrt(0.4 * (this.getTotalExperience() - (7839.0 / 40.0))));
-        // Levels 32+
-        else return (int) Math.floor((325.0 / 18.0) + Math.sqrt((2.0 / 9.0) * (this.getTotalExperience() - (54215.0 / 72.0))));
-    }
-
-    /**
      * Returns {@code true} if this {@link User} is currently vanished.
      */
     boolean isVanished();

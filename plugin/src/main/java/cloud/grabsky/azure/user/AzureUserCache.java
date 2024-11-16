@@ -48,7 +48,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.scheduler.BukkitTask;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
 
@@ -85,8 +84,6 @@ public final class AzureUserCache implements UserCache, Listener {
 
     private final JsonAdapter<AzureUser> adapter;
 
-    private final BukkitTask autoSaveTask;
-
     public AzureUserCache(final @NotNull Azure plugin) {
         this.plugin = plugin;
         this.cacheDirectory = new File(plugin.getDataFolder(), "usercache");
@@ -111,17 +108,6 @@ public final class AzureUserCache implements UserCache, Listener {
                 .build().adapter(AzureUser.class).nullSafe().indent("  ");
         // Caching users.
         this.cacheUsers();
-        // ...
-        this.autoSaveTask = plugin.getBedrockScheduler().repeat(60L * 20L , 60L * 20L, Long.MAX_VALUE, _ -> {
-            internalUserMap.values().stream().filter(AzureUser::isModified).forEach(user -> {
-                // Removing modified state before saving to prevent potential data-loss when value is updated during the asynchronous save.
-                user.setModified(false);
-                // Saving. This operation is done asynchronously.
-                saveUser(user);
-            });
-            // ...
-            return true;
-        });
     }
 
     public void cacheUsers() throws IllegalStateException {
@@ -227,10 +213,8 @@ public final class AzureUserCache implements UserCache, Listener {
                     (skin != null) ? encodeTextures(skin) : "",
                     (address != null) ? address : "N/A",
                     "N/A", // Country code is fetched asynchronously in the next step.
-                    0F,
                     false,
                     false,
-                    false, // isModified
                     null,
                     null
             );
@@ -304,10 +288,8 @@ public final class AzureUserCache implements UserCache, Listener {
                     (skin != null) ? encodeTextures(skin) : "",
                     (thisPlayer.getAddress() != null) ? thisPlayer.getAddress().getHostString() : "N/A",
                     "N/A", // Country code is fetched asynchronously in the next step.
-                    (existingUser != null) ? existingUser.getTotalExperience() : 0F,
                     (existingUser != null) ? existingUser.isVanished() : false,
                     (existingUser != null) ? existingUser.isSpying() : false,
-                    (existingUser != null) ? existingUser.isModified() : false,
                     (existingUser != null) ? (AzurePunishment) existingUser.getMostRecentBan() : null,
                     (existingUser != null) ? (AzurePunishment) existingUser.getMostRecentMute() : null
             );
