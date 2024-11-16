@@ -289,7 +289,7 @@ public final class ChatManager implements Listener, MessageCreateListener {
             // Console...
             if (viewer instanceof ConsoleCommandSender) {
                 return MiniMessage.miniMessage().deserialize(
-                        PluginConfig.CHAT_FORMATS_CONSOLE,
+                        PlaceholderAPI.setPlaceholders(player, PluginConfig.CHAT_FORMATS_CONSOLE),
                         Placeholder.unparsed("signature_uuid", (signatureUUID != null) ? signatureUUID.toString() : "N/A"),
                         Placeholder.unparsed("player", source.getName()),
                         Placeholder.unparsed("group", requirePresent(metaData.getPrimaryGroup(), "")),
@@ -305,7 +305,7 @@ public final class ChatManager implements Listener, MessageCreateListener {
                 final String matchingChatFormat = this.findSuitableChatFormat(source, PluginConfig.CHAT_FORMATS_DEFAULT);
                 // ...
                 final Component formattedChat = MiniMessage.miniMessage().deserialize(
-                        matchingChatFormat,
+                        PlaceholderAPI.setPlaceholders(player, matchingChatFormat),
                         Placeholder.unparsed("player", source.getName()),
                         Placeholder.unparsed("group", requirePresent(metaData.getPrimaryGroup(), "")),
                         Placeholder.parsed("prefix", requirePresent(metaData.getPrefix(), "")),
