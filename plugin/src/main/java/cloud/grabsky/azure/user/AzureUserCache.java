@@ -213,6 +213,7 @@ public final class AzureUserCache implements UserCache, Listener {
                     (skin != null) ? encodeTextures(skin) : "",
                     (address != null) ? address : "N/A",
                     "N/A", // Country code is fetched asynchronously in the next step.
+                    0, // maxLevel
                     false,
                     false,
                     null,
@@ -288,6 +289,7 @@ public final class AzureUserCache implements UserCache, Listener {
                     (skin != null) ? encodeTextures(skin) : "",
                     (thisPlayer.getAddress() != null) ? thisPlayer.getAddress().getHostString() : "N/A",
                     "N/A", // Country code is fetched asynchronously in the next step.
+                    (existingUser != null) ? existingUser.getMaxLevel() : 0,
                     (existingUser != null) ? existingUser.isVanished() : false,
                     (existingUser != null) ? existingUser.isSpying() : false,
                     (existingUser != null) ? (AzurePunishment) existingUser.getMostRecentBan() : null,
