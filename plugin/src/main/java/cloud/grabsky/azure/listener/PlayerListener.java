@@ -271,6 +271,7 @@ public final class PlayerListener implements Listener {
         // Hiding death messages if enabled.
         if (PluginConfig.CHAT_HIDE_DEATH_MESSAGES == true) {
             event.setDeathMessage(null);
+            event.deathMessage(null);
             return;
         }
         // Using plugin death messages if enabled.
@@ -284,8 +285,10 @@ public final class PlayerListener implements Listener {
                         .placeholder("attacker", (event.getDamageSource().getCausingEntity() != null) ? event.getDamageSource().getCausingEntity().getName() : "N/A")
                         .placeholder("attacker_displayname", (event.getDamageSource().getCausingEntity() != null && event.getDamageSource().getCausingEntity() instanceof Player attacker) ? attacker.displayName() : ComponentBuilder.EMPTY);
                 // Broadcasting the message.
-                // NOTE: Displayed twice in the console due to a bug in bedrock lib.
                 message.broadcast();
+                // Preventing vanilla death message from appearing in chat.
+                event.setDeathMessage(null);
+                event.deathMessage(null);
                 // Discord integration... Must be handled here because we're cancelling the death message right after this event is called.
                 if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_DEATH_MESSAGE_FORWARDING_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_DEATH_MESSAGE_FORWARDING_WEBHOOK_URL.isEmpty() == true)
                     return;
@@ -310,8 +313,6 @@ public final class PlayerListener implements Listener {
                     builder.sendSilently(plugin.getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_DEATH_MESSAGE_FORWARDING_WEBHOOK_URL);
                 }
             }
-            // Preventing vanilla death message from appearing in chat.
-            event.setDeathMessage(null);
         }
     }
 
