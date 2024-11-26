@@ -1,11 +1,11 @@
 // This JSON configuration file is lenient but keep an eye where you leave trailing commas as they tend to cause issues.
 {
     "general_settings": {
-        // Determinate whether titles should be cleared on join.
+        // Determines whether titles should be cleared on join.
         "clear_title_on_join": false,
-        // Determinate whether player should respawn on spawn-point of the primary world.
+        // Determines whether player should respawn on spawn-point of the primary world.
         "respawn_on_primary_world_spawn": true,
-        // Determinate whether new players should spawn on spawn-point of the primary world.
+        // Determines whether new players should spawn on spawn-point of the primary world.
         "teleport_new_players_to_primary_world_spawn": true,
         // Determines whether to use $.command_filter.blocked_command_error_message as unknown command message.
         "use_blocked_command_error_message_for_unknown_command": false
@@ -62,9 +62,9 @@
         "moderation": {
             // Message deletion. Messages can be deleted for 5 minutes after being sent.
             "message_deletion": {
-                // Determinate whether player messages are allowed to be deleted by moderators.
+                // Determines whether player messages are allowed to be deleted by moderators.
                 "enabled": true,
-                // Determinate how long message signature should be stored for. In seconds.
+                // Determines how long message signature should be stored for. In seconds.
                 "cache_expiration_rate": 300,
                 // Message delete button styling. Position can either be BEFORE or AFTER.
                 "button": { "position": "BEFORE", "text": "<gray>×", "hover": "<gray>Naciśnij, aby usunąć wiadomość." }
