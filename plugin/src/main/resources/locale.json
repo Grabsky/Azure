@@ -152,18 +152,14 @@
             "",
             "",
             "<gray>Twoja blokada zostanie usunięta za <red><duration_left>",
-            "",
-            "",
-            "<gray>Uważasz, że to pomyłka? Skontaktuj się z nami na <gold>https://firedot.pl/discord<gray> lub napisz na nasz adres <gold>administracja@firedot.pl"
+            ""
         ],
         "ban_disconnect_message_permanent": [
             "<gray>Zostałeś <red>permanentnie<gray> zbanowany.",
             "",
             "",
             "<gray>Powód: <red><reason>",
-            "",
-            "",
-            "<gray>Uważasz, że to pomyłka? Skontaktuj się z nami na <gold>https://firedot.pl/discord<gray> lub napisz na nasz adres <gold>administracja@firedot.pl"
+            ""
         ],
         // Mute
         "mute_usage": "<dark_gray>› <gray>Użycie: <gold>/mute <white>(player) (duration) <gray>(reason)",
