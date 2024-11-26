@@ -76,10 +76,6 @@ public final class AzureUser implements User {
     @Getter(AccessLevel.PUBLIC) @Setter(value = AccessLevel.PACKAGE, onMethod = @__(@Internal))
     private @NotNull String lastCountryCode;
 
-    public @Nullable String getDiscordId() {
-        return discordId;
-    }
-
     @Getter(AccessLevel.PUBLIC) @Setter(value = AccessLevel.PUBLIC, onMethod = @__(@Internal))
     private int maxLevel;
 
