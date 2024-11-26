@@ -69,6 +69,17 @@
                 // Message delete button styling. Position can either be BEFORE or AFTER.
                 "button": { "position": "BEFORE", "text": "<gray>×", "hover": "<gray>Naciśnij, aby usunąć wiadomość." }
             }
+        },
+        "automated_messages": {
+            // Determines whether automated messages should be enabled.
+            "enabled": false,
+            // Interval between messages. In seconds.
+            "interval": 600,
+            // Message definitions. Order is shuffled upon plugin reload.
+            "messages": [
+                // "One Line",
+                // ["First Line", "Second Line"]
+            ]
         }
     },
     "punishment_settings": {
@@ -216,5 +227,7 @@
         // { "name": "Website", "url": "https://example.com" }
     ],
     // Recipes to be unregistered after plugin has successfully reloaded. Keep in mind unregistered recipes are removed from players' recipe discovery list.
-    "disabled_recipes": []
+    "disabled_recipes": [
+        // "minecraft:iron_pickaxe"
+    ]
 }

@@ -40,6 +40,8 @@ import org.javacord.api.entity.message.component.ButtonStyle;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
@@ -134,6 +136,16 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("chat_settings.moderation.message_deletion.button")
     public static DeleteButton CHAT_MODERATION_MESSAGE_DELETION_BUTTON;
 
+    // Chat Settings > Automated Messages
+
+    @JsonPath("chat_settings.automated_messages.enabled")
+    public static boolean CHAT_AUTOMATED_MESSAGES_ENABLED;
+
+    @JsonPath("chat_settings.automated_messages.interval")
+    public static long CHAT_AUTOMATED_MESSAGES_INTERVAL;
+
+    @JsonPath("chat_settings.automated_messages.messages")
+    public static List<Component> CHAT_AUTOMATED_MESSAGES_CONTENTS;
 
     // Punishment Settings
 
@@ -330,6 +342,17 @@ public final class PluginConfig implements JsonConfiguration {
     public void onReload() {
         ChatManager.CHAT_FORMATS_REVERSED = reversed(PluginConfig.CHAT_FORMATS_EXTRA);
         ChatManager.CHAT_TAGS_REVERSED = reversed(PluginConfig.CHAT_MESSAGE_TAGS_EXTRA);
+
+        // Copying the automated messages list.
+        final List<Component> shuffled = new ArrayList<>(CHAT_AUTOMATED_MESSAGES_CONTENTS);
+        // Shuffling the copied list.
+        Collections.shuffle(shuffled);
+        // Updating iterator held within ChatManager class.
+        ChatManager.AUTOMATED_MESSAGES_SHUFFLED = shuffled;
+
+        // (Re)scheduling ChatManager tasks.
+        ChatManager.scheduleAutomatedMessagesTask();
+
         // Iterating over disabled recipes list and removing them from the server. May not be the best place to do that.
         DISABLED_RECIPES.forEach(key -> {
             if (Bukkit.removeRecipe(key) == false)

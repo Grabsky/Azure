@@ -64,6 +64,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitTask;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
 import org.javacord.api.entity.message.mention.AllowedMentions;
@@ -82,6 +83,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -124,6 +126,13 @@ public final class ChatManager implements Listener, MessageCreateListener {
 
     public static List<FormatHolder> CHAT_FORMATS_REVERSED;
     public static List<TagsHolder> CHAT_TAGS_REVERSED;
+    public static List<Component> AUTOMATED_MESSAGES_SHUFFLED;
+
+    private static @Nullable ListIterator<Component> AUTOMATED_MESSAGES_ITERATOR;
+
+    // Holds reference to a task responsible for sending automated chat messages.
+    // It can be re-assigned from a static context. (PluginConfig#onReload)
+    private static BukkitTask AUTOMATED_MESSAGES_TASK;
 
     // Raw type of Set<String> used for deserialization with Moshi.
     private static final Type LIST_STRING_TYPE = Types.newParameterizedType(Set.class, String.class);
@@ -150,6 +159,35 @@ public final class ChatManager implements Listener, MessageCreateListener {
         this.chatCooldowns = new HashMap<>();
         this.lastRecipients = new HashMap<>();
         this.inappropriateWords = new HashSet<>();
+
+    }
+
+    /**
+     * Cancels previous, and schedules new automated messages task.
+     */
+    // NOTE: Perhaps in the future this (and related components) could be re-written to not be static.
+    public static void scheduleAutomatedMessagesTask() {
+        // Cancelling the task if already running.
+        if (AUTOMATED_MESSAGES_TASK != null)
+            AUTOMATED_MESSAGES_TASK.cancel();
+        // "Invalidating" current iterator to make it auto-update during the first task iteration.
+        AUTOMATED_MESSAGES_ITERATOR = null;
+        // Returning in case feature is disabled or messages list is empty.
+        if (PluginConfig.CHAT_AUTOMATED_MESSAGES_ENABLED == false || PluginConfig.CHAT_AUTOMATED_MESSAGES_CONTENTS.isEmpty() == true)
+            return;
+        // Scheduling the task.
+        AUTOMATED_MESSAGES_TASK = Azure.getInstance().getBedrockScheduler().repeat(PluginConfig.CHAT_AUTOMATED_MESSAGES_INTERVAL * 20, PluginConfig.CHAT_AUTOMATED_MESSAGES_INTERVAL * 20, Long.MAX_VALUE, (_) -> {
+            // Resetting iterator in case it reached the end.
+            if (AUTOMATED_MESSAGES_ITERATOR == null || AUTOMATED_MESSAGES_ITERATOR.hasNext() == false) {
+                AUTOMATED_MESSAGES_ITERATOR = AUTOMATED_MESSAGES_SHUFFLED.listIterator();
+            }
+            // Getting the next message.
+            final Component message = AUTOMATED_MESSAGES_ITERATOR.next();
+            // Sending message to all online players. Not using Server#sendMessage because this will make it appear in the console.
+            Bukkit.getOnlinePlayers().forEach(player -> player.sendMessage(message));
+            // ...
+            return true;
+        });
     }
 
     /**
