@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: write
+  packages: write
 
 jobs:
   build_and_publish:
@@ -31,7 +32,7 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          path: build/libs
+          path: plugin/build/libs
       # Expose Release Name
       - name: Expose Release Name
         run: echo "PROJECT_RELEASE_NAME=$( ./gradlew release -q --no-rebuild )" >> $GITHUB_ENV
@@ -46,7 +47,7 @@ jobs:
           name: "${{ env.PROJECT_RELEASE_NAME }}"
           tag_name: "${{ env.PROJECT_TAG }}"
           # Configuring files that are attached to the release.
-          files: "build/libs/Azure-*.jar"
+          files: "plugin/build/libs/Azure-*.jar"
           # Configuring release body.
           append_body: true
           body: "Unless stated otherwise, this is NOT a stable release. You are advised AGAINST running it, even in a development environment."
