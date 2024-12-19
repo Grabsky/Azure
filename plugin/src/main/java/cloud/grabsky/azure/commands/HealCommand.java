@@ -58,7 +58,7 @@ public final class HealCommand extends RootCommand {
             return;
         }
         // Healing the target.
-        target.setHealth(target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()); // Should never throw NPE.
+        target.setHealth(target.getAttribute(Attribute.MAX_HEALTH).getValue()); // Should never throw NPE.
         // Sending success message to the sender. (if applicable)
         if (sender != target)
             Message.of(PluginLocale.COMMAND_HEAL_SUCCESS).placeholder("player", target).send(sender);

@@ -2,7 +2,7 @@ plugins {
     id("java-library")
 }
 
-final String VERSION = "1.21.3"
+final String VERSION = "1.21.4"
 final String RUN_NUMBER = System.getenv("GITHUB_RUN_NUMBER") ?: "DEV"
 
 group = "cloud.grabsky"
@@ -35,10 +35,10 @@ subprojects {
     dependencies {
         compileOnly("org.jetbrains:annotations:24.0.1")
         // Lombok
-        compileOnly("org.projectlombok:lombok:1.18.32")
-        annotationProcessor("org.projectlombok:lombok:1.18.32")
+        compileOnly("org.projectlombok:lombok:1.18.36")
+        annotationProcessor("org.projectlombok:lombok:1.18.36")
         // Paper API
-        compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
+        compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     }
 
     compileJava {

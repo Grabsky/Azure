@@ -4,6 +4,7 @@ plugins {
 }
 
 repositories {
+    // Repository containing the 'PlaceholderAPI' dependency.
     maven { url = "https://repo.extendedclip.com/content/repositories/placeholderapi/" }
 }
 
@@ -20,11 +21,12 @@ dependencies {
         exclude group: "com.squareup.moshi"
         exclude group: "com.squareup.okio"
     }
-    // JEmoji
-    implementation("net.fellbaum:jemoji:1.5.2")
-    // Plugin dependencies, should be present in the classpath as required per 'paper-plugin.yml' file.
+    // JEmoji (Shaded)
+    implementation("net.fellbaum:jemoji:1.6.0")
+    // LuckPerms API (Provided)
     compileOnly("net.luckperms:api:5.4")
-    compileOnly("me.clip:placeholderapi:2.11.5")
+    // PlaceholderAPI (Provided)
+    compileOnly("me.clip:placeholderapi:2.11.6")
 }
 
 tasks {
@@ -37,7 +39,7 @@ tasks {
 paper {
     name = "Azure"
     main = "cloud.grabsky.azure.Azure"
-    apiVersion = "1.21.1"
+    apiVersion = "1.21.4"
     serverDependencies {
         "LuckPerms"      { load = "BEFORE"; required = true }
         "PlaceholderAPI" { load = "BEFORE"; required = true }
