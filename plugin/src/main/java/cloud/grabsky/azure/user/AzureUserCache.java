@@ -32,6 +32,7 @@ import com.squareup.moshi.Moshi;
 import net.kyori.adventure.text.Component;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.group.Group;
+import net.luckperms.api.node.types.PermissionNode;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -339,8 +340,14 @@ public final class AzureUserCache implements UserCache, Listener {
             // Throwing IllegalStateException if configured server is inaccessible.
             if (server == null)
                 throw new IllegalStateException("Server is inaccessible: " + PluginConfig.DISCORD_INTEGRATIONS_DISCORD_SERVER_ID);
-            // Checking if user is still on the server.
+            // Checking if user has left the server
             if (server.getMemberById(thisUser.getDiscordId()).isPresent() == false) {
+                // Removing permission from the player, if configured.
+                if ("".equals(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_PERMISSION) == false)
+                    // Loading LuckPerms' User and removing permission from them.
+                    plugin.getLuckPerms().getUserManager().modifyUser(thisUser.getUniqueId(), (it) -> {
+                        it.data().remove(PermissionNode.builder(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_PERMISSION).build());
+                    });
                 // Getting verification role.
                 final @Nullable Role role = server.getRoleById(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_ROLE_ID).orElse(null);
                 // If the role exists, it is now being removed from the user.

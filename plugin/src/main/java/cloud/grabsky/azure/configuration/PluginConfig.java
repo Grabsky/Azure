@@ -241,6 +241,8 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("discord_integrations.verification.role_id")
     public static String DISCORD_INTEGRATIONS_VERIFICATION_ROLE_ID;
 
+    @JsonPath("discord_integrations.verification.permission")
+    public static String DISCORD_INTEGRATIONS_VERIFICATION_PERMISSION;
     
     // Discord Integrations > Chat Forwarding
 

@@ -22,6 +22,7 @@ import cloud.grabsky.azure.user.AzureUserCache;
 import cloud.grabsky.bedrock.components.Message;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import net.luckperms.api.node.types.PermissionNode;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.javacord.api.DiscordApi;
@@ -118,6 +119,12 @@ public final class VerificationManager {
                         user.setDiscordId(event.getModalInteraction().getUser().getIdAsString());
                         // Saving...
                         plugin.getUserCache().as(AzureUserCache.class).saveUser(user);
+                        // Adding permission to the player, if configured.
+                        if ("".equals(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_PERMISSION) == false)
+                            // Loading LuckPerms' User and adding permission node to them.
+                            plugin.getLuckPerms().getUserManager().modifyUser(uniqueId, (it) -> {
+                                it.data().add(PermissionNode.builder(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_PERMISSION).build());
+                            });
                         // Adding role if specified.
                         if (PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_ROLE_ID.isEmpty() == false) {
                             // Getting configured server.

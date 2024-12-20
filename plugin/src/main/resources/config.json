@@ -164,8 +164,10 @@
             "modal_label": "Weryfikacja",
             // Modal input label.
             "modal_input_label": "WPISZ WYGENEROWANY KOD (XXX-XXX)",
-            // Role ID. Granted upon successful verification.
-            "role_id": ""
+            // Role ID. Granted upon successful verification and revoked when no longer verified.
+            "role_id": "",
+            // Permission. Granted upon successful verification and revoked when no longer verified.
+            "permission": "azure.plugin.is_verified"
         },
         // Chat forwarding creates a bridge between Minecraft and Discord servers.
         "chat_forwarding": {
