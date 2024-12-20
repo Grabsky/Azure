@@ -23,6 +23,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import net.kyori.adventure.resource.ResourcePackInfo;
 import net.kyori.adventure.resource.ResourcePackRequest;
+import net.kyori.adventure.title.Title;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -30,6 +31,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent.Status;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,6 +42,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -166,7 +170,7 @@ public final class ResourcePackManager implements Listener {
         // Sending resource pack 1 tick after event is fired. (if enabled)
         if (PluginConfig.RESOURCE_PACK_SEND_ON_JOIN == true && this.server != null) {
             // Sending resource-packs to the player. (next tick)
-            plugin.getBedrockScheduler().run(1L, (task) -> sendResourcePacks(event.getPlayer()));
+            plugin.getBedrockScheduler().run(1L, (_) -> sendResourcePacks(event.getPlayer()));
         }
     }
 
@@ -177,6 +181,21 @@ public final class ResourcePackManager implements Listener {
             // Removing http contexts when no longer needed. Condition might be confusing but is a bit shorter when handled that way.
             if (event.getStatus() != Status.ACCEPTED && event.getStatus() != Status.SUCCESSFULLY_LOADED)
                 server.removeContext("/" + secrets.get(player.getUniqueId()) + "/" + event.getID());
+            // When the first pack is accepted.
+            if (event.getStatus() == Status.ACCEPTED && player.getMetadata("sent_resource-packs").getFirst().asInt() == 1) {
+                // Sending title to the player if enabled.
+                if (PluginConfig.RESOURCE_PACK_LOADING_SCREEN_APPLY_TITLE_AND_SUBTITLE == true)
+                    event.getPlayer().showTitle(
+                            Title.title(
+                                    PluginConfig.RESOURCE_PACK_LOADING_SCREEN_TITLE,
+                                    PluginConfig.RESOURCE_PACK_LOADING_SCREEN_SUBTITLE,
+                                    Title.Times.times(Duration.ofMillis(500), Duration.ofDays(1), Duration.ofMillis(500))
+                            )
+                    );
+                // Applying blindness effect if enabled.
+                if (PluginConfig.RESOURCE_PACK_LOADING_SCREEN_APPLY_BLINDNESS == true)
+                    event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 0, false, false, false));
+            }
             // Setting resource-pack related meta-data. This is mainly for ease of use with other plugins.
             if (event.getStatus() == Status.SUCCESSFULLY_LOADED) {
                 // Increasing number of resource-packs loaded by this player since the last time they were sent.
@@ -185,6 +204,15 @@ public final class ResourcePackManager implements Listener {
                 // Increasing total number of resource-packs loaded by this player since they logged in.
                 final int totalCount = player.getMetadata("total_loaded_resource-packs").getFirst().asInt();
                 event.getPlayer().setMetadata("total_loaded_resource-packs", new FixedMetadataValue(plugin, totalCount + 1));
+                // After last pack has been loaded.
+                if (player.getMetadata("sent_resource-packs").getFirst().asInt() == count + 1) {
+                    // Clearing the title.
+                    if (PluginConfig.RESOURCE_PACK_LOADING_SCREEN_APPLY_TITLE_AND_SUBTITLE == true)
+                        player.clearTitle();
+                    // Removing blindness effect from the player.
+                    if (PluginConfig.RESOURCE_PACK_LOADING_SCREEN_APPLY_BLINDNESS == true)
+                        player.removePotionEffect(PotionEffectType.BLINDNESS);
+                }
             }
         }
     }
