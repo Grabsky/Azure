@@ -182,9 +182,12 @@ public final class ResourcePackManager implements Listener {
             if (event.getStatus() != Status.ACCEPTED && event.getStatus() != Status.SUCCESSFULLY_LOADED)
                 server.removeContext("/" + secrets.get(player.getUniqueId()) + "/" + event.getID());
             // When the first pack is accepted.
-            if (event.getStatus() == Status.ACCEPTED && player.getMetadata("sent_resource-packs").getFirst().asInt() == 1) {
+            if (event.getStatus() == Status.ACCEPTED && player.hasMetadata("is_loading_resource-packs") == false) {
+                // Setting the metadata.
+                player.setMetadata("is_loading_resource-packs", new FixedMetadataValue(plugin, true));
                 // Sending title to the player if enabled.
-                if (PluginConfig.RESOURCE_PACK_LOADING_SCREEN_APPLY_TITLE_AND_SUBTITLE == true)
+                if  (PluginConfig.RESOURCE_PACK_LOADING_SCREEN_APPLY_TITLE_AND_SUBTITLE == true) {
+                    // Showing the title.
                     event.getPlayer().showTitle(
                             Title.title(
                                     PluginConfig.RESOURCE_PACK_LOADING_SCREEN_TITLE,
@@ -192,6 +195,7 @@ public final class ResourcePackManager implements Listener {
                                     Title.Times.times(Duration.ofMillis(500), Duration.ofDays(1), Duration.ofMillis(500))
                             )
                     );
+                }
                 // Applying blindness effect if enabled.
                 if (PluginConfig.RESOURCE_PACK_LOADING_SCREEN_APPLY_BLINDNESS == true)
                     event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 0, false, false, false));
@@ -206,6 +210,8 @@ public final class ResourcePackManager implements Listener {
                 event.getPlayer().setMetadata("total_loaded_resource-packs", new FixedMetadataValue(plugin, totalCount + 1));
                 // After last pack has been loaded.
                 if (player.getMetadata("sent_resource-packs").getFirst().asInt() == count + 1) {
+                    // Removing the metadata.
+                    player.removeMetadata("is_loading_resource-packs", plugin);
                     // Clearing the title.
                     if (PluginConfig.RESOURCE_PACK_LOADING_SCREEN_APPLY_TITLE_AND_SUBTITLE == true)
                         player.clearTitle();
