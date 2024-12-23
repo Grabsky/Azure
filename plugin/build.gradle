@@ -1,6 +1,7 @@
 plugins {
     id "net.minecrell.plugin-yml.paper" version "0.6.0"
     id "com.gradleup.shadow" version "8.3.3"
+    id "io.github.revxrsal.zapper" version "1.0.2"
 }
 
 repositories {
@@ -15,14 +16,11 @@ dependencies {
     implementation("cloud.grabsky:commands:1.20.1-38")
     implementation("cloud.grabsky:configuration-paper:1.20.1-43")
     // Must share version between 'plugin' and 'api' modules.
-    implementation("net.kyori:adventure-nbt:$KYORI_NBT_VERSION")
+    zap("net.kyori:adventure-nbt:$KYORI_NBT_VERSION")
     // Moshi and Okio are already in the classpath.
-    implementation("org.javacord:javacord:3.8.0") {
-        exclude group: "com.squareup.moshi"
-        exclude group: "com.squareup.okio"
-    }
+    zap("org.javacord:javacord:3.8.0")
     // JEmoji (Shaded)
-    implementation("net.fellbaum:jemoji:1.6.0")
+    zap("net.fellbaum:jemoji:1.6.0")
     // LuckPerms API (Provided)
     compileOnly("net.luckperms:api:5.4")
     // PlaceholderAPI (Provided)

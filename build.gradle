@@ -16,7 +16,7 @@ subprojects {
 
     ext {
         BEDROCK_VERSION = "1.21-63"
-        KYORI_NBT_VERSION = "4.17.0"
+        KYORI_NBT_VERSION = "4.18.0"
     }
 
     repositories {
