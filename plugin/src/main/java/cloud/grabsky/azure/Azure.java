@@ -64,6 +64,7 @@ import cloud.grabsky.azure.resourcepack.ResourcePackManager;
 import cloud.grabsky.azure.user.AzureUserCache;
 import cloud.grabsky.azure.util.FileLogger;
 import cloud.grabsky.azure.world.AzureWorldManager;
+import cloud.grabsky.bedrock.BedrockPlugin;
 import cloud.grabsky.commands.RootCommandManager;
 import cloud.grabsky.configuration.ConfigurationHolder;
 import cloud.grabsky.configuration.ConfigurationMapper;
@@ -105,7 +106,7 @@ import lombok.SneakyThrows;
 
 import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
 
-public final class Azure extends AzureBase implements AzureAPI, Listener {
+public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
 
     @Getter(AccessLevel.PUBLIC)
     private static Azure instance;
