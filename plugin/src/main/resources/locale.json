@@ -201,6 +201,10 @@
         "gamemode_info": "<dark_gray>› <gray>Tryb gry gracza <gold><player><gray> to <gold><mode><gray>.",
         "gamemode_set_success_sender": "<dark_gray>› <gray>Ustawiono tryb <gold><player><gray> na <gold><mode><gray>.",
         "gamemode_set_success_target": "<dark_gray>› <gray>Twój tryb został ustawiony na <gold><mode><gray>.",
+        // Get
+        "get_usage": "<dark_gray>› <gray>Użycie: <gold>/get <white>(item) (amount)",
+        "get_success": "<dark_gray>› <gray>Otrzymałeś: <gold><item><gray>.",
+        "get_failure_not_found": "<dark_gray>› <red>Przedmiot <gold><input><gray> nie jest skonfigurowany.",
         // Give
         "give_usage": "<dark_gray>› <gray>Użycie: <gold>/give <white>(player) (material) (amount) <gray>(--silent)",
         "give_success_sender": "<dark_gray>› <gray>Gracz <gold><player><gray> otrzymał <gold><item><gray>.",

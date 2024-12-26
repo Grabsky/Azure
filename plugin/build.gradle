@@ -13,7 +13,7 @@ dependencies {
     // Must share version between 'plugin' and 'api' modules.
     implementation("cloud.grabsky:bedrock:$BEDROCK_VERSION")
     implementation("cloud.grabsky:commands:1.20.1-38")
-    implementation("cloud.grabsky:configuration-paper:1.20.1-43")
+    implementation("cloud.grabsky:configuration-paper:1.21.3-46")
     // Must share version between 'plugin' and 'api' modules.
     implementation("net.kyori:adventure-nbt:$KYORI_NBT_VERSION")
     // Moshi and Okio are already in the classpath.

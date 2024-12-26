@@ -28,6 +28,7 @@ import cloud.grabsky.azure.commands.EnderchestCommand;
 import cloud.grabsky.azure.commands.FeedCommand;
 import cloud.grabsky.azure.commands.FlyCommand;
 import cloud.grabsky.azure.commands.GameModeCommand;
+import cloud.grabsky.azure.commands.GetCommand;
 import cloud.grabsky.azure.commands.GiveCommand;
 import cloud.grabsky.azure.commands.HatCommand;
 import cloud.grabsky.azure.commands.HealCommand;
@@ -55,6 +56,7 @@ import cloud.grabsky.azure.commands.templates.CommandArgumentTemplate;
 import cloud.grabsky.azure.commands.templates.CommandExceptionTemplate;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.configuration.PluginConfig.DeleteButton;
+import cloud.grabsky.azure.configuration.PluginItems;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.azure.configuration.adapters.BossBarAdapterFactory;
 import cloud.grabsky.azure.configuration.adapters.TagResolverAdapter;
@@ -199,6 +201,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                 .registerCommand(EnderchestCommand.class)
                 .registerCommand(FeedCommand.class)
                 .registerCommand(GameModeCommand.class)
+                .registerCommand(GetCommand.class)
                 .registerCommand(GiveCommand.class)
                 .registerCommand(HatCommand.class)
                 .registerCommand(HealCommand.class)
@@ -290,11 +293,13 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
             final File locale = ensureResourceExistence(this, new File(this.getDataFolder(), "locale.json"));
             final File localeCommands = ensureResourceExistence(this, new File(this.getDataFolder(), "locale_commands.json"));
             final File config = ensureResourceExistence(this, new File(this.getDataFolder(), "config.json"));
+            final File items = ensureResourceExistence(this, new File(this.getDataFolder(), "items.json"));
             // Reloading configuration files.
             mapper.map(
                     ConfigurationHolder.of(PluginLocale.class, locale),
                     ConfigurationHolder.of(PluginLocale.Commands.class, localeCommands),
-                    ConfigurationHolder.of(PluginConfig.class, config)
+                    ConfigurationHolder.of(PluginConfig.class, config),
+                    ConfigurationHolder.of(PluginItems.class, items)
             );
             // Reloading ResourcePackManager.
             resourcePackManager.reload();
