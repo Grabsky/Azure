@@ -78,7 +78,6 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -435,7 +434,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
         @Override
         public String onRequest(final @NotNull OfflinePlayer player, final @NotNull String params) {
             if (params.equalsIgnoreCase("is_idle") == true && player instanceof Player onlinePlayer && onlinePlayer.isOnline() == true) {
-                final boolean isIdle = onlinePlayer.getIdleDuration().get(ChronoUnit.SECONDS) >= (long) Bukkit.getIdleTimeout() * 60;
+                final boolean isIdle = onlinePlayer.getIdleDuration().get(ChronoUnit.SECONDS) >= PluginConfig.GENERAL_PLAYER_IDLE_TIME;
                 return String.valueOf(isIdle);
             } else if (params.equalsIgnoreCase("displayname") == true && Azure.getInstance() != null && Azure.getInstance().getUserCache() != null) {
                 if (Azure.getInstance().getUserCache().hasUser(player.getUniqueId()) == true) {

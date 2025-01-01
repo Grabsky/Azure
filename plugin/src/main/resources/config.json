@@ -8,7 +8,9 @@
         // Determines whether new players should spawn on spawn-point of the primary world.
         "teleport_new_players_to_primary_world_spawn": true,
         // Determines whether to use $.command_filter.blocked_command_error_message as unknown command message.
-        "use_blocked_command_error_message_for_unknown_command": false
+        "use_blocked_command_error_message_for_unknown_command": false,
+        // Seconds to pass before player is marked as idle.
+        "player_idle_time": 300,
     },
     "chat_settings": {
         // Chat cooldown in milliseconds. Set to 0 to disable. Bypass: azure.plugin.chat.can_bypass_cooldown
