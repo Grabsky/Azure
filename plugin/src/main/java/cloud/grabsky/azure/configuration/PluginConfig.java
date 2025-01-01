@@ -63,6 +63,12 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("general_settings.player_idle_time")
     public static long GENERAL_PLAYER_IDLE_TIME;
 
+    @JsonPath("general_settings.end_portal_teleports_to_spawn")
+    public static boolean GENERAL_END_PORTAL_TELEPORTS_TO_SPAWN;
+
+    @JsonPath("general_settings.disable_end_platform_generation")
+    public static boolean GENERAL_DISABLE_END_PLATFORM_GENERATION;
+
     // Chat Settings
 
     @JsonPath("chat_settings.cooldown")

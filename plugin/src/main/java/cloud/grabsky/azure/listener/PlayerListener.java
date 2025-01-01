@@ -25,6 +25,7 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.luckperms.api.cacheddata.CachedMetaData;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -41,6 +42,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLevelChangeEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.world.PortalCreateEvent;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
 
 import java.net.URI;
@@ -343,6 +346,24 @@ public final class PlayerListener implements Listener {
             // Saving...
             plugin.getUserCache().as(AzureUserCache.class).saveUser(user);
         }
+    }
+
+    /* TELEPORT PLAYER TO THE WORLD SPAWN WHEN ENTERING THROUGH THE END PORTAL */
+
+    private static final NamespacedKey THE_END = new NamespacedKey("minecraft", "the_end");
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onPortal(final @NotNull PlayerTeleportEvent event) {
+        if (PluginConfig.GENERAL_END_PORTAL_TELEPORTS_TO_SPAWN == true && event.getCause() == PlayerTeleportEvent.TeleportCause.END_PORTAL && event.getTo().getWorld().key().equals(THE_END) == true)
+            event.setTo(plugin.getWorldManager().getSpawnPoint(event.getTo().getWorld()));
+    }
+
+    /* CANCEL GENERATION OF END PLATFORM */
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPlatformGenerate(final PortalCreateEvent event) {
+        if (PluginConfig.GENERAL_DISABLE_END_PLATFORM_GENERATION == true && event.getWorld().key().equals(THE_END) == true)
+            event.setCancelled(true);
     }
 
 }

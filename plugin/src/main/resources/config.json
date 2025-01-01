@@ -11,6 +11,10 @@
         "use_blocked_command_error_message_for_unknown_command": false,
         // Seconds to pass before player is marked as idle.
         "player_idle_time": 300,
+        // Whether entering the end portal should teleport player to the spawn point.
+        "end_portal_teleports_to_spawn": false,
+        // Whether entering the end portal should not cause end platform to be generated.
+        "disable_end_platform_generation": false
     },
     "chat_settings": {
         // Chat cooldown in milliseconds. Set to 0 to disable. Bypass: azure.plugin.chat.can_bypass_cooldown
