@@ -314,7 +314,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                 if (PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getState().isEmpty() == false)
                     // Scheduling a refreshing task if desired.
                     if (PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getRefreshRate() > 0)
-                        this.activityRefreshTask = this.getBedrockScheduler().repeat(0L, PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getRefreshRate() * 20L, Long.MAX_VALUE, (___) -> {
+                        this.activityRefreshTask = this.getBedrockScheduler().repeat(0L, PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getRefreshRate() * 20L, Long.MAX_VALUE, (_) -> {
                             // Parsing string with PlaceholderAPI.
                             final String parsed = PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getState());
                             // Updating the activity.

@@ -161,8 +161,7 @@ public final class ResourcePackManager implements Listener {
         plugin.getLogger().info("Resource-packs requested by '" + player.getUniqueId() + "' and total of " + request.packs().size() + " contexts has been created with secret '" + secret + "'... " + requestMeasuredTime + "ms");
     }
 
-    // NOTE: This is likely to be moved into configuration event once available. (1.20.2)
-    // NOTE: We're at 1.21 and API for that does not exist yet...
+    // NOTE: In the future, resource-packs could be sent in the configuration phase. There is no API for that currently. (as of 2025/05/01)
     @EventHandler(ignoreCancelled = true)
     public void onPlayerJoin(final @NotNull PlayerJoinEvent event) {
         // Setting total number of resource-packs loaded by this player to 0. This is mainly for ease of use with other plugins.
@@ -229,7 +228,7 @@ public final class ResourcePackManager implements Listener {
     public static @Nullable URI toURI(final @NotNull String uri) {
         try {
             return new URI(uri);
-        } catch (final URISyntaxException ___) {
+        } catch (final URISyntaxException _) {
             return null;
         }
     }

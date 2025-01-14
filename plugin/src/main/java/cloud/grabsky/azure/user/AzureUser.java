@@ -64,16 +64,16 @@ public final class AzureUser implements User {
     @Getter(AccessLevel.PUBLIC)
     private @NotNull String lastAddress;
 
-    @Getter(AccessLevel.PUBLIC) @Setter(value = AccessLevel.PACKAGE, onMethod = @__(@Internal))
+    @Getter(AccessLevel.PUBLIC) @Setter(value = AccessLevel.PACKAGE, onMethod_ = @Internal)
     private @NotNull String lastCountryCode;
 
-    @Getter(AccessLevel.PUBLIC) @Setter(value = AccessLevel.PUBLIC, onMethod = @__(@Internal))
+    @Getter(AccessLevel.PUBLIC) @Setter(value = AccessLevel.PUBLIC, onMethod_ = @Internal)
     private int maxLevel;
 
     @Getter(AccessLevel.PUBLIC)
     private boolean isVanished;
 
-    @Getter(AccessLevel.PUBLIC) @Setter(value = AccessLevel.PUBLIC, onMethod = @__(@Internal))
+    @Getter(AccessLevel.PUBLIC) @Setter(value = AccessLevel.PUBLIC, onMethod_ = @Internal)
     private boolean isSpying;
 
     // Defined as implementation rather than interface because we want Moshi to know what adapter to use.
