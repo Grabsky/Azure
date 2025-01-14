@@ -26,6 +26,7 @@ import cloud.grabsky.commands.RootCommandContext;
 import cloud.grabsky.commands.annotation.Command;
 import cloud.grabsky.commands.annotation.Dependency;
 import cloud.grabsky.commands.exception.CommandLogicException;
+import net.luckperms.api.node.types.PermissionNode;
 import org.bukkit.entity.Player;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
@@ -68,6 +69,12 @@ public final class UnverifyCommand extends RootCommand {
             return;
         // Getting verification role.
         final @Nullable Role role = server.getRoleById(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_ROLE_ID).orElse(null);
+        // Removing permission from the player, if configured.
+        if ("".equals(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_PERMISSION) == false)
+            // Loading LuckPerms' User and removing permission node from them.
+            plugin.getLuckPerms().getUserManager().modifyUser(sender.getUniqueId(), (it) -> {
+                it.data().remove(PermissionNode.builder(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_PERMISSION).build());
+            });
         // Getting Member object associated with this user, if the role still exists.
         if (role != null)
             plugin.getDiscord().getUserById(discordId).thenAccept(it -> server.removeRoleFromUser(it, role));
