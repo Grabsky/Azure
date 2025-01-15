@@ -63,7 +63,7 @@ public final class BanCommand extends RootCommand {
     public @NotNull CompletionsProvider onTabComplete(final @NotNull RootCommandContext context, final int index) throws CommandLogicException {
         return switch (index) {
             case 0 -> CompletionsProvider.of(OfflinePlayer.class);
-            case 1 -> IntervalArgument.ofRange(0L, 12L, Unit.YEARS);
+            case 1 -> CompletionsProvider.of(IntervalArgument.ofRange(0L, 12L, Unit.YEARS).provide(context, "permanent"));
             default -> CompletionsProvider.EMPTY;
         };
     }
@@ -83,7 +83,7 @@ public final class BanCommand extends RootCommand {
             return;
         }
         // Getting duration.
-        final Interval duration = arguments.next(Interval.class, IntervalArgument.ofRange(0L, 12L, Unit.YEARS)).asRequired(BAN_USAGE);
+        final Interval duration = arguments.next(Interval.class, IntervalArgument.DEFAULT_RANGE).asRequired(BAN_USAGE);
         // (optional) Getting the punishment reason.
         final @Nullable String reason = arguments.next(String.class, StringArgument.GREEDY).asOptional(PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON);
         // ...
@@ -99,7 +99,7 @@ public final class BanCommand extends RootCommand {
                     return;
                 }
                 // Continuing... scheduling the rest of the logic onto the main thread.
-                plugin.getBedrockScheduler().run(1L, (task) -> ban(sender, target, targetUser, reason, duration));
+                plugin.getBedrockScheduler().run(1L, (_) -> ban(sender, target, targetUser, reason, duration));
             });
             return;
         }
@@ -109,7 +109,7 @@ public final class BanCommand extends RootCommand {
 
     private static void ban(final @NotNull CommandSender sender, final @NotNull OfflinePlayer target, final @NotNull User targetUser, final @Nullable String reason, final @NotNull Interval duration) {
         // When duration is 0, punishment will be permanent - until manually removed.
-        if (duration.as(Unit.MILLISECONDS) == 0) {
+        if (duration.as(Unit.MILLISECONDS) == Long.MAX_VALUE) {
             // Banning the player. Player will be kicked manually for the sake of customizable message.
             targetUser.ban(null, reason, sender);
             // Kicking with custom message.

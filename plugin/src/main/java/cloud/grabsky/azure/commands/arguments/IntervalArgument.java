@@ -28,6 +28,7 @@ import cloud.grabsky.commands.exception.NumberParseException;
 import it.unimi.dsi.fastutil.Pair;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -78,9 +79,21 @@ public final class IntervalArgument implements ArgumentParser<Interval>, Complet
         return new ArrayList<>();
     }
 
+    public @NotNull List<String> provide(final @NotNull RootCommandContext context, final String... extra) {
+        final List<String> result = new ArrayList<>(provide(context));
+        // Adding extra elements to the result.
+        if (extra.length > 0)
+            Collections.addAll(result, extra);
+        // Returning the result.
+        return result;
+    }
+
     @Override
     public Interval parse(final @NotNull RootCommandContext context, final @NotNull ArgumentQueue queue) throws ArgumentParseException, MissingInputException {
         final String value = queue.next(String.class).asRequired();
+        // Handling 'permanent' / 'infinite' case to return Interval of Long.MAX_VALUE milliseconds.
+        if ("infinite".equalsIgnoreCase(value) == true || "permanent".equalsIgnoreCase(value) == true)
+            return Interval.of(Long.MAX_VALUE, Unit.MILLISECONDS);
         // Splitting on position between digit and letter.
         final String[] split = SPLIT_PATTERN.split(value);
         // Throwing exception when split total elements is not 2.
