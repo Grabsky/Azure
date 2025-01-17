@@ -80,7 +80,10 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Registry;
+import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -456,9 +459,28 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                     final User user = Azure.getInstance().getUserCache().getUser(player.getUniqueId());
                     return String.valueOf(user.getMaxLevel());
                 }
+            } else if (params.equalsIgnoreCase("total_mined_blocks") == true) {
+                return calculateTotalBlock(player, Statistic.MINE_BLOCK);
             } else if (params.equalsIgnoreCase("discord_online") == true && Azure.getInstance() != null && Azure.getInstance().getDiscord() != null)
                 return ONLINE_MEMBERS.toString();
             return null;
+        }
+
+        // This should be more efficient than 'Statistic' expansion for PlaceholderAPI.
+        private static String calculateTotalBlock(final @NotNull OfflinePlayer player, final @NotNull Statistic statistic) {
+            final AtomicLong total = new AtomicLong();
+            // Iterating over all blocks in the registry.
+            Registry.BLOCK.forEach(it -> {
+                // Converting BlockType to Material, because this is what Player#getStatistic expects as a parameter.
+                final @Nullable Material material = it.asMaterial();
+                // Returning for null materials.
+                if (material == null)
+                    return;
+                // Incrementing the total amount.
+                total.addAndGet(player.getStatistic(statistic, material));
+            });
+            // Returning...
+            return Long.toString(total.get());
         }
 
     }
