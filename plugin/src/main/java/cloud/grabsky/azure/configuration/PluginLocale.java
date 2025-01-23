@@ -693,6 +693,14 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.unverify_failure_not_enabled")
     public static Component COMMAND_UNVERIFY_FAILURE_NOT_ENABLED;
 
+    // Commands > Back
+
+    @JsonPath("commands.back_success")
+    public static Component COMMAND_BACK_SUCCESS;
+
+    @JsonPath("commands.back_failure_no_previous_location")
+    public static Component COMMAND_BACK_FAILURE_NO_PREVIOUS_LOCATION;
+
 
     public static final class Commands implements JsonConfiguration {
 

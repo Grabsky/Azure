@@ -31,6 +31,8 @@ dependencies {
     // Aurora and AuroraQuests
     compileOnly("gg.auroramc:Aurora:2.1.2")
     compileOnly("gg.auroramc:AuroraQuests:1.3.14")
+    // MorePersistentDataTypes
+    implementation("com.jeff-media:MorePersistentDataTypes:2.4.0")
 }
 
 tasks {

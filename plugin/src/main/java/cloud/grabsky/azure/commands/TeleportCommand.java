@@ -24,9 +24,11 @@ import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.component.ExceptionHandler;
 import cloud.grabsky.commands.exception.CommandLogicException;
 import cloud.grabsky.commands.exception.MissingInputException;
+import com.jeff_media.morepersistentdatatypes.DataType;
 import io.papermc.paper.math.Position;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -35,8 +37,10 @@ import org.jetbrains.annotations.NotNull;
 import static java.lang.String.format;
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
-@Command(name = "teleport", permission = "azure.command.teleport", usage = "/teleport (target) (destination) (--silent)")
+@Command(name = "teleport", permission = "azure.command.teleport", usage = "/teleport (target) (destination) (--verbose)")
 public final class TeleportCommand extends RootCommand {
+
+    private static final NamespacedKey PREVIOUS_LOCATION = new NamespacedKey("azure", "previous_location");
 
     private static final ExceptionHandler.Factory TELEPORT_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)
@@ -54,10 +58,10 @@ public final class TeleportCommand extends RootCommand {
                         ? CompletionsProvider.of(Player.class, "@x @y @z")
                         : CompletionsProvider.EMPTY;
             case 2 -> (input.equalsIgnoreCase("@self") == true || Bukkit.getPlayerExact(input) != null)
-                        ? CompletionsProvider.of("--silent")
+                        ? CompletionsProvider.of("--verbose")
                         : CompletionsProvider.of("@y @z");
             case 3 -> CompletionsProvider.of("@z");
-            case 4 -> CompletionsProvider.of("--silent");
+            case 4 -> CompletionsProvider.of("--verbose");
             default -> CompletionsProvider.EMPTY;
         };
     }
@@ -65,7 +69,7 @@ public final class TeleportCommand extends RootCommand {
     @Override
     public void onCommand(final @NotNull RootCommandContext context, final @NotNull ArgumentQueue arguments) throws CommandLogicException {
         // Trying to resolve the command using Player as a destination...
-        if (context.getInput().maxIndex() == 2 || context.getInput().at(3, "").equalsIgnoreCase("--silent") == true)
+        if (context.getInput().maxIndex() == 2 || context.getInput().at(3, "").equalsIgnoreCase("--verbose") == true)
             this.onTeleportToPlayer(context, arguments);
         // ...or using Position otherwise...
         else this.onTeleportToPosition(context, arguments);
@@ -76,7 +80,7 @@ public final class TeleportCommand extends RootCommand {
         // ...
         final Player target = arguments.next(Player.class).asRequired(TELEPORT_USAGE);
         final Player destination = arguments.next(Player.class).asRequired(TELEPORT_USAGE);
-        final boolean isSilent = arguments.next(String.class).asOptional("--not-silent").equalsIgnoreCase("--silent")
+        final boolean isVerbose = arguments.next(String.class).asOptional("--not-verbose").equalsIgnoreCase("--verbose")
                 || target.canSee(destination) == false
                 || destination.canSee(target) == false;
         // ...
@@ -89,8 +93,12 @@ public final class TeleportCommand extends RootCommand {
             Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
             return;
         }
-        // ...
-        target.teleport(destination, TeleportCause.COMMAND);
+        // Getting the current location of the player.
+        final Location currentLocation = target.getLocation();
+        // Teleporting...
+        final boolean isSuccess = target.teleport(destination, TeleportCause.COMMAND);
+        // Updating the previous location if teleportation was successful.
+        if (isSuccess == true) target.getPersistentDataContainer().set(PREVIOUS_LOCATION, DataType.LOCATION, currentLocation);
         // ...
         if (sender != target && sender != destination)
             Message.of(PluginLocale.COMMAND_TELEPORT_PLAYER_SUCCESS_SENDER)
@@ -98,7 +106,7 @@ public final class TeleportCommand extends RootCommand {
                     .placeholder("destination", destination)
                     .send(sender);
         // ...
-        if (isSilent == false) {
+        if (isVerbose == true) {
             Message.of(PluginLocale.COMMAND_TELEPORT_PLAYER_SUCCESS_TARGET).placeholder("destination", destination).send(target);
             Message.of(PluginLocale.COMMAND_TELEPORT_PLAYER_SUCCESS_DESTINATION).placeholder("target", target).send(destination);
         }
@@ -109,7 +117,7 @@ public final class TeleportCommand extends RootCommand {
         // ...
         final Player target = arguments.next(Player.class).asRequired(TELEPORT_USAGE);
         final Position destination = arguments.next(Position.class).asRequired(TELEPORT_USAGE);
-        final boolean isSilent = arguments.next(String.class).asOptional("--not-silent").equalsIgnoreCase("--silent");
+        final boolean isVerbose = arguments.next(String.class).asOptional("--not-verbose").equalsIgnoreCase("--verbose");
         // ...
         final Location location = new Location(target.getWorld(), destination.x(), destination.y(), destination.z(), target.getLocation().getYaw(), target.getLocation().getPitch());
         // ...
@@ -117,8 +125,13 @@ public final class TeleportCommand extends RootCommand {
             Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
             return;
         }
-        // ...
-        target.teleportAsync(location, TeleportCause.COMMAND);
+        // Getting the current location of the player.
+        final Location currentLocation = target.getLocation();
+        // Teleporting...
+        target.teleportAsync(location, TeleportCause.COMMAND).thenAccept(isSuccess -> {
+            // Updating the previous location if teleportation was successful.
+            if (isSuccess == true) target.getPersistentDataContainer().set(PREVIOUS_LOCATION, DataType.LOCATION, currentLocation);
+        });
         // ...
         if (sender != target)
             Message.of(PluginLocale.COMMAND_TELEPORT_POSITION_SUCCESS_SENDER)
@@ -128,7 +141,7 @@ public final class TeleportCommand extends RootCommand {
                     .placeholder("z", format("%.2f", destination.z()))
                     .send(sender);
         // ...
-        if (isSilent == false) {
+        if (isVerbose == true) {
             Message.of(PluginLocale.COMMAND_TELEPORT_POSITION_SUCCESS_TARGET)
                     .placeholder("x", format("%.2f", destination.x()))
                     .placeholder("y", format("%.2f", destination.y()))

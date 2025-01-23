@@ -461,6 +461,9 @@
         // Unverify
         "unverify_success": "<dark_gray>› <gray>Pomyślnie cofnąłeś weryfikację konta.",
         "unverify_failure_not_verified": "<dark_gray>› <red>Nie jesteś zweryfikowany. Wpisz <gold>/verify<red>, aby rozpocząć.",
-        "unverify_failure_not_enabled": "<dark_gray>› <red>Integracja jest tymczasowo wyłączona. Skontaktuj się z administracją serwera."
+        "unverify_failure_not_enabled": "<dark_gray>› <red>Integracja jest tymczasowo wyłączona. Skontaktuj się z administracją serwera.",
+        // Back
+        "back_success": "<dark_gray>› <gray>Zostałeś przeniesiony do poprzedniej lokalizacji.",
+        "back_failure_no_previous_location": "<dark_gray>› <red>Nie znaleziono żadnej poprzedniej lokalizacji."
     }
 }
