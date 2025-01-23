@@ -114,6 +114,9 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("chat_settings.chat_format.console")
     public static String CHAT_FORMATS_CONSOLE;
 
+    @JsonPath("chat_settings.chat_format.admin")
+    public static String CHAT_FORMATS_ADMIN;
+
     @JsonPath("chat_settings.chat_format.extra")
     public static List<FormatHolder> CHAT_FORMATS_EXTRA;
 

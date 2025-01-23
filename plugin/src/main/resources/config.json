@@ -50,6 +50,8 @@
             "default": "<player>: <message>",
             // Console chat format. Placeholders: [player, displayname, group, prefix, suffix, message]
             "console": "[<signature_uuid>] [<group>] <player>: <message>",
+            // Admin chat format. Placeholders: [player, displayname, message]
+            "admin": "[AdminChat] <player>: <message>",
             // Per-permission formats. First matching element will be applied. Iterated in reverse order, from last to first.
             "extra": [
                 { "permission": "group.donator", "format": "<gold>(Donator)<white> <player>: <message>" },

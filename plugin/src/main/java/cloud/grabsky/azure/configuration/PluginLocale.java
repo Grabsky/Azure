@@ -701,6 +701,11 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.back_failure_no_previous_location")
     public static Component COMMAND_BACK_FAILURE_NO_PREVIOUS_LOCATION;
 
+    // Commands > AdminChat
+
+    @JsonPath("commands.adminchat_usage")
+    public static Component COMMAND_ADMINCHAT_USAGE;
+
 
     public static final class Commands implements JsonConfiguration {
 

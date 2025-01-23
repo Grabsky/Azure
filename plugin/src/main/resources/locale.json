@@ -464,6 +464,8 @@
         "unverify_failure_not_enabled": "<dark_gray>› <red>Integracja jest tymczasowo wyłączona. Skontaktuj się z administracją serwera.",
         // Back
         "back_success": "<dark_gray>› <gray>Zostałeś przeniesiony do poprzedniej lokalizacji.",
-        "back_failure_no_previous_location": "<dark_gray>› <red>Nie znaleziono żadnej poprzedniej lokalizacji."
+        "back_failure_no_previous_location": "<dark_gray>› <red>Nie znaleziono żadnej poprzedniej lokalizacji.",
+        // AdminChat
+        "adminchat_usage": "<dark_gray>› <gray>Użycie: <gold>/a (message)"
     }
 }

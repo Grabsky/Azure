@@ -19,6 +19,7 @@ import cloud.grabsky.azure.api.AzureProvider;
 import cloud.grabsky.azure.api.user.User;
 import cloud.grabsky.azure.api.user.UserCache;
 import cloud.grabsky.azure.chat.ChatManager;
+import cloud.grabsky.azure.commands.AdminChatCommand;
 import cloud.grabsky.azure.commands.AzureCommand;
 import cloud.grabsky.azure.commands.BackCommand;
 import cloud.grabsky.azure.commands.BanCommand;
@@ -200,6 +201,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                 .registerDependency(AzureWorldManager.class, worldManager)
                 .registerDependency(UserCache.class, userCache)
                 // Registering commands...
+                .registerCommand(AdminChatCommand.class)
                 .registerCommand(AzureCommand.class)
                 .registerCommand(BanCommand.class)
                 .registerCommand(DefeatCommand.class)
