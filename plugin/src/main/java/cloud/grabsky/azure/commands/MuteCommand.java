@@ -68,7 +68,7 @@ public final class MuteCommand extends RootCommand {
         return switch (index) {
             case 0 -> CompletionsProvider.of(OfflinePlayer.class);
             case 1 -> CompletionsProvider.of(IntervalArgument.ofRange(0L, 12L, Unit.YEARS).provide(context, "permanent"));
-            default -> CompletionsProvider.EMPTY;
+            default -> context.getInput().getInput().trim().endsWith("--silent") == false ? CompletionsProvider.of("--silent") : CompletionsProvider.EMPTY;
         };
     }
 
@@ -89,7 +89,9 @@ public final class MuteCommand extends RootCommand {
         // Getting duration.
         final Interval duration = arguments.next(Interval.class, IntervalArgument.DEFAULT_RANGE).asRequired(MUTE_USAGE);
         // (optional) Getting the punishment reason.
-        final @Nullable String reason = arguments.next(String.class, StringArgument.GREEDY).asOptional(PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON);
+        final String reason = arguments.next(String.class, StringArgument.GREEDY).asOptional(PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON);
+        // Checking whether punishment should be silent.
+        final boolean isSilent = reason.contains("--silent");
         // ...
         if (sender instanceof Player senderOnline) {
             // Getting group of the sender.
@@ -103,15 +105,15 @@ public final class MuteCommand extends RootCommand {
                     return;
                 }
                 // Continuing... scheduling the rest of the logic onto the main thread.
-                plugin.getBedrockScheduler().run(1L, (_) -> mute(sender, targetUser, reason, duration));
+                plugin.getBedrockScheduler().run(1L, (_) -> mute(sender, targetUser, reason.split("--silent")[0].trim(), duration, isSilent));
             });
             return;
         }
         // Otherwise, just muting.
-        mute(sender, targetUser, reason, duration);
+        mute(sender, targetUser, reason.split("--silent")[0].trim(), duration, isSilent);
     }
 
-    private static void mute(final @NotNull CommandSender sender, final @NotNull User targetUser, final @Nullable String reason, final @NotNull Interval duration) {
+    private static void mute(final @NotNull CommandSender sender, final @NotNull User targetUser, final @Nullable String reason, final @NotNull Interval duration, final boolean isSilent) {
         // When duration is 0, punishment will be permanent - until manually removed.
         if (duration.as(Unit.MILLISECONDS) == Long.MAX_VALUE) {
             // Muting the player.
@@ -121,7 +123,7 @@ public final class MuteCommand extends RootCommand {
                     .placeholder("player", targetUser.getName())
                     .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
                     // Sending to all players with specific permission.
-                    .broadcast(receiver -> receiver instanceof ConsoleCommandSender || receiver.hasPermission("azure.command.mute") == true);
+                    .broadcast(receiver -> isSilent == false || receiver instanceof ConsoleCommandSender || receiver.hasPermission("azure.command.mute") == true);
             // Exiting the command block.
             return;
         }
@@ -133,7 +135,7 @@ public final class MuteCommand extends RootCommand {
                 .placeholder("duration_left", duration)
                 .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
                 // Sending to all players with specific permission.
-                .broadcast(receiver -> receiver instanceof ConsoleCommandSender || receiver.hasPermission("azure.command.mute") == true);
+                .broadcast(receiver -> isSilent == false || receiver instanceof ConsoleCommandSender || receiver.hasPermission("azure.command.mute") == true);
     }
 
 }

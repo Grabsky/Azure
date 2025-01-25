@@ -64,7 +64,7 @@ public final class BanCommand extends RootCommand {
         return switch (index) {
             case 0 -> CompletionsProvider.of(OfflinePlayer.class);
             case 1 -> CompletionsProvider.of(IntervalArgument.ofRange(0L, 12L, Unit.YEARS).provide(context, "permanent"));
-            default -> CompletionsProvider.EMPTY;
+            default -> context.getInput().getInput().trim().endsWith("--silent") == false ? CompletionsProvider.of("--silent") : CompletionsProvider.EMPTY;
         };
     }
 
@@ -85,7 +85,9 @@ public final class BanCommand extends RootCommand {
         // Getting duration.
         final Interval duration = arguments.next(Interval.class, IntervalArgument.DEFAULT_RANGE).asRequired(BAN_USAGE);
         // (optional) Getting the punishment reason.
-        final @Nullable String reason = arguments.next(String.class, StringArgument.GREEDY).asOptional(PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON);
+        final String reason = arguments.next(String.class, StringArgument.GREEDY).asOptional(PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON);
+        // Checking whether punishment should be silent.
+        final boolean isSilent = reason.contains("--silent");
         // ...
         if (sender instanceof Player senderOnline) {
             // Getting group of the sender.
@@ -99,15 +101,15 @@ public final class BanCommand extends RootCommand {
                     return;
                 }
                 // Continuing... scheduling the rest of the logic onto the main thread.
-                plugin.getBedrockScheduler().run(1L, (_) -> ban(sender, target, targetUser, reason, duration));
+                plugin.getBedrockScheduler().run(1L, (_) -> ban(sender, target, targetUser, reason.split("--silent")[0].trim().trim(), duration, isSilent));
             });
             return;
         }
         // Otherwise, just banning.
-        ban(sender, target, targetUser, reason, duration);
+        ban(sender, target, targetUser, reason.split("--silent")[0].trim().trim(), duration, isSilent);
     }
 
-    private static void ban(final @NotNull CommandSender sender, final @NotNull OfflinePlayer target, final @NotNull User targetUser, final @Nullable String reason, final @NotNull Interval duration) {
+    private static void ban(final @NotNull CommandSender sender, final @NotNull OfflinePlayer target, final @NotNull User targetUser, final @Nullable String reason, final @NotNull Interval duration, final boolean isSilent) {
         // When duration is 0, punishment will be permanent - until manually removed.
         if (duration.as(Unit.MILLISECONDS) == Long.MAX_VALUE) {
             // Banning the player. Player will be kicked manually for the sake of customizable message.
@@ -125,7 +127,7 @@ public final class BanCommand extends RootCommand {
                     .placeholder("player", targetUser.getName())
                     .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
                     // Sending to all players with specific permission.
-                    .broadcast(receiver -> receiver instanceof ConsoleCommandSender || receiver.hasPermission("azure.command.ban") == true);
+                    .broadcast(receiver ->  isSilent == false || receiver instanceof ConsoleCommandSender || receiver.hasPermission("azure.command.ban") == true);
             // Exiting the command block.
             return;
         }
@@ -147,7 +149,7 @@ public final class BanCommand extends RootCommand {
                 .placeholder("duration_left", duration.toString())
                 .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
                 // Sending to all players with specific permission.
-                .broadcast(receiver -> receiver instanceof ConsoleCommandSender || receiver.hasPermission("azure.command.ban") == true);
+                .broadcast(receiver -> isSilent == false || receiver instanceof ConsoleCommandSender || receiver.hasPermission("azure.command.ban") == true);
     }
 
 }

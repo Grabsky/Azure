@@ -41,7 +41,7 @@
             "disallow_inappropriate_words": true,
             // Console commands to execute message contains any word marked as INAPPROPRIATE.
             "punishment_commands": [
-                "mute <player> 10s Używanie nieodpowiednich słów."
+                "mute <player> 10s Używanie nieodpowiednich słów. --silent"
             ]
         },
         // Chat formats. Supports MiniMessage tags and some placeholders.

@@ -62,7 +62,7 @@ public final class KickCommand extends RootCommand {
 
     @Override
     public @NotNull CompletionsProvider onTabComplete(final @NotNull RootCommandContext context, final int index) throws CommandLogicException {
-        return (index == 0) ? CompletionsProvider.of(Player.class) : CompletionsProvider.EMPTY;
+        return (index == 0) ? CompletionsProvider.of(Player.class) : context.getInput().getInput().trim().endsWith("--silent") == false ? CompletionsProvider.of("--silent") : CompletionsProvider.EMPTY;
     }
 
     @Override
@@ -71,7 +71,9 @@ public final class KickCommand extends RootCommand {
         // Getting Player argument.
         final Player target = arguments.next(Player.class).asRequired(KICK_USAGE);
         // (optional) Getting the punishment reason.
-        final @Nullable String reason = arguments.next(String.class, StringArgument.GREEDY).asOptional(PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON);
+        final String reason = arguments.next(String.class, StringArgument.GREEDY).asOptional(PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON);
+        // Checking whether punishment should be silent.
+        final boolean isSilent = reason.contains("--silent");
         // ...
         if (sender instanceof Player senderOnline) {
             final UUID targetUniqueId = target.getUniqueId();
@@ -86,15 +88,15 @@ public final class KickCommand extends RootCommand {
                     return;
                 }
                 // Continuing... scheduling the rest of the logic onto the main thread.
-                plugin.getBedrockScheduler().run(1L, (task) -> kick(sender, target, reason));
+                plugin.getBedrockScheduler().run(1L, (_) -> kick(sender, target, reason.split("--silent")[0].trim(), isSilent));
             });
             return;
         }
         // Otherwise, just kicking.
-        kick(sender, target, reason);
+        kick(sender, target, reason.split("--silent")[0].trim(), isSilent);
     }
 
-    private void kick(final @NotNull CommandSender sender, final @NotNull Player target, final @Nullable String reason) {
+    private void kick(final @NotNull CommandSender sender, final @NotNull Player target, final @Nullable String reason, final boolean isSilent) {
         target.kick(
                 Message.of(PluginLocale.COMMAND_KICK_DISCONNECT_MESSAGE)
                         .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
@@ -105,7 +107,7 @@ public final class KickCommand extends RootCommand {
                 .placeholder("player", target)
                 .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
                 // Sending to all players with specific permission.
-                .broadcast(receiver -> receiver instanceof ConsoleCommandSender || receiver.hasPermission("azure.command.ban") == true);
+                .broadcast(receiver -> isSilent == false || receiver instanceof ConsoleCommandSender || receiver.hasPermission("azure.command.ban") == true);
         // Logging...
         plugin.getPunishmentsFileLogger().log("Player " + target.getName() + " (" + target.getUniqueId() + ") has been KICKED by " + sender.getName() + " with a reason: " + reason);
         // Forwarding to Discord...
