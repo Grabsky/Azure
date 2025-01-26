@@ -429,6 +429,11 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
         }
 
         @Override
+        public boolean persist() {
+            return true;
+        }
+
+        @Override
         public @NotNull String getAuthor() {
             return "Grabsky";
         }
