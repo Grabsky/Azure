@@ -147,6 +147,9 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("chat_settings.automated_messages.interval")
     public static long CHAT_AUTOMATED_MESSAGES_INTERVAL;
 
+    @JsonNullable @JsonPath("chat_settings.automated_messages.sound")
+    public static @Nullable Sound CHAT_AUTOMATED_MESSAGES_SOUND;
+
     @JsonPath("chat_settings.automated_messages.messages")
     public static List<Component> CHAT_AUTOMATED_MESSAGES_CONTENTS;
 

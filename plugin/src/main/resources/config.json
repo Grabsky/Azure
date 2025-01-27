@@ -83,6 +83,8 @@
             "enabled": false,
             // Interval between messages. In seconds.
             "interval": 600,
+            // Sound to be played when message is sent. Can be null.
+            "sound": { "key": "minecraft:entity.item.pickup", "source": "master", "volume": 0.5, "pitch": 2.0 },
             // Message definitions. Order is shuffled upon plugin reload.
             "messages": [
                 // "One Line",
