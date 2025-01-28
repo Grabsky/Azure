@@ -69,6 +69,7 @@ import cloud.grabsky.azure.user.AzureUserCache;
 import cloud.grabsky.azure.util.FileLogger;
 import cloud.grabsky.azure.world.AzureWorldManager;
 import cloud.grabsky.bedrock.BedrockPlugin;
+import cloud.grabsky.bedrock.helpers.Conditions;
 import cloud.grabsky.commands.RootCommandManager;
 import cloud.grabsky.configuration.ConfigurationHolder;
 import cloud.grabsky.configuration.ConfigurationMapper;
@@ -103,6 +104,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.time.temporal.ChronoUnit;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.jetbrains.annotations.NotNull;
@@ -449,29 +451,71 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
         }
 
         @Override
-        public String onRequest(final @NotNull OfflinePlayer player, final @NotNull String params) {
-            if (params.equalsIgnoreCase("is_idle") == true && player instanceof Player onlinePlayer && onlinePlayer.isOnline() == true) {
-                final boolean isIdle = onlinePlayer.getIdleDuration().get(ChronoUnit.SECONDS) >= PluginConfig.GENERAL_PLAYER_IDLE_TIME;
-                return String.valueOf(isIdle);
-            } else if (params.equalsIgnoreCase("displayname") == true && Azure.getInstance() != null && Azure.getInstance().getUserCache() != null) {
-                if (Azure.getInstance().getUserCache().hasUser(player.getUniqueId()) == true) {
-                    final User user = Azure.getInstance().getUserCache().getUser(player.getUniqueId());
-                    return (user.getDisplayName() != null) ? user.getDisplayName() : user.getName();
+        public String onRequest(final @NotNull OfflinePlayer offlinePlayer, final @NotNull String params) {
+            if (offlinePlayer.isOnline() == false || offlinePlayer.isConnected() == false)
+                return null;
+            // Checking if this OfflinePlayer instance is an instance of Player.
+            if (offlinePlayer instanceof Player player) {
+                final UUID uniqueId = player.getUniqueId();
+
+                // Placeholder: %azure_is_idle%
+                if (params.equalsIgnoreCase("is_idle") == true) {
+                    final boolean isIdle = player.getIdleDuration().get(ChronoUnit.SECONDS) >= PluginConfig.GENERAL_PLAYER_IDLE_TIME;
+                    return String.valueOf(isIdle);
                 }
-            } else if (params.equalsIgnoreCase("is_verified") == true && Azure.getInstance() != null && Azure.getInstance().getUserCache() != null) {
-                if (Azure.getInstance().getUserCache().hasUser(player.getUniqueId()) == true) {
-                    final User user = Azure.getInstance().getUserCache().getUser(player.getUniqueId());
-                    return String.valueOf(user.getDiscordId() != null);
+
+                // Placeholder: %azure_mined_blocks%
+                else if (params.equalsIgnoreCase("total_mined_blocks") == true) {
+                    return calculateTotalBlock(player, Statistic.MINE_BLOCK);
                 }
-            } else if (params.equalsIgnoreCase("max_level") == true && Azure.getInstance() != null && Azure.getInstance().getUserCache() != null) {
-                if (Azure.getInstance().getUserCache().hasUser(player.getUniqueId()) == true) {
-                    final User user = Azure.getInstance().getUserCache().getUser(player.getUniqueId());
-                    return String.valueOf(user.getMaxLevel());
+
+                // Placeholder: %azure_discord_online%
+                else if (params.equalsIgnoreCase("discord_online") == true && Azure.getInstance() != null && Azure.getInstance().getDiscord() != null) {
+                    return ONLINE_MEMBERS.toString();
                 }
-            } else if (params.equalsIgnoreCase("total_mined_blocks") == true) {
-                return calculateTotalBlock(player, Statistic.MINE_BLOCK);
-            } else if (params.equalsIgnoreCase("discord_online") == true && Azure.getInstance() != null && Azure.getInstance().getDiscord() != null)
-                return ONLINE_MEMBERS.toString();
+
+                // Placeholder: %azure_displayname%
+                else if (params.equalsIgnoreCase("displayname") == true && Azure.getInstance() != null && Azure.getInstance().getUserCache() != null) {
+                    if (Azure.getInstance().getUserCache().hasUser(uniqueId) == true) {
+                        // Getting the User instance.
+                        final User user = Azure.getInstance().getUserCache().getUser(uniqueId);
+                        // Returning player name if user is null.
+                        if (user == null || user.getDisplayName() == null) {
+                            // Getting the LuckPerms' User instance.
+                            final net.luckperms.api.model.user.User luckpermsUser = Azure.getInstance().getLuckPerms().getUserManager().getUser(uniqueId);
+                            // Checking if LuckPerms' User instance is not null.
+                            if (luckpermsUser != null) {
+                                // Returning player's name with prefix if present.
+                                return Conditions.requirePresent(luckpermsUser.getCachedData().getMetaData().getPrefix(), "") + player.getName();
+                            }
+                            // Otherwise, returning returning just the player's name.
+                            return player.getName();
+                        }
+                        // Returning the User display name, if present.
+                        else if (user.getDisplayName() != null)
+                            return user.getDisplayName();
+                        // Otherwise, returning player's name.
+                        else return player.getName();
+                    }
+                }
+
+                // Placeholder: %azure_is_verified%
+                else if (params.equalsIgnoreCase("is_verified") == true && Azure.getInstance() != null && Azure.getInstance().getUserCache() != null) {
+                    if (Azure.getInstance().getUserCache().hasUser(uniqueId) == true) {
+                        final User user = Azure.getInstance().getUserCache().getUser(uniqueId);
+                        return String.valueOf(user.getDiscordId() != null);
+                    }
+                }
+
+                // Placeholder: %azure_max_level%
+                else if (params.equalsIgnoreCase("max_level") == true && Azure.getInstance() != null && Azure.getInstance().getUserCache() != null) {
+                    if (Azure.getInstance().getUserCache().hasUser(uniqueId) == true) {
+                        final User user = Azure.getInstance().getUserCache().getUser(uniqueId);
+                        return String.valueOf(user.getMaxLevel());
+                    }
+                }
+
+            }
             return null;
         }
 
