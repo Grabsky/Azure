@@ -70,7 +70,7 @@ public final class UnmuteCommand extends RootCommand {
                 targetUser.unmute(sender);
                 // Sending success message to the sender.
                 Message.of(PluginLocale.COMMAND_UNMUTE_SUCCESS)
-                        .placeholder("player", targetUser)
+                        .placeholder("player", targetUser.getName())
                         .broadcast(receiver -> receiver instanceof ConsoleCommandSender || receiver.hasPermission("azure.command.ban") == true);
                 return;
             }

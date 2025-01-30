@@ -70,7 +70,7 @@ public final class UnbanCommand extends RootCommand {
                 targetUser.unban(sender);
                 // Sending success message to the sender.
                 Message.of(PluginLocale.COMMAND_UNBAN_SUCCESS)
-                        .placeholder("player", targetUser)
+                        .placeholder("player", targetUser.getName())
                         .broadcast(receiver -> receiver instanceof ConsoleCommandSender || receiver.hasPermission("azure.command.ban") == true);
                 return;
             }
