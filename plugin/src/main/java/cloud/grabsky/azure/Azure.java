@@ -102,8 +102,11 @@ import org.javacord.api.entity.user.UserStatus;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.text.SimpleDateFormat;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -408,6 +411,13 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
         // This task updates online members count every minute.
         private static BukkitTask COUNTER_TASK = null;
 
+        // SimpleDateFormat responsible for formatting countdown time.
+        private final static SimpleDateFormat COUNTDOWN_FORMAT = new SimpleDateFormat("HH:mm:ss");
+
+        static {
+            COUNTDOWN_FORMAT.setTimeZone(TimeZone.getTimeZone("Europe/Warsaw"));
+        }
+
         public Placeholders() {
             // Cancelling the task if already running.
             if (COUNTER_TASK != null) {
@@ -452,6 +462,17 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
 
         @Override
         public String onRequest(final @NotNull OfflinePlayer offlinePlayer, final @NotNull String params) {
+
+            // Placeholder: %azure_countdown_[TIMESTAMP]%
+            if (params.startsWith("countdown_") == true) {
+                try {
+                    final String number = params.replace("countdown_", "");
+                    return COUNTDOWN_FORMAT.format(new Date(Math.clamp(Long.parseLong(number) - System.currentTimeMillis(), 0, Long.MAX_VALUE)));
+                } catch (final NumberFormatException e) {
+                    return "00:00:00";
+                }
+            }
+
             if (offlinePlayer.isOnline() == false || offlinePlayer.isConnected() == false)
                 return null;
             // Checking if this OfflinePlayer instance is an instance of Player.
