@@ -344,6 +344,28 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("discord_integrations.punishments_forwarding.webhook_url")
     public static String DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_WEBHOOK_URL;
 
+    @JsonPath("discord_integrations.punishments_forwarding.kick_format")
+    public static String DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_KICK_FORMAT;
+
+    @JsonPath("discord_integrations.punishments_forwarding.mute_format")
+    public static String DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_MUTE_FORMAT;
+
+    @JsonPath("discord_integrations.punishments_forwarding.permanent_mute_format")
+    public static String DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_PERMANENT_MUTE_FORMAT;
+
+    @JsonPath("discord_integrations.punishments_forwarding.ban_format")
+    public static String DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_BAN_FORMAT;
+
+    @JsonPath("discord_integrations.punishments_forwarding.permanent_ban_format")
+    public static String DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_PERMANENT_BAN_FORMAT;
+
+    @JsonPath("discord_integrations.punishments_forwarding.unmute_format")
+    public static String DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_UNMUTE_FORMAT;
+
+    @JsonPath("discord_integrations.punishments_forwarding.unban_format")
+    public static String DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_UNBAN_FORMAT;
+
+
     // Server Links
 
     @JsonPath("server_links")

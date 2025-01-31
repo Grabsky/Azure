@@ -19,6 +19,7 @@ import cloud.grabsky.azure.api.user.User;
 import cloud.grabsky.azure.commands.arguments.IntervalArgument;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.configuration.PluginLocale;
+import cloud.grabsky.azure.user.AzurePunishment;
 import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.bedrock.util.Interval;
 import cloud.grabsky.bedrock.util.Interval.Unit;
@@ -38,6 +39,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.javacord.api.entity.message.WebhookMessageBuilder;
 
 import java.util.UUID;
 
@@ -114,28 +116,52 @@ public final class MuteCommand extends RootCommand {
     }
 
     private static void mute(final @NotNull CommandSender sender, final @NotNull User targetUser, final @Nullable String reason, final @NotNull Interval duration, final boolean isSilent) {
-        // When duration is 0, punishment will be permanent - until manually removed.
+        final String finalReason = (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON;
+
+        // Permanently banning the player when duration is 0.
         if (duration.as(Unit.MILLISECONDS) == Long.MAX_VALUE) {
-            // Muting the player.
-            targetUser.mute(null, reason, sender);
+            final AzurePunishment punishment = (AzurePunishment) targetUser.mute(null, reason, sender);
             // Sending success message to the sender.
             Message.of(PluginLocale.COMMAND_MUTE_SUCCESS_PERMANENT)
                     .placeholder("player", targetUser.getName())
-                    .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
+                    .placeholder("reason", finalReason)
                     // Sending to all players with specific permission.
                     .broadcast(receiver -> isSilent == false || receiver instanceof ConsoleCommandSender || receiver.hasPermission("azure.command.mute") == true);
-            // Exiting the command block.
-            return;
+            // Forwarding to Discord...
+            if (isSilent == false && PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_WEBHOOK_URL.isEmpty() == false) {
+                // Constructing the message.
+                final String message = PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_PERMANENT_MUTE_FORMAT
+                        .replace("<name>", targetUser.getName())
+                        .replace("<issuer>", punishment.getIssuer())
+                        .replace("<reason>", finalReason);
+                // Forwarding the message through configured webhook.
+                if (message.isEmpty() == false)
+                    new WebhookMessageBuilder().setContent(message).sendSilently(Azure.getInstance().getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_WEBHOOK_URL);
+            }
+
+        // Otherwise, banning player temporarily.
+        } else {
+            final AzurePunishment punishment = (AzurePunishment) targetUser.mute(duration, reason, sender);
+            // Sending success message to the sender.
+            Message.of(PluginLocale.COMMAND_MUTE_SUCCESS)
+                    .placeholder("player", targetUser.getName())
+                    .placeholder("duration_left", duration)
+                    .placeholder("reason", finalReason)
+                    // Sending to all players with specific permission.
+                    .broadcast(receiver -> isSilent == false || receiver instanceof ConsoleCommandSender || receiver.hasPermission("azure.command.mute") == true);
+            // Forwarding to Discord...
+            if (isSilent == false && PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_WEBHOOK_URL.isEmpty() == false) {
+                // Constructing the message.
+                final String message = PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_MUTE_FORMAT
+                        .replace("<name>", targetUser.getName())
+                        .replace("<issuer>", punishment.getIssuer())
+                        .replace("<duration>", duration.toString())
+                        .replace("<reason>", finalReason);
+                // Forwarding the message through configured webhook.
+                if (message.isEmpty() == false)
+                    new WebhookMessageBuilder().setContent(message).sendSilently(Azure.getInstance().getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_WEBHOOK_URL);
+            }
         }
-        // Muting the player temporarily.
-        targetUser.mute(duration, reason, sender);
-        // Sending success message to the sender.
-        Message.of(PluginLocale.COMMAND_MUTE_SUCCESS)
-                .placeholder("player", targetUser.getName())
-                .placeholder("duration_left", duration)
-                .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
-                // Sending to all players with specific permission.
-                .broadcast(receiver -> isSilent == false || receiver instanceof ConsoleCommandSender || receiver.hasPermission("azure.command.mute") == true);
     }
 
 }

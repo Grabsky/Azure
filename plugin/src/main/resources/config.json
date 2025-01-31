@@ -242,7 +242,15 @@
             // Whether to enable punishment logging to Discord server.
             "enabled": false,
             // Discord webhook URL. Keep it secure.
-            "webhook_url": ""
+            "webhook_url": "",
+            // Punishment message formats.
+            "kick_format": "Player **<name>** has been kicked for **<reason>**.",
+            "mute_format": "Player **<name>** has been muted (**<duration>**) for **<reason>**.",
+            "permanent_mute_format": "Player **<name>** has been permanently muted for **<reason>**.",
+            "ban_format": "Player **<name>** has been banned (**<duration>**) for **<reason>**.",
+            "permanent_ban_format": "Player **<name>** has been permanently banned for **<reason>**.",
+            "unmute_format": "Player **<name>** has been unmuted.",
+            "unban_format": "Player **<name>** has been unbanned."
         }
     },
     // Server links.

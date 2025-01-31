@@ -19,6 +19,7 @@ import cloud.grabsky.azure.api.user.User;
 import cloud.grabsky.azure.commands.arguments.IntervalArgument;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.configuration.PluginLocale;
+import cloud.grabsky.azure.user.AzurePunishment;
 import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.bedrock.util.Interval;
 import cloud.grabsky.bedrock.util.Interval.Unit;
@@ -38,6 +39,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.javacord.api.entity.message.WebhookMessageBuilder;
 
 import java.util.UUID;
 
@@ -110,46 +112,65 @@ public final class BanCommand extends RootCommand {
     }
 
     private static void ban(final @NotNull CommandSender sender, final @NotNull OfflinePlayer target, final @NotNull User targetUser, final @Nullable String reason, final @NotNull Interval duration, final boolean isSilent) {
-        // When duration is 0, punishment will be permanent - until manually removed.
+        final String finalReason = (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON;
+
+        // Permanently banning the player when duration is 0.
         if (duration.as(Unit.MILLISECONDS) == Long.MAX_VALUE) {
-            // Banning the player. Player will be kicked manually for the sake of customizable message.
-            targetUser.ban(null, reason, sender);
+            final AzurePunishment punishment = (AzurePunishment) targetUser.ban(null, reason, sender);
             // Kicking with custom message.
             if (target.isOnline() && target instanceof Player onlineTarget) {
                 onlineTarget.kick(
-                        Message.of(PluginLocale.COMMAND_BAN_DISCONNECT_MESSAGE_PERMANENT)
-                                .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
-                                .parse()
+                        Message.of(PluginLocale.COMMAND_BAN_DISCONNECT_MESSAGE_PERMANENT).placeholder("reason", finalReason).parse()
                 );
             }
             // Sending success message to the sender.
             Message.of(PluginLocale.COMMAND_BAN_SUCCESS_PERMANENT)
                     .placeholder("player", targetUser.getName())
-                    .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
+                    .placeholder("reason", finalReason)
                     // Sending to all players with specific permission.
                     .broadcast(receiver ->  isSilent == false || receiver instanceof ConsoleCommandSender || receiver.hasPermission("azure.command.ban") == true);
-            // Exiting the command block.
-            return;
-        }
-        // Banning the player temporarily. Player will be kicked manually for the sake of customizable message.
-        targetUser.ban(duration, reason, sender);
-        // Kicking with custom message.
-        if (target.isOnline() && target instanceof Player onlineTarget) {
+            // Forwarding to Discord...
+            if (isSilent == false && PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_WEBHOOK_URL.isEmpty() == false) {
+                // Constructing the message.
+                final String message = PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_PERMANENT_BAN_FORMAT
+                        .replace("<name>", targetUser.getName())
+                        .replace("<issuer>", punishment.getIssuer())
+                        .replace("<reason>", finalReason);
+                // Forwarding the message through configured webhook.
+                if (message.isEmpty() == false)
+                    new WebhookMessageBuilder().setContent(message).sendSilently(Azure.getInstance().getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_WEBHOOK_URL);
+            }
+
+        // Otherwise, banning player temporarily.
+        } else {
+            final AzurePunishment punishment = (AzurePunishment) targetUser.ban(duration, reason, sender);
             // Kicking with custom message.
-            onlineTarget.kick(
-                    Message.of(PluginLocale.COMMAND_BAN_DISCONNECT_MESSAGE)
-                            .placeholder("duration_left", duration.toString())
-                            .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
-                            .parse()
-            );
+            if (target.isOnline() && target instanceof Player onlineTarget) {
+                // Kicking with custom message.
+                onlineTarget.kick(
+                        Message.of(PluginLocale.COMMAND_BAN_DISCONNECT_MESSAGE).placeholder("duration_left", duration.toString()).placeholder("reason", finalReason).parse()
+                );
+            }
+            // Sending success message to the sender.
+            Message.of(PluginLocale.COMMAND_BAN_SUCCESS)
+                    .placeholder("player", targetUser.getName())
+                    .placeholder("duration_left", duration.toString())
+                    .placeholder("reason", finalReason)
+                    // Sending to all players with specific permission.
+                    .broadcast(receiver -> isSilent == false || receiver instanceof ConsoleCommandSender || receiver.hasPermission("azure.command.ban") == true);
+            // Forwarding to Discord...
+            if (isSilent == false && PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_WEBHOOK_URL.isEmpty() == false) {
+                // Constructing the message.
+                final String message = PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_BAN_FORMAT
+                        .replace("<name>", targetUser.getName())
+                        .replace("<issuer>", punishment.getIssuer())
+                        .replace("<duration>", duration.toString())
+                        .replace("<reason>", finalReason);
+                // Forwarding the message through configured webhook.
+                if (message.isEmpty() == false)
+                    new WebhookMessageBuilder().setContent(message).sendSilently(Azure.getInstance().getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_WEBHOOK_URL);
+            }
         }
-        // Sending success message to the sender.
-        Message.of(PluginLocale.COMMAND_BAN_SUCCESS)
-                .placeholder("player", targetUser.getName())
-                .placeholder("duration_left", duration.toString())
-                .placeholder("reason", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON)
-                // Sending to all players with specific permission.
-                .broadcast(receiver -> isSilent == false || receiver instanceof ConsoleCommandSender || receiver.hasPermission("azure.command.ban") == true);
     }
 
 }

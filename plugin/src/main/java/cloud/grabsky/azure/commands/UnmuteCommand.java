@@ -16,6 +16,7 @@ package cloud.grabsky.azure.commands;
 
 import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.api.user.User;
+import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.commands.ArgumentQueue;
@@ -30,6 +31,8 @@ import cloud.grabsky.commands.exception.MissingInputException;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.Player;
+import org.javacord.api.entity.message.WebhookMessageBuilder;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnknownNullability;
@@ -43,9 +46,11 @@ public final class UnmuteCommand extends RootCommand {
 
     @Override
     public @NotNull CompletionsProvider onTabComplete(final @NotNull RootCommandContext context, final int index) {
-        return (index == 0)
-                ? (ctx) -> plugin.getUserCache().getUsers().stream().filter(User::isMuted).map(User::getName).toList()
-                : CompletionsProvider.EMPTY;
+        return switch (index) {
+            case 0 -> (_) -> plugin.getUserCache().getUsers().stream().filter(User::isMuted).map(User::getName).toList();
+            case 1 -> context.getInput().getInput().trim().endsWith("--silent") == false ? CompletionsProvider.of("--silent") : CompletionsProvider.EMPTY;
+            default -> CompletionsProvider.EMPTY;
+        };
     }
 
     private static final ExceptionHandler.Factory UNMUTE_USAGE = (exception) -> {
@@ -62,6 +67,8 @@ public final class UnmuteCommand extends RootCommand {
         final OfflinePlayer target = arguments.next(OfflinePlayer.class).asRequired(UNMUTE_USAGE);
         // ...
         final User targetUser = plugin.getUserCache().getUser(target.getUniqueId());
+        // Whether the action is silent.
+        final boolean isSilent = arguments.next(String.class).asOptional("--non-silent").equalsIgnoreCase("--silent");
         // ...
         if (targetUser != null) {
             // Checking if player is muted.
@@ -71,7 +78,17 @@ public final class UnmuteCommand extends RootCommand {
                 // Sending success message to the sender.
                 Message.of(PluginLocale.COMMAND_UNMUTE_SUCCESS)
                         .placeholder("player", targetUser.getName())
-                        .broadcast(receiver -> receiver instanceof ConsoleCommandSender || receiver.hasPermission("azure.command.ban") == true);
+                        .broadcast(receiver -> isSilent == false || receiver instanceof ConsoleCommandSender || receiver.hasPermission("azure.command.ban") == true);
+                // Forwarding to Discord...
+                if (isSilent == false && PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_WEBHOOK_URL.isEmpty() == false) {
+                    // Constructing the message.
+                    final String message = PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_UNMUTE_FORMAT
+                            .replace("<name>", targetUser.getName())
+                            .replace("<issuer>", sender instanceof Player ? sender.getName() : "Console");
+                    // Forwarding the message through configured webhook.
+                    if (message.isEmpty() == false)
+                        new WebhookMessageBuilder().setContent(message).sendSilently(Azure.getInstance().getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_WEBHOOK_URL);
+                }
                 return;
             }
             // Sending failure message to the sender.
