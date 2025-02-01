@@ -175,12 +175,10 @@ public final class ChatManager implements Listener, MessageCreateListener {
             // Getting the next message.
             final Component message = AUTOMATED_MESSAGES_ITERATOR.next();
             // Sending message to all online players. Not using Server#sendMessage because this will make it appear in the console.
-            Bukkit.getOnlinePlayers().forEach(player -> {
-                player.sendMessage(message);
-                // Playing sound, if configured.
-                if (PluginConfig.CHAT_AUTOMATED_MESSAGES_SOUND != null)
-                    Bukkit.getServer().playSound(PluginConfig.CHAT_AUTOMATED_MESSAGES_SOUND);
-            });
+            Bukkit.getOnlinePlayers().forEach(player -> player.sendMessage(message));
+            // Playing sound, if configured.
+            if (PluginConfig.CHAT_AUTOMATED_MESSAGES_SOUND != null)
+                Bukkit.getServer().playSound(PluginConfig.CHAT_AUTOMATED_MESSAGES_SOUND);
             // ...
             return true;
         });
