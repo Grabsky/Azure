@@ -80,9 +80,7 @@ public final class TeleportCommand extends RootCommand {
         // ...
         final Player target = arguments.next(Player.class).asRequired(TELEPORT_USAGE);
         final Player destination = arguments.next(Player.class).asRequired(TELEPORT_USAGE);
-        final boolean isVerbose = arguments.next(String.class).asOptional("--not-verbose").equalsIgnoreCase("--verbose")
-                || target.canSee(destination) == false
-                || destination.canSee(target) == false;
+        final boolean isVerbose = arguments.next(String.class).asOptional("--not-verbose").equalsIgnoreCase("--verbose");
         // ...
         if (target == destination) {
             Message.of(PluginLocale.TELEPORT_PLAYER_FAILURE_TARGETS_ARE_THE_SAME).send(sender);
