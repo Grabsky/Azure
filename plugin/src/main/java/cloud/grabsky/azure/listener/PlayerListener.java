@@ -272,8 +272,12 @@ public final class PlayerListener implements Listener {
         if (PluginConfig.CHAT_USE_PLUGIN_DEATH_MESSAGES == true && plugin.getUserCache().getUser(event.getPlayer()).isVanished() == false) {
             if (event.deathMessage() instanceof TranslatableComponent translatable) {
                 final String text = PluginLocale.DEATH_MESSAGES.getOrDefault(translatable.key(), PluginLocale.DEATH_MESSAGES_DEFAULT);
+                // Getting LuckPerms' cached meta-data. This should never be null despite the warning.
+                final CachedMetaData metaData = plugin.getLuckPerms().getUserManager().getUser(event.getPlayer().getUniqueId()).getCachedData().getMetaData();
                 // Preparing the message.
                 final Message.StringMessage message = Message.of(text)
+                        .replace("<prefix>", requirePresent(metaData.getPrefix(), ""))
+                        .replace("<suffix>", requirePresent(metaData.getSuffix(), ""))
                         .placeholder("victim", event.getPlayer())
                         .placeholder("victim_displayname", event.getPlayer().displayName())
                         .placeholder("attacker", (event.getDamageSource().getCausingEntity() != null) ? event.getDamageSource().getCausingEntity().getName() : "N/A")
@@ -291,6 +295,8 @@ public final class PlayerListener implements Listener {
                     // Setting message placeholders.
                     final String webhookMessage = MiniMessage.miniMessage().stripTags(text)
                             .replace("› ", "") // Very dirty workaround but this had to be done ASAP; Will be improved in the future.
+                            .replace("<prefix>", "")
+                            .replace("<suffix>", "")
                             .replace("<victim>", "**" + event.getPlayer().getName() + "**")
                             .replace("<victim_displayname>", "**" + event.getPlayer().getName() + "**")
                             .replace("<attacker>", "**" + (event.getDamageSource().getCausingEntity() != null ? event.getDamageSource().getCausingEntity().getName() : "") + "**")

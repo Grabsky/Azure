@@ -20,9 +20,9 @@
         // Chat cooldown in milliseconds. Set to 0 to disable. Bypass: azure.plugin.chat.can_bypass_cooldown
         "cooldown": 1000,
         // Message to be sent when player joins the server.
-        "server_join_message": "<dark_gray>› <gray><suffix><player><gray> dołączył do gry.",
+        "server_join_message": "<dark_gray>› <gray><prefix><player><reset><gray> dołączył do gry.",
         // Message to be sent when player leaves the server.
-        "server_quit_message": "<dark_gray>› <gray><suffix><player><gray> wyszedł z gry.",
+        "server_quit_message": "<dark_gray>› <gray><prefix><player><reset><gray> wyszedł z gry.",
         // Whether death messages should be hidden.
         "hide_death_messages": false,
         // Whether to use plugin death messages. Must also be enabled with setting above.
