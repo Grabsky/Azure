@@ -365,6 +365,23 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("discord_integrations.punishments_forwarding.unban_format")
     public static String DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_UNBAN_FORMAT;
 
+    // Discord Integrations > Auction Listings Forwarding
+
+    @JsonPath("discord_integrations.auction_listings_forwarding.enabled")
+    public static boolean DISCORD_INTEGRATIONS_AUCTION_LISTINGS_FORWARDING_ENABLED;
+
+    @JsonPath("discord_integrations.auction_listings_forwarding.webhook_url")
+    public static String DISCORD_INTEGRATIONS_AUCTION_LISTINGS_FORWARDING_WEBHOOK_URL;
+
+    @JsonPath("discord_integrations.auction_listings_forwarding.webhook_username")
+    public static String DISCORD_INTEGRATIONS_AUCTION_LISTINGS_FORWARDING_WEBHOOK_USERNAME;
+
+    @JsonPath("discord_integrations.auction_listings_forwarding.webhook_avatar")
+    public static String DISCORD_INTEGRATIONS_AUCTION_LISTINGS_FORWARDING_WEBHOOK_AVATAR;
+
+    @JsonPath("discord_integrations.auction_listings_forwarding.format")
+    public static String DISCORD_INTEGRATIONS_AUCTION_LISTINGS_FORWARDING_FORMAT;
+
 
     // Server Links
 

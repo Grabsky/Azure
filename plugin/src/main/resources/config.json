@@ -251,6 +251,19 @@
             "permanent_ban_format": "Player **<name>** has been permanently banned for **<reason>**.",
             "unmute_format": "Player **<name>** has been unmuted.",
             "unban_format": "Player **<name>** has been unbanned."
+        },
+        // Auction listing messages forwarding to Discord servers. Requires ExcellentShop to work.
+        "auction_listings_forwarding": {
+            // Whether to enable this integration.
+            "enabled": false,
+            // Discord webhook URL. Keep it secure.
+            "webhook_url": "",
+            // Discord webhook username. Supports PlaceholderAPI.
+            "webhook_username": "",
+            // Discord webhook avatar URL. Supports PlaceholderAPI.
+            "webhook_avatar": "",
+            // Message format. Supports PlaceholderAPI.
+            "format": "Player **%player_name%** has listed **<amount>x <item>** to the auction house."
         }
     },
     // Server links.

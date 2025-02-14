@@ -7,6 +7,8 @@ repositories {
     // Repository containing the 'PlaceholderAPI' dependency.
     maven { url = "https://repo.extendedclip.com/content/repositories/placeholderapi/" }
     maven { url = "https://repo.auroramc.gg/repository/maven-public/" }
+    // Repository containing the 'ExcellentShop' dependency.
+    maven { url = "https://repo.nightexpressdev.com/releases/" }
 }
 
 dependencies {
@@ -31,6 +33,8 @@ dependencies {
     // Aurora and AuroraQuests
     compileOnly("gg.auroramc:Aurora:2.1.2")
     compileOnly("gg.auroramc:AuroraQuests:1.3.14")
+    // ExcellentShop (Provided)
+    compileOnly("su.nightexpress.excellentshop:Core:4.14.0")
     // MorePersistentDataTypes
     implementation("com.jeff-media:MorePersistentDataTypes:2.4.0")
 }
@@ -52,6 +56,7 @@ paper {
         "PlaceholderAPI" { load = "BEFORE"; required = true }
         // Optional
         "AuroraQuests"   { load = "BEFORE"; required = false }
+        "ExcellentShop"  { load = "BEFORE"; required = false }
     }
 }
 

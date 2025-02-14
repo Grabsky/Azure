@@ -63,6 +63,7 @@ import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.azure.configuration.adapters.BossBarAdapterFactory;
 import cloud.grabsky.azure.configuration.adapters.TagResolverAdapter;
 import cloud.grabsky.azure.discord.VerificationManager;
+import cloud.grabsky.azure.listener.ExcellentShopListener;
 import cloud.grabsky.azure.listener.PlayerListener;
 import cloud.grabsky.azure.resourcepack.ResourcePackManager;
 import cloud.grabsky.azure.user.AzureUserCache;
@@ -275,7 +276,11 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
         // Registering PAPI placeholders...
         Placeholders.INSTANCE.register();
         // Registering AuroraQuests integration...
-        new AuroraQuestsIntegration(this).initialize();
+        if (this.getServer().getPluginManager().isPluginEnabled("AuroraQuests") == true)
+            new AuroraQuestsIntegration(this).initialize();
+        // Registering ExcellentShop integration...
+        if (this.getServer().getPluginManager().isPluginEnabled("ExcellentShop") == true)
+            this.getServer().getPluginManager().registerEvents(new ExcellentShopListener(), this);
     }
 
     @Override @SneakyThrows
