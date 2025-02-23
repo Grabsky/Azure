@@ -63,7 +63,8 @@ import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.azure.configuration.adapters.BossBarAdapterFactory;
 import cloud.grabsky.azure.configuration.adapters.TagResolverAdapter;
 import cloud.grabsky.azure.discord.VerificationManager;
-import cloud.grabsky.azure.listener.ExcellentShopListener;
+import cloud.grabsky.azure.integrations.AuroraQuestsIntegration;
+import cloud.grabsky.azure.integrations.ExcellentShopIntegration;
 import cloud.grabsky.azure.listener.PlayerListener;
 import cloud.grabsky.azure.resourcepack.ResourcePackManager;
 import cloud.grabsky.azure.user.AzureUserCache;
@@ -77,8 +78,6 @@ import cloud.grabsky.configuration.ConfigurationMapper;
 import cloud.grabsky.configuration.adapter.AbstractEnumJsonAdapter;
 import cloud.grabsky.configuration.exception.ConfigurationMappingException;
 import cloud.grabsky.configuration.paper.PaperConfigurationMapper;
-import gg.auroramc.quests.api.AuroraQuestsProvider;
-import gg.auroramc.quests.api.quest.QuestManager;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -116,7 +115,6 @@ import org.jetbrains.annotations.Nullable;
 
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
 import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
@@ -276,11 +274,9 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
         // Registering PAPI placeholders...
         Placeholders.INSTANCE.register();
         // Registering AuroraQuests integration...
-        if (this.getServer().getPluginManager().isPluginEnabled("AuroraQuests") == true)
-            new AuroraQuestsIntegration(this).initialize();
+        AuroraQuestsIntegration.initialize(this);
         // Registering ExcellentShop integration...
-        if (this.getServer().getPluginManager().isPluginEnabled("ExcellentShop") == true)
-            this.getServer().getPluginManager().registerEvents(new ExcellentShopListener(), this);
+        ExcellentShopIntegration.initialize(this);
     }
 
     @Override @SneakyThrows
@@ -560,32 +556,6 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
             });
             // Returning...
             return Long.toString(total.get());
-        }
-
-    }
-
-    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-    public static final class AuroraQuestsIntegration {
-
-        private final Azure plugin;
-        private QuestManager quests = null;
-
-        public void initialize() {
-            if (plugin.getServer().getPluginManager().isPluginEnabled("AuroraQuests") == true)
-                this.quests = AuroraQuestsProvider.getQuestManager();
-            else plugin.getLogger().warning("AuroraQuests integration could not be initialized. (DEPENDENCY_NOT_ENABLED)");
-            //
-            if (quests == null)
-                return;
-            // Scheduling an asynchronous repeating task which progresses players in PLAY_ONE_MINUTE task every minute they play on a server. (Technically not true, but this implementation is close enough)
-            plugin.getBedrockScheduler().repeatAsync(0L, 1200L, Long.MAX_VALUE, (_) -> {
-                // Iterating over all online players and adding one minute to their playtime.
-                plugin.getServer().getOnlinePlayers().forEach(it -> {
-                    quests.progress(it, "PLAY_ONE_MINUTE", 1.0, null);
-                });
-                // ...
-                return true;
-            });
         }
 
     }

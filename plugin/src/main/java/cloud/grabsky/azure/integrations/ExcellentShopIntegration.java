@@ -1,4 +1,4 @@
-package cloud.grabsky.azure.listener;
+package cloud.grabsky.azure.integrations;
 
 import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.configuration.PluginConfig;
@@ -16,7 +16,23 @@ import org.jetbrains.annotations.NotNull;
 
 import lombok.SneakyThrows;
 
-public final class ExcellentShopListener implements Listener {
+public enum ExcellentShopIntegration implements Listener {
+    INSTANCE; // SINGLETON
+
+    private static boolean IS_INITIALIZED = false;
+
+    public static boolean initialize(final @NotNull Azure plugin) {
+        if (IS_INITIALIZED == false && plugin.getServer().getPluginManager().getPlugin("ExcellentShop") != null) {
+            plugin.getServer().getPluginManager().registerEvents(ExcellentShopIntegration.INSTANCE, plugin);
+            // Marking the integration as initialized.
+            IS_INITIALIZED = true;
+            // Returning true if integration was successfully initialized.
+            return true;
+        }
+        // Logging warning and returning false if integration could not be initialized.
+        plugin.getLogger().warning("ExcellentShop integration could not be initialized. (DEPENDENCY_NOT_ENABLED)");
+        return false;
+    }
 
     /* DISCORD INTEGRATIONS - FORWARDING AUCTION LISTINGS */
 
