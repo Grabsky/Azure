@@ -95,6 +95,11 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("discord_verification_failure_already_verified")
     public static String DISCORD_VERIFICATION_FAILURE_VERIFIED;
 
+    // Command Cooldown
+
+    @JsonPath("command_on_cooldown")
+    public static String COMMAND_ON_COOLDOWN;
+
     // Death
 
     @JsonPath("death_messages.default")

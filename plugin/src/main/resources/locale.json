@@ -18,6 +18,8 @@
     "discord_verification_failure_invalid_code": "Podany kod jest nieprawidłowy lub upłynął czas na weryfikację.",
     "discord_verification_failure_already_verified": "Twoje konto jest już zweryfikowane. Wpisz komendę **/unverify** w grze, aby cofnąć weryfikację.\n\nJeżeli nie masz dostępu do konta, skontaktuj się z administracją serwera.",
     // ...
+    "command_on_cooldown": "<dark_gray>› <red>Musisz poczekać <time_left> przed ponownym użyciem tej komendy.",
+    // ...
     "death_messages": {
         // Default death message is used when specialized message cannot be found.
         "default": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> zginął.",
