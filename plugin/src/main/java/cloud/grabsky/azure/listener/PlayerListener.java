@@ -15,8 +15,10 @@
 package cloud.grabsky.azure.listener;
 
 import cloud.grabsky.azure.Azure;
+import cloud.grabsky.azure.api.event.ResourcePackLoadEvent;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.configuration.PluginLocale;
+import cloud.grabsky.azure.resourcepack.ResourcePackManager;
 import cloud.grabsky.azure.user.AzureUser;
 import cloud.grabsky.azure.user.AzureUserCache;
 import cloud.grabsky.bedrock.components.ComponentBuilder;
@@ -25,6 +27,7 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.luckperms.api.cacheddata.CachedMetaData;
+import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -44,10 +47,12 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.world.PortalCreateEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
 
 import java.net.URI;
 import java.util.HashSet;
+import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -74,7 +79,7 @@ public final class PlayerListener implements Listener {
             // Getting the primary world.
             final World primaryWorld = plugin.getWorldManager().getPrimaryWorld();
             // Setting the respawn location.
-            plugin.getBedrockScheduler().run(1L, (task) -> player.teleportAsync(plugin.getWorldManager().getSpawnPoint(primaryWorld)));
+            plugin.getBedrockScheduler().run(1L, (_) -> player.teleportAsync(plugin.getWorldManager().getSpawnPoint(primaryWorld)));
         }
         // Clearing title. (if enabled)
         if (PluginConfig.GENERAL_CLEAR_TITLE_ON_JOIN == true)
@@ -83,17 +88,29 @@ public final class PlayerListener implements Listener {
         event.joinMessage(null);
         // Sending join message to audience that can see the player associated with the event.
         if (PluginConfig.CHAT_SERVER_JOIN_MESSAGE.isBlank() == false) {
-            // Getting LuckPerms' cached meta-data. This should never be null despite the warning.
-            final CachedMetaData metaData = plugin.getLuckPerms().getUserManager().getUser(player.getUniqueId()).getCachedData().getMetaData();
-            // Sending join message to the audience.
-            Message.of(PluginConfig.CHAT_SERVER_JOIN_MESSAGE)
-                    .placeholder("player", player)
-                    .placeholder("group", requirePresent(metaData.getPrimaryGroup(), ""))
-                    .replace("<prefix>", requirePresent(metaData.getPrefix(), ""))
-                    .replace("<suffix>", requirePresent(metaData.getSuffix(), ""))
-                    .placeholder("displayname", player.displayName())
-                    .broadcast(audience -> audience.canSee(player) == true);
+            // Continuing only if resource-packs are not being sent on join. This means message should be postponed and handled within ResourcePackLoadEvent listener.
+            if (PluginConfig.RESOURCE_PACK_SEND_ON_JOIN == false) {
+                // Getting LuckPerms' cached meta-data. This should never be null despite the warning.
+                final CachedMetaData metaData = plugin.getLuckPerms().getUserManager().getUser(player.getUniqueId()).getCachedData().getMetaData();
+                // Sending join message to the audience.
+                Message.of(PluginConfig.CHAT_SERVER_JOIN_MESSAGE)
+                        .placeholder("player", player)
+                        .placeholder("group", requirePresent(metaData.getPrimaryGroup(), ""))
+                        .replace("<prefix>", requirePresent(metaData.getPrefix(), ""))
+                        .replace("<suffix>", requirePresent(metaData.getSuffix(), ""))
+                        .placeholder("displayname", player.displayName())
+                        .broadcast(audience -> audience.canSee(player) == true);
+            }
         }
+        // Setting total number of resource-packs loaded by this player to 0. This is mainly for ease of use with other plugins.
+        event.getPlayer().setMetadata("total_loaded_resource-packs", new FixedMetadataValue(plugin, 0));
+        // Sending resource pack 1 tick after event is fired. (if enabled)
+        if (PluginConfig.RESOURCE_PACK_SEND_ON_JOIN == true) {
+            // Sending resource-packs to the player. (next tick)
+            plugin.getBedrockScheduler().run(1L, (_) -> plugin.getResourcePackManager().sendResourcePacks(player));
+        }
+        // Dispatching configured commands.
+        PluginConfig.COMMAND_TRIGGERS_ON_JOIN.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), PlaceholderAPI.setPlaceholders(event.getPlayer(), command)));
     }
 
     @EventHandler // We need to somehow ensure this is called AFTER AzureUserCache#onPlayerJoin(...) listener. I guess registration order is enough?
@@ -103,17 +120,63 @@ public final class PlayerListener implements Listener {
         event.quitMessage(null);
         // Sending quit message to audience that can see the player associated with the event.
         if (PluginConfig.CHAT_SERVER_QUIT_MESSAGE.isBlank() == false) {
+            // Checking if player has successfully loaded all resource-packs before sending a quit message.
+            if (PluginConfig.RESOURCE_PACK_SEND_ON_JOIN == false || ResourcePackManager.isLoadingPacks(event.getPlayer()) == false) {
+                // Getting LuckPerms' cached meta-data. This should never be null despite the warning.
+                final CachedMetaData metaData = plugin.getLuckPerms().getUserManager().getUser(player.getUniqueId()).getCachedData().getMetaData();
+                // Sending quit message to the audience.
+                Message.of(PluginConfig.CHAT_SERVER_QUIT_MESSAGE)
+                        .placeholder("player", player)
+                        .placeholder("group", requirePresent(metaData.getPrimaryGroup(), ""))
+                        .replace("<prefix>", requirePresent(metaData.getPrefix(), ""))
+                        .replace("<suffix>", requirePresent(metaData.getSuffix(), ""))
+                        .placeholder("displayname", player.displayName())
+                        .broadcast(audience -> audience.canSee(player) == true);
+            }
+        }
+        // Dispatching configured commands.
+        PluginConfig.COMMAND_TRIGGERS_ON_QUIT.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), PlaceholderAPI.setPlaceholders(event.getPlayer(), command)));
+    }
+
+    /* COMMAND TRIGGERS - RESOURCE PACK */
+
+    @EventHandler @SneakyThrows
+    public void onResourcePackLoad(final @NotNull ResourcePackLoadEvent event) {
+        if (event.isInitial() == true && PluginConfig.RESOURCE_PACK_SEND_ON_JOIN == true) {
+            final Player player = event.getPlayer();
+            final UUID uniqueId = event.getPlayer().getUniqueId();
             // Getting LuckPerms' cached meta-data. This should never be null despite the warning.
-            final CachedMetaData metaData = plugin.getLuckPerms().getUserManager().getUser(player.getUniqueId()).getCachedData().getMetaData();
-            // Sending quit message to the audience.
-            Message.of(PluginConfig.CHAT_SERVER_QUIT_MESSAGE)
+            final CachedMetaData metaData = plugin.getLuckPerms().getUserManager().getUser(uniqueId).getCachedData().getMetaData();
+            // Sending join message to the audience.
+            Message.of(PluginConfig.CHAT_SERVER_JOIN_MESSAGE)
                     .placeholder("player", player)
                     .placeholder("group", requirePresent(metaData.getPrimaryGroup(), ""))
                     .replace("<prefix>", requirePresent(metaData.getPrefix(), ""))
                     .replace("<suffix>", requirePresent(metaData.getSuffix(), ""))
                     .placeholder("displayname", player.displayName())
                     .broadcast(audience -> audience.canSee(player) == true);
+            // Continuing only if resource-packs are not being sent on join. This means message should be postponed and handled within ResourcePackLoadEvent listener.
+            if (PluginConfig.RESOURCE_PACK_SEND_ON_JOIN == true) {
+                // Forwarding message to webhook...
+                if (plugin.getUserCache().getUser(event.getPlayer()).isVanished() == false) {
+                    // Setting message placeholders.
+                    final String message = PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_JOIN_MESSAGE_FORMAT);
+                    // Creating new instance of WebhookMessageBuilder.
+                    final WebhookMessageBuilder builder = new WebhookMessageBuilder().setContent(message);
+                    // Setting username if specified.
+                    if (PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_USERNAME.isEmpty() == false)
+                        builder.setDisplayName(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_USERNAME));
+                    // Setting avatar if specified.
+                    if (PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
+                        builder.setDisplayAvatar(new URI(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_AVATAR)).toURL());
+                    // Sending the message.
+                    builder.sendSilently(plugin.getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_URL);
+                }
+            }
         }
+        // Dispatching configured commands.
+        (event.isInitial() == true ? PluginConfig.COMMAND_TRIGGERS_ON_RESOURCES_FIRST_LOAD : PluginConfig.COMMAND_TRIGGERS_ON_RESOURCES_LOAD)
+                .forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), PlaceholderAPI.setPlaceholders(event.getPlayer(), command)));
     }
 
     /* WORLD RESPAWN - Respawns players on spawn-point of the main world. */
@@ -137,20 +200,23 @@ public final class PlayerListener implements Listener {
         // Skipping in case discord integrations are not enabled or misconfigured.
         if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_URL.isEmpty() == true)
             return;
-        // Forwarding message to webhook...
-        if (plugin.getUserCache().getUser(event.getPlayer()).isVanished() == false) {
-            // Setting message placeholders.
-            final String message = PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_JOIN_MESSAGE_FORMAT);
-            // Creating new instance of WebhookMessageBuilder.
-            final WebhookMessageBuilder builder = new WebhookMessageBuilder().setContent(message);
-            // Setting username if specified.
-            if (PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_USERNAME.isEmpty() == false)
-                builder.setDisplayName(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_USERNAME));
-            // Setting avatar if specified.
-            if (PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
-                builder.setDisplayAvatar(new URI(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_AVATAR)).toURL());
-            // Sending the message.
-            builder.sendSilently(plugin.getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_URL);
+        // Continuing only if resource-packs are not being sent on join. This means message should be postponed and handled within ResourcePackLoadEvent listener.
+        if (PluginConfig.RESOURCE_PACK_SEND_ON_JOIN == false) {
+            // Forwarding message to webhook...
+            if (plugin.getUserCache().getUser(event.getPlayer()).isVanished() == false) {
+                // Setting message placeholders.
+                final String message = PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_JOIN_MESSAGE_FORMAT);
+                // Creating new instance of WebhookMessageBuilder.
+                final WebhookMessageBuilder builder = new WebhookMessageBuilder().setContent(message);
+                // Setting username if specified.
+                if (PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_USERNAME.isEmpty() == false)
+                    builder.setDisplayName(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_USERNAME));
+                // Setting avatar if specified.
+                if (PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
+                    builder.setDisplayAvatar(new URI(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_AVATAR)).toURL());
+                // Sending the message.
+                builder.sendSilently(plugin.getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_URL);
+            }
         }
     }
 
@@ -161,6 +227,9 @@ public final class PlayerListener implements Listener {
     public void onPlayerQuitForward(final @NotNull PlayerQuitEvent event) {
         // Skipping in case discord integrations are not enabled or misconfigured.
         if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_URL.isEmpty() == true)
+            return;
+        // Skipping in case player has not loaded resource-packs.
+        if (PluginConfig.RESOURCE_PACK_SEND_ON_JOIN == true && ResourcePackManager.isLoadingPacks(event.getPlayer()) == true)
             return;
         // Forwarding message to webhook...
         if (plugin.getUserCache().getUser(event.getPlayer()).isVanished() == false) {
@@ -367,7 +436,7 @@ public final class PlayerListener implements Listener {
     /* CANCEL GENERATION OF END PLATFORM */
 
     @EventHandler(ignoreCancelled = true)
-    public void onPlatformGenerate(final PortalCreateEvent event) {
+    public void onPlatformGenerate(final @NotNull PortalCreateEvent event) {
         if (PluginConfig.GENERAL_DISABLE_END_PLATFORM_GENERATION == true && event.getWorld().key().equals(THE_END) == true)
             event.setCancelled(true);
     }

@@ -266,6 +266,16 @@
             "format": "Player **%player_name%** has listed **<amount>x <item>** to the auction house."
         }
     },
+    "command_triggers": {
+        // Commands to be executed when player joins the server.
+        "on_join": [],
+        // Commands to be executed when player leaves the server.
+        "on_quit": [],
+        // Commands to be executed when player loads resources for the first time in the session.
+        "on_resources_first_load": [],
+        // Commands to be executed each time when player loads resources.
+        "on_resources_load": []
+    },
     // Server links.
     "server_links": [
         // { "name": "Website", "url": "https://example.com" }

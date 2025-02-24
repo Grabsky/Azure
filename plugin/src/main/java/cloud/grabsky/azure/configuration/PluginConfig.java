@@ -215,7 +215,6 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("resource_pack.loading_screen.apply_blindness")
     public static Boolean RESOURCE_PACK_LOADING_SCREEN_APPLY_BLINDNESS;
 
-
     // Vanish
 
     @JsonNullable @JsonPath("vanish.bossbar")
@@ -382,6 +381,19 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("discord_integrations.auction_listings_forwarding.format")
     public static String DISCORD_INTEGRATIONS_AUCTION_LISTINGS_FORWARDING_FORMAT;
 
+    // Command Triggers
+
+    @JsonPath("command_triggers.on_join")
+    public static List<String> COMMAND_TRIGGERS_ON_JOIN;
+
+    @JsonPath("command_triggers.on_quit")
+    public static List<String> COMMAND_TRIGGERS_ON_QUIT;
+
+    @JsonPath("command_triggers.on_resources_first_load")
+    public static List<String> COMMAND_TRIGGERS_ON_RESOURCES_FIRST_LOAD;
+
+    @JsonPath("command_triggers.on_resources_load")
+    public static List<String> COMMAND_TRIGGERS_ON_RESOURCES_LOAD;
 
     // Server Links
 

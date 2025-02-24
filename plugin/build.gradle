@@ -6,6 +6,7 @@ plugins {
 repositories {
     // Repository containing the 'PlaceholderAPI' dependency.
     maven { url = "https://repo.extendedclip.com/content/repositories/placeholderapi/" }
+    // Repository containing the 'AuroraQuests' dependency.
     maven { url = "https://repo.auroramc.gg/repository/maven-public/" }
     // Repository containing the 'ExcellentShop' dependency.
     maven { url = "https://repo.nightexpressdev.com/releases/" }

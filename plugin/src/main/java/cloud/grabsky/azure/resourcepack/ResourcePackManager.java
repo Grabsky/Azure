@@ -15,6 +15,7 @@
 package cloud.grabsky.azure.resourcepack;
 
 import cloud.grabsky.azure.Azure;
+import cloud.grabsky.azure.api.event.ResourcePackLoadEvent;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.util.Iterables;
 import com.google.common.hash.Hashing;
@@ -27,7 +28,6 @@ import net.kyori.adventure.title.Title;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent.Status;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -107,6 +107,10 @@ public final class ResourcePackManager implements Listener {
      * Sends configured resource-packs to the specified {@link Player}.
      */
     public void sendResourcePacks(final @NotNull Player player) {
+        // Logging error if internal web server has is null.
+        if (this.server == null)
+            plugin.getLogger().severe("Requested resource-packs for '" + player.getUniqueId() + "' but the internal web server is null.");
+        // Generating secret.
         final String secret = UUID.randomUUID().toString();
         // Adding secret to the map. This can be later used for context removal.
         secrets.put(player.getUniqueId(), secret);
@@ -161,18 +165,6 @@ public final class ResourcePackManager implements Listener {
         plugin.getLogger().info("Resource-packs requested by '" + player.getUniqueId() + "' and total of " + request.packs().size() + " contexts has been created with secret '" + secret + "'... " + requestMeasuredTime + "ms");
     }
 
-    // NOTE: In the future, resource-packs could be sent in the configuration phase. There is no API for that currently. (as of 2025/05/01)
-    @EventHandler(ignoreCancelled = true)
-    public void onPlayerJoin(final @NotNull PlayerJoinEvent event) {
-        // Setting total number of resource-packs loaded by this player to 0. This is mainly for ease of use with other plugins.
-        event.getPlayer().setMetadata("total_loaded_resource-packs", new FixedMetadataValue(plugin, 0));
-        // Sending resource pack 1 tick after event is fired. (if enabled)
-        if (PluginConfig.RESOURCE_PACK_SEND_ON_JOIN == true && this.server != null) {
-            // Sending resource-packs to the player. (next tick)
-            plugin.getBedrockScheduler().run(1L, (_) -> sendResourcePacks(event.getPlayer()));
-        }
-    }
-
     @EventHandler
     public void onResourcePackStatus(final @NotNull PlayerResourcePackStatusEvent event) {
         if (PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS.isBlank() == false && this.server != null) {
@@ -217,6 +209,8 @@ public final class ResourcePackManager implements Listener {
                     // Removing blindness effect from the player.
                     if (PluginConfig.RESOURCE_PACK_LOADING_SCREEN_APPLY_BLINDNESS == true)
                         player.removePotionEffect(PotionEffectType.BLINDNESS);
+                    // Calling the event.
+                    new ResourcePackLoadEvent(player, count == totalCount).callEvent();
                 }
             }
         }
@@ -231,6 +225,13 @@ public final class ResourcePackManager implements Listener {
         } catch (final URISyntaxException _) {
             return null;
         }
+    }
+
+    /**
+     * Returns whether the specified {@link Player} is currently loading resource-packs.
+     */
+    public static boolean isLoadingPacks(final @NotNull Player player) {
+        return player.hasMetadata("is_loading_resource-packs") == true && player.getMetadata("is_loading_resource-packs").getFirst().asBoolean() == true;
     }
 
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
