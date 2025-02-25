@@ -70,6 +70,9 @@ public final class PlayerListener implements Listener {
     // Players with this permission are excluded from command filtering logic.
     private static final String PERMISSION_BYPASS_COMMAND_FILTER = "azure.plugin.bypass_command_filter";
 
+    // Represents the NamespacedKey of the end dimension.
+    private static final NamespacedKey THE_END = new NamespacedKey("minecraft", "the_end");
+
 
     @EventHandler // We need to somehow ensure this is called AFTER AzureUserCache#onPlayerJoin(...) listener. I guess registration order is enough?
     public void onPlayerJoin(final @NotNull PlayerJoinEvent event) {
@@ -189,6 +192,11 @@ public final class PlayerListener implements Listener {
             final World primaryWorld = plugin.getWorldManager().getPrimaryWorld();
             // Setting the respawn location.
             event.setRespawnLocation(plugin.getWorldManager().getSpawnPoint(primaryWorld));
+        } else if (event.getPlayer().getLocation().getWorld().getKey().equals(THE_END) == true) {
+            // Getting the world player is currently in. (THE_END)
+            final World world = event.getPlayer().getLocation().getWorld();
+            // Setting the respawn location.
+            event.setRespawnLocation(plugin.getWorldManager().getSpawnPoint(world));
         }
     }
 
@@ -424,8 +432,6 @@ public final class PlayerListener implements Listener {
     }
 
     /* TELEPORT PLAYER TO THE WORLD SPAWN WHEN ENTERING THROUGH THE END PORTAL */
-
-    private static final NamespacedKey THE_END = new NamespacedKey("minecraft", "the_end");
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPortal(final @NotNull PlayerTeleportEvent event) {
