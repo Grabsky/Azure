@@ -45,6 +45,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLevelChangeEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerRespawnEvent.RespawnReason;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.world.PortalCreateEvent;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -186,17 +187,21 @@ public final class PlayerListener implements Listener {
 
     @EventHandler
     public void onPlayerRespawn(final @NotNull PlayerRespawnEvent event) {
-        // Setting respawn location to spawn point of the primary world. (if enabled)
+        // THE END: Setting respawn location to spawn point of the end world.
+        if (event.getPlayer().getLocation().getWorld().getKey().equals(THE_END) == true && event.getRespawnReason() == RespawnReason.DEATH) {
+            // Getting the world player is currently in. (THE_END)
+            final World world = event.getPlayer().getLocation().getWorld();
+            // Setting the respawn location.
+            event.setRespawnLocation(plugin.getWorldManager().getSpawnPoint(world));
+            // Returning
+            return;
+        }
+        // Otherwise, defaulting respawn point to the spawn point of the primary world. Overridden by active Bed or Respawn Anchor.
         if (PluginConfig.GENERAL_RESPAWN_ON_PRIMARY_WORLD_SPAWN == true && event.isBedSpawn() == false && event.isAnchorSpawn() == false) {
             // Getting the primary world.
             final World primaryWorld = plugin.getWorldManager().getPrimaryWorld();
             // Setting the respawn location.
             event.setRespawnLocation(plugin.getWorldManager().getSpawnPoint(primaryWorld));
-        } else if (event.getPlayer().getLocation().getWorld().getKey().equals(THE_END) == true) {
-            // Getting the world player is currently in. (THE_END)
-            final World world = event.getPlayer().getLocation().getWorld();
-            // Setting the respawn location.
-            event.setRespawnLocation(plugin.getWorldManager().getSpawnPoint(world));
         }
     }
 
