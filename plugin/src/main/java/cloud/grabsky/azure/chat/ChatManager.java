@@ -282,16 +282,16 @@ public final class ChatManager implements Listener, MessageCreateListener {
             // ...setting cooldown
             chatCooldowns.put(player.getUniqueId(), currentTimeMillis());
         }
-        final String messsage = PlainTextComponentSerializer.plainText().serialize(event.message());
+        final String message = PlainTextComponentSerializer.plainText().serialize(event.message());
         // Cancelling messages containing invalid characters. Mostly to ensure players are not using resource-pack-reserved characters in chat. (E000-F8FF)
-        if (PluginConfig.CHAT_FILTERING_DISALLOW_INVALID_CHARACTERS == true && messsage.chars().anyMatch(it -> Conditions.inRange(it, 57344, 63743) == true) == true) {
+        if (PluginConfig.CHAT_FILTERING_DISALLOW_INVALID_CHARACTERS == true && message.chars().anyMatch(it -> Conditions.inRange(it, 57344, 63743) == true) == true) {
             event.setCancelled(true);
             Message.of(PluginLocale.CHAT_MESSAGE_CONTAINS_INVALID_CHARACTERS).send(player);
             return;
         }
         // Cancelling messages containing inappropriate words.
         if (PluginConfig.CHAT_FILTERING_DISALLOW_INAPPROPRIATE_WORDS == true && inappropriateWords != null && inappropriateWords.isEmpty() == false) {
-            final String[] words = messsage.split(" ");
+            final String[] words = message.split(" ");
             // Iterating over all words in a message.
             for (final String word : words) {
                 // Cancelling message if the current word is in the list of inappropriate words.
@@ -315,7 +315,7 @@ public final class ChatManager implements Listener, MessageCreateListener {
             signatureCache.put(signatureUUID, event.signedMessage().signature());
         }
         // Customizing renderer...
-        event.renderer((source, sourceDisplayName, message, viewer) -> {
+        event.renderer((source, sourceDisplayName, msg, viewer) -> {
             // Getting the luckperms primary group
             final CachedMetaData metaData = luckPermsUserManager.getUser(source.getUniqueId()).getCachedData().getMetaData();
             // Console...
@@ -333,7 +333,6 @@ public final class ChatManager implements Listener, MessageCreateListener {
             }
             // Player...
             if (viewer instanceof Player receiver) {
-                // ...
                 final String matchingChatFormat = this.findSuitableChatFormat(source, PluginConfig.CHAT_FORMATS_DEFAULT);
                 // ...
                 final Component formattedChat = MiniMessage.miniMessage().deserialize(
@@ -348,17 +347,21 @@ public final class ChatManager implements Listener, MessageCreateListener {
                 // Adding "DELETE MESSAGE" button for allowed viewers
                 if (PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_ENABLED == true && receiver.hasPermission(CHAT_MODERATION_PERMISSION) == true && source.hasPermission(CHAT_MODERATION_PERMISSION) == false) {
                     final Component button = PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_BUTTON.getText()
-                            .clickEvent(callback(audience -> this.deleteMessage(signatureUUID), Options.builder().uses(1).lifetime(Duration.ofMinutes(5)).build()))
+                            .clickEvent(callback(_ -> this.deleteMessage(signatureUUID), Options.builder().uses(1).lifetime(Duration.ofMinutes(5)).build()))
                             .hoverEvent(showText(PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_BUTTON.getHover()));
                     // ...
                     return (PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_BUTTON.getPosition() == Position.BEFORE)
                             ? empty().append(button).appendSpace().append(formattedChat)
                             : empty().append(formattedChat).appendSpace().append(button);
                 }
+                // Playing sound if message mentions player name.
+                if (PluginConfig.CHAT_MENTION_SOUND != null && message.contains(player.getName()) == true)
+                    player.playSound(PluginConfig.CHAT_MENTION_SOUND);
+                // Returning the formatted chat.
                 return formattedChat;
             }
             // Anything else...
-            return message;
+            return msg;
         });
 
     }

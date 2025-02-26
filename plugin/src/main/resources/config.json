@@ -33,6 +33,8 @@
         "advancement_message_send_global": false,
         // Advancement message format. Set to "" to use vanilla message. Placeholders: [player, displayname, advancement]
         "advancement_message_format": "<dark_gray>› <green>Gratulacje! <gray>Odblokowałeś osiągnięcie <advancement><gray>...",
+        // Sound to be played when player is mentioned. Can be null.
+        "mention_sound": { "key": "minecraft:block.note_block.xylophone ", "source": "master", "volume": 1.0, "pitch": 2.0 },
         // Chat filtering settings.
         "filtering": {
             // Whether characters considered as invalid should be disallowed.

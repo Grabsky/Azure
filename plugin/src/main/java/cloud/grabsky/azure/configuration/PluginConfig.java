@@ -95,6 +95,9 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("chat_settings.advancement_message_format")
     public static String CHAT_ADVANCEMENT_MESSAGE_FORMAT;
 
+    @JsonNullable @JsonPath("chat_settings.mention_sound")
+    public static @Nullable Sound CHAT_MENTION_SOUND;
+
     // Chat Settings > Filtering
 
     @JsonPath("chat_settings.filtering.disallow_invalid_characters")
