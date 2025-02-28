@@ -156,7 +156,6 @@ public final class ResourcePackManager implements Listener {
                     // Wrapping and returning as ResourcePackInfo object.
                     return ResourcePackInfo.resourcePackInfo(holder.uniqueId, uri, holder.hash);
                 }).filter(Objects::nonNull).toList()).build();
-
         // Sending resource-packs to the player.
         player.sendResourcePacks(request);
         // Measuring request time for debug purposes. Part 2.
@@ -177,7 +176,7 @@ public final class ResourcePackManager implements Listener {
                 // Setting the metadata.
                 player.setMetadata("is_loading_resource-packs", new FixedMetadataValue(plugin, true));
                 // Sending title to the player if enabled.
-                if  (PluginConfig.RESOURCE_PACK_LOADING_SCREEN_APPLY_TITLE_AND_SUBTITLE == true) {
+                if (PluginConfig.RESOURCE_PACK_LOADING_SCREEN_APPLY_TITLE_AND_SUBTITLE == true) {
                     // Showing the title.
                     event.getPlayer().showTitle(
                             Title.title(
