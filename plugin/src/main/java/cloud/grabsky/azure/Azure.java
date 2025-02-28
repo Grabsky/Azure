@@ -508,7 +508,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                             // Checking if LuckPerms' User instance is not null.
                             if (luckpermsUser != null) {
                                 // Returning player's name with prefix if present.
-                                return Conditions.requirePresent(luckpermsUser.getCachedData().getMetaData().getPrefix(), "") + player.getName();
+                                return Conditions.requirePresent(luckpermsUser.getCachedData().getMetaData().getPrefix(), "") + Conditions.requirePresent(luckpermsUser.getCachedData().getMetaData().getMetaValue("color"), "") + player.getName();
                             }
                             // Otherwise, returning returning just the player's name.
                             return player.getName();
