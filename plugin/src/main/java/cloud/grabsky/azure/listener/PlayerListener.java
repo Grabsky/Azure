@@ -30,6 +30,7 @@ import net.luckperms.api.cacheddata.CachedMetaData;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -363,7 +364,8 @@ public final class PlayerListener implements Listener {
                         .placeholder("victim", event.getPlayer())
                         .placeholder("victim_displayname", event.getPlayer().displayName())
                         .placeholder("attacker", (event.getDamageSource().getCausingEntity() != null) ? event.getDamageSource().getCausingEntity().getName() : "N/A")
-                        .placeholder("attacker_displayname", (event.getDamageSource().getCausingEntity() != null && event.getDamageSource().getCausingEntity() instanceof Player attacker) ? attacker.displayName() : ComponentBuilder.EMPTY);
+                        .placeholder("attacker_displayname", (event.getDamageSource().getCausingEntity() != null && event.getDamageSource().getCausingEntity() instanceof Player attacker) ? attacker.displayName() : ComponentBuilder.EMPTY)
+                        .placeholder("mob", (event.getDamageSource().getCausingEntity() != null && event.getDamageSource().getCausingEntity() instanceof Mob mob) ? PluginLocale.MOBS.getOrDefault(mob.getType().translationKey(), mob.getType().translationKey()) : ComponentBuilder.EMPTY);
                 // Broadcasting the message.
                 message.broadcast();
                 // Preventing vanilla death message from appearing in chat.
@@ -382,7 +384,8 @@ public final class PlayerListener implements Listener {
                             .replace("<victim>", "**" + event.getPlayer().getName() + "**")
                             .replace("<victim_displayname>", "**" + event.getPlayer().getName() + "**")
                             .replace("<attacker>", "**" + (event.getDamageSource().getCausingEntity() != null ? event.getDamageSource().getCausingEntity().getName() : "") + "**")
-                            .replace("<attacker_displayname>", "**" + (event.getDamageSource().getCausingEntity() != null ? event.getDamageSource().getCausingEntity().getName() : "") + "**");
+                            .replace("<attacker_displayname>", "**" + (event.getDamageSource().getCausingEntity() != null ? event.getDamageSource().getCausingEntity().getName() : "") + "**")
+                            .replace("<mob>", "**" + (event.getDamageSource().getCausingEntity() != null && event.getDamageSource().getCausingEntity() instanceof Mob mob ? PluginLocale.MOBS.getOrDefault(mob.getType().translationKey(), mob.getType().translationKey()) : "") + "**");
                     // Creating new instance of WebhookMessageBuilder.
                     final WebhookMessageBuilder builder = new WebhookMessageBuilder().setContent(webhookMessage);
                     // Setting username if specified.

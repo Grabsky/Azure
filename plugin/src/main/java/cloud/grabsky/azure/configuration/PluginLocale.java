@@ -100,6 +100,11 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("command_on_cooldown")
     public static String COMMAND_ON_COOLDOWN;
 
+    // Mobs
+
+    @JsonPath("mobs")
+    public static Map<String, String> MOBS;
+
     // Death
 
     @JsonPath("death_messages.default")
