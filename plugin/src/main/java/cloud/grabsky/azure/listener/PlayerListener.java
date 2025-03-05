@@ -98,7 +98,7 @@ public final class PlayerListener implements Listener {
                 // Getting LuckPerms' cached meta-data. This should never be null despite the warning.
                 final CachedMetaData metaData = plugin.getLuckPerms().getUserManager().getUser(player.getUniqueId()).getCachedData().getMetaData();
                 // Sending join message to the audience.
-                Message.of(PluginConfig.CHAT_SERVER_JOIN_MESSAGE)
+                Message.of(PlaceholderAPI.setPlaceholders(player, PluginConfig.CHAT_SERVER_JOIN_MESSAGE))
                         .placeholder("player", player)
                         .placeholder("group", requirePresent(metaData.getPrimaryGroup(), ""))
                         .replace("<prefix>", requirePresent(metaData.getPrefix(), ""))
@@ -130,7 +130,7 @@ public final class PlayerListener implements Listener {
                 // Getting LuckPerms' cached meta-data. This should never be null despite the warning.
                 final CachedMetaData metaData = plugin.getLuckPerms().getUserManager().getUser(player.getUniqueId()).getCachedData().getMetaData();
                 // Sending quit message to the audience.
-                Message.of(PluginConfig.CHAT_SERVER_QUIT_MESSAGE)
+                Message.of(PlaceholderAPI.setPlaceholders(player, PluginConfig.CHAT_SERVER_QUIT_MESSAGE))
                         .placeholder("player", player)
                         .placeholder("group", requirePresent(metaData.getPrimaryGroup(), ""))
                         .replace("<prefix>", requirePresent(metaData.getPrefix(), ""))
