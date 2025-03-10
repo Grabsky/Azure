@@ -64,6 +64,7 @@ import cloud.grabsky.azure.configuration.adapters.BossBarAdapterFactory;
 import cloud.grabsky.azure.configuration.adapters.TagResolverAdapter;
 import cloud.grabsky.azure.discord.VerificationManager;
 import cloud.grabsky.azure.integrations.AuroraQuestsIntegration;
+import cloud.grabsky.azure.integrations.DiscordIntegration;
 import cloud.grabsky.azure.integrations.ExcellentShopIntegration;
 import cloud.grabsky.azure.listener.PlayerListener;
 import cloud.grabsky.azure.resourcepack.ResourcePackManager;
@@ -78,7 +79,6 @@ import cloud.grabsky.configuration.ConfigurationMapper;
 import cloud.grabsky.configuration.adapter.AbstractEnumJsonAdapter;
 import cloud.grabsky.configuration.exception.ConfigurationMappingException;
 import cloud.grabsky.configuration.paper.PaperConfigurationMapper;
-import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.luckperms.api.LuckPerms;
@@ -88,24 +88,16 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.Registry;
 import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.server.ServerLoadEvent;
-import org.bukkit.scheduler.BukkitTask;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.intent.Intent;
-import org.javacord.api.entity.message.WebhookMessageBuilder;
-import org.javacord.api.entity.user.UserStatus;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
@@ -115,7 +107,6 @@ import org.jetbrains.annotations.Nullable;
 
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.SneakyThrows;
 
 import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
 
@@ -143,15 +134,13 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
     private ResourcePackManager resourcePackManager;
 
     @Getter(AccessLevel.PUBLIC)
-    private VerificationManager verificationManager;
-
-    @Getter(AccessLevel.PUBLIC)
     private FileLogger punishmentsFileLogger;
 
     @Getter(AccessLevel.PUBLIC)
-    private @Nullable DiscordApi discord;
+    private DiscordIntegration discordIntegration;
 
-    private @Nullable BukkitTask activityRefreshTask;
+    @Getter(AccessLevel.PUBLIC)
+    private @Nullable DiscordApi discord;
 
     private ConfigurationMapper mapper;
 
@@ -253,6 +242,8 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                 this.getLogger().severe("Cannot establish connection with Discord API because specified token is incorrect.");
             // Trying to connect to Discord API. Failure should not stop the server but instead log error to the console.
             try {
+                this.discordIntegration = new DiscordIntegration(this);
+                // ...
                 this.discord = new DiscordApiBuilder()
                         .setToken(PluginConfig.DISCORD_INTEGRATIONS_DISCORD_BOT_TOKEN)
                         .addIntents(Intent.MESSAGE_CONTENT, Intent.GUILD_MEMBERS, Intent.GUILD_PRESENCES)
@@ -279,31 +270,6 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
         ExcellentShopIntegration.initialize(this);
     }
 
-    @Override @SneakyThrows
-    public void onDisable() {
-        super.onDisable();
-        // ...
-        if (discord != null) {
-            // Forwarding message to webhook...
-            if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_URL.isEmpty() == false) {
-                // Setting message placeholders.
-                final String message = PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_STOP_MESSAGE_FORMAT);
-                // Creating new instance of WebhookMessageBuilder.
-                final WebhookMessageBuilder builder = new WebhookMessageBuilder().setContent(message);
-                // Setting username if specified.
-                if (PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_USERNAME.isEmpty() == false)
-                    builder.setDisplayName(PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_USERNAME));
-                // Setting avatar if specified.
-                if (PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
-                    builder.setDisplayAvatar(new URI(PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_AVATAR)).toURL());
-                // Sending the message. Expected to be a blocking call.
-                builder.send(discord, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_URL).join();
-            }
-            // Disconnecting from Discord API. Expected to be a blocking call.
-            discord.disconnect().join();
-        }
-    }
-
     @Override
     public boolean onReload() {
         try {
@@ -323,28 +289,6 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
             // Reloading filtered words.
             if (this.chatManager != null)
                 chatManager.loadInappropriateWords();
-            // Reloading discord bot custom activity.
-            if (discord != null) {
-                // Cancelling the current task.
-                if (activityRefreshTask != null && activityRefreshTask.isCancelled() == false)
-                    activityRefreshTask.cancel();
-                // Setting configured activity if specified.
-                if (PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getState().isEmpty() == false)
-                    // Scheduling a refreshing task if desired.
-                    if (PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getRefreshRate() > 0)
-                        this.activityRefreshTask = this.getBedrockScheduler().repeat(0L, PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getRefreshRate() * 20L, Long.MAX_VALUE, (_) -> {
-                            // Parsing string with PlaceholderAPI.
-                            final String parsed = PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getState());
-                            // Updating the activity.
-                            discord.updateActivity(PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getType(), parsed);
-                            // Continuing with the task.
-                            return true;
-                        });
-                        // Otherwise, just setting the activity.
-                    else discord.updateActivity(PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getType(), PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getState());
-                // Otherwise, unsetting the activity.
-                else discord.unsetActivity();
-            }
             // Unregistering PAPI expansion if already registered.
             if (Placeholders.INSTANCE.isRegistered() == true)
                 Placeholders.INSTANCE.unregister();
@@ -362,83 +306,14 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
         }
     }
 
-    // Waiting for server to be fully enabled before updating discord activity. PlaceholderAPI extensions should be enabled by now.
-    @SneakyThrows
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onServerLoad(final ServerLoadEvent event) {
-        // Setting configured activity if specified.
-        if (discord != null) {
-            // Forwarding message to webhook...
-            if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_URL.isEmpty() == false) {
-                // Setting message placeholders.
-                final String message = PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_START_MESSAGE_FORMAT);
-                // Creating new instance of WebhookMessageBuilder.
-                final WebhookMessageBuilder builder = new WebhookMessageBuilder().setContent(message);
-                // Setting username if specified.
-                if (PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_USERNAME.isEmpty() == false)
-                    builder.setDisplayName(PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_USERNAME));
-                // Setting avatar if specified.
-                if (PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
-                    builder.setDisplayAvatar(new URI(PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_AVATAR)).toURL());
-                // Sending the message. Expected to be a blocking call.
-                builder.send(discord, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_URL).join();
-            }
-            // Cancelling the current task.
-            if (activityRefreshTask != null && activityRefreshTask.isCancelled() == false)
-                activityRefreshTask.cancel();
-            // Setting configured activity if specified.
-            if (PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getState().isEmpty() == false)
-                // Scheduling a refreshing task if desired.
-                if (PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getRefreshRate() > 0)
-                    this.activityRefreshTask = this.getBedrockScheduler().repeat(100L, PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getRefreshRate() * 20L, Long.MAX_VALUE, (_) -> {
-                        // Parsing string with PlaceholderAPI.
-                        final String parsed = PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getState());
-                        // Updating the activity.
-                        discord.updateActivity(PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getType(), parsed);
-                        // Continuing with the task.
-                        return true;
-                    });
-                // Otherwise, just setting the activity.
-                else discord.updateActivity(PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getType(), PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getState());
-        }
-    }
-
     public static final class Placeholders extends PlaceholderExpansion {
-        /* SINGLETON */ public static final Placeholders INSTANCE = new Placeholders();
-
-        // This is the number of currently online members on configured Discord server.
-        private final static AtomicLong ONLINE_MEMBERS = new AtomicLong(0);
-
-        // This task updates online members count every minute.
-        private static BukkitTask COUNTER_TASK = null;
+        public static final Placeholders INSTANCE = new Placeholders(); // SINGLETON
 
         // SimpleDateFormat responsible for formatting countdown time.
         private final static SimpleDateFormat COUNTDOWN_FORMAT = new SimpleDateFormat("HH:mm:ss");
 
         static {
             COUNTDOWN_FORMAT.setTimeZone(TimeZone.getTimeZone("Europe/Warsaw"));
-        }
-
-        public Placeholders() {
-            // Cancelling the task if already running.
-            if (COUNTER_TASK != null) {
-                // Cancelling the task.
-                COUNTER_TASK.cancel();
-                // Setting the task to null.
-                COUNTER_TASK = null;
-            }
-            // Starting a task.
-            COUNTER_TASK = Azure.getInstance().getBedrockScheduler().repeatAsync(0L, 1200L, Long.MAX_VALUE, (_) -> {
-                // Skipping if plugin instance has not been finalized, or integrations aren't enabled (yet?), or server with configured id is inaccessible.
-                if (Azure.getInstance() == null || Azure.getInstance().getDiscord() == null || Azure.getInstance().getDiscord().getServerById(PluginConfig.DISCORD_INTEGRATIONS_DISCORD_SERVER_ID).isEmpty() == true)
-                    return true;
-                // Getting set containing all members that are on the server.
-                final Set<org.javacord.api.entity.user.User> users = Azure.getInstance().getDiscord().getServerById(PluginConfig.DISCORD_INTEGRATIONS_DISCORD_SERVER_ID).get().getMembers();
-                // Filtering based on status, counting elements and updating the online members count.
-                ONLINE_MEMBERS.set(users.stream().filter(user -> user.getStatus() != UserStatus.OFFLINE).count());
-                // ...
-                return true;
-            });
         }
 
         @Override
@@ -489,11 +364,6 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                 // Placeholder: %azure_mined_blocks%
                 else if (params.equalsIgnoreCase("total_mined_blocks") == true) {
                     return calculateTotalBlock(player, Statistic.MINE_BLOCK);
-                }
-
-                // Placeholder: %azure_discord_online%
-                else if (params.equalsIgnoreCase("discord_online") == true && Azure.getInstance() != null && Azure.getInstance().getDiscord() != null) {
-                    return ONLINE_MEMBERS.toString();
                 }
 
                 // Placeholder: %azure_displayname%

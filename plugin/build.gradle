@@ -25,6 +25,12 @@ dependencies {
         exclude group: "com.squareup.moshi"
         exclude group: "com.squareup.okio"
     }
+    // JDA
+    implementation("net.dv8tion:JDA:5.3.0") {
+        exclude module: "opus-java"
+    }
+    // Discord Webhooks
+    implementation("club.minnced:discord-webhooks:0.8.4")
     // JEmoji (Shaded)
     implementation("net.fellbaum:jemoji:1.6.0")
     // LuckPerms API (Provided)

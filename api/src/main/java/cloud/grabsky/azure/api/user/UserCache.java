@@ -59,6 +59,13 @@ public interface UserCache {
      */
     boolean hasUser(final @NotNull String name);
 
+    /**
+     * Returns matching {@link User} for the specified discord identifier.
+     */
+    default @Nullable User fromDiscord(final String discordId) {
+        return getUsers().stream().filter(user -> user.getDiscordId() != null && user.getDiscordId().equals(discordId) == true).findFirst().orElse(null);
+    }
+
     @Internal
     default <T extends UserCache> T as(final Class<T> clazz) {
         return (T) this;

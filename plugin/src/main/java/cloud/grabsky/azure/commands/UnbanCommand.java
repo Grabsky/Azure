@@ -32,7 +32,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
-import org.javacord.api.entity.message.WebhookMessageBuilder;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnknownNullability;
@@ -87,7 +86,7 @@ public final class UnbanCommand extends RootCommand {
                             .replace("<issuer>", sender instanceof Player ? sender.getName() : "Console");
                     // Forwarding the message through configured webhook.
                     if (message.isEmpty() == false)
-                        new WebhookMessageBuilder().setContent(message).sendSilently(Azure.getInstance().getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_WEBHOOK_URL);
+                        plugin.getDiscordIntegration().getWebhookForwardingPunishments().send(message);
                 }
                 return;
             }

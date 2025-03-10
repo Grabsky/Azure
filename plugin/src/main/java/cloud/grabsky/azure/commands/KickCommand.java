@@ -33,7 +33,6 @@ import net.luckperms.api.model.group.Group;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
-import org.javacord.api.entity.message.WebhookMessageBuilder;
 
 import java.util.UUID;
 
@@ -117,7 +116,7 @@ public final class KickCommand extends RootCommand {
                     .replace("<reason>", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON);
             // Forwarding the message through configured webhook.
             if (message.isEmpty() == false)
-                new WebhookMessageBuilder().setContent(message).sendSilently(Azure.getInstance().getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_WEBHOOK_URL);
+                plugin.getDiscordIntegration().getWebhookForwardingPunishments().send(message);
         }
 
     }

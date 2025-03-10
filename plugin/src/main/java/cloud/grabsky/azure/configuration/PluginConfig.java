@@ -20,14 +20,14 @@ import cloud.grabsky.configuration.JsonConfiguration;
 import cloud.grabsky.configuration.JsonNullable;
 import cloud.grabsky.configuration.JsonPath;
 import com.squareup.moshi.Json;
+import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
-import org.javacord.api.entity.activity.ActivityType;
-import org.javacord.api.entity.message.component.ButtonStyle;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -514,7 +514,7 @@ public final class PluginConfig implements JsonConfiguration {
         private final int refreshRate;
 
         @Getter(AccessLevel.PUBLIC)
-        private final ActivityType type;
+        private final Activity.ActivityType type;
 
         @Getter(AccessLevel.PUBLIC)
         private final String state;

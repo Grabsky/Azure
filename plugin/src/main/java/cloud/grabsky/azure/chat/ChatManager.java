@@ -52,12 +52,10 @@ import org.bukkit.Material;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 import org.javacord.api.entity.channel.ServerChannel;
-import org.javacord.api.entity.message.WebhookMessageBuilder;
 import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
 import org.javacord.api.entity.permission.Role;
@@ -68,7 +66,6 @@ import org.javacord.api.listener.message.MessageCreateListener;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.net.URI;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
@@ -84,8 +81,6 @@ import java.util.regex.Pattern;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import lombok.SneakyThrows;
 
 import static cloud.grabsky.bedrock.helpers.Conditions.requirePresent;
 import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
@@ -364,31 +359,6 @@ public final class ChatManager implements Listener, MessageCreateListener {
             return msg;
         });
 
-    }
-
-    @SneakyThrows
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onChatForward(final AsyncChatEvent event) {
-        // Skipping in case discord integrations are not enabled or misconfigured.
-        if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_URL.isEmpty() == true)
-            return;
-        // Forwarding message to webhook...
-        if (event.viewers().isEmpty() == false) {
-            // Serializing Component to plain String.
-            final String plainMessage = PlainTextComponentSerializer.plainText().serialize(event.message());
-            // Creating new instance of WebhookMessageBuilder.
-            final WebhookMessageBuilder builder = new WebhookMessageBuilder()
-                    .setAllowedMentions(NO_MENTIONS)
-                    .setContent(plainMessage.startsWith("xaero-waypoint:") == true ? "[Xaero's Waypoint]" : plainMessage);
-            // Setting username if specified.
-            if (PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_USERNAME.isEmpty() == false)
-                builder.setDisplayName(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_USERNAME));
-            // Setting avatar if specified.
-            if (PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
-                builder.setDisplayAvatar(new URI(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_AVATAR)).toURL());
-            // Sending the message.
-            builder.sendSilently(plugin.getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_URL);
-        }
     }
 
     @Override @SuppressWarnings("deprecation") // Suppressing @Deprecated method(s) as adventure seems to not provide an alternative for that.

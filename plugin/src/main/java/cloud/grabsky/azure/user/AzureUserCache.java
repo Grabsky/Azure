@@ -334,7 +334,7 @@ public final class AzureUserCache implements UserCache, Listener {
         if (thisUser.getDisplayName() != null)
             thisPlayer.displayName(miniMessage().deserialize(thisUser.getDisplayName()));
         // Removing role and associated Discord ID if user is not on the server anymore.
-        if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_ENABLED == true && plugin.getDiscord() != null) {
+        if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_ENABLED == true) {
             // Getting configured server.
             final @Nullable Server server = plugin.getDiscord().getServerById(PluginConfig.DISCORD_INTEGRATIONS_DISCORD_SERVER_ID).orElse(null);
             // Throwing IllegalStateException if configured server is inaccessible.

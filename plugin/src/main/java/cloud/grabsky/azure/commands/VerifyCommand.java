@@ -26,11 +26,9 @@ import cloud.grabsky.commands.annotation.Command;
 import cloud.grabsky.commands.annotation.Dependency;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.exception.CommandLogicException;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.bukkit.entity.Player;
-import org.javacord.api.entity.channel.TextChannel;
-import org.javacord.api.entity.message.MessageBuilder;
-import org.javacord.api.entity.message.component.ActionRow;
-import org.javacord.api.entity.message.component.Button;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,7 +38,7 @@ import org.jetbrains.annotations.UnknownNullability;
 public final class VerifyCommand extends RootCommand {
 
     @Dependency
-    private @UnknownNullability Azure plugin;;
+    private @UnknownNullability Azure plugin;
 
     @Override
     public @NotNull CompletionsProvider onTabComplete(final @NotNull RootCommandContext context, final int index) throws CommandLogicException {
@@ -53,7 +51,7 @@ public final class VerifyCommand extends RootCommand {
 
     @Override
     public void onCommand(final @NotNull RootCommandContext context, final @NotNull ArgumentQueue arguments) throws CommandLogicException {
-        if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_ENABLED == false || plugin.getDiscord() == null) {
+        if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_ENABLED == false) {
             Message.of(PluginLocale.COMMAND_VERIFY_FAILURE_NOT_ENABLED).send(context.getExecutor().asCommandSender());
             return;
         }
@@ -62,18 +60,16 @@ public final class VerifyCommand extends RootCommand {
             // Checking required permissions.
             if (context.getExecutor().hasPermission("azure.command.verify.send_component") == true) {
                 // Getting the text channel from provided ID.
-                final @Nullable TextChannel channel = plugin.getDiscord().getTextChannelById(arguments.nextString()).orElse(null);
+                final @Nullable TextChannel channel = plugin.getDiscordIntegration().getClient().getTextChannelById(arguments.nextString());
                 // Sending error message in case channel does not not exist or is inaccessible.
                 if (channel == null) {
                     Message.of(PluginLocale.COMMAND_VERIFY_FAILURE_SEND_COMPONENT_FAILURE_INVALID_CHANNEL).send(context.getExecutor().asCommandSender());
                     return;
                 }
-                // Creating a message with button component.
-                final MessageBuilder builder = new MessageBuilder().addComponents(ActionRow.of(
-                        Button.create("verification_button", PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_BUTTON_STYLE, PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_BUTTON_LABEL)
-                ));
-                // Sending...
-                builder.send(channel);
+                // Sending the button
+                channel.sendMessage("").addActionRow(
+                        Button.of(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_BUTTON_STYLE, "verification_button", PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_BUTTON_LABEL)
+                ).queue();
             }
             return;
         }
