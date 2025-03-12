@@ -32,6 +32,7 @@ import com.google.common.cache.CacheBuilder;
 import com.squareup.moshi.JsonReader;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.event.player.AsyncChatDecorateEvent;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import me.clip.placeholderapi.PlaceholderAPI;
@@ -39,6 +40,8 @@ import net.fellbaum.jemoji.EmojiManager;
 import net.kyori.adventure.chat.SignedMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickCallback.Options;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -240,8 +243,24 @@ public final class ChatManager implements Listener, MessageCreateListener {
         // ...
         final Component result = (matchingResolvers.has("item") == true)
                 ? (item.isEmpty() == false && item.getType() != Material.AIR)
-                        ? EMPTY_MINIMESSAGE.deserialize(message, matchingResolvers, Placeholder.component("item", empty().color(WHITE).append(item.displayName()).hoverEvent(item.asHoverEvent())))
-                        : EMPTY_MINIMESSAGE.deserialize(message, matchingResolvers, Placeholder.component("item", ComponentBuilder.of("", WHITE).append("[").appendTranslation("block.minecraft.air").append("]").build()))
+                        ? EMPTY_MINIMESSAGE.deserialize(message, matchingResolvers,
+                                Placeholder.component("item",
+                                        Component.text().color(getEffectiveColor(item))
+                                                        .append(Component.text("["))
+                                                        .append(item.getAmount() > 1 ? Component.text(item.getAmount() + "x ") : ComponentBuilder.EMPTY)
+                                                        .append(item.effectiveName())
+                                                        .append(Component.text("]"))
+                                                        .hoverEvent(item.asHoverEvent())
+                                                        .build()
+                                ))
+                        : EMPTY_MINIMESSAGE.deserialize(message, matchingResolvers,
+                                Placeholder.component("item",
+                                        Component.text().color(WHITE)
+                                                        .append(Component.text("["))
+                                                        .append(Component.translatable("block.minecraft.air"))
+                                                        .append(Component.text("]"))
+                                                        .build()
+                                ))
                 : EMPTY_MINIMESSAGE.deserialize(message, matchingResolvers);
         // Setting result, the rest is handled within AsyncChatEvent
         event.result(result);
@@ -459,6 +478,21 @@ public final class ChatManager implements Listener, MessageCreateListener {
     }
 
     /* UTILITY METHODS */
+
+    @SuppressWarnings("UnstableApiUsage")
+    private static TextColor getEffectiveColor(final @NotNull ItemStack item) {
+        // 1. ITEM NAME
+        if (item.getItemMeta().itemName().color() != null)
+            return item.getItemMeta().itemName().color();
+        // 2. RARITY
+        else if (item.hasData(DataComponentTypes.RARITY) == true)
+            return item.getData(DataComponentTypes.RARITY).color();
+        // 3. ENCHANTED ITEM COLOR
+        else if (item.getItemMeta().hasEnchants() == true)
+            return NamedTextColor.AQUA;
+        // 4. DEFAULT
+        else return NamedTextColor.WHITE;
+    }
 
     // Less complex and more performant alternative to Message#getReadableContent.
     private static String replaceMentions(String text, final Server server, boolean stripTags) {
