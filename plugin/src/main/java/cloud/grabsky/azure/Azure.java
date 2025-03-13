@@ -14,6 +14,23 @@
  */
 package cloud.grabsky.azure;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.TimeZone;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+
+import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
+
 import cloud.grabsky.azure.api.AzureAPI;
 import cloud.grabsky.azure.api.AzureProvider;
 import cloud.grabsky.azure.api.user.User;
@@ -89,25 +106,6 @@ import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.javacord.api.DiscordApi;
-import org.javacord.api.DiscordApiBuilder;
-import org.javacord.api.entity.intent.Intent;
-
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.TimeZone;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicLong;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import lombok.AccessLevel;
-import lombok.Getter;
-
-import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
 
 public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
 
@@ -242,18 +240,6 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
             // Trying to connect to Discord API. Failure should not stop the server but instead log error to the console.
             try {
                 this.discordIntegration = new DiscordIntegration(this);
-                // ...
-                this.discord = new DiscordApiBuilder()
-                        .setToken(PluginConfig.DISCORD_INTEGRATIONS_DISCORD_BOT_TOKEN)
-                        .addIntents(Intent.MESSAGE_CONTENT, Intent.GUILD_MEMBERS, Intent.GUILD_PRESENCES)
-                        // For mentions to display properly.
-                        .setUserCacheEnabled(true)
-                        .setWaitForUsersOnStartup(true)
-                        .addListener(chatManager)
-                        .login().join();
-                // Creating new instance of VerificationManager, which also register two listeners.
-                // At this point we know that 'this.discord' is not null. No extra check required.
-                this.verificationManager = new VerificationManager(this, discord);
             } catch (final RuntimeException e) {
                 this.getLogger().severe("Could not establish connection with Discord API.");
                 this.getLogger().severe("  " + e.getMessage());

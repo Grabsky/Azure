@@ -1,5 +1,15 @@
 package cloud.grabsky.azure.integrations;
 
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+
 import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.api.user.User;
 import cloud.grabsky.azure.configuration.PluginConfig;
@@ -21,7 +31,6 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -53,17 +62,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.scheduler.BukkitTask;
-import org.javacord.api.entity.server.Server;
-
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import lombok.AccessLevel;
-import lombok.Getter;
 
 /*
  * TO-DO:
@@ -441,31 +439,31 @@ public final class DiscordIntegration implements Listener {
 
     /* VERIFICATION */
 
-    public void updateVerificationRole(final @NotNull String discordId) throws IllegalStateException {
-        // Getting configured server.
-        final @Nullable Guild guild = client.getGuildById(PluginConfig.DISCORD_INTEGRATIONS_DISCORD_SERVER_ID);
-        // Throwing IllegalStateException if configured server is inaccessible.
-        if (guild == null)
-            throw new IllegalStateException("Server is inaccessible: " + PluginConfig.DISCORD_INTEGRATIONS_DISCORD_SERVER_ID);
-        // Checking if user has left the server
-        if (guild.getMemberById(discordId) != null) {
-            // Removing permission from the player, if configured.
-            if ("".equals(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_PERMISSION) == false)
-                // Loading LuckPerms' User and removing permission from them.
-                plugin.getLuckPerms().getUserManager().modifyUser(thisUser.getUniqueId(), (it) -> {
-                    it.data().remove(PermissionNode.builder(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_PERMISSION).build());
-                });
-            // Getting verification role.
-            final @Nullable org.javacord.api.entity.permission.Role role = server.getRoleById(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_ROLE_ID).orElse(null);
-            // If the role exists, it is now being removed from the user.
-            if (role != null)
-                plugin.getDiscord().getUserById(thisUser.getDiscordId()).thenAccept(it -> server.removeRoleFromUser(it, role));
-            // Removing associated ID.
-            thisUser.setDiscordId(null);
-            // Saving... Hopefully this won't cause any CME or data loss due to the fact we're saving file earlier too.
-            // I think in the worst case scenario either this or country info would be lost.
-            this.saveUser(thisUser);
-        }
-    }
+//    public void updateVerificationRole(final @NotNull String discordId) throws IllegalStateException {
+//        // Getting configured server.
+//        final @Nullable Guild guild = client.getGuildById(PluginConfig.DISCORD_INTEGRATIONS_DISCORD_SERVER_ID);
+//        // Throwing IllegalStateException if configured server is inaccessible.
+//        if (guild == null)
+//            throw new IllegalStateException("Server is inaccessible: " + PluginConfig.DISCORD_INTEGRATIONS_DISCORD_SERVER_ID);
+//        // Checking if user has left the server
+//        if (guild.getMemberById(discordId) != null) {
+//            // Removing permission from the player, if configured.
+//            if ("".equals(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_PERMISSION) == false)
+//                // Loading LuckPerms' User and removing permission from them.
+//                plugin.getLuckPerms().getUserManager().modifyUser(thisUser.getUniqueId(), (it) -> {
+//                    it.data().remove(PermissionNode.builder(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_PERMISSION).build());
+//                });
+//            // Getting verification role.
+//            final @Nullable org.javacord.api.entity.permission.Role role = server.getRoleById(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_ROLE_ID).orElse(null);
+//            // If the role exists, it is now being removed from the user.
+//            if (role != null)
+//                plugin.getDiscord().getUserById(thisUser.getDiscordId()).thenAccept(it -> server.removeRoleFromUser(it, role));
+//            // Removing associated ID.
+//            thisUser.setDiscordId(null);
+//            // Saving... Hopefully this won't cause any CME or data loss due to the fact we're saving file earlier too.
+//            // I think in the worst case scenario either this or country info would be lost.
+//            this.saveUser(thisUser);
+//        }
+//    }
 
 }
