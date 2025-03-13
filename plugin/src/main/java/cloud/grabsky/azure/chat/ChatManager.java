@@ -32,6 +32,7 @@ import com.google.common.cache.CacheBuilder;
 import com.squareup.moshi.JsonReader;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.event.player.AsyncChatDecorateEvent;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import me.clip.placeholderapi.PlaceholderAPI;
@@ -39,6 +40,8 @@ import net.fellbaum.jemoji.EmojiManager;
 import net.kyori.adventure.chat.SignedMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickCallback.Options;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -53,6 +56,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemRarity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 import org.javacord.api.entity.channel.ServerChannel;
@@ -227,16 +231,34 @@ public final class ChatManager implements Listener, MessageCreateListener {
         if (event.isCancelled() == true || event.player() == null)
             return;
         // ...
-        final String message = PLAIN_SERIALIZER.serialize(event.originalMessage());
+        String message = PLAIN_SERIALIZER.serialize(event.originalMessage());
         // ...
         final ItemStack item = event.player().getInventory().getItemInMainHand();
         // Creating result Component using serializers player has access to
         final TagResolver matchingResolvers = this.findSuitableTagsCollection(event.player(), PluginConfig.CHAT_MESSAGE_TAGS_DEFAULT);
-        // ...
+        // Replacing all occurrences of <i>, [item] and [i] with <item>.
+        message = message.replace("<i>", "<item>").replace("[item]", "<item>").replace("[i]", "<item>");
+        // Preparing the result component.
         final Component result = (matchingResolvers.has("item") == true)
                 ? (item.isEmpty() == false && item.getType() != Material.AIR)
-                        ? EMPTY_MINIMESSAGE.deserialize(message, matchingResolvers, Placeholder.component("item", empty().color(WHITE).append(item.displayName()).hoverEvent(item.asHoverEvent())))
-                        : EMPTY_MINIMESSAGE.deserialize(message, matchingResolvers, Placeholder.component("item", ComponentBuilder.of("", WHITE).append("[").appendTranslation("block.minecraft.air").append("]").build()))
+                        ? EMPTY_MINIMESSAGE.deserialize(message, matchingResolvers,
+                                Placeholder.component("item",
+                                        Component.text().color(getEffectiveColor(item))
+                                                        .append(Component.text("["))
+                                                        .append(item.getAmount() > 1 ? Component.text(item.getAmount() + "x ") : ComponentBuilder.EMPTY)
+                                                        .append(item.effectiveName())
+                                                        .append(Component.text("]"))
+                                                        .hoverEvent(item.asHoverEvent())
+                                                        .build()
+                                ))
+                        : EMPTY_MINIMESSAGE.deserialize(message, matchingResolvers,
+                                Placeholder.component("item",
+                                        Component.text().color(WHITE)
+                                                        .append(Component.text("["))
+                                                        .append(Component.translatable("block.minecraft.air"))
+                                                        .append(Component.text("]"))
+                                                        .build()
+                                ))
                 : EMPTY_MINIMESSAGE.deserialize(message, matchingResolvers);
         // Setting result, the rest is handled within AsyncChatEvent
         event.result(result);
@@ -429,6 +451,21 @@ public final class ChatManager implements Listener, MessageCreateListener {
     }
 
     /* UTILITY METHODS */
+
+    @SuppressWarnings("UnstableApiUsage")
+    private static TextColor getEffectiveColor(final @NotNull ItemStack item) {
+        // Item name color has the highest priority.
+        if (item.getItemMeta().itemName().color() != null)
+            return item.getItemMeta().itemName().color();
+        // Enchantment color is the next, but only when the rarity is not epic.
+        else if (item.getItemMeta().hasEnchants() == true && item.getData(DataComponentTypes.RARITY) != ItemRarity.EPIC)
+            return NamedTextColor.AQUA;
+        // Rarity color is the last color to check.
+        else if (item.hasData(DataComponentTypes.RARITY) == true)
+            return item.getData(DataComponentTypes.RARITY).color();
+        // No color was found, so it should default to WHITE.
+        else return NamedTextColor.WHITE;
+    }
 
     // Less complex and more performant alternative to Message#getReadableContent.
     private static String replaceMentions(String text, final Server server, boolean stripTags) {

@@ -62,7 +62,6 @@ import cloud.grabsky.azure.configuration.PluginItems;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.azure.configuration.adapters.BossBarAdapterFactory;
 import cloud.grabsky.azure.configuration.adapters.TagResolverAdapter;
-import cloud.grabsky.azure.discord.VerificationManager;
 import cloud.grabsky.azure.integrations.AuroraQuestsIntegration;
 import cloud.grabsky.azure.integrations.DiscordIntegration;
 import cloud.grabsky.azure.integrations.ExcellentShopIntegration;
@@ -338,7 +337,6 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
 
         @Override
         public String onRequest(final @NotNull OfflinePlayer offlinePlayer, final @NotNull String params) {
-
             // Placeholder: %azure_countdown_[TIMESTAMP]%
             if (params.startsWith("countdown_") == true) {
                 try {
@@ -348,27 +346,19 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                     return "00:00:00";
                 }
             }
-
-            if (offlinePlayer.isOnline() == false || offlinePlayer.isConnected() == false)
-                return null;
-            // Checking if this OfflinePlayer instance is an instance of Player.
-            if (offlinePlayer instanceof Player player) {
-                final UUID uniqueId = player.getUniqueId();
-
+            // Getting the UUID of the player.
+            final UUID uniqueId = offlinePlayer.getUniqueId();
+            // Getting the placeholder identifier.
+            final String identifier = params.toLowerCase();
+            // Handling placeholders based on the identifier.
+            return switch (identifier) {
                 // Placeholder: %azure_is_idle%
-                if (params.equalsIgnoreCase("is_idle") == true) {
-                    final boolean isIdle = player.getIdleDuration().get(ChronoUnit.SECONDS) >= PluginConfig.GENERAL_PLAYER_IDLE_TIME;
-                    return String.valueOf(isIdle);
-                }
-
+                case "is_idle" -> (offlinePlayer instanceof Player player && player.getIdleDuration().get(ChronoUnit.SECONDS) >= PluginConfig.GENERAL_PLAYER_IDLE_TIME) ? "true" : "false";
                 // Placeholder: %azure_mined_blocks%
-                else if (params.equalsIgnoreCase("total_mined_blocks") == true) {
-                    return calculateTotalBlock(player, Statistic.MINE_BLOCK);
-                }
-
+                case "total_mined_blocks" -> calculateTotalBlock(offlinePlayer, Statistic.MINE_BLOCK);
                 // Placeholder: %azure_displayname%
-                else if (params.equalsIgnoreCase("displayname") == true && Azure.getInstance() != null && Azure.getInstance().getUserCache() != null) {
-                    if (Azure.getInstance().getUserCache().hasUser(uniqueId) == true) {
+                case "displayname" -> {
+                    if (Azure.getInstance() != null && Azure.getInstance().getUserCache() != null) {
                         // Getting the User instance.
                         final User user = Azure.getInstance().getUserCache().getUser(uniqueId);
                         // Returning player name if user is null.
@@ -378,37 +368,30 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                             // Checking if LuckPerms' User instance is not null.
                             if (luckpermsUser != null) {
                                 // Returning player's name with prefix if present.
-                                return Conditions.requirePresent(luckpermsUser.getCachedData().getMetaData().getPrefix(), "") + Conditions.requirePresent(luckpermsUser.getCachedData().getMetaData().getMetaValue("color"), "") + player.getName();
+                                yield Conditions.requirePresent(luckpermsUser.getCachedData().getMetaData().getPrefix(), "") + Conditions.requirePresent(luckpermsUser.getCachedData().getMetaData().getMetaValue("color"), "") + offlinePlayer.getName();
                             }
                             // Otherwise, returning returning just the player's name.
-                            return player.getName();
+                            yield offlinePlayer.getName();
                         }
                         // Returning the User display name, if present.
                         else if (user.getDisplayName() != null)
-                            return user.getDisplayName();
-                        // Otherwise, returning player's name.
-                        else return player.getName();
+                            yield user.getDisplayName();
+                            // Otherwise, returning player's name.
+                        else yield offlinePlayer.getName();
                     }
+                    yield null;
                 }
-
                 // Placeholder: %azure_is_verified%
-                else if (params.equalsIgnoreCase("is_verified") == true && Azure.getInstance() != null && Azure.getInstance().getUserCache() != null) {
-                    if (Azure.getInstance().getUserCache().hasUser(uniqueId) == true) {
-                        final User user = Azure.getInstance().getUserCache().getUser(uniqueId);
-                        return String.valueOf(user.getDiscordId() != null);
-                    }
-                }
-
+                case "is_verified" -> (Azure.getInstance().getUserCache() != null && Azure.getInstance().getUserCache().hasUser(uniqueId) == true)
+                        ? String.valueOf(Azure.getInstance().getUserCache().getUser(uniqueId).getDiscordId() != null)
+                        : "N/A";
                 // Placeholder: %azure_max_level%
-                else if (params.equalsIgnoreCase("max_level") == true && Azure.getInstance() != null && Azure.getInstance().getUserCache() != null) {
-                    if (Azure.getInstance().getUserCache().hasUser(uniqueId) == true) {
-                        final User user = Azure.getInstance().getUserCache().getUser(uniqueId);
-                        return String.valueOf(user.getMaxLevel());
-                    }
-                }
-
-            }
-            return null;
+                case "max_level" -> (Azure.getInstance().getUserCache() != null && Azure.getInstance().getUserCache().hasUser(uniqueId) == true)
+                        ? String.valueOf(Azure.getInstance().getUserCache().getUser(uniqueId).getMaxLevel())
+                        : "N/A";
+                // Anything else is not a valid placeholder.
+                default -> null;
+            };
         }
 
         // This should be more efficient than 'Statistic' expansion for PlaceholderAPI.
