@@ -1,6 +1,6 @@
 plugins {
-    id "net.minecrell.plugin-yml.paper" version "0.6.0"
-    id "com.gradleup.shadow" version "8.3.3"
+    id "de.eldoria.plugin-yml.paper" version "0.7.1"
+    id "com.gradleup.shadow" version "8.3.6"
 }
 
 repositories {
@@ -26,7 +26,7 @@ dependencies {
         exclude group: "com.squareup.okio"
     }
     // JEmoji (Shaded)
-    implementation("net.fellbaum:jemoji:1.6.0")
+    implementation("net.fellbaum:jemoji:1.7.1")
     // LuckPerms API (Provided)
     compileOnly("net.luckperms:api:5.4")
     // PlaceholderAPI (Provided)
