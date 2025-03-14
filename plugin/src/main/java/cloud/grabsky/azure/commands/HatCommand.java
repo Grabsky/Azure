@@ -32,13 +32,13 @@ public final class HatCommand extends RootCommand {
     @Override
     public void onCommand(final @NotNull RootCommandContext context, final @NotNull ArgumentQueue arguments) throws CommandLogicException {
         final Player sender = context.getExecutor().asPlayer();
-        // Feeding the target.
+        // Getting the held item and helmet from the player.
         final ItemStack held = sender.getInventory().getItemInMainHand();
         final ItemStack helmet = sender.getInventory().getHelmet();
-        // Sending success message to the sender. (if applicable)
+        // Replacing helmet with the held item.
         sender.getInventory().setItemInMainHand(helmet);
         sender.getInventory().setHelmet(held);
-        // Sending success message to the target.
+        // Sending success message to the player.
         Message.of(PluginLocale.COMMAND_HAT_SUCCESS).send(sender);
     }
 
