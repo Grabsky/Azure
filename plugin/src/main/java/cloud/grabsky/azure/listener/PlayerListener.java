@@ -161,7 +161,7 @@ public final class PlayerListener implements Listener {
                     .placeholder("displayname", player.displayName())
                     .broadcast(audience -> audience.canSee(player) == true);
             // Continuing only if resource-packs are not being sent on join. This means message should be postponed and handled within ResourcePackLoadEvent listener.
-            if (PluginConfig.RESOURCE_PACK_SEND_ON_JOIN == true) {
+            if (PluginConfig.RESOURCE_PACK_SEND_ON_JOIN == true && PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_ENABLED == true) {
                 // Forwarding message to webhook...
                 if (plugin.getUserCache().getUser(event.getPlayer()).isVanished() == false) {
                     // Setting message placeholders.
