@@ -578,6 +578,11 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.feed_success_target")
     public static Component COMMAND_FEED_SUCCESS_TARGET;
 
+    // Commands > Glow
+
+    @JsonPath("commands.glow_success")
+    public static String COMMAND_GLOW_SUCCESS;
+
     // Commands > Hat
 
     @JsonPath("commands.hat_success")
