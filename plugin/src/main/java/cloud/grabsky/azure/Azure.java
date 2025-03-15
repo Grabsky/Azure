@@ -14,6 +14,25 @@
  */
 package cloud.grabsky.azure;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.text.SimpleDateFormat;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.TimeZone;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.SneakyThrows;
+
+import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
+
 import cloud.grabsky.azure.api.AzureAPI;
 import cloud.grabsky.azure.api.AzureProvider;
 import cloud.grabsky.azure.api.user.User;
@@ -44,6 +63,7 @@ import cloud.grabsky.azure.commands.PackCommand;
 import cloud.grabsky.azure.commands.PlayerCommand;
 import cloud.grabsky.azure.commands.RepairCommand;
 import cloud.grabsky.azure.commands.ReplyCommand;
+import cloud.grabsky.azure.commands.ScheduleRestartCommand;
 import cloud.grabsky.azure.commands.SkullCommand;
 import cloud.grabsky.azure.commands.SpeedCommand;
 import cloud.grabsky.azure.commands.SpyCommand;
@@ -97,25 +117,6 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.text.SimpleDateFormat;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.TimeZone;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicLong;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.SneakyThrows;
-
-import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
 
 public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
 
@@ -237,6 +238,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                 .registerCommand(VerifyCommand.class)
                 .registerCommand(UnverifyCommand.class)
                 .registerCommand(BackCommand.class)
+                .registerCommand(ScheduleRestartCommand.class)
                 // Registering debug commands...
                 .registerCommand(DebugCommand.class);
         // Registering events...
