@@ -367,14 +367,22 @@ public final class ChatManager implements Listener, MessageCreateListener {
                         Placeholder.component("message", event.message())
                 );
                 // Adding "DELETE MESSAGE" button for allowed viewers
-                if (PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_ENABLED == true && receiver.hasPermission(CHAT_MODERATION_PERMISSION) == true && source.hasPermission(CHAT_MODERATION_PERMISSION) == false) {
-                    final Component button = PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_BUTTON.getText()
-                            .clickEvent(callback(_ -> this.deleteMessage(signatureUUID), Options.builder().uses(1).lifetime(Duration.ofMinutes(5)).build()))
-                            .hoverEvent(showText(PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_BUTTON.getHover()));
-                    // ...
-                    return (PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_BUTTON.getPosition() == Position.BEFORE)
-                            ? empty().append(button).appendSpace().append(formattedChat)
-                            : empty().append(formattedChat).appendSpace().append(button);
+                if (PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_ENABLED == true && receiver.hasPermission(CHAT_MODERATION_PERMISSION) == true) {
+                    final PluginConfig.DeleteButton buttonConfig = (source.hasPermission(CHAT_MODERATION_PERMISSION) == false)
+                            ? PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_BUTTON_ACTIVE
+                            : PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_BUTTON_INACTIVE;
+                    // Creating the button component.
+                    final Component button = (source.hasPermission(CHAT_MODERATION_PERMISSION) == false)
+                            // Creating button with delete option. (Moderator seeing non-moderator's message)
+                            ? buttonConfig.getText()
+                                    .clickEvent(callback((_) -> this.deleteMessage(signatureUUID), Options.builder().uses(1).lifetime(Duration.ofMinutes(PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_CACHE_EXPIRATION_RATE)).build()))
+                                    .hoverEvent(showText(PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_BUTTON_ACTIVE.getHover()))
+                            // Creating button without delete option. (Moderator seeing self or other moderator's message)
+                            : buttonConfig.getText().hoverEvent(showText(PluginConfig.CHAT_MODERATION_MESSAGE_DELETION_BUTTON_INACTIVE.getHover()));
+                    // Appending the button to the chat format.
+                    return (buttonConfig.getPosition() == Position.BEFORE)
+                            ? empty().append(button).append(formattedChat)
+                            : empty().append(formattedChat).append(button);
                 }
                 // Playing sound if message mentions player name.
                 if (PluginConfig.CHAT_MENTION_SOUND != null && message.contains(player.getName()) == true)

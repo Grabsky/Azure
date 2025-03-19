@@ -77,7 +77,9 @@
                 // Determines how long message signature should be stored for. In seconds.
                 "cache_expiration_rate": 300,
                 // Message delete button styling. Position can either be BEFORE or AFTER.
-                "button": { "position": "BEFORE", "text": "<gray>×", "hover": "<gray>Naciśnij, aby usunąć wiadomość." }
+                "button_active": { "position": "BEFORE", "text": "<gray>×", "hover": "<gray>Naciśnij, aby usunąć wiadomość." },
+                // Message delete button styling. Position can either be BEFORE or AFTER.
+                "button_inactive": { "position": "BEFORE", "text": "<dark_gray>×", "hover": "<gray>Nie możesz usunąć tej wiadomości." }
             }
         },
         "automated_messages": {
