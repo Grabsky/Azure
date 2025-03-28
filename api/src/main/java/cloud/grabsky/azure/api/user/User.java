@@ -172,8 +172,7 @@ public interface User {
      */
     default CompoundBinaryTag getPlayerData() throws IOException {
         final File file = new File(new File(AzureProvider.getAPI().getWorldManager().getPrimaryWorld().getWorldFolder(), "playerdata"), getUniqueId() + ".dat");
-        // ...
-        return BinaryTagIO.reader().read(file.toPath(), BinaryTagIO.Compression.GZIP); // Should be automatically closed.
+        return BinaryTagIO.reader(1_000_000L).read(file.toPath(), BinaryTagIO.Compression.GZIP); // Should be automatically closed.
     }
 
 }
