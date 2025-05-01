@@ -14,17 +14,17 @@
  */
 package cloud.grabsky.azure.configuration;
 
+import java.util.Map;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnknownNullability;
+
 import cloud.grabsky.configuration.JsonAdapter;
 import cloud.grabsky.configuration.JsonConfiguration;
 import cloud.grabsky.configuration.JsonPath;
 import cloud.grabsky.configuration.paper.adapter.StringComponentAdapter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
-
-import java.util.Map;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.UnknownNullability;
 
 public final class PluginLocale implements JsonConfiguration {
 
@@ -581,6 +581,11 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.feed_success_target")
     public static Component COMMAND_FEED_SUCCESS_TARGET;
 
+    // Commands > Glow
+
+    @JsonPath("commands.glow_success")
+    public static String COMMAND_GLOW_SUCCESS;
+
     // Commands > Hat
 
     @JsonPath("commands.hat_success")
@@ -718,6 +723,16 @@ public final class PluginLocale implements JsonConfiguration {
 
     @JsonPath("commands.adminchat_usage")
     public static Component COMMAND_ADMINCHAT_USAGE;
+
+    // Commands > Schedule Restart
+
+    @JsonPath("commands.schedule_restart_initial")
+    @JsonAdapter(fromJson = StringComponentAdapter.class)
+    public static String COMMAND_SCHEDULE_RESTART_INITIAL;
+
+    @JsonPath("commands.schedule_restart_reminder")
+    @JsonAdapter(fromJson = StringComponentAdapter.class)
+    public static String COMMAND_SCHEDULE_RESTART_REMINDER;
 
 
     public static final class Commands implements JsonConfiguration {

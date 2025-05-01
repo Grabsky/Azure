@@ -467,6 +467,8 @@
         "feed_success_target": "<dark_gray>› <gray>Twoje punkty głodu zostały uzupełnione.",
         // Hat
         "hat_success": "<dark_gray>› <gray>Twój hełm został zaktualizowany.",
+        // Glow
+        "glow_success": "<dark_gray>› <gray>Tryb świecenia: <state>",
         // Player
         "player_usage": "<dark_gray>› <gray>Użycie: <gold>/player <white>(player)",
         "player_hidden_entry": "<white>ᴜᴋʀʏᴛᴇ",
@@ -557,6 +559,18 @@
         "back_success": "<dark_gray>› <gray>Zostałeś przeniesiony do poprzedniej lokalizacji.",
         "back_failure_no_previous_location": "<dark_gray>› <red>Nie znaleziono żadnej poprzedniej lokalizacji.",
         // AdminChat
-        "adminchat_usage": "<dark_gray>› <gray>Użycie: <gold>/a (message)"
+        "adminchat_usage": "<dark_gray>› <gray>Użycie: <gold>/a (message)",
+        // Schedule Restart
+        "schedule_restart_initial": [
+            "",
+            "<dark_gray>› <red>Za <gold><time_left><red> wykonany zostanie restart serwera.",
+            ""
+        ],
+        "schedule_restart_reminder": [
+            "",
+            "<dark_gray>› <red>Za <gold>15 sekund<red> wykonany zostanie restart serwera.",
+            "<dark_gray>› <gray>Zapraszamy ponownie już za chwilę. :)",
+            ""
+        ]
     }
 }

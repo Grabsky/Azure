@@ -139,8 +139,11 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("chat_settings.moderation.message_deletion.cache_expiration_rate")
     public static long CHAT_MODERATION_MESSAGE_DELETION_CACHE_EXPIRATION_RATE;
 
-    @JsonPath("chat_settings.moderation.message_deletion.button")
-    public static DeleteButton CHAT_MODERATION_MESSAGE_DELETION_BUTTON;
+    @JsonPath("chat_settings.moderation.message_deletion.button_active")
+    public static DeleteButton CHAT_MODERATION_MESSAGE_DELETION_BUTTON_ACTIVE;
+
+    @JsonPath("chat_settings.moderation.message_deletion.button_inactive")
+    public static DeleteButton CHAT_MODERATION_MESSAGE_DELETION_BUTTON_INACTIVE;
 
     // Chat Settings > Automated Messages
 

@@ -49,6 +49,7 @@ import cloud.grabsky.azure.commands.FlyCommand;
 import cloud.grabsky.azure.commands.GameModeCommand;
 import cloud.grabsky.azure.commands.GetCommand;
 import cloud.grabsky.azure.commands.GiveCommand;
+import cloud.grabsky.azure.commands.GlowCommand;
 import cloud.grabsky.azure.commands.HatCommand;
 import cloud.grabsky.azure.commands.HealCommand;
 import cloud.grabsky.azure.commands.InventoryCommand;
@@ -61,6 +62,7 @@ import cloud.grabsky.azure.commands.PackCommand;
 import cloud.grabsky.azure.commands.PlayerCommand;
 import cloud.grabsky.azure.commands.RepairCommand;
 import cloud.grabsky.azure.commands.ReplyCommand;
+import cloud.grabsky.azure.commands.ScheduleRestartCommand;
 import cloud.grabsky.azure.commands.SkullCommand;
 import cloud.grabsky.azure.commands.SpeedCommand;
 import cloud.grabsky.azure.commands.SpyCommand;
@@ -201,6 +203,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                 .registerCommand(GameModeCommand.class)
                 .registerCommand(GetCommand.class)
                 .registerCommand(GiveCommand.class)
+                .registerCommand(GlowCommand.class)
                 .registerCommand(HatCommand.class)
                 .registerCommand(HealCommand.class)
                 .registerCommand(InventoryCommand.class)
@@ -225,6 +228,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                 .registerCommand(VerifyCommand.class)
                 .registerCommand(UnverifyCommand.class)
                 .registerCommand(BackCommand.class)
+                .registerCommand(ScheduleRestartCommand.class)
                 // Registering debug commands...
                 .registerCommand(DebugCommand.class);
         // Registering events...
