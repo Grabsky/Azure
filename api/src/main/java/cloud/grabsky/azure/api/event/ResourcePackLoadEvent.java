@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 
+@Deprecated(forRemoval = true)
 public final class ResourcePackLoadEvent extends PlayerEvent {
 
     private static final HandlerList HANDLER_LIST = new HandlerList();
