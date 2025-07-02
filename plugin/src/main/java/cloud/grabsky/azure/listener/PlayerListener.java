@@ -290,7 +290,8 @@ public final class PlayerListener implements Listener {
         // Using plugin death messages if enabled.
         if (PluginConfig.CHAT_USE_PLUGIN_DEATH_MESSAGES == true && plugin.getUserCache().getUser(event.getPlayer()).isVanished() == false) {
             if (event.deathMessage() instanceof TranslatableComponent translatable) {
-                final String text = PluginLocale.DEATH_MESSAGES.getOrDefault(translatable.key(), PluginLocale.DEATH_MESSAGES_DEFAULT);
+                plugin.getLogger().info("Player " + event.getPlayer().getName() + " died from " + event.getDamageSource().getDamageType() + " caused by " + event.getDamageSource().getCausingEntity() + " with translatable " + translatable.key());
+                final String text = (translatable.key().isBlank() == false) ? PluginLocale.DEATH_MESSAGES.getOrDefault(translatable.key(), PluginLocale.DEATH_MESSAGES_DEFAULT) : PluginLocale.DEATH_MESSAGES_DEFAULT;
                 // Getting LuckPerms' cached meta-data. This should never be null despite the warning.
                 final CachedMetaData metaData = plugin.getLuckPerms().getUserManager().getUser(event.getPlayer().getUniqueId()).getCachedData().getMetaData();
                 // Preparing the message.
