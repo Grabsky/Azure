@@ -14,25 +14,6 @@
  */
 package cloud.grabsky.azure;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.text.SimpleDateFormat;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.TimeZone;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicLong;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.SneakyThrows;
-
-import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
-
 import cloud.grabsky.azure.api.AzureAPI;
 import cloud.grabsky.azure.api.AzureProvider;
 import cloud.grabsky.azure.api.user.User;
@@ -42,7 +23,6 @@ import cloud.grabsky.azure.commands.AdminChatCommand;
 import cloud.grabsky.azure.commands.AzureCommand;
 import cloud.grabsky.azure.commands.BackCommand;
 import cloud.grabsky.azure.commands.BanCommand;
-import cloud.grabsky.azure.commands.DebugCommand;
 import cloud.grabsky.azure.commands.DefeatCommand;
 import cloud.grabsky.azure.commands.DeleteCommand;
 import cloud.grabsky.azure.commands.EnderchestCommand;
@@ -116,6 +96,25 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.message.WebhookMessageBuilder;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.text.SimpleDateFormat;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.TimeZone;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.SneakyThrows;
+
+import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
 
 public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
 
@@ -237,9 +236,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                 .registerCommand(VerifyCommand.class)
                 .registerCommand(UnverifyCommand.class)
                 .registerCommand(BackCommand.class)
-                .registerCommand(ScheduleRestartCommand.class)
-                // Registering debug commands...
-                .registerCommand(DebugCommand.class);
+                .registerCommand(ScheduleRestartCommand.class);
         // Registering events...
         this.getServer().getPluginManager().registerEvents(this, this);
         this.getServer().getPluginManager().registerEvents(chatManager, this);
