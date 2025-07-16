@@ -22,15 +22,20 @@ public enum ExcellentShopIntegration implements Listener {
     private static boolean IS_INITIALIZED = false;
 
     public static boolean initialize(final @NotNull Azure plugin) {
-        if (IS_INITIALIZED == false && plugin.getServer().getPluginManager().getPlugin("ExcellentShop") != null) {
-            plugin.getServer().getPluginManager().registerEvents(ExcellentShopIntegration.INSTANCE, plugin);
-            // Marking the integration as initialized.
-            IS_INITIALIZED = true;
-            // Returning true if integration was successfully initialized.
-            return true;
+        if (IS_INITIALIZED == false) {
+            if (plugin.getServer().getPluginManager().getPlugin("ExcellentShop") != null) {
+                plugin.getServer().getPluginManager().registerEvents(ExcellentShopIntegration.INSTANCE, plugin);
+                // Marking the integration as initialized.
+                IS_INITIALIZED = true;
+                // Returning true if integration was successfully initialized.
+                return true;
+            }
+            // Logging warning and returning false if integration could not be initialized.
+            plugin.getLogger().warning("ExcellentShop integration could not be initialized. (DEPENDENCY_NOT_ENABLED)");
+            return false;
         }
         // Logging warning and returning false if integration could not be initialized.
-        plugin.getLogger().warning("ExcellentShop integration could not be initialized. (DEPENDENCY_NOT_ENABLED)");
+        plugin.getLogger().warning("ExcellentShop integration could not be initialized. (ALREADY_INITIALIZED)");
         return false;
     }
 

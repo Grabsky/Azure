@@ -347,7 +347,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
             Placeholders.INSTANCE.register();
             // Returning 'true' as reload finished without any exceptions.
             return true;
-        } catch (final IllegalStateException | ConfigurationMappingException | IOException e) {
+        } catch (final ConfigurationMappingException | IllegalStateException | IOException e) {
             this.getLogger().severe("Reloading of the plugin failed due to following error(s):");
             this.getLogger().severe(" (1) " + e.getClass().getSimpleName() + ": " + e.getMessage());
             if (e.getCause() != null)
@@ -458,11 +458,9 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                         if (user == null || user.getDisplayName() == null) {
                             // Getting the LuckPerms' User instance.
                             final net.luckperms.api.model.user.User luckpermsUser = Azure.getInstance().getLuckPerms().getUserManager().getUser(uniqueId);
-                            // Checking if LuckPerms' User instance is not null.
-                            if (luckpermsUser != null) {
-                                // Returning player's name with prefix if present.
+                            // Returning player's name with prefix if present.
+                            if (luckpermsUser != null)
                                 yield Conditions.requirePresent(luckpermsUser.getCachedData().getMetaData().getPrefix(), "") + Conditions.requirePresent(luckpermsUser.getCachedData().getMetaData().getMetaValue("color"), "") + offlinePlayer.getName();
-                            }
                             // Otherwise, returning returning just the player's name.
                             yield offlinePlayer.getName();
                         }
@@ -501,7 +499,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                 total.addAndGet(player.getStatistic(statistic, material));
             });
             // Returning...
-            return Long.toString(total.get());
+            return total.toString();
         }
 
     }
