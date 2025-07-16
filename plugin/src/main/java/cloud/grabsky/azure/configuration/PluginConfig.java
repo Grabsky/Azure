@@ -29,8 +29,6 @@ import org.bukkit.NamespacedKey;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.message.component.ButtonStyle;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -208,18 +206,6 @@ public final class PluginConfig implements JsonConfiguration {
 
     @JsonNullable @JsonPath("resource_pack.notification_sound")
     public static @Nullable Sound RESOURCE_PACK_NOTIFICATION_SOUND;
-
-    @JsonPath("resource_pack.loading_screen.apply_title_and_subtitle")
-    public static Boolean RESOURCE_PACK_LOADING_SCREEN_APPLY_TITLE_AND_SUBTITLE;
-
-    @JsonPath("resource_pack.loading_screen.title")
-    public static Component RESOURCE_PACK_LOADING_SCREEN_TITLE;
-
-    @JsonPath("resource_pack.loading_screen.subtitle")
-    public static Component RESOURCE_PACK_LOADING_SCREEN_SUBTITLE;
-
-    @JsonPath("resource_pack.loading_screen.apply_blindness")
-    public static Boolean RESOURCE_PACK_LOADING_SCREEN_APPLY_BLINDNESS;
 
     // Vanish
 
@@ -404,7 +390,7 @@ public final class PluginConfig implements JsonConfiguration {
 
     /* CONFIGURATION LIFECYCLE */
 
-    @Override @SuppressWarnings("UnstableApiUsage")
+    @Override
     public void onReload() {
         ChatManager.CHAT_FORMATS_REVERSED = reversed(PluginConfig.CHAT_FORMATS_EXTRA);
         ChatManager.CHAT_TAGS_REVERSED = reversed(PluginConfig.CHAT_MESSAGE_TAGS_EXTRA);
