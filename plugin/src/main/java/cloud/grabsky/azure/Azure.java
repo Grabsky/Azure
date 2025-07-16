@@ -306,7 +306,6 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
             final File locale = ensureResourceExistence(this, new File(this.getDataFolder(), "locale.json"));
             final File localeCommands = ensureResourceExistence(this, new File(this.getDataFolder(), "locale_commands.json"));
             final File config = ensureResourceExistence(this, new File(this.getDataFolder(), "config.json"));
-            final File items = ensureResourceExistence(this, new File(this.getDataFolder(), "items.json"));
             // Reloading configuration files.
             mapper.map(
                     ConfigurationHolder.of(PluginLocale.class, locale),
