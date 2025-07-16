@@ -395,17 +395,6 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("command_triggers.on_quit")
     public static List<String> COMMAND_TRIGGERS_ON_QUIT;
 
-    @JsonPath("command_triggers.on_resources_first_load")
-    public static List<String> COMMAND_TRIGGERS_ON_RESOURCES_FIRST_LOAD;
-
-    @JsonPath("command_triggers.on_resources_load")
-    public static List<String> COMMAND_TRIGGERS_ON_RESOURCES_LOAD;
-
-    // Server Links
-
-    @JsonPath("server_links")
-    public static List<ServerLinkWrapper> SERVER_LINKS;
-
 
     // Disabled Recipes
 
@@ -437,19 +426,6 @@ public final class PluginConfig implements JsonConfiguration {
         });
         // Updating recipes for all players.
         Bukkit.updateRecipes();
-        // Removing server links currently stored within the server.
-        Bukkit.getServerLinks().getLinks().forEach(it -> {
-            Bukkit.getServerLinks().removeLink(it);
-        });
-        // Adding new links.
-        SERVER_LINKS.forEach(it -> {
-            try {
-                Bukkit.getServerLinks().addLink(it.name, new URI(it.url));
-            } catch (final URISyntaxException e) {
-                Bukkit.getLogger().severe("Conversion of server link URI failed due to following error(s):");
-                Bukkit.getLogger().severe(" (1) " + e.getClass().getSimpleName() + ": " + e.getMessage());
-            }
-        });
     }
 
 
@@ -521,19 +497,6 @@ public final class PluginConfig implements JsonConfiguration {
 
         @Getter(AccessLevel.PUBLIC)
         private final String state;
-
-    }
-
-    // Moshi should be able to create instance of the object despite the constructor being private.
-    @AllArgsConstructor(access = AccessLevel.PRIVATE)
-    public static final class ServerLinkWrapper {
-
-        @Getter(AccessLevel.PUBLIC)
-        private final Component name;
-
-        @Getter(AccessLevel.PUBLIC)
-        private final String url;
-
 
     }
 
