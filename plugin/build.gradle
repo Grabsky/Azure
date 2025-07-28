@@ -9,6 +9,7 @@ repositories {
     maven { url = "https://repo.extendedclip.com/content/repositories/placeholderapi/" }
     // Repository containing the 'AuroraQuests' dependency.
     maven { url = "https://repo.auroramc.gg/releases/" }
+    maven { url = "https://repo.auroramc.gg/snapshots/" }
     // Repository containing the 'ExcellentShop' dependency.
     maven { url = "https://repo.nightexpressdev.com/releases/" }
 }
@@ -33,8 +34,8 @@ dependencies {
     // PlaceholderAPI (Provided)
     compileOnly("me.clip:placeholderapi:2.11.6")
     // Aurora and AuroraQuests
-    compileOnly("gg.auroramc:Aurora:2.1.6")
-    compileOnly("gg.auroramc:AuroraQuests:1.3.16")
+    compileOnly("gg.auroramc:Aurora:2.3.4")
+    compileOnly("gg.auroramc:AuroraQuests:2.0.0-SNAPSHOT")
     // ExcellentShop (Provided)
     compileOnly("su.nightexpress.excellentshop:Core:4.15.0")
     // MorePersistentDataTypes

@@ -132,7 +132,7 @@
         // Server message shown in the resource-pack prompt.
         "prompt_message": "\n\n<gray>Aby grać na naszym serwerze, musisz <green>zaakceptować<gray> paczkę zasobów.\n\n\n<gray>Pobrane zasoby znajdziesz w <white><lang:menu.options> <dark_gray>→ <white><lang:options.resourcepack>\n",
         // Sound played when player is notified about resource-packs update.
-        "notification_sound": { "key": "minecraft:block.note_block.bell", "source": "master", "volume": 1, "pitch": 0.5 },
+        "notification_sound": { "key": "minecraft:block.note_block.bell", "source": "master", "volume": 1, "pitch": 0.5 }
     },
     // Hidden players are not removed from server list status. Consider setting 'hide-online-players' to 'true'. (server.properties)
     "vanish": {
