@@ -34,7 +34,7 @@
         // Advancement message format. Set to "" to use vanilla message. Placeholders: [player, displayname, advancement]
         "advancement_message_format": "<dark_gray>› <green>Gratulacje! <gray>Odblokowałeś osiągnięcie <advancement><gray>...",
         // Sound to be played when player is mentioned. Can be null.
-        "mention_sound": { "key": "minecraft:block.note_block.xylophone ", "source": "master", "volume": 1.0, "pitch": 2.0 },
+        "mention_sound": { "key": "minecraft:block.note_block.xylophone", "source": "master", "volume": 1.0, "pitch": 2.0 },
         // Chat filtering settings.
         "filtering": {
             // Whether characters considered as invalid should be disallowed.
@@ -132,18 +132,7 @@
         // Server message shown in the resource-pack prompt.
         "prompt_message": "\n\n<gray>Aby grać na naszym serwerze, musisz <green>zaakceptować<gray> paczkę zasobów.\n\n\n<gray>Pobrane zasoby znajdziesz w <white><lang:menu.options> <dark_gray>→ <white><lang:options.resourcepack>\n",
         // Sound played when player is notified about resource-packs update.
-        "notification_sound": { "key": "minecraft:block.note_block.bell", "source": "master", "volume": 1, "pitch": 0.5 },
-        // Loading screen is a set of display components that lasts until player has downloaded and loaded all resource-packs.
-        "loading_screen": {
-            // Whether title and subtitle should be applied.
-            "apply_title_and_subtitle": true,
-            // Title to be displayed.
-            "title": "<gold>Ładowanie...",
-            // Subtitle to be displayed.
-            "subtitle": "To powinno zająć tylko chwilę.",
-            // Whether blindness effect should be applied.
-            "apply_blindness": true
-        }
+        "notification_sound": { "key": "minecraft:block.note_block.bell", "source": "master", "volume": 1, "pitch": 0.5 }
     },
     // Hidden players are not removed from server list status. Consider setting 'hide-online-players' to 'true'. (server.properties)
     "vanish": {
@@ -274,16 +263,8 @@
         // Commands to be executed when player joins the server.
         "on_join": [],
         // Commands to be executed when player leaves the server.
-        "on_quit": [],
-        // Commands to be executed when player loads resources for the first time in the session.
-        "on_resources_first_load": [],
-        // Commands to be executed each time when player loads resources.
-        "on_resources_load": []
+        "on_quit": []
     },
-    // Server links.
-    "server_links": [
-        // { "name": "Website", "url": "https://example.com" }
-    ],
     // Recipes to be unregistered after plugin has successfully reloaded. Keep in mind unregistered recipes are removed from players' recipe discovery list.
     "disabled_recipes": [
         // "minecraft:iron_pickaxe"

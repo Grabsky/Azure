@@ -1,20 +1,9 @@
 package cloud.grabsky.azure.integrations;
 
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import lombok.AccessLevel;
-import lombok.Getter;
-
 import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.api.user.User;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.configuration.PluginLocale;
-import cloud.grabsky.azure.resourcepack.ResourcePackManager;
 import cloud.grabsky.azure.user.AzureUserCache;
 import cloud.grabsky.bedrock.components.Message;
 import club.minnced.discord.webhook.WebhookClient;
@@ -62,6 +51,16 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.scheduler.BukkitTask;
+
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import lombok.AccessLevel;
+import lombok.Getter;
 
 /*
  * TO-DO:
@@ -361,23 +360,20 @@ public final class DiscordIntegration implements Listener {
         // Skipping in case discord integrations are not enabled or misconfigured.
         if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_URL.isEmpty() == true)
             return;
-        // Continuing only if resource-packs are not being sent on join. This means message should be postponed and handled within ResourcePackLoadEvent listener.
-        if (PluginConfig.RESOURCE_PACK_SEND_ON_JOIN == false) {
-            // Forwarding message to webhook...
-            if (plugin.getUserCache().getUser(event.getPlayer()).isVanished() == false) {
-                // Setting message placeholders.
-                final String message = PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_JOIN_MESSAGE_FORMAT);
-                // Creating new instance of WebhookMessageBuilder.
-                final WebhookMessageBuilder builder = new WebhookMessageBuilder().setContent(message);
-                // Setting username if specified.
-                if (PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_USERNAME.isEmpty() == false)
-                    builder.setUsername(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_USERNAME));
-                // Setting avatar if specified.
-                if (PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
-                    builder.setAvatarUrl(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_AVATAR));
-                // Sending the message.
-                WebhookForwardingJoinQuit.send(builder.build());
-            }
+        // Forwarding message to webhook...
+        if (plugin.getUserCache().getUser(event.getPlayer()).isVanished() == false) {
+            // Setting message placeholders.
+            final String message = PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_JOIN_MESSAGE_FORMAT);
+            // Creating new instance of WebhookMessageBuilder.
+            final WebhookMessageBuilder builder = new WebhookMessageBuilder().setContent(message);
+            // Setting username if specified.
+            if (PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_USERNAME.isEmpty() == false)
+                builder.setUsername(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_USERNAME));
+            // Setting avatar if specified.
+            if (PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
+                builder.setAvatarUrl(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_AVATAR));
+            // Sending the message.
+            WebhookForwardingJoinQuit.send(builder.build());
         }
     }
 
@@ -385,9 +381,6 @@ public final class DiscordIntegration implements Listener {
     private void onPlayerQuitForward(final @NotNull PlayerQuitEvent event) {
         // Skipping in case discord integrations are not enabled or misconfigured.
         if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_URL.isEmpty() == true)
-            return;
-        // Skipping in case player has not loaded resource-packs.
-        if (PluginConfig.RESOURCE_PACK_SEND_ON_JOIN == true && ResourcePackManager.isLoadingPacks(event.getPlayer()) == true)
             return;
         // Forwarding message to webhook...
         if (plugin.getUserCache().getUser(event.getPlayer()).isVanished() == false) {

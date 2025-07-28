@@ -14,9 +14,6 @@
  */
 package cloud.grabsky.azure.commands;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.UnknownNullability;
-
 import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.commands.arguments.IntervalArgument;
 import cloud.grabsky.azure.configuration.PluginLocale;
@@ -30,7 +27,9 @@ import cloud.grabsky.commands.annotation.Command;
 import cloud.grabsky.commands.annotation.Dependency;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.exception.CommandLogicException;
-import org.bukkit.entity.Player;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnknownNullability;
 
 @Command(name = "schedule_restart", permission = "azure.command.schedule_restart", usage = "/schedule_restart (time)")
 public final class ScheduleRestartCommand extends RootCommand {
@@ -45,7 +44,6 @@ public final class ScheduleRestartCommand extends RootCommand {
 
     @Override
     public void onCommand(final @NotNull RootCommandContext context, final @NotNull ArgumentQueue arguments) throws CommandLogicException {
-        final Player sender = context.getExecutor().asPlayer();
         // Getting the specified interval before the restart is initiated.
         final Interval interval = arguments.next(Interval.class, IntervalArgument.ofRange(1, 60, Unit.MINUTES)).asOptional(Interval.of(60, Unit.SECONDS));
         // Sending immediate message to all players.

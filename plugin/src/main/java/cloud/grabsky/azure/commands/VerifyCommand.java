@@ -83,9 +83,9 @@ public final class VerifyCommand extends RootCommand {
             return;
         }
         // Requesting a code and starting verification process.
-        final String token = plugin.getVerificationManager().requestCode(sender.getUniqueId());
+        // final String token = plugin.getVerificationManager().requestCode(sender.getUniqueId());
         // Sending prompt message to the player.
-        Message.of(PluginLocale.COMMAND_VERIFY_PROMPT).replace("<code>", token).send(sender);
+        // Message.of(PluginLocale.COMMAND_VERIFY_PROMPT).replace("<code>", token).send(sender);
     }
 
 }

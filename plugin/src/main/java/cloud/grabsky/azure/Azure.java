@@ -30,7 +30,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 
 import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
-
 import cloud.grabsky.azure.api.AzureAPI;
 import cloud.grabsky.azure.api.AzureProvider;
 import cloud.grabsky.azure.api.user.User;
@@ -40,14 +39,12 @@ import cloud.grabsky.azure.commands.AdminChatCommand;
 import cloud.grabsky.azure.commands.AzureCommand;
 import cloud.grabsky.azure.commands.BackCommand;
 import cloud.grabsky.azure.commands.BanCommand;
-import cloud.grabsky.azure.commands.DebugCommand;
 import cloud.grabsky.azure.commands.DefeatCommand;
 import cloud.grabsky.azure.commands.DeleteCommand;
 import cloud.grabsky.azure.commands.EnderchestCommand;
 import cloud.grabsky.azure.commands.FeedCommand;
 import cloud.grabsky.azure.commands.FlyCommand;
 import cloud.grabsky.azure.commands.GameModeCommand;
-import cloud.grabsky.azure.commands.GetCommand;
 import cloud.grabsky.azure.commands.GiveCommand;
 import cloud.grabsky.azure.commands.GlowCommand;
 import cloud.grabsky.azure.commands.HatCommand;
@@ -77,7 +74,6 @@ import cloud.grabsky.azure.commands.templates.CommandArgumentTemplate;
 import cloud.grabsky.azure.commands.templates.CommandExceptionTemplate;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.configuration.PluginConfig.DeleteButton;
-import cloud.grabsky.azure.configuration.PluginItems;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.azure.configuration.adapters.BossBarAdapterFactory;
 import cloud.grabsky.azure.configuration.adapters.TagResolverAdapter;
@@ -201,7 +197,6 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                 .registerCommand(EnderchestCommand.class)
                 .registerCommand(FeedCommand.class)
                 .registerCommand(GameModeCommand.class)
-                .registerCommand(GetCommand.class)
                 .registerCommand(GiveCommand.class)
                 .registerCommand(GlowCommand.class)
                 .registerCommand(HatCommand.class)
@@ -228,9 +223,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                 .registerCommand(VerifyCommand.class)
                 .registerCommand(UnverifyCommand.class)
                 .registerCommand(BackCommand.class)
-                .registerCommand(ScheduleRestartCommand.class)
-                // Registering debug commands...
-                .registerCommand(DebugCommand.class);
+                .registerCommand(ScheduleRestartCommand.class);
         // Registering events...
         this.getServer().getPluginManager().registerEvents(this, this);
         this.getServer().getPluginManager().registerEvents(chatManager, this);
@@ -265,13 +258,11 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
             final File locale = ensureResourceExistence(this, new File(this.getDataFolder(), "locale.json"));
             final File localeCommands = ensureResourceExistence(this, new File(this.getDataFolder(), "locale_commands.json"));
             final File config = ensureResourceExistence(this, new File(this.getDataFolder(), "config.json"));
-            final File items = ensureResourceExistence(this, new File(this.getDataFolder(), "items.json"));
             // Reloading configuration files.
             mapper.map(
                     ConfigurationHolder.of(PluginLocale.class, locale),
                     ConfigurationHolder.of(PluginLocale.Commands.class, localeCommands),
-                    ConfigurationHolder.of(PluginConfig.class, config),
-                    ConfigurationHolder.of(PluginItems.class, items)
+                    ConfigurationHolder.of(PluginConfig.class, config)
             );
             // Reloading ResourcePackManager.
             resourcePackManager.reload();
@@ -285,7 +276,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
             Placeholders.INSTANCE.register();
             // Returning 'true' as reload finished without any exceptions.
             return true;
-        } catch (final IllegalStateException | ConfigurationMappingException | IOException e) {
+        } catch (final ConfigurationMappingException | IllegalStateException | IOException e) {
             this.getLogger().severe("Reloading of the plugin failed due to following error(s):");
             this.getLogger().severe(" (1) " + e.getClass().getSimpleName() + ": " + e.getMessage());
             if (e.getCause() != null)
@@ -355,11 +346,9 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                         if (user == null || user.getDisplayName() == null) {
                             // Getting the LuckPerms' User instance.
                             final net.luckperms.api.model.user.User luckpermsUser = Azure.getInstance().getLuckPerms().getUserManager().getUser(uniqueId);
-                            // Checking if LuckPerms' User instance is not null.
-                            if (luckpermsUser != null) {
-                                // Returning player's name with prefix if present.
+                            // Returning player's name with prefix if present.
+                            if (luckpermsUser != null)
                                 yield Conditions.requirePresent(luckpermsUser.getCachedData().getMetaData().getPrefix(), "") + Conditions.requirePresent(luckpermsUser.getCachedData().getMetaData().getMetaValue("color"), "") + offlinePlayer.getName();
-                            }
                             // Otherwise, returning returning just the player's name.
                             yield offlinePlayer.getName();
                         }
@@ -398,7 +387,7 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                 total.addAndGet(player.getStatistic(statistic, material));
             });
             // Returning...
-            return Long.toString(total.get());
+            return total.toString();
         }
 
     }

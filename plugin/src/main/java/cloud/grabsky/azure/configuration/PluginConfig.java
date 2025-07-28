@@ -29,8 +29,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -209,18 +207,6 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonNullable @JsonPath("resource_pack.notification_sound")
     public static @Nullable Sound RESOURCE_PACK_NOTIFICATION_SOUND;
 
-    @JsonPath("resource_pack.loading_screen.apply_title_and_subtitle")
-    public static Boolean RESOURCE_PACK_LOADING_SCREEN_APPLY_TITLE_AND_SUBTITLE;
-
-    @JsonPath("resource_pack.loading_screen.title")
-    public static Component RESOURCE_PACK_LOADING_SCREEN_TITLE;
-
-    @JsonPath("resource_pack.loading_screen.subtitle")
-    public static Component RESOURCE_PACK_LOADING_SCREEN_SUBTITLE;
-
-    @JsonPath("resource_pack.loading_screen.apply_blindness")
-    public static Boolean RESOURCE_PACK_LOADING_SCREEN_APPLY_BLINDNESS;
-
     // Vanish
 
     @JsonNullable @JsonPath("vanish.bossbar")
@@ -395,17 +381,6 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("command_triggers.on_quit")
     public static List<String> COMMAND_TRIGGERS_ON_QUIT;
 
-    @JsonPath("command_triggers.on_resources_first_load")
-    public static List<String> COMMAND_TRIGGERS_ON_RESOURCES_FIRST_LOAD;
-
-    @JsonPath("command_triggers.on_resources_load")
-    public static List<String> COMMAND_TRIGGERS_ON_RESOURCES_LOAD;
-
-    // Server Links
-
-    @JsonPath("server_links")
-    public static List<ServerLinkWrapper> SERVER_LINKS;
-
 
     // Disabled Recipes
 
@@ -415,7 +390,7 @@ public final class PluginConfig implements JsonConfiguration {
 
     /* CONFIGURATION LIFECYCLE */
 
-    @Override @SuppressWarnings("UnstableApiUsage")
+    @Override
     public void onReload() {
         ChatManager.CHAT_FORMATS_REVERSED = reversed(PluginConfig.CHAT_FORMATS_EXTRA);
         ChatManager.CHAT_TAGS_REVERSED = reversed(PluginConfig.CHAT_MESSAGE_TAGS_EXTRA);
@@ -437,19 +412,6 @@ public final class PluginConfig implements JsonConfiguration {
         });
         // Updating recipes for all players.
         Bukkit.updateRecipes();
-        // Removing server links currently stored within the server.
-        Bukkit.getServerLinks().getLinks().forEach(it -> {
-            Bukkit.getServerLinks().removeLink(it);
-        });
-        // Adding new links.
-        SERVER_LINKS.forEach(it -> {
-            try {
-                Bukkit.getServerLinks().addLink(it.name, new URI(it.url));
-            } catch (final URISyntaxException e) {
-                Bukkit.getLogger().severe("Conversion of server link URI failed due to following error(s):");
-                Bukkit.getLogger().severe(" (1) " + e.getClass().getSimpleName() + ": " + e.getMessage());
-            }
-        });
     }
 
 
@@ -521,19 +483,6 @@ public final class PluginConfig implements JsonConfiguration {
 
         @Getter(AccessLevel.PUBLIC)
         private final String state;
-
-    }
-
-    // Moshi should be able to create instance of the object despite the constructor being private.
-    @AllArgsConstructor(access = AccessLevel.PRIVATE)
-    public static final class ServerLinkWrapper {
-
-        @Getter(AccessLevel.PUBLIC)
-        private final Component name;
-
-        @Getter(AccessLevel.PUBLIC)
-        private final String url;
-
 
     }
 

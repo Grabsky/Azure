@@ -1,6 +1,7 @@
 plugins {
-    id "de.eldoria.plugin-yml.paper" version "0.7.1"
     id "com.gradleup.shadow" version "8.3.6"
+    id "xyz.jpenilla.run-paper" version "2.3.1"
+    id "de.eldoria.plugin-yml.paper" version "0.7.1"
 }
 
 repositories {
@@ -8,6 +9,7 @@ repositories {
     maven { url = "https://repo.extendedclip.com/content/repositories/placeholderapi/" }
     // Repository containing the 'AuroraQuests' dependency.
     maven { url = "https://repo.auroramc.gg/releases/" }
+    maven { url = "https://repo.auroramc.gg/snapshots/" }
     // Repository containing the 'ExcellentShop' dependency.
     maven { url = "https://repo.nightexpressdev.com/releases/" }
 }
@@ -16,8 +18,8 @@ dependencies {
     api(project(":azure-api"))
     // Must share version between 'plugin' and 'api' modules.
     implementation("cloud.grabsky:bedrock:$BEDROCK_VERSION")
-    implementation("cloud.grabsky:commands:1.20.1-38")
-    implementation("cloud.grabsky:configuration-paper:1.21.4-47")
+    implementation("cloud.grabsky:commands:1.20.1-40")
+    implementation("cloud.grabsky:configuration-paper:1.21.4-54")
     // Must share version between 'plugin' and 'api' modules.
     implementation("net.kyori:adventure-nbt:$KYORI_NBT_VERSION")
     // Moshi and Okio are already in the classpath.
@@ -38,8 +40,8 @@ dependencies {
     // PlaceholderAPI (Provided)
     compileOnly("me.clip:placeholderapi:2.11.6")
     // Aurora and AuroraQuests
-    compileOnly("gg.auroramc:Aurora:2.1.6")
-    compileOnly("gg.auroramc:AuroraQuests:1.3.16")
+    compileOnly("gg.auroramc:Aurora:2.3.4")
+    compileOnly("gg.auroramc:AuroraQuests:2.0.0-SNAPSHOT")
     // ExcellentShop (Provided)
     compileOnly("su.nightexpress.excellentshop:Core:4.15.0")
     // MorePersistentDataTypes
@@ -51,12 +53,16 @@ tasks {
         // Changing name of the artifact.
         archiveFileName = "${rootProject.name}-${project.version}.jar"
     }
+    runServer {
+        minecraftVersion("1.21.8")
+        jvmArgs("--enable-preview")
+    }
 }
 
 paper {
     name = "Azure"
     main = "cloud.grabsky.azure.Azure"
-    apiVersion = "1.21.4"
+    apiVersion = "1.21.8"
     serverDependencies {
         // Required
         "LuckPerms"      { load = "BEFORE"; required = true }

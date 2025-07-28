@@ -1,3 +1,17 @@
+/*
+ * Azure (https://github.com/Grabsky/Azure)
+ *
+ * Copyright (C) 2024  Grabsky <michal.czopek.foss@proton.me>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License v3 as published by
+ * the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License v3 for more details.
+ */
 package cloud.grabsky.azure.integrations;
 
 import cloud.grabsky.azure.Azure;
@@ -20,15 +34,20 @@ public enum ExcellentShopIntegration implements Listener {
     private static boolean IS_INITIALIZED = false;
 
     public static boolean initialize(final @NotNull Azure plugin) {
-        if (IS_INITIALIZED == false && plugin.getServer().getPluginManager().getPlugin("ExcellentShop") != null) {
-            plugin.getServer().getPluginManager().registerEvents(ExcellentShopIntegration.INSTANCE, plugin);
-            // Marking the integration as initialized.
-            IS_INITIALIZED = true;
-            // Returning true if integration was successfully initialized.
-            return true;
+        if (IS_INITIALIZED == false) {
+            if (plugin.getServer().getPluginManager().getPlugin("ExcellentShop") != null) {
+                plugin.getServer().getPluginManager().registerEvents(ExcellentShopIntegration.INSTANCE, plugin);
+                // Marking the integration as initialized.
+                IS_INITIALIZED = true;
+                // Returning true if integration was successfully initialized.
+                return true;
+            }
+            // Logging warning and returning false if integration could not be initialized.
+            plugin.getLogger().warning("ExcellentShop integration could not be initialized. (DEPENDENCY_NOT_ENABLED)");
+            return false;
         }
         // Logging warning and returning false if integration could not be initialized.
-        plugin.getLogger().warning("ExcellentShop integration could not be initialized. (DEPENDENCY_NOT_ENABLED)");
+        plugin.getLogger().warning("ExcellentShop integration could not be initialized. (ALREADY_INITIALIZED)");
         return false;
     }
 

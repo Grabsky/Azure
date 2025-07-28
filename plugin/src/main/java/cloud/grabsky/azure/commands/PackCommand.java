@@ -83,7 +83,7 @@ public final class PackCommand extends RootCommand {
                     Message.of(PluginLocale.MISSING_PERMISSIONS).send(sender);
                     return;
                 }
-                plugin.getResourcePackManager().sendResourcePacks(target);
+                plugin.getResourcePackManager().sendResourcePacks(target.getUniqueId(), target);
             }
             case "notify" -> {
                 final CommandSender sender = context.getExecutor().asCommandSender();

@@ -29,6 +29,8 @@ import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.JsonReader;
 import com.squareup.moshi.JsonWriter;
 import com.squareup.moshi.Moshi;
+import io.papermc.paper.connection.PlayerConfigurationConnection;
+import io.papermc.paper.event.connection.PlayerConnectionValidateLoginEvent;
 import net.kyori.adventure.text.Component;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.group.Group;
@@ -39,7 +41,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
 
@@ -237,29 +238,31 @@ public final class AzureUserCache implements UserCache, Listener {
         return false;
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onUserLogin(final @NotNull PlayerLoginEvent event) {
-        final Player player = event.getPlayer();
-        // ...
-        if (internalUserMap.containsKey(player.getUniqueId()) == true) {
-            final User user = internalUserMap.get(player.getUniqueId());
+    public void onUserLogin(final @NotNull PlayerConnectionValidateLoginEvent event) {
+        // NOTE: May want to replace it with PlayerLoginConnection once it's known for sure it works as expected.
+        //       It currently allows the player to log-in despite the kickMessage being set.
+        if (event.getConnection() instanceof PlayerConfigurationConnection connection) {
+            final UUID uniqueId = connection.getProfile().getId();
             // ...
-            if (user.getMostRecentBan() != null && user.getMostRecentBan().isActive() == true) {
-                event.setResult(PlayerLoginEvent.Result.KICK_BANNED);
+            if (internalUserMap.containsKey(uniqueId) == true) {
+                final User user = internalUserMap.get(uniqueId);
                 // ...
-                final Punishment punishment = user.getMostRecentBan();
-                // Preparing the kick message.
-                final Component message = (punishment.getDuration().as(Unit.MILLISECONDS) != Long.MAX_VALUE)
-                        ? Message.of(PluginLocale.COMMAND_BAN_DISCONNECT_MESSAGE)
-                                .placeholder("duration_left", Interval.between((long) punishment.getEndDate().as(Unit.MILLISECONDS), System.currentTimeMillis(), Unit.MILLISECONDS).toString())
-                                .placeholder("reason", punishment.getReason())
-                                .parse()
-                        : Message.of(PluginLocale.COMMAND_BAN_DISCONNECT_MESSAGE_PERMANENT)
-                                .placeholder("reason", punishment.getReason())
-                                .parse();
-                // Setting the kick message, unless null.
-                if (message != null)
-                    event.kickMessage(message);
+                if (user.getMostRecentBan() != null && user.getMostRecentBan().isActive() == true) {
+                    final Punishment punishment = user.getMostRecentBan();
+                    // Preparing the kick message.
+                    final @Nullable Component message = (punishment.getDuration().as(Unit.MILLISECONDS) != Long.MAX_VALUE)
+                            ? Message.of(PluginLocale.COMMAND_BAN_DISCONNECT_MESSAGE)
+                                    .placeholder("duration_left", Interval.between((long) punishment.getEndDate().as(Unit.MILLISECONDS), System.currentTimeMillis(), Unit.MILLISECONDS).toString())
+                                    .placeholder("reason", punishment.getReason())
+                                    .parse()
+                            : Message.of(PluginLocale.COMMAND_BAN_DISCONNECT_MESSAGE_PERMANENT)
+                                    .placeholder("reason", punishment.getReason())
+                                    .parse();
+                    // Setting the kick message, which should effectively disallow player from joining.
+                    event.kickMessage(message != null ? message : Component.translatable("multiplayer.disconnect.banned"));
+                }
             }
         }
     }

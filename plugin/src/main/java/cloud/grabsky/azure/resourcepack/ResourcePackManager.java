@@ -15,24 +15,20 @@
 package cloud.grabsky.azure.resourcepack;
 
 import cloud.grabsky.azure.Azure;
-import cloud.grabsky.azure.api.event.ResourcePackLoadEvent;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.util.Iterables;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
+import io.papermc.paper.connection.PlayerConfigurationConnection;
+import io.papermc.paper.event.connection.configuration.AsyncPlayerConnectionConfigureEvent;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.resource.ResourcePackInfo;
 import net.kyori.adventure.resource.ResourcePackRequest;
-import net.kyori.adventure.title.Title;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerResourcePackStatusEvent;
-import org.bukkit.event.player.PlayerResourcePackStatusEvent.Status;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,13 +38,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -106,113 +102,78 @@ public final class ResourcePackManager implements Listener {
     /**
      * Sends configured resource-packs to the specified {@link Player}.
      */
-    public void sendResourcePacks(final @NotNull Player player) {
-        // Logging error if internal web server has is null.
+    @SuppressWarnings("UnstableApiUsage")
+    public CompletableFuture<Void> sendResourcePacks(final @NotNull UUID uniqueId, final @NotNull Audience audience) {
+        // Logging error if internal web server is null.
         if (this.server == null)
-            plugin.getLogger().severe("Requested resource-packs for '" + player.getUniqueId() + "' but the internal web server is null.");
+            plugin.getLogger().severe("Requested resource-packs for '" + uniqueId + "' but the internal web server is null.");
         // Generating secret.
         final String secret = UUID.randomUUID().toString();
         // Adding secret to the map. This can be later used for context removal.
-        secrets.put(player.getUniqueId(), secret);
-        // Resetting number of loaded resource-packs. This is mainly for ease of use with other plugins.
-        player.setMetadata("sent_resource-packs", new FixedMetadataValue(plugin, 0));
-        player.setMetadata("loaded_resource-packs", new FixedMetadataValue(plugin, 0));
+        secrets.put(uniqueId, secret);
         // Measuring request time for debug purposes.
         final long requestStart = System.nanoTime();
+        // Converting pack holders to ResourcePackInfo objects.
+        final List<ResourcePackInfo> packs = holders.stream().map(holder -> {
+            // Creating on-demand URI with the generated secret.
+            final @Nullable URI uri = toURI("http://" + PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS + ":" + PluginConfig.RESOURCE_PACK_PORT + "/" + secret + "/" + holder.uniqueId);
+            // Logging an error in case URI happened to be null, likely due to a syntax error.
+            if (uri == null) {
+                plugin.getLogger().severe("Could not create URI: " + "http://" + PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS + ":" + PluginConfig.RESOURCE_PACK_PORT + "/" + secret + "/" + holder.uniqueId);
+                plugin.getLogger().severe("  Resource-pack " + holder.file.getName() + " will be excluded from the request.");
+                return null;
+            }
+            // Creating new context at path '/{SECRET}/{RESOURCE_PACK_UUID}' which points to a downloadable file.
+            server.createContext("/" + secret + "/" + holder.uniqueId, (exchange) -> {
+                // Opening FileInputStream for the resource-pack file.
+                final FileInputStream in = new FileInputStream(holder.file);
+                // Reading all bytes.
+                final byte[] bytes = in.readAllBytes();
+                // Closing the FileInputStream.
+                in.close();
+                // Responding with code 200 and bytes length.
+                exchange.sendResponseHeaders(200, bytes.length);
+                // Writing bytes (file) to the response.
+                exchange.getResponseBody().write(bytes);
+                // Closing the response.
+                exchange.getResponseBody().close();
+                // Closing the exchange.
+                exchange.close();
+            });
+            // Wrapping and returning as ResourcePackInfo object.
+            return ResourcePackInfo.resourcePackInfo(holder.uniqueId, uri, holder.hash);
+        }).filter(Objects::nonNull).toList();
+        // Preparing CompletableFuture that will be completed when all packs are loaded.
+        final CompletableFuture<Void> future = new CompletableFuture<>();
         // Creating the ResourcePackRequest instance.
         final ResourcePackRequest request = ResourcePackRequest.resourcePackRequest()
+                .packs(packs)
                 .replace(true)
                 .required(PluginConfig.RESOURCE_PACK_IS_REQUIRED)
                 .prompt(PluginConfig.RESOURCE_PACK_PROMPT_MESSAGE)
-                .packs(holders.stream().map(holder -> {
-                    // Creating on-demand URI with the generated secret.
-                    final @Nullable URI uri = toURI("http://" + PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS + ":" + PluginConfig.RESOURCE_PACK_PORT + "/" + secret + "/" + holder.uniqueId);
-                    // Logging an error in case URI happened to be null, likely due to a syntax error.
-                    if (uri == null) {
-                        plugin.getLogger().severe("Could not create URI: " + "http://" + PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS + ":" + PluginConfig.RESOURCE_PACK_PORT + "/" + secret + "/" + holder.uniqueId);
-                        plugin.getLogger().severe("  Resource-pack " + holder.file.getName() + " will be excluded from the request.");
-                        return null;
+                .callback((packId, status, _) -> {
+                    if (audience instanceof PlayerConfigurationConnection connection && status.intermediate() == false) {
+                        // Removing HttpContext since it is no longer needed.
+                        server.removeContext("/" + secrets.get(connection.getProfile().getId()) + "/" + packId);
+                        // Completing the future (and releasing player from configuration phase) after processing the last resource-pack.
+                        if (packs.getLast().id().equals(packId) == true)
+                            future.complete(null);
                     }
-                    // Creating new context at path '/{SECRET}/{RESOURCE_PACK_UUID}' which points to a downloadable file.
-                    server.createContext("/" + secret + "/" + holder.uniqueId, (exchange) -> {
-                        // Opening FileInputStream for the resource-pack file.
-                        final FileInputStream in = new FileInputStream(holder.file);
-                        // Reading all bytes.
-                        final byte[] bytes = in.readAllBytes();
-                        // Closing the FileInputStream.
-                        in.close();
-                        // Responding with code 200 and bytes length.
-                        exchange.sendResponseHeaders(200, bytes.length);
-                        // Writing bytes (file) to the response.
-                        exchange.getResponseBody().write(bytes);
-                        // Closing the response.
-                        exchange.getResponseBody().close();
-                        // Closing the exchange.
-                        exchange.close();
-                    });
-                    // Setting meta-data so other plugins can easily tell when player loaded all packs.
-                    final int count = player.getMetadata("sent_resource-packs").getFirst().asInt();
-                    player.setMetadata("sent_resource-packs", new FixedMetadataValue(plugin, count + 1));
-                    // Wrapping and returning as ResourcePackInfo object.
-                    return ResourcePackInfo.resourcePackInfo(holder.uniqueId, uri, holder.hash);
-                }).filter(Objects::nonNull).toList()).build();
+                })
+                .build();
         // Sending resource-packs to the player.
-        player.sendResourcePacks(request);
-        // Measuring request time for debug purposes. Part 2.
-        final double requestMeasuredTime = (System.nanoTime() - requestStart) / 1000000.0D;
+        audience.sendResourcePacks(request);
         // Logging...
-        plugin.getLogger().info("Resource-packs requested by '" + player.getUniqueId() + "' and total of " + request.packs().size() + " contexts has been created with secret '" + secret + "'... " + requestMeasuredTime + "ms");
+        plugin.getLogger().info("Resource-packs requested by '" + uniqueId + "' and total of " + request.packs().size() + " contexts has been created with secret '" + secret + "'... " + ((System.nanoTime() - requestStart) / 1000000.0D) + "ms");
+        // Returning the future. This will remain incompleted until all packs are processed.
+        return future;
     }
 
-    @EventHandler
-    public void onResourcePackStatus(final @NotNull PlayerResourcePackStatusEvent event) {
-        if (PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS.isBlank() == false && this.server != null) {
-            final Player player = event.getPlayer();
-            // Removing http contexts when no longer needed. Condition might be confusing but is a bit shorter when handled that way.
-            if (event.getStatus() != Status.ACCEPTED && event.getStatus() != Status.SUCCESSFULLY_LOADED)
-                server.removeContext("/" + secrets.get(player.getUniqueId()) + "/" + event.getID());
-            // When the first pack is accepted.
-            if (event.getStatus() == Status.ACCEPTED && player.hasMetadata("is_loading_resource-packs") == false) {
-                // Setting the metadata.
-                player.setMetadata("is_loading_resource-packs", new FixedMetadataValue(plugin, true));
-                // Sending title to the player if enabled.
-                if (PluginConfig.RESOURCE_PACK_LOADING_SCREEN_APPLY_TITLE_AND_SUBTITLE == true) {
-                    // Showing the title.
-                    event.getPlayer().showTitle(
-                            Title.title(
-                                    PluginConfig.RESOURCE_PACK_LOADING_SCREEN_TITLE,
-                                    PluginConfig.RESOURCE_PACK_LOADING_SCREEN_SUBTITLE,
-                                    Title.Times.times(Duration.ofMillis(500), Duration.ofDays(1), Duration.ofMillis(500))
-                            )
-                    );
-                }
-                // Applying blindness effect if enabled.
-                if (PluginConfig.RESOURCE_PACK_LOADING_SCREEN_APPLY_BLINDNESS == true)
-                    event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 0, false, false, false));
-            }
-            // Setting resource-pack related meta-data. This is mainly for ease of use with other plugins.
-            if (event.getStatus() == Status.SUCCESSFULLY_LOADED) {
-                // Increasing number of resource-packs loaded by this player since the last time they were sent.
-                final int count = player.getMetadata("loaded_resource-packs").getFirst().asInt();
-                event.getPlayer().setMetadata("loaded_resource-packs", new FixedMetadataValue(plugin, count + 1));
-                // Increasing total number of resource-packs loaded by this player since they logged in.
-                final int totalCount = player.getMetadata("total_loaded_resource-packs").getFirst().asInt();
-                event.getPlayer().setMetadata("total_loaded_resource-packs", new FixedMetadataValue(plugin, totalCount + 1));
-                // After last pack has been loaded.
-                if (player.getMetadata("sent_resource-packs").getFirst().asInt() == count + 1) {
-                    // Removing the metadata.
-                    player.removeMetadata("is_loading_resource-packs", plugin);
-                    // Clearing the title.
-                    if (PluginConfig.RESOURCE_PACK_LOADING_SCREEN_APPLY_TITLE_AND_SUBTITLE == true)
-                        player.clearTitle();
-                    // Removing blindness effect from the player.
-                    if (PluginConfig.RESOURCE_PACK_LOADING_SCREEN_APPLY_BLINDNESS == true)
-                        player.removePotionEffect(PotionEffectType.BLINDNESS);
-                    // Calling the event.
-                    new ResourcePackLoadEvent(player, count == totalCount).callEvent();
-                }
-            }
-        }
+    @EventHandler @SuppressWarnings("UnstableApiUsage")
+    public void onPlayerConnectionConfiguration(final @NotNull AsyncPlayerConnectionConfigureEvent event) {
+        if (PluginConfig.RESOURCE_PACK_SEND_ON_JOIN == true)
+            // UUID should never be null at this stage.
+            plugin.getResourcePackManager().sendResourcePacks(event.getConnection().getProfile().getId(), event.getConnection().getAudience()).join();
     }
 
     /**
@@ -224,13 +185,6 @@ public final class ResourcePackManager implements Listener {
         } catch (final URISyntaxException _) {
             return null;
         }
-    }
-
-    /**
-     * Returns whether the specified {@link Player} is currently loading resource-packs.
-     */
-    public static boolean isLoadingPacks(final @NotNull Player player) {
-        return player.hasMetadata("is_loading_resource-packs") == true && player.getMetadata("is_loading_resource-packs").getFirst().asBoolean() == true;
     }
 
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
