@@ -63,12 +63,6 @@ import org.jetbrains.annotations.Nullable;
 import lombok.AccessLevel;
 import lombok.Getter;
 
-/*
- * TO-DO:
- * - JOIN / QUIT MESSAGES
- * - PUNISHMENTS
- * -
- */
 public final class DiscordIntegration implements Listener {
 
     private final Azure plugin;
@@ -319,7 +313,7 @@ public final class DiscordIntegration implements Listener {
     /* BUKKIT STUFF */
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onServerLoad(final @NotNull ServerLoadEvent event) {
+    public void onServerStart(final @NotNull ServerLoadEvent event) {
         // Forwarding message to webhook...
         if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_URL.isEmpty() == false) {
             // Setting message placeholders.
@@ -336,6 +330,25 @@ public final class DiscordIntegration implements Listener {
             WebhookForwardingStartStop.send(builder.build());
         }
     }
+
+    // NOTE: This is NOT a listener. This method is called inside 'Azure#onDisable' block and is responsible for sending shutdown message via webhook.
+    public void onServerShutdown() {
+        if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_URL.isEmpty() == false) {
+            // Setting message placeholders.
+            final String message = PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_STOP_MESSAGE_FORMAT);
+            // Creating new instance of WebhookMessageBuilder.
+            final WebhookMessageBuilder builder = new WebhookMessageBuilder().setContent(message);
+            // Setting username if specified.
+            if (PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_USERNAME.isEmpty() == false)
+                builder.setUsername(PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_USERNAME));
+            // Setting avatar if specified.
+            if (PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
+                builder.setAvatarUrl(PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_AVATAR));
+            // Sending the message. Expected to be a blocking call.
+            WebhookForwardingStartStop.send(builder.build());
+        }
+    }
+
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onPlayerChat(final @NotNull AsyncChatEvent event) {

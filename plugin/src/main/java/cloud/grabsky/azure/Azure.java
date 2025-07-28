@@ -14,22 +14,6 @@
  */
 package cloud.grabsky.azure;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.TimeZone;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicLong;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import lombok.AccessLevel;
-import lombok.Getter;
-
-import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
 import cloud.grabsky.azure.api.AzureAPI;
 import cloud.grabsky.azure.api.AzureProvider;
 import cloud.grabsky.azure.api.user.User;
@@ -104,6 +88,23 @@ import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.javacord.api.DiscordApi;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.TimeZone;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+
+import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
 
 public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
 
@@ -250,6 +251,13 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
         AuroraQuestsIntegration.initialize(this);
         // Registering ExcellentShop integration...
         ExcellentShopIntegration.initialize(this);
+    }
+
+    @Override
+    public void onDisable() {
+        if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true)
+            this.getDiscordIntegration().onServerShutdown();
+            this.getDiscordIntegration().shutdown();
     }
 
     @Override
