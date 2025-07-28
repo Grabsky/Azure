@@ -45,6 +45,7 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -100,11 +101,12 @@ public final class DiscordIntegration implements Listener {
     // Strict MiniMessage instance used for deserialization of translatable components and colors appended internally in Discord -> Minecraft chat forwarding.
     private static final MiniMessage STRICT_MINI_MESSAGE = MiniMessage.builder().tags(TagResolver.resolver(StandardTags.translatable(), StandardTags.color())).build();
 
-    private static final java.awt.Color SUCCESS_COLOR = new java.awt.Color(87, 242, 135);
-    private static final java.awt.Color FAILURE_COLOR = new java.awt.Color(237, 66, 69);
+    private static final int SUCCESS_COLOR = 0x57F287;
+    private static final int FAILURE_COLOR = 0xED4245;
 
     public DiscordIntegration(final @NotNull Azure plugin) {
         this.plugin = plugin;
+        // ...
         this.client = JDABuilder.createDefault(PluginConfig.DISCORD_INTEGRATIONS_DISCORD_BOT_TOKEN)
                 // Enabling required intents.
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MEMBERS)
@@ -129,6 +131,8 @@ public final class DiscordIntegration implements Listener {
                 ? JDAWebhookClient.withUrl(PluginConfig.DISCORD_INTEGRATIONS_AUCTION_LISTINGS_FORWARDING_WEBHOOK_URL) : null;
         WebhookForwardingStartStop = (PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_ENABLED)
                 ? JDAWebhookClient.withUrl(PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_URL) : null;
+        // Registering Bukkit event listeners.
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     public void shutdown() {
@@ -147,6 +151,8 @@ public final class DiscordIntegration implements Listener {
             WebhookForwardingDeathMessages.close();
         if (WebhookForwardingAuctionHouseListings != null)
             WebhookForwardingAuctionHouseListings.close();
+        // Unregistering event listeners.
+        HandlerList.unregisterAll(this);
     }
 
     @SubscribeEvent
