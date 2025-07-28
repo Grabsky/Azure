@@ -48,7 +48,7 @@ tasks {
         archiveFileName = "${rootProject.name}-${project.version}.jar"
     }
     runServer {
-        minecraftVersion("1.21.7")
+        minecraftVersion("1.21.8")
         jvmArgs("--enable-preview")
     }
 }
@@ -56,7 +56,7 @@ tasks {
 paper {
     name = "Azure"
     main = "cloud.grabsky.azure.Azure"
-    apiVersion = "1.21.7"
+    apiVersion = "1.21.8"
     serverDependencies {
         // Required
         "LuckPerms"      { load = "BEFORE"; required = true }
