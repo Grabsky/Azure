@@ -86,7 +86,7 @@ public final class UnbanCommand extends RootCommand {
                             .replace("<issuer>", sender instanceof Player ? sender.getName() : "Console");
                     // Forwarding the message through configured webhook.
                     if (message.isEmpty() == false)
-                        plugin.getDiscordIntegration().getWebhookForwardingPunishments().send(message);
+                        plugin.getDiscordIntegration().getWebhookClients().get("PUNISHMENTS").send(message);
                 }
                 return;
             }

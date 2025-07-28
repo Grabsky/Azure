@@ -73,7 +73,7 @@ public enum ExcellentShopIntegration implements Listener {
         if (PluginConfig.DISCORD_INTEGRATIONS_AUCTION_LISTINGS_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
             builder.setAvatarUrl(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_AUCTION_LISTINGS_FORWARDING_WEBHOOK_AVATAR));
         // Sending the message.
-        Azure.getInstance().getDiscordIntegration().getWebhookForwardingAuctionHouseListings().send(builder.build());
+        Azure.getInstance().getDiscordIntegration().getWebhookClients().get("AUCTION_HOUSE").send(builder.build());
     }
 
 }

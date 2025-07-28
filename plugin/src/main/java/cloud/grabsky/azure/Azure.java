@@ -230,19 +230,6 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
         this.getServer().getPluginManager().registerEvents(chatManager, this);
         this.getServer().getPluginManager().registerEvents(resourcePackManager, this);
         this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
-        // Initializing Discord API, logging-in to the bot.
-        if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true) {
-            // Logging error message when token is unspecified or empty.
-            if (PluginConfig.DISCORD_INTEGRATIONS_DISCORD_BOT_TOKEN == null || PluginConfig.DISCORD_INTEGRATIONS_DISCORD_BOT_TOKEN.isEmpty() == true)
-                this.getLogger().severe("Cannot establish connection with Discord API because specified token is incorrect.");
-            // Trying to connect to Discord API. Failure should not stop the server but instead log error to the console.
-            try {
-                this.discordIntegration = new DiscordIntegration(this);
-            } catch (final RuntimeException e) {
-                this.getLogger().severe("Could not establish connection with Discord API.");
-                this.getLogger().severe("  " + e.getMessage());
-            }
-        }
         // Finalizing... (exposing instance to the API)
         AzureProvider.finalize(this);
         // Registering PlaceholderAPI placeholders...
@@ -255,9 +242,10 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
 
     @Override
     public void onDisable() {
-        if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true)
+        if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true) {
             this.getDiscordIntegration().onServerShutdown();
             this.getDiscordIntegration().shutdown();
+        }
     }
 
     @Override
@@ -282,6 +270,26 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                 Placeholders.INSTANCE.unregister();
             // Registering the expansion again.
             Placeholders.INSTANCE.register();
+            // Shutting down JDA instance if started.
+            if (this.discordIntegration != null) {
+                this.getLogger().info("Shutting down Discord (JDA) integration...");
+                this.discordIntegration.shutdown();
+                this.discordIntegration = null;
+            }
+            // Initializing Discord API, logging-in to the bot.
+            if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true) {
+                this.getLogger().info("Enabling Discord (JDA) integration...");
+                // Logging error message when token is unspecified or empty.
+                if (PluginConfig.DISCORD_INTEGRATIONS_DISCORD_BOT_TOKEN == null || PluginConfig.DISCORD_INTEGRATIONS_DISCORD_BOT_TOKEN.isEmpty() == true)
+                    this.getLogger().severe("Cannot establish connection with Discord API because specified token is incorrect.");
+                // Trying to connect to Discord API. Failure should not stop the server but instead log error to the console.
+                try {
+                    this.discordIntegration = new DiscordIntegration(this);
+                } catch (final RuntimeException e) {
+                    this.getLogger().severe("Could not establish connection with Discord API.");
+                    this.getLogger().severe("  " + e.getMessage());
+                }
+            }
             // Returning 'true' as reload finished without any exceptions.
             return true;
         } catch (final ConfigurationMappingException | IllegalStateException | IOException e) {

@@ -116,7 +116,7 @@ public final class KickCommand extends RootCommand {
                     .replace("<reason>", (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON);
             // Forwarding the message through configured webhook.
             if (message.isEmpty() == false)
-                plugin.getDiscordIntegration().getWebhookForwardingPunishments().send(message);
+                plugin.getDiscordIntegration().getWebhookClients().get("PUNISHMENTS").send(message);
         }
 
     }

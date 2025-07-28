@@ -135,7 +135,7 @@ public final class MuteCommand extends RootCommand {
                         .replace("<reason>", finalReason);
                 // Forwarding the message through configured webhook.
                 if (message.isEmpty() == false)
-                    plugin.getDiscordIntegration().getWebhookForwardingPunishments().send(message);
+                    plugin.getDiscordIntegration().getWebhookClients().get("PUNISHMENTS").send(message);
             }
 
         // Otherwise, banning player temporarily.
@@ -158,7 +158,7 @@ public final class MuteCommand extends RootCommand {
                         .replace("<reason>", finalReason);
                 // Forwarding the message through configured webhook.
                 if (message.isEmpty() == false)
-                    plugin.getDiscordIntegration().getWebhookForwardingPunishments().send(message);
+                    plugin.getDiscordIntegration().getWebhookClients().get("PUNISHMENTS").send(message);
             }
         }
     }

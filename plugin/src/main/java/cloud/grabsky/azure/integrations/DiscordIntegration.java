@@ -20,6 +20,7 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -53,6 +54,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -70,27 +72,15 @@ public final class DiscordIntegration implements Listener {
     @Getter(AccessLevel.PUBLIC)
     private final JDA client;
 
+    @Getter(AccessLevel.PUBLIC)
+    private final Map<String, WebhookClient> webhookClients = new HashMap<>();
+
     private @Nullable BukkitTask activityRefreshTask;
 
     // Stores all currently active codes.
     private final Cache<UUID, String> codes = CacheBuilder.newBuilder()
             .expireAfterWrite(5, TimeUnit.MINUTES)
             .build();
-
-    private final WebhookClient WebhookForwardingChat;
-
-    @Getter(AccessLevel.PUBLIC) // This webhook is accessed from other classes.
-    private final WebhookClient WebhookForwardingJoinQuit;
-
-    private final WebhookClient WebhookForwardingStartStop;
-
-    @Getter(AccessLevel.PUBLIC) // This webhook is accessed from other classes.
-    private final WebhookClient WebhookForwardingPunishments;
-
-    private final WebhookClient WebhookForwardingDeathMessages;
-
-    @Getter(AccessLevel.PUBLIC) // This webhook is accessed from other classes.
-    private final WebhookClient WebhookForwardingAuctionHouseListings;
 
     // Strict MiniMessage instance used for deserialization of translatable components and colors appended internally in Discord -> Minecraft chat forwarding.
     private static final MiniMessage STRICT_MINI_MESSAGE = MiniMessage.builder().tags(TagResolver.resolver(StandardTags.translatable(), StandardTags.color())).build();
@@ -100,7 +90,7 @@ public final class DiscordIntegration implements Listener {
 
     public DiscordIntegration(final @NotNull Azure plugin) {
         this.plugin = plugin;
-        // ...
+        // Initializing and
         this.client = JDABuilder.createDefault(PluginConfig.DISCORD_INTEGRATIONS_DISCORD_BOT_TOKEN)
                 // Enabling required intents.
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MEMBERS)
@@ -112,50 +102,26 @@ public final class DiscordIntegration implements Listener {
                 .addEventListeners(this)
                 // Building and logging in. This method does not block.
                 .build();
-        // Setting up webhooks.
-        WebhookForwardingChat = (PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_ENABLED)
-                ? JDAWebhookClient.withUrl(PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_URL) : null;
-        WebhookForwardingPunishments = (PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_ENABLED)
-                ? JDAWebhookClient.withUrl(PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_WEBHOOK_URL) : null;
-        WebhookForwardingJoinQuit = (PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_ENABLED)
-                ? JDAWebhookClient.withUrl(PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_URL) : null;
-        WebhookForwardingDeathMessages = (PluginConfig.DISCORD_INTEGRATIONS_DEATH_MESSAGE_FORWARDING_ENABLED)
-                ? JDAWebhookClient.withUrl(PluginConfig.DISCORD_INTEGRATIONS_DEATH_MESSAGE_FORWARDING_WEBHOOK_URL) : null;
-        WebhookForwardingAuctionHouseListings = (PluginConfig.DISCORD_INTEGRATIONS_AUCTION_LISTINGS_FORWARDING_ENABLED)
-                ? JDAWebhookClient.withUrl(PluginConfig.DISCORD_INTEGRATIONS_AUCTION_LISTINGS_FORWARDING_WEBHOOK_URL) : null;
-        WebhookForwardingStartStop = (PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_ENABLED)
-                ? JDAWebhookClient.withUrl(PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_URL) : null;
+        // Initializing webhook clients.
+        if (PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_ENABLED)
+            this.webhookClients.put("CHAT", JDAWebhookClient.withUrl(PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_URL));
+        if (PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_ENABLED)
+            this.webhookClients.put("PUNISHMENTS", JDAWebhookClient.withUrl(PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_WEBHOOK_URL));
+        if (PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_ENABLED)
+            this.webhookClients.put("JOIN_QUIT", JDAWebhookClient.withUrl(PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_URL));
+        if (PluginConfig.DISCORD_INTEGRATIONS_DEATH_MESSAGE_FORWARDING_ENABLED)
+            this.webhookClients.put("DEATHS", JDAWebhookClient.withUrl(PluginConfig.DISCORD_INTEGRATIONS_DEATH_MESSAGE_FORWARDING_WEBHOOK_URL));
+        if (PluginConfig.DISCORD_INTEGRATIONS_AUCTION_LISTINGS_FORWARDING_ENABLED)
+            this.webhookClients.put("AUCTION_HOUSE", JDAWebhookClient.withUrl(PluginConfig.DISCORD_INTEGRATIONS_AUCTION_LISTINGS_FORWARDING_WEBHOOK_URL));
+        if (PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_ENABLED)
+            this.webhookClients.put("START_STOP", JDAWebhookClient.withUrl(PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_URL));
         // Registering Bukkit event listeners.
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     public void shutdown() {
         // Shutting down the JDA.
-        this.client.shutdown();
-        // Closing all webhook clients.
-        if (WebhookForwardingChat != null)
-            WebhookForwardingChat.close();
-        if (WebhookForwardingJoinQuit != null)
-            WebhookForwardingJoinQuit.close();
-        if (WebhookForwardingStartStop != null)
-            WebhookForwardingStartStop.close();
-        if (WebhookForwardingPunishments != null)
-            WebhookForwardingPunishments.close();
-        if (WebhookForwardingDeathMessages != null)
-            WebhookForwardingDeathMessages.close();
-        if (WebhookForwardingAuctionHouseListings != null)
-            WebhookForwardingAuctionHouseListings.close();
-        // Unregistering event listeners.
-        HandlerList.unregisterAll(this);
-    }
-
-    @SubscribeEvent
-    private void onShutdown(final @NotNull ShutdownEvent event) {
-        // Cancelling the current task.
-        if (activityRefreshTask != null && activityRefreshTask.isCancelled() == false) {
-            activityRefreshTask.cancel();
-            activityRefreshTask = null;
-        }
+        this.client.shutdownNow();
     }
 
     @SubscribeEvent
@@ -179,6 +145,20 @@ public final class DiscordIntegration implements Listener {
             else client.getPresence().setPresence(Activity.of(PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getType(), PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getState())), false);
         // Otherwise, unsetting the activity.
         else client.getPresence().setActivity(null);
+    }
+
+    @SubscribeEvent
+    private void onShutdown(final @NotNull ShutdownEvent event) {
+        // Cancelling the current task.
+        if (activityRefreshTask != null && activityRefreshTask.isCancelled() == false) {
+            activityRefreshTask.cancel();
+            activityRefreshTask = null;
+        }
+        // Closing all webhook clients.
+        this.webhookClients.values().forEach(WebhookClient::close);
+        this.webhookClients.clear();
+        // Unregistering Bukkit event listeners.
+        HandlerList.unregisterAll(this);
     }
 
     @SubscribeEvent
@@ -327,7 +307,7 @@ public final class DiscordIntegration implements Listener {
             if (PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
                 builder.setAvatarUrl(PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_AVATAR));
             // Sending the message. Expected to be a blocking call.
-            WebhookForwardingStartStop.send(builder.build());
+            this.webhookClients.get("START_STOP").send(builder.build());
         }
     }
 
@@ -345,7 +325,7 @@ public final class DiscordIntegration implements Listener {
             if (PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
                 builder.setAvatarUrl(PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_AVATAR));
             // Sending the message. Expected to be a blocking call.
-            WebhookForwardingStartStop.send(builder.build());
+            this.webhookClients.get("START_STOP").send(builder.build());
         }
     }
 
@@ -370,7 +350,7 @@ public final class DiscordIntegration implements Listener {
             if (PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
                 builder.setAvatarUrl(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_AVATAR));
             // Sending the message.
-            WebhookForwardingChat.send(builder.build());
+            this.webhookClients.get("CHAT").send(builder.build());
         }
     }
 
@@ -392,7 +372,7 @@ public final class DiscordIntegration implements Listener {
             if (PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
                 builder.setAvatarUrl(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_AVATAR));
             // Sending the message.
-            WebhookForwardingJoinQuit.send(builder.build());
+            this.webhookClients.get("JOIN_QUIT").send(builder.build());
         }
     }
 
@@ -414,7 +394,7 @@ public final class DiscordIntegration implements Listener {
             if (PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
                 builder.setAvatarUrl(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_AVATAR));
             // Sending the message.
-            WebhookForwardingJoinQuit.send(builder.build());
+            this.webhookClients.get("JOIN_QUIT").send(builder.build());
         }
     }
 
@@ -445,37 +425,38 @@ public final class DiscordIntegration implements Listener {
             if (PluginConfig.DISCORD_INTEGRATIONS_DEATH_MESSAGE_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
                 builder.setAvatarUrl(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_DEATH_MESSAGE_FORWARDING_WEBHOOK_AVATAR));
             // Sending the message.
-            WebhookForwardingDeathMessages.send(builder.build());
+            this.webhookClients.get("DEATHS").send(builder.build());
         }
     }
 
     /* VERIFICATION */
 
-//    public void updateVerificationRole(final @NotNull String discordId) throws IllegalStateException {
-//        // Getting configured server.
-//        final @Nullable Guild guild = client.getGuildById(PluginConfig.DISCORD_INTEGRATIONS_DISCORD_SERVER_ID);
-//        // Throwing IllegalStateException if configured server is inaccessible.
-//        if (guild == null)
-//            throw new IllegalStateException("Server is inaccessible: " + PluginConfig.DISCORD_INTEGRATIONS_DISCORD_SERVER_ID);
-//        // Checking if user has left the server
-//        if (guild.getMemberById(discordId) != null) {
-//            // Removing permission from the player, if configured.
-//            if ("".equals(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_PERMISSION) == false)
-//                // Loading LuckPerms' User and removing permission from them.
-//                plugin.getLuckPerms().getUserManager().modifyUser(thisUser.getUniqueId(), (it) -> {
-//                    it.data().remove(PermissionNode.builder(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_PERMISSION).build());
-//                });
-//            // Getting verification role.
-//            final @Nullable org.javacord.api.entity.permission.Role role = server.getRoleById(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_ROLE_ID).orElse(null);
-//            // If the role exists, it is now being removed from the user.
-//            if (role != null)
-//                plugin.getDiscord().getUserById(thisUser.getDiscordId()).thenAccept(it -> server.removeRoleFromUser(it, role));
-//            // Removing associated ID.
-//            thisUser.setDiscordId(null);
-//            // Saving... Hopefully this won't cause any CME or data loss due to the fact we're saving file earlier too.
-//            // I think in the worst case scenario either this or country info would be lost.
-//            this.saveUser(thisUser);
-//        }
-//    }
+    public void updateVerificationRole(final User user, final @NotNull String discordId) throws IllegalStateException {
+        // Getting configured server.
+        final @Nullable Guild guild = client.getGuildById(PluginConfig.DISCORD_INTEGRATIONS_DISCORD_SERVER_ID);
+        // Throwing IllegalStateException if configured server is inaccessible.
+        if (guild == null)
+            throw new IllegalStateException("Server is inaccessible: " + PluginConfig.DISCORD_INTEGRATIONS_DISCORD_SERVER_ID);
+        // Checking if user has left the server
+        if (guild.getMemberById(discordId) != null) {
+            // Removing permission from the player, if configured.
+            if ("".equals(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_PERMISSION) == false)
+                // Loading LuckPerms' User and removing permission from them.
+                plugin.getLuckPerms().getUserManager().modifyUser(user.getUniqueId(), (it) -> {
+                    it.data().remove(PermissionNode.builder(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_PERMISSION).build());
+                });
+            // Getting verification role.
+            final @Nullable Role role = guild.getRoleById(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_ROLE_ID);
+            // If the role exists, it is now being removed from the user.
+            if (role != null)
+                guild.removeRoleFromMember(UserSnowflake.fromId(discordId), role).queue();
+            // Removing associated ID.
+            user.setDiscordId(null);
+            // Saving... Hopefully this won't cause any CME or data loss due to the fact we're saving file earlier too.
+            // I think in the worst case scenario either this or country info would be lost.
+            plugin.getUserCache().as(AzureUserCache.class).saveUser(user);
+        }
+    }
+
 
 }
