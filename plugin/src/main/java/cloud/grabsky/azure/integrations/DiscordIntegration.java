@@ -54,7 +54,9 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.security.SecureRandom;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -456,6 +458,28 @@ public final class DiscordIntegration implements Listener {
             // I think in the worst case scenario either this or country info would be lost.
             plugin.getUserCache().as(AzureUserCache.class).saveUser(user);
         }
+    }
+
+    /**
+     * Returns verification code which is active for the next 5 minutes. Code expiration is handled by the {@link Cache} storage.
+     */
+    public @NotNull String requestCode(final @NotNull UUID uniqueId) {
+        final @Nullable String existingToken = codes.getIfPresent(uniqueId);
+        // Returning existing token if exists.
+        if (existingToken != null)
+            return existingToken;
+        // Generate a new token otherwise...
+        final Iterator<String> iterator = codes.asMap().values().iterator();
+        // Token. Generated in the next step.
+        String token = "";
+        // Generating...
+        while (token.isEmpty() == true || codes.asMap().containsValue(token) == true) {
+            token = new SecureRandom().nextInt(100, 1000) + "-" + new SecureRandom().nextInt(100, 1000);
+        }
+        // Adding to cache.
+        codes.put(uniqueId, token);
+        // Returning...
+        return token;
     }
 
 
