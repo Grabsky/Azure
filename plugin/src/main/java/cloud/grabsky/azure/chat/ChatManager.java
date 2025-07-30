@@ -36,7 +36,6 @@ import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.event.player.AsyncChatDecorateEvent;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import me.clip.placeholderapi.PlaceholderAPI;
-import net.fellbaum.jemoji.EmojiManager;
 import net.kyori.adventure.chat.SignedMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickCallback.Options;
@@ -45,12 +44,10 @@ import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.luckperms.api.cacheddata.CachedMetaData;
 import net.luckperms.api.model.user.UserManager;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -59,13 +56,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemRarity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
-import org.javacord.api.entity.channel.ServerChannel;
-import org.javacord.api.entity.message.mention.AllowedMentions;
-import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
-import org.javacord.api.entity.permission.Role;
-import org.javacord.api.entity.server.Server;
-import org.javacord.api.event.message.MessageCreateEvent;
-import org.javacord.api.listener.message.MessageCreateListener;
 
 import java.io.File;
 import java.io.IOException;
@@ -80,8 +70,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -96,7 +84,7 @@ import static net.kyori.adventure.text.format.NamedTextColor.WHITE;
 import static okio.Okio.buffer;
 import static okio.Okio.source;
 
-public final class ChatManager implements Listener, MessageCreateListener {
+public final class ChatManager implements Listener {
 
     private final Azure plugin;
 
@@ -127,19 +115,6 @@ public final class ChatManager implements Listener, MessageCreateListener {
     // Raw type of Set<String> used for deserialization with Moshi.
     private static final Type LIST_STRING_TYPE = Types.newParameterizedType(Set.class, String.class);
 
-    // Strict MiniMessage instance used for deserialization of translatable components and colors appended internally in Discord -> Minecraft chat forwarding.
-    private static final MiniMessage STRICT_MINI_MESSAGE = MiniMessage.builder().tags(TagResolver.resolver(StandardTags.translatable(), StandardTags.color())).build();
-
-    // Slightly less complex REGEX which (1) does not take backslashes into account (2) possibly breaks other edge-cases.
-    private static final Pattern MENTION_REGEX = Pattern.compile("(<@!?(\\d+)>|<@&(\\d+)>|<#(\\d+)>|<a?:(\\w+):(\\d+)>)");
-
-    private static final AllowedMentions NO_MENTIONS = new AllowedMentionsBuilder()
-            .setMentionEveryoneAndHere(false)
-            .setMentionRepliedUser(false)
-            .setMentionUsers(false)
-            .setMentionRoles(false)
-            .build();
-
     public ChatManager(final Azure plugin) {
         this.plugin = plugin;
         this.luckPermsUserManager = plugin.getLuckPerms().getUserManager();
@@ -149,7 +124,6 @@ public final class ChatManager implements Listener, MessageCreateListener {
         this.chatCooldowns = new HashMap<>();
         this.lastRecipients = new HashMap<>();
         this.inappropriateWords = new HashSet<>();
-
     }
 
     /**
@@ -391,48 +365,6 @@ public final class ChatManager implements Listener, MessageCreateListener {
 
     }
 
-    @Override @SuppressWarnings("deprecation") // Suppressing @Deprecated method(s) as adventure seems to not provide an alternative for that.
-    public void onMessageCreate(final @NotNull MessageCreateEvent event) {
-        // Skipping in case chat returning is not enabled.
-        if (PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_ENABLED == false)
-            return;
-        // Skipping irrelevant channels and bot replies.
-        if (event.getChannel().getIdAsString().equals(PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_CHANNEL_ID) == true && event.getMessageAuthor().isRegularUser() == true) {
-            // Getting the message components.
-            final String username = event.getMessageAuthor().getName();
-            final String displayname = event.getMessageAuthor().getDisplayName();
-            // Getting the message and stripping all tags and formatting. Not final because it's modified in the next step.
-            String message = replaceMentions(event.getMessageContent(), event.getServer().get(), true);
-            // Replacing all emojis in this message with a translatable component.
-            message = EmojiManager.replaceAllEmojis(message, (emoji) -> "<white><lang:'" + emoji.getDiscordAliases().getFirst() + "'></white>");
-            // Appending '(Attachment)' or similar string to the message if it contains an attachment like image etc.
-            message = (event.getMessage().getAttachments().isEmpty() == false)
-                    ? (message.isBlank() == false)
-                            ? message + " " + PluginLocale.CHAT_ATTACHMENT
-                            : PluginLocale.CHAT_ATTACHMENT
-                    : message;
-            // Appending '(Re: User)' in front of the message if it's a reply.
-            message = (event.getMessage().getReferencedMessage().isPresent() == true)
-                    ? "<#848484>(Re: <#A89468>" + event.getMessage().getReferencedMessage().map(ref -> ref.getAuthor().getName()).orElse("N/A") + "</#A89468>)</#848484> " + message
-                    : message;
-            // Parsing the message using MiniMessage, with just the translatable and color tags enabled.
-            final Component finalMessage = STRICT_MINI_MESSAGE.deserialize(message);
-            // Sending message to the console.
-            Message.of(PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_CONSOLE_FORMAT)
-                    .placeholder("username", username)
-                    .placeholder("displayname", displayname)
-                    .placeholder("message", finalMessage)
-                    .send(Bukkit.getConsoleSender());
-            // Sending message to all players.
-            Message.of(PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_CHAT_FORMAT)
-                    .placeholder("username", username)
-                    .placeholder("displayname", displayname)
-                    .placeholder("message", finalMessage)
-                    .send(Bukkit.getServer().filterAudience(audience -> audience instanceof Player));
-        }
-
-    }
-
     public void setLastRecipients(final @NotNull UUID first, final @NotNull UUID second) {
         this.lastRecipients.put(first, second);
         this.lastRecipients.put(second, first);
@@ -473,49 +405,6 @@ public final class ChatManager implements Listener, MessageCreateListener {
             return item.getData(DataComponentTypes.RARITY).color();
         // No color was found, so it should default to WHITE.
         else return NamedTextColor.WHITE;
-    }
-
-    // Less complex and more performant alternative to Message#getReadableContent.
-    private static String replaceMentions(String text, final Server server, boolean stripTags) {
-        // Stripping legacy chat colors and tags if specified.
-        if (stripTags == true)
-            text = MiniMessage.miniMessage().stripTags(ChatColor.stripColor(text));
-        // Creating new instance of Matcher from compiled pattern (above) and specified text.
-        final Matcher matcher = MENTION_REGEX.matcher(text);
-        // Preparing a result StringBuilder which will be filled by the code below.
-        final StringBuilder result = new StringBuilder();
-        // Matching...
-        while (matcher.find() == true) {
-            // Matching all possible mentions using groups.
-            final String userId = matcher.group(2);
-            final String roleId = matcher.group(3);
-            final String channelId = matcher.group(4);
-            final String emojiName = matcher.group(5);
-            final String emojiId = matcher.group(6);
-            // Creating replacement variable which defaults to the original text.
-            String replacement = matcher.group(0);
-            // User ID '<@1234567890>'
-            if (userId != null)
-                replacement = "<#A89468>@" + server.getApi().getCachedUserById(userId).map(org.javacord.api.entity.user.User::getName).orElse("invalid-user") + "</#A89468>";
-                // Role ID '<@&123456780>'
-            else if (roleId != null)
-                replacement = "<#A89468>@" + server.getApi().getRoleById(roleId).map(Role::getName).orElse("invalid-role") + "</#A89468>";
-                // Channel ID '<#1234567890>'
-            else if (channelId != null)
-                replacement =  "<#A89468>#" + server.getApi().getServerChannelById(channelId).map(ServerChannel::getName).orElse("invalid-channel") + "</#A89468>";
-                // Emoji name '<:[NAME]:[ID]>'
-            else if (emojiName != null)
-                replacement = ":" + emojiName + ":";
-            // If the replacement is null, keep the original mention.
-            if (replacement == null)
-                replacement = matcher.group(0);
-            // Appending replacement (or original string) to the result.
-            matcher.appendReplacement(result, replacement);
-        }
-        // Appending the rest of the matcher to the result.
-        matcher.appendTail(result);
-        // Building and returning the result, with all mentions replaced.
-        return result.toString();
     }
 
 }

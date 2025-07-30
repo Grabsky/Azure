@@ -87,7 +87,6 @@ import org.bukkit.Registry;
 import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import org.javacord.api.DiscordApi;
 
 import java.io.File;
 import java.io.IOException;
@@ -134,9 +133,6 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
 
     @Getter(AccessLevel.PUBLIC)
     private DiscordIntegration discordIntegration;
-
-    @Getter(AccessLevel.PUBLIC)
-    private @Nullable DiscordApi discord;
 
     private ConfigurationMapper mapper;
 
