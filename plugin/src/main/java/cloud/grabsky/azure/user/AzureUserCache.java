@@ -177,17 +177,8 @@ public final class AzureUserCache implements UserCache, Listener {
     }
 
     @Override
-    public @Nullable User getUser(final @NotNull UUID uniqueId) {
-        return internalUserMap.get(uniqueId);
-    }
-
-    @Override
-    public @Nullable User getUser(final @NotNull String name) {
-        for (final User user : internalUserMap.values())
-            if (user.getName().equals(name) == true)
-                return user;
-        // No user found. Returning null.
-        return null;
+    public @NotNull @Unmodifiable Map<UUID, User> getUsersMap() {
+        return Collections.unmodifiableMap(internalUserMap);
     }
 
     @Override
@@ -223,20 +214,6 @@ public final class AzureUserCache implements UserCache, Listener {
             // Returning the User instance.
             return user;
         });
-    }
-
-    @Override
-    public boolean hasUser(final @NotNull UUID uniqueId) {
-        return internalUserMap.containsKey(uniqueId);
-    }
-
-    @Override
-    public boolean hasUser(final @NotNull String name) {
-        for (final User user : internalUserMap.values())
-            if (user.getName().equals(name) == true)
-                return true;
-        // No user found. Returning false.
-        return false;
     }
 
     @SuppressWarnings("UnstableApiUsage")

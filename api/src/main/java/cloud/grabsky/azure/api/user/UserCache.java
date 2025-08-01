@@ -17,6 +17,7 @@ package cloud.grabsky.azure.api.user;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.UUID;
 
 import org.jetbrains.annotations.ApiStatus.Internal;
@@ -35,14 +36,23 @@ public interface UserCache {
     @NotNull @Unmodifiable Collection<User> getUsers();
 
     /**
-     * Returns {@link User} if currently in cache, {@code null} otherwise.
+     * Returns unmodifiable {@link Map} of users currently held in cache.
      */
-    @Nullable User getUser(final @NotNull UUID uniqueId);
+    @NotNull @Unmodifiable Map<UUID, User> getUsersMap();
 
     /**
      * Returns {@link User} if currently in cache, {@code null} otherwise.
      */
-    @Nullable User getUser(final @NotNull String name);
+    default @Nullable User getUser(final @NotNull UUID uniqueId) {
+        return this.getUsersMap().get(uniqueId);
+    }
+
+    /**
+     * Returns {@link User} if currently in cache, {@code null} otherwise.
+     */
+    default @Nullable User getUser(final @NotNull String name) {
+        return this.getUsers().stream().filter(user -> user.getName().equalsIgnoreCase(name) == true).findFirst().orElse(null);
+    }
 
     /**
      * Returns {@link User} if currently in cache, {@code null} otherwise.
@@ -52,12 +62,16 @@ public interface UserCache {
     /**
      * Returns {@code true} if user with provided {@link UUID} (uniqueId) is currently in cache.
      */
-    boolean hasUser(final @NotNull UUID uniqueId);
+    default boolean hasUser(final @NotNull UUID uniqueId) {
+        return this.getUsersMap().containsKey(uniqueId);
+    }
 
     /**
      * Returns {@code true} if user with provided {@link String} (name) is currently in cache.
      */
-    boolean hasUser(final @NotNull String name);
+    default boolean hasUser(final @NotNull String name) {
+        return this.getUsers().stream().anyMatch(user -> user.getName().equalsIgnoreCase(name));
+    }
 
     /**
      * Returns matching {@link User} for the specified discord identifier.
