@@ -61,8 +61,8 @@ import cloud.grabsky.azure.configuration.PluginConfig.DeleteButton;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.azure.configuration.adapters.BossBarAdapterFactory;
 import cloud.grabsky.azure.configuration.adapters.TagResolverAdapter;
-import cloud.grabsky.azure.discord.VerificationManager;
 import cloud.grabsky.azure.integrations.AuroraQuestsIntegration;
+import cloud.grabsky.azure.integrations.DiscordIntegration;
 import cloud.grabsky.azure.integrations.ExcellentShopIntegration;
 import cloud.grabsky.azure.listener.PlayerListener;
 import cloud.grabsky.azure.resourcepack.ResourcePackManager;
@@ -77,7 +77,6 @@ import cloud.grabsky.configuration.ConfigurationMapper;
 import cloud.grabsky.configuration.adapter.AbstractEnumJsonAdapter;
 import cloud.grabsky.configuration.exception.ConfigurationMappingException;
 import cloud.grabsky.configuration.paper.PaperConfigurationMapper;
-import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.luckperms.api.LuckPerms;
@@ -87,19 +86,10 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.Registry;
 import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.server.ServerLoadEvent;
-import org.bukkit.scheduler.BukkitTask;
-import org.javacord.api.DiscordApi;
-import org.javacord.api.DiscordApiBuilder;
-import org.javacord.api.entity.intent.Intent;
-import org.javacord.api.entity.message.WebhookMessageBuilder;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -112,7 +102,6 @@ import org.jetbrains.annotations.Nullable;
 
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.SneakyThrows;
 
 import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
 
@@ -140,15 +129,10 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
     private ResourcePackManager resourcePackManager;
 
     @Getter(AccessLevel.PUBLIC)
-    private VerificationManager verificationManager;
-
-    @Getter(AccessLevel.PUBLIC)
     private FileLogger punishmentsFileLogger;
 
     @Getter(AccessLevel.PUBLIC)
-    private @Nullable DiscordApi discord;
-
-    private @Nullable BukkitTask activityRefreshTask;
+    private DiscordIntegration discordIntegration;
 
     private ConfigurationMapper mapper;
 
@@ -242,29 +226,6 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
         this.getServer().getPluginManager().registerEvents(chatManager, this);
         this.getServer().getPluginManager().registerEvents(resourcePackManager, this);
         this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
-        // Initializing Discord API, logging-in to the bot.
-        if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true) {
-            // Logging error message when token is unspecified or empty.
-            if (PluginConfig.DISCORD_INTEGRATIONS_DISCORD_BOT_TOKEN == null || PluginConfig.DISCORD_INTEGRATIONS_DISCORD_BOT_TOKEN.isEmpty() == true)
-                this.getLogger().severe("Cannot establish connection with Discord API because specified token is incorrect.");
-            // Trying to connect to Discord API. Failure should not stop the server but instead log error to the console.
-            try {
-                this.discord = new DiscordApiBuilder()
-                        .setToken(PluginConfig.DISCORD_INTEGRATIONS_DISCORD_BOT_TOKEN)
-                        .addIntents(Intent.MESSAGE_CONTENT, Intent.GUILD_MEMBERS, Intent.GUILD_PRESENCES)
-                        // For mentions to display properly.
-                        .setUserCacheEnabled(true)
-                        .setWaitForUsersOnStartup(true)
-                        .addListener(chatManager)
-                        .login().join();
-                // Creating new instance of VerificationManager, which also register two listeners.
-                // At this point we know that 'this.discord' is not null. No extra check required.
-                this.verificationManager = new VerificationManager(this, discord);
-            } catch (final RuntimeException e) {
-                this.getLogger().severe("Could not establish connection with Discord API.");
-                this.getLogger().severe("  " + e.getMessage());
-            }
-        }
         // Finalizing... (exposing instance to the API)
         AzureProvider.finalize(this);
         // Registering PlaceholderAPI placeholders...
@@ -275,28 +236,11 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
         ExcellentShopIntegration.initialize(this);
     }
 
-    @Override @SneakyThrows
+    @Override
     public void onDisable() {
-        super.onDisable();
-        // ...
-        if (discord != null) {
-            // Forwarding message to webhook...
-            if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_URL.isEmpty() == false) {
-                // Setting message placeholders.
-                final String message = PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_STOP_MESSAGE_FORMAT);
-                // Creating new instance of WebhookMessageBuilder.
-                final WebhookMessageBuilder builder = new WebhookMessageBuilder().setContent(message);
-                // Setting username if specified.
-                if (PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_USERNAME.isEmpty() == false)
-                    builder.setDisplayName(PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_USERNAME));
-                // Setting avatar if specified.
-                if (PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
-                    builder.setDisplayAvatar(new URI(PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_AVATAR)).toURL());
-                // Sending the message. Expected to be a blocking call.
-                builder.send(discord, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_URL).join();
-            }
-            // Disconnecting from Discord API. Expected to be a blocking call.
-            discord.disconnect().join();
+        if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true) {
+            this.getDiscordIntegration().onServerShutdown();
+            this.getDiscordIntegration().shutdown();
         }
     }
 
@@ -317,33 +261,31 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
             // Reloading filtered words.
             if (this.chatManager != null)
                 chatManager.loadInappropriateWords();
-            // Reloading discord bot custom activity.
-            if (discord != null) {
-                // Cancelling the current task.
-                if (activityRefreshTask != null && activityRefreshTask.isCancelled() == false)
-                    activityRefreshTask.cancel();
-                // Setting configured activity if specified.
-                if (PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getState().isEmpty() == false)
-                    // Scheduling a refreshing task if desired.
-                    if (PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getRefreshRate() > 0)
-                        this.activityRefreshTask = this.getBedrockScheduler().repeat(0L, PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getRefreshRate() * 20L, Long.MAX_VALUE, (_) -> {
-                            // Parsing string with PlaceholderAPI.
-                            final String parsed = PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getState());
-                            // Updating the activity.
-                            discord.updateActivity(PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getType(), parsed);
-                            // Continuing with the task.
-                            return true;
-                        });
-                        // Otherwise, just setting the activity.
-                    else discord.updateActivity(PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getType(), PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getState());
-                // Otherwise, unsetting the activity.
-                else discord.unsetActivity();
-            }
             // Unregistering PAPI expansion if already registered.
             if (Placeholders.INSTANCE.isRegistered() == true)
                 Placeholders.INSTANCE.unregister();
             // Registering the expansion again.
             Placeholders.INSTANCE.register();
+            // Shutting down JDA instance if started.
+            if (this.discordIntegration != null) {
+                this.getLogger().info("Shutting down Discord (JDA) integration...");
+                this.discordIntegration.shutdown();
+                this.discordIntegration = null;
+            }
+            // Initializing Discord API, logging-in to the bot.
+            if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true) {
+                this.getLogger().info("Enabling Discord (JDA) integration...");
+                // Logging error message when token is unspecified or empty.
+                if (PluginConfig.DISCORD_INTEGRATIONS_DISCORD_BOT_TOKEN == null || PluginConfig.DISCORD_INTEGRATIONS_DISCORD_BOT_TOKEN.isEmpty() == true)
+                    this.getLogger().severe("Cannot establish connection with Discord API because specified token is incorrect.");
+                // Trying to connect to Discord API. Failure should not stop the server but instead log error to the console.
+                try {
+                    this.discordIntegration = new DiscordIntegration(this);
+                } catch (final RuntimeException e) {
+                    this.getLogger().severe("Could not establish connection with Discord API.");
+                    this.getLogger().severe("  " + e.getMessage());
+                }
+            }
             // Returning 'true' as reload finished without any exceptions.
             return true;
         } catch (final ConfigurationMappingException | IllegalStateException | IOException e) {
@@ -356,49 +298,8 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
         }
     }
 
-    // Waiting for server to be fully enabled before updating discord activity. PlaceholderAPI extensions should be enabled by now.
-    @SneakyThrows
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onServerLoad(final ServerLoadEvent event) {
-        // Setting configured activity if specified.
-        if (discord != null) {
-            // Forwarding message to webhook...
-            if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_URL.isEmpty() == false) {
-                // Setting message placeholders.
-                final String message = PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_START_MESSAGE_FORMAT);
-                // Creating new instance of WebhookMessageBuilder.
-                final WebhookMessageBuilder builder = new WebhookMessageBuilder().setContent(message);
-                // Setting username if specified.
-                if (PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_USERNAME.isEmpty() == false)
-                    builder.setDisplayName(PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_USERNAME));
-                // Setting avatar if specified.
-                if (PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
-                    builder.setDisplayAvatar(new URI(PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_AVATAR)).toURL());
-                // Sending the message. Expected to be a blocking call.
-                builder.send(discord, PluginConfig.DISCORD_INTEGRATIONS_START_AND_STOP_FORWARDING_WEBHOOK_URL).join();
-            }
-            // Cancelling the current task.
-            if (activityRefreshTask != null && activityRefreshTask.isCancelled() == false)
-                activityRefreshTask.cancel();
-            // Setting configured activity if specified.
-            if (PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getState().isEmpty() == false)
-                // Scheduling a refreshing task if desired.
-                if (PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getRefreshRate() > 0)
-                    this.activityRefreshTask = this.getBedrockScheduler().repeat(100L, PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getRefreshRate() * 20L, Long.MAX_VALUE, (_) -> {
-                        // Parsing string with PlaceholderAPI.
-                        final String parsed = PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getState());
-                        // Updating the activity.
-                        discord.updateActivity(PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getType(), parsed);
-                        // Continuing with the task.
-                        return true;
-                    });
-                // Otherwise, just setting the activity.
-                else discord.updateActivity(PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getType(), PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getState());
-        }
-    }
-
     public static final class Placeholders extends PlaceholderExpansion {
-        /* SINGLETON */ public static final Placeholders INSTANCE = new Placeholders();
+        public static final Placeholders INSTANCE = new Placeholders(); // SINGLETON
 
         // SimpleDateFormat responsible for formatting countdown time.
         private final static SimpleDateFormat COUNTDOWN_FORMAT = new SimpleDateFormat("HH:mm:ss");

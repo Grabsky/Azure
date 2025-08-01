@@ -26,10 +26,10 @@ import cloud.grabsky.commands.RootCommandContext;
 import cloud.grabsky.commands.annotation.Command;
 import cloud.grabsky.commands.annotation.Dependency;
 import cloud.grabsky.commands.exception.CommandLogicException;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Role;
 import net.luckperms.api.node.types.PermissionNode;
 import org.bukkit.entity.Player;
-import org.javacord.api.entity.permission.Role;
-import org.javacord.api.entity.server.Server;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,7 +43,7 @@ public final class UnverifyCommand extends RootCommand {
 
     @Override
     public void onCommand(final @NotNull RootCommandContext context, final @NotNull ArgumentQueue arguments) throws CommandLogicException {
-        if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_ENABLED == false || plugin.getDiscord() == null) {
+        if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_ENABLED == false) {
             Message.of(PluginLocale.COMMAND_UNVERIFY_FAILURE_NOT_ENABLED).send(context.getExecutor().asCommandSender());
             return;
         }
@@ -63,12 +63,12 @@ public final class UnverifyCommand extends RootCommand {
         // Saving...
         plugin.getUserCache().as(AzureUserCache.class).saveUser(user);
         // Getting configured server.
-        final @Nullable Server server = plugin.getDiscord().getServerById(PluginConfig.DISCORD_INTEGRATIONS_DISCORD_SERVER_ID).orElse(null);
+        final @Nullable Guild guild = plugin.getDiscordIntegration().getClient().getGuildById(PluginConfig.DISCORD_INTEGRATIONS_DISCORD_SERVER_ID);
         // Sending error if configured server is inaccessible.
-        if (server == null)
+        if (guild == null)
             return;
         // Getting verification role.
-        final @Nullable Role role = server.getRoleById(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_ROLE_ID).orElse(null);
+        final @Nullable Role role = guild.getRoleById(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_ROLE_ID);
         // Removing permission from the player, if configured.
         if ("".equals(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_PERMISSION) == false)
             // Loading LuckPerms' User and removing permission node from them.
@@ -76,8 +76,8 @@ public final class UnverifyCommand extends RootCommand {
                 it.data().remove(PermissionNode.builder(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_PERMISSION).build());
             });
         // Getting Member object associated with this user, if the role still exists.
-        if (role != null)
-            plugin.getDiscord().getUserById(discordId).thenAccept(it -> server.removeRoleFromUser(it, role));
+        if (role != null && guild.getMemberById(discordId) != null)
+            guild.removeRoleFromMember(guild.getMemberById(discordId), role).queue();
         // Sending prompt message to the player.
         Message.of(PluginLocale.COMMAND_UNVERIFY_SUCCESS).send(sender);
     }

@@ -215,9 +215,9 @@
             // Discord webhook avatar URL. Supports PlaceholderAPI.
             "webhook_avatar": "",
             // Start message format. Supports PlaceholderAPI.
-            "start_message_format": "Server is shutting down...",
+            "start_message_format": "Server is now online...",
             // Stoop message format. Supports PlaceholderAPI.
-            "stop_message_format": "Server is now online..."
+            "stop_message_format": "Server is shutting down..."
         },
         // Player JOIN and QUIT messages forwarding to Discord server.
         "death_message_forwarding": {

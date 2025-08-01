@@ -39,7 +39,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
-import org.javacord.api.entity.message.WebhookMessageBuilder;
 
 import java.util.UUID;
 
@@ -111,7 +110,7 @@ public final class BanCommand extends RootCommand {
         ban(sender, target, targetUser, reason.split("--silent")[0].trim().trim(), duration, isSilent);
     }
 
-    private static void ban(final @NotNull CommandSender sender, final @NotNull OfflinePlayer target, final @NotNull User targetUser, final @Nullable String reason, final @NotNull Interval duration, final boolean isSilent) {
+    private void ban(final @NotNull CommandSender sender, final @NotNull OfflinePlayer target, final @NotNull User targetUser, final @Nullable String reason, final @NotNull Interval duration, final boolean isSilent) {
         final String finalReason = (reason != null) ? reason : PluginConfig.PUNISHMENT_SETTINGS_DEFAULT_REASON;
 
         // Permanently banning the player when duration is 0.
@@ -138,7 +137,7 @@ public final class BanCommand extends RootCommand {
                         .replace("<reason>", finalReason);
                 // Forwarding the message through configured webhook.
                 if (message.isEmpty() == false)
-                    new WebhookMessageBuilder().setContent(message).sendSilently(Azure.getInstance().getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_WEBHOOK_URL);
+                    plugin.getDiscordIntegration().getWebhookClients().get("PUNISHMENTS").send(message);
             }
 
         // Otherwise, banning player temporarily.
@@ -168,7 +167,7 @@ public final class BanCommand extends RootCommand {
                         .replace("<reason>", finalReason);
                 // Forwarding the message through configured webhook.
                 if (message.isEmpty() == false)
-                    new WebhookMessageBuilder().setContent(message).sendSilently(Azure.getInstance().getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_PUNISHMENTS_FORWARDING_WEBHOOK_URL);
+                    plugin.getDiscordIntegration().getWebhookClients().get("PUNISHMENTS").send(message);
             }
         }
     }

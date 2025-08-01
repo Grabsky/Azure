@@ -221,7 +221,8 @@
         "on_cooldown": "<dark_gray>› <red>Musisz chwilę poczekać...",
         "muted": "<dark_gray>› <gray>Jesteś wyciszony przez kolejne <red><duration_left><gray>.",
         "muted_permanent": "<dark_gray>› <gray>Jesteś <red>permanentnie<gray> wyciszony.",
-        "attachment": "(\uD83D\uDCCE Załącznik)"
+        "attachment": "(\uD83D\uDCCE Załącznik)",
+        "gif": "(\uD83D\uDDBC\uFE0F Gif)"
     },
     // ...
     "commands": {
