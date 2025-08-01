@@ -33,6 +33,7 @@ import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.MarkdownSanitizer;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.fellbaum.jemoji.EmojiManager;
 import net.kyori.adventure.text.Component;
@@ -56,7 +57,6 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.security.SecureRandom;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -171,7 +171,7 @@ public final class DiscordIntegration implements Listener {
         // Skipping irrelevant channels and bot replies.
         if (event.getChannel().getId().equals(PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_CHANNEL_ID) == true && event.getAuthor().isBot() == false && event.getAuthor().isSystem() == false) {
             // Getting the message and stripping all tags and formatting. Not final because it's modified in the next step.
-            String message = event.getMessage().getContentDisplay();
+            String message = MiniMessage.miniMessage().stripTags(event.getMessage().getContentDisplay());
             // Replacing all emojis in this message with a translatable component.
             message = EmojiManager.replaceAllEmojis(message, (emoji) -> "<white><lang:'" + emoji.getDiscordAliases().getFirst() + "'></white>");
             // Appending '(Gif)' or similar string to the message if it contains a gif attachment.
@@ -214,82 +214,75 @@ public final class DiscordIntegration implements Listener {
 
     @SubscribeEvent
     public void onButtonInteraction(final @NotNull ButtonInteractionEvent event) {
-        if (event.getComponentId().equals("verification_button") == true) {
-            // Sending error message if user already has a role.
-            if (event.getMember() != null && event.getMember().getRoles().stream().anyMatch(it -> it.getId().equals(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_ROLE_ID) == true) == true) {
-                event.replyEmbeds(new EmbedBuilder()
-                        .setDescription(PluginLocale.DISCORD_VERIFICATION_FAILURE_VERIFIED)
-                        .setColor(FAILURE_COLOR)
-                        .build()
-                ).setEphemeral(true).queue();
-            }
-            // Otherwise, showing a modal.
-            event.getInteraction().replyModal(Modal.create("verification_modal", PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_MODAL_LABEL)
-                    .addActionRow(TextInput.create("verification_code", PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_MODAL_INPUT_LABEL, TextInputStyle.SHORT)
-                            .setMinLength(7).setMaxLength(7).setRequired(true).build()
-                    ).build()
-            ).queue();
+        if (event.getMember() == null || event.getComponentId().equals("verification_button") == false)
+            return;
+        // Sending error message if user already has a role.
+        if (event.getMember().getRoles().stream().anyMatch(it -> it.getId().equals(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_ROLE_ID) == true) == true) {
+            event.replyEmbeds(new EmbedBuilder()
+                    .setDescription(PluginLocale.DISCORD_VERIFICATION_FAILURE_VERIFIED)
+                    .setColor(FAILURE_COLOR)
+                    .build()
+            ).setEphemeral(true).queue();
         }
+        // Otherwise, showing a modal.
+        event.getInteraction().replyModal(Modal.create("verification_modal", PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_MODAL_LABEL)
+                .addActionRow(TextInput.create("verification_code", PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_MODAL_INPUT_LABEL, TextInputStyle.SHORT)
+                        .setMinLength(7).setMaxLength(7).setRequired(true).build()
+                ).build()
+        ).queue();
     }
 
     @SubscribeEvent
     public void onModalInteraction(final @NotNull ModalInteractionEvent event) {
-        // Returning if interaction does not come from a guild.
-        if (event.getMember() == null || event.getGuild() == null)
+        // Returning if interaction (1) does not come from a guild (2) is not the verification modal.
+        if (event.getMember() == null || event.getGuild() == null || event.getModalId().equals("verification_modal") == false)
             return;
-        if (event.getModalId().equals("verification_modal") == true) {
-            final @Nullable ModalMapping component = event.getInteraction().getValue("verification_code");
-            // Returning
-            if (component == null)
-                return;
-            final String code = component.getAsString();
-            // ...
-            final @Nullable UUID uniqueId = codes.asMap().entrySet().stream().filter(it -> it.getValue().equals(code) == true).map(Map.Entry::getKey).findFirst().orElse(null);
-            // Sending error message if UUID is null.
-            if (uniqueId == null) {
-                event.getInteraction().replyEmbeds(
-                        new EmbedBuilder().setDescription(PluginLocale.DISCORD_VERIFICATION_FAILURE_INVALID_CODE).setColor(FAILURE_COLOR).build()
-                ).setEphemeral(true).queue();
-                // Returning...
-                return;
-            }
-            // Getting User object from the UUID.
-            final @Nullable User user = plugin.getUserCache().getUser(uniqueId);
-            // Throwing IllegalStateException if User object for this UUID returned 'null'.
-            if (user == null)
-                throw new IllegalStateException("Verification failed. Missing User object for: " + uniqueId);
-            // Updating Discord ID associated with this user.
-            user.setDiscordId(event.getInteraction().getMember().getId());
-            // Saving...
-            plugin.getUserCache().as(AzureUserCache.class).saveUser(user);
-            // Adding permission to the player, if configured.
-            if ("".equals(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_PERMISSION) == false)
-                // Loading LuckPerms' User and adding permission node to them.
-                plugin.getLuckPerms().getUserManager().modifyUser(uniqueId, (it) -> {
-                    it.data().add(PermissionNode.builder(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_PERMISSION).build());
-                });
-            // Adding role if specified.
-            if (PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_ROLE_ID.isEmpty() == false) {
-                // Getting configured server.
-                final Guild guild = event.getGuild();
-                // Getting verification role.
-                final @Nullable Role role = guild.getRoleById(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_ROLE_ID);
-                // Getting Member object associated with this user, if the role still exists.
-                if (role != null)
-                    guild.addRoleToMember(event.getMember(), role).queue();
-            }
-            // Sending success message to the user.
+        // Getting the 'verification_code' value inputted by the user.
+        final @Nullable ModalMapping code = event.getInteraction().getValue("verification_code");
+        // Returning if there's no 'verification_code' component in the modal.
+        if (code == null)
+            return;
+        // Finding first UUID that is matching specified code.
+        final @Nullable UUID uniqueId = codes.asMap().entrySet().stream().filter(it -> it.getValue().equals(code.getAsString()) == true).map(Map.Entry::getKey).findFirst().orElse(null);
+        // Sending error message if UUID is null.
+        if (uniqueId == null) {
             event.getInteraction().replyEmbeds(
-                    new EmbedBuilder().setDescription(PluginLocale.DISCORD_VERIFICATION_SUCCESS).setColor(SUCCESS_COLOR).build()
+                    new EmbedBuilder().setDescription(PluginLocale.DISCORD_VERIFICATION_FAILURE_INVALID_CODE).setColor(FAILURE_COLOR).build()
             ).setEphemeral(true).queue();
-            // Sending success message to the player.
-            final Player player = Bukkit.getPlayer(uniqueId);
-            // ...
-            if (player != null && player.isOnline() == true)
-                Message.of(PluginLocale.COMMAND_VERIFY_SUCCESS).send(player);
-            // Invalidating...
-            codes.invalidate(uniqueId);
+            // Returning...
+            return;
         }
+        // Getting User object from the UUID.
+        final @Nullable User user = plugin.getUserCache().getUser(uniqueId);
+        // Throwing IllegalStateException if User object for this UUID returned 'null'.
+        if (user == null)
+            throw new IllegalStateException("Verification failed. Missing User object for: " + uniqueId);
+        // Updating Discord ID associated with this user.
+        user.setDiscordId(event.getMember().getId());
+        // Saving...
+        plugin.getUserCache().as(AzureUserCache.class).saveUser(user);
+        // Adding permission to the player, if configured.
+        if ("".equals(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_PERMISSION) == false)
+            // Loading LuckPerms' User and adding permission node to them.
+            plugin.getLuckPerms().getUserManager().modifyUser(uniqueId, (it) -> {
+                it.data().add(PermissionNode.builder(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_PERMISSION).build());
+            });
+        // Adding role if specified.
+        if (PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_ROLE_ID.isEmpty() == false) {
+            // Getting verification role.
+            final @Nullable Role role = event.getGuild().getRoleById(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_ROLE_ID);
+            // Adding role to a member if it still exists.
+            if (role != null)
+                event.getGuild().addRoleToMember(event.getMember(), role).queue();
+        }
+        // Sending success message to the Discord user.
+        event.getInteraction().replyEmbeds(
+                new EmbedBuilder().setDescription(PluginLocale.DISCORD_VERIFICATION_SUCCESS).setColor(SUCCESS_COLOR).build()
+        ).setEphemeral(true).queue();
+        // Sending success message to the Minecraft user.
+        Message.of(PluginLocale.COMMAND_VERIFY_SUCCESS).send(user);
+        // Invalidating...
+        codes.invalidate(uniqueId);
     }
 
     /* BUKKIT STUFF */
@@ -339,8 +332,8 @@ public final class DiscordIntegration implements Listener {
             return;
         // Forwarding message to webhook...
         if (event.viewers().isEmpty() == false) {
-            // Serializing Component to plain String.
-            final String plainMessage = PlainTextComponentSerializer.plainText().serialize(event.message());
+            // Serializing Component to plain String and sanitizing any Markdown formatting.
+            final String plainMessage = MarkdownSanitizer.sanitize(PlainTextComponentSerializer.plainText().serialize(event.message()), MarkdownSanitizer.SanitizationStrategy.REMOVE);
             // Creating new instance of WebhookMessageBuilder.
             final club.minnced.discord.webhook.send.WebhookMessageBuilder builder = new WebhookMessageBuilder()
                     .setAllowedMentions(AllowedMentions.none())
@@ -363,8 +356,10 @@ public final class DiscordIntegration implements Listener {
             return;
         // Forwarding message to webhook...
         if (plugin.getUserCache().getUser(event.getPlayer()).isVanished() == false) {
-            // Setting message placeholders.
-            final String message = PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_JOIN_MESSAGE_FORMAT);
+            // Getting the player's name and escaping underscores from it.
+            final String username = event.getPlayer().getName().replace("_", "\\_");
+            // Setting message placeholders. (Placeholder %player_name% is overridden as to make sure underscores are properly escaped)
+            final String message = PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_JOIN_MESSAGE_FORMAT.replace("%player_name%", username));
             // Creating new instance of WebhookMessageBuilder.
             final WebhookMessageBuilder builder = new WebhookMessageBuilder().setContent(message);
             // Setting username if specified.
@@ -385,8 +380,10 @@ public final class DiscordIntegration implements Listener {
             return;
         // Forwarding message to webhook...
         if (plugin.getUserCache().getUser(event.getPlayer()).isVanished() == false) {
-            // Setting message placeholders.
-            final String message = PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_QUIT_MESSAGE_FORMAT);
+            // Getting the player's name and escaping underscores from it.
+            final String username = event.getPlayer().getName().replace("_", "\\_");
+            // Setting message placeholders. (Placeholder %player_name% is overridden as to make sure underscores are properly escaped)
+            final String message = PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_QUIT_MESSAGE_FORMAT.replace("%player_name%", username));
             // Creating new instance of WebhookMessageBuilder.
             final WebhookMessageBuilder builder = new WebhookMessageBuilder().setContent(message);
             // Setting username if specified.
@@ -400,7 +397,7 @@ public final class DiscordIntegration implements Listener {
         }
     }
 
-    // THIS IS NOT A LISTENER, THIS METHOD IS CALLED BY CHAT MANAGER
+    // THIS IS NOT A LISTENER, THIS METHOD IS CALLED BY PLAYER LISTENER
     @SuppressWarnings("UnstableApiUsage")
     public void onPlayerDeathForward(final @NotNull PlayerDeathEvent event, final String text) {
         // Discord integration... Must be handled here because we're cancelling the death message right after this event is called.
@@ -433,14 +430,20 @@ public final class DiscordIntegration implements Listener {
 
     /* VERIFICATION */
 
-    public void updateVerificationRole(final User user, final @NotNull String discordId) throws IllegalStateException {
+    /**
+     * Attempts to revoke "Verified" role from specified {@link User} if they are no longer on the server.
+     */
+    // TO-DO: Make sure it works properly.
+    public void attemptRevokeVerifiedRole(final User user) throws IllegalStateException {
         // Getting configured server.
         final @Nullable Guild guild = client.getGuildById(PluginConfig.DISCORD_INTEGRATIONS_DISCORD_SERVER_ID);
         // Throwing IllegalStateException if configured server is inaccessible.
         if (guild == null)
             throw new IllegalStateException("Server is inaccessible: " + PluginConfig.DISCORD_INTEGRATIONS_DISCORD_SERVER_ID);
-        // Checking if user has left the server
-        if (guild.getMemberById(discordId) != null) {
+        // Getting stored Discord identifier.
+        final @Nullable String discordId = user.getDiscordId();
+        // Checking if user has left the .
+        if (discordId != null && guild.getMemberById(discordId) != null) {
             // Removing permission from the player, if configured.
             if ("".equals(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_PERMISSION) == false)
                 // Loading LuckPerms' User and removing permission from them.
@@ -468,8 +471,6 @@ public final class DiscordIntegration implements Listener {
         // Returning existing token if exists.
         if (existingToken != null)
             return existingToken;
-        // Generate a new token otherwise...
-        final Iterator<String> iterator = codes.asMap().values().iterator();
         // Token. Generated in the next step.
         String token = "";
         // Generating...
@@ -481,6 +482,5 @@ public final class DiscordIntegration implements Listener {
         // Returning...
         return token;
     }
-
 
 }

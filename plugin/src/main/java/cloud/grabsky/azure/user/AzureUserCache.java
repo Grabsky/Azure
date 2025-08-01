@@ -31,13 +31,9 @@ import com.squareup.moshi.JsonWriter;
 import com.squareup.moshi.Moshi;
 import io.papermc.paper.connection.PlayerConfigurationConnection;
 import io.papermc.paper.event.connection.PlayerConnectionValidateLoginEvent;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.kyori.adventure.text.Component;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.group.Group;
-import net.luckperms.api.node.types.PermissionNode;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -316,30 +312,7 @@ public final class AzureUserCache implements UserCache, Listener {
             thisPlayer.displayName(miniMessage().deserialize(thisUser.getDisplayName()));
         // Removing role and associated Discord ID if user is not on the server anymore.
         if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_ENABLED == true && thisUser.getDiscordId() != null) {
-            // Getting configured server.
-            final @Nullable Guild server = plugin.getDiscordIntegration().getClient().getGuildById(PluginConfig.DISCORD_INTEGRATIONS_DISCORD_SERVER_ID);
-            // Throwing IllegalStateException if configured server is inaccessible.
-            if (server == null)
-                throw new IllegalStateException("Server is inaccessible: " + PluginConfig.DISCORD_INTEGRATIONS_DISCORD_SERVER_ID);
-            // Checking if user has left the server
-            if (server.getMemberById(thisUser.getDiscordId()) != null) {
-                // Removing permission from the player, if configured.
-                if ("".equals(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_PERMISSION) == false)
-                    // Loading LuckPerms' User and removing permission from them.
-                    plugin.getLuckPerms().getUserManager().modifyUser(thisUser.getUniqueId(), (it) -> {
-                        it.data().remove(PermissionNode.builder(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_PERMISSION).build());
-                    });
-                // Getting verification role.
-                final @Nullable Role role = server.getRoleById(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_ROLE_ID);
-                // If the role exists, it is now being removed from the user.
-                if (role != null)
-                    server.removeRoleFromMember(UserSnowflake.fromId(thisUser.getDiscordId()), role).queue();
-                // Removing associated ID.
-                thisUser.setDiscordId(null);
-                // Saving... Hopefully this won't cause any CME or data loss due to the fact we're saving file earlier too.
-                // I think in the worst case scenario either this or country info would be lost.
-                this.saveUser(thisUser);
-            }
+            plugin.getDiscordIntegration().attemptRevokeVerifiedRole(thisUser);
         }
     }
 
