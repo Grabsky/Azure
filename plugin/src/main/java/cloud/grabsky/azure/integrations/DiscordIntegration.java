@@ -445,8 +445,9 @@ public final class DiscordIntegration implements Listener {
     // NOTE: Removing role is not needed (and impossible) because user is no longer in the guild.
     @EventHandler(priority = EventPriority.MONITOR)
     public void onJoinRevokeVerified(final @NotNull PlayerJoinEvent event) {
+        // Getting the User instance.
         final User user = plugin.getUserCache().getUser(event.getPlayer());
-        //
+        // Revoking 'Verified' status from player if (1) it is set (2) user is no longer in the guild.
         if (user.getDiscordId() != null) {
             guild.retrieveMemberById(user.getDiscordId()).queue(null, thr -> {
                 if (thr instanceof ErrorResponseException error && error.getErrorResponse() == ErrorResponse.UNKNOWN_MEMBER) {
