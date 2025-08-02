@@ -26,8 +26,9 @@ import cloud.grabsky.commands.annotation.Command;
 import cloud.grabsky.commands.annotation.Dependency;
 import cloud.grabsky.commands.component.CompletionsProvider;
 import cloud.grabsky.commands.exception.CommandLogicException;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.bukkit.entity.Player;
 
 import org.jetbrains.annotations.NotNull;
@@ -67,9 +68,9 @@ public final class VerifyCommand extends RootCommand {
                     return;
                 }
                 // Sending the button
-                channel.sendMessage("").addActionRow(
+                channel.sendMessage("").addComponents(ActionRow.of(
                         Button.of(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_BUTTON_STYLE, "verification_button", PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_BUTTON_LABEL)
-                ).queue();
+                )).queue();
             }
             return;
         }

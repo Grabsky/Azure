@@ -17,6 +17,9 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.textinput.TextInput;
+import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
@@ -28,8 +31,6 @@ import net.dv8tion.jda.api.events.session.ShutdownEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
-import net.dv8tion.jda.api.interactions.components.text.TextInput;
-import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import net.dv8tion.jda.api.requests.ErrorResponse;
@@ -81,7 +82,7 @@ public final class DiscordIntegration implements Listener {
     private @Nullable BukkitTask activityRefreshTask;
 
     @Getter(AccessLevel.PUBLIC)
-    private @NotNull Guild guild;
+    private Guild guild;
 
     // Stores all currently active codes.
     private final Cache<UUID, String> codes = CacheBuilder.newBuilder()
@@ -240,9 +241,9 @@ public final class DiscordIntegration implements Listener {
         }
         // Otherwise, showing a modal.
         event.getInteraction().replyModal(Modal.create("verification_modal", PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_MODAL_LABEL)
-                .addActionRow(TextInput.create("verification_code", PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_MODAL_INPUT_LABEL, TextInputStyle.SHORT)
+                .addComponents(ActionRow.of(TextInput.create("verification_code", PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_MODAL_INPUT_LABEL, TextInputStyle.SHORT)
                         .setMinLength(7).setMaxLength(7).setRequired(true).build()
-                ).build()
+                )).build()
         ).queue();
     }
 
@@ -412,7 +413,6 @@ public final class DiscordIntegration implements Listener {
     }
 
     // THIS IS NOT A LISTENER, THIS METHOD IS CALLED BY PLAYER LISTENER
-    @SuppressWarnings("UnstableApiUsage")
     public void onPlayerDeathForward(final @NotNull PlayerDeathEvent event, final String text) {
         // Discord integration... Must be handled here because we're cancelling the death message right after this event is called.
         if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_DEATH_MESSAGE_FORWARDING_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_DEATH_MESSAGE_FORWARDING_WEBHOOK_URL.isEmpty() == true)

@@ -23,7 +23,7 @@ dependencies {
     // Must share version between 'plugin' and 'api' modules.
     implementation("net.kyori:adventure-nbt:$KYORI_NBT_VERSION")
     // JDA
-    implementation("net.dv8tion:JDA:5.3.0") {
+    implementation("net.dv8tion:JDA:6.0.0-rc.2") {
         exclude module: "opus-java"
     }
     // Discord Webhooks
