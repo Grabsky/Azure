@@ -20,18 +20,19 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.events.session.ShutdownEvent;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MarkdownSanitizer;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
@@ -78,6 +79,9 @@ public final class DiscordIntegration implements Listener {
     private final Map<String, WebhookClient> webhookClients = new HashMap<>();
 
     private @Nullable BukkitTask activityRefreshTask;
+
+    @Getter(AccessLevel.PUBLIC)
+    private @NotNull Guild guild;
 
     // Stores all currently active codes.
     private final Cache<UUID, String> codes = CacheBuilder.newBuilder()
@@ -128,6 +132,16 @@ public final class DiscordIntegration implements Listener {
 
     @SubscribeEvent
     private void onReady(final @NotNull ReadyEvent event) {
+        // Getting the configured guild.
+        final Guild guild = client.getGuildById(PluginConfig.DISCORD_INTEGRATIONS_DISCORD_SERVER_ID);
+        // Shutting down JDA and logging console information if configured server is inaccessible.
+        if (guild == null) {
+            plugin.getLogger().warning("Guild '" + PluginConfig.DISCORD_INTEGRATIONS_DISCORD_SERVER_ID + "'is inaccessible. JDA will be shutting down.");
+            this.shutdown();
+            return;
+        } else {
+            this.guild = guild;
+        }
         // Cancelling the current task.
         if (activityRefreshTask != null && activityRefreshTask.isCancelled() == false)
             activityRefreshTask.cancel();
@@ -143,7 +157,7 @@ public final class DiscordIntegration implements Listener {
                     // Continuing with the task.
                     return true;
                 });
-                // Otherwise, just setting the activity.
+            // Otherwise, just setting the activity.
             else client.getPresence().setPresence(Activity.of(PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getType(), PlaceholderAPI.setPlaceholders(null, PluginConfig.DISCORD_INTEGRATIONS_BOT_ACTIVITY.getState())), false);
         // Otherwise, unsetting the activity.
         else client.getPresence().setActivity(null);
@@ -428,38 +442,25 @@ public final class DiscordIntegration implements Listener {
         }
     }
 
-    /* VERIFICATION */
-
-    /**
-     * Attempts to revoke "Verified" role from specified {@link User} if they are no longer on the server.
-     */
-    // TO-DO: Make sure it works properly.
-    public void attemptRevokeVerifiedRole(final User user) throws IllegalStateException {
-        // Getting configured server.
-        final @Nullable Guild guild = client.getGuildById(PluginConfig.DISCORD_INTEGRATIONS_DISCORD_SERVER_ID);
-        // Throwing IllegalStateException if configured server is inaccessible.
-        if (guild == null)
-            throw new IllegalStateException("Server is inaccessible: " + PluginConfig.DISCORD_INTEGRATIONS_DISCORD_SERVER_ID);
-        // Getting stored Discord identifier.
-        final @Nullable String discordId = user.getDiscordId();
-        // Checking if user has left the .
-        if (discordId != null && guild.getMemberById(discordId) != null) {
-            // Removing permission from the player, if configured.
-            if ("".equals(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_PERMISSION) == false)
-                // Loading LuckPerms' User and removing permission from them.
-                plugin.getLuckPerms().getUserManager().modifyUser(user.getUniqueId(), (it) -> {
-                    it.data().remove(PermissionNode.builder(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_PERMISSION).build());
-                });
-            // Getting verification role.
-            final @Nullable Role role = guild.getRoleById(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_ROLE_ID);
-            // If the role exists, it is now being removed from the user.
-            if (role != null)
-                guild.removeRoleFromMember(UserSnowflake.fromId(discordId), role).queue();
-            // Removing associated ID.
-            user.setDiscordId(null);
-            // Saving... Hopefully this won't cause any CME or data loss due to the fact we're saving file earlier too.
-            // I think in the worst case scenario either this or country info would be lost.
-            plugin.getUserCache().as(AzureUserCache.class).saveUser(user);
+    // NOTE: Removing role is not needed (and impossible) because user is no longer in the guild.
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onJoinRevokeVerified(final @NotNull PlayerJoinEvent event) {
+        final User user = plugin.getUserCache().getUser(event.getPlayer());
+        //
+        if (user.getDiscordId() != null) {
+            guild.retrieveMemberById(user.getDiscordId()).queue(null, thr -> {
+                if (thr instanceof ErrorResponseException error && error.getErrorResponse() == ErrorResponse.UNKNOWN_MEMBER) {
+                    plugin.getLogger().warning("User '" + user.getName() + "' linked to Discord ID '" + user.getDiscordId() + "' is no longer in the Discord server. They will have their 'Verified' status revoked.");
+                    // Removing in-game "Verified" status permission.
+                    plugin.getLuckPerms().getUserManager().modifyUser(event.getPlayer().getUniqueId(), (it) -> {
+                        it.data().remove(PermissionNode.builder(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_PERMISSION).build());
+                    });
+                    // Removing ID of linked account.
+                    user.setDiscordId(null);
+                    // Scheduling User instance to be saved.
+                    plugin.getUserCache().as(AzureUserCache.class).saveUser(user);
+                }
+            });
         }
     }
 

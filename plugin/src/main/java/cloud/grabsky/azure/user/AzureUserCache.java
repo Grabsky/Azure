@@ -310,10 +310,6 @@ public final class AzureUserCache implements UserCache, Listener {
         // Setting display name.
         if (thisUser.getDisplayName() != null)
             thisPlayer.displayName(miniMessage().deserialize(thisUser.getDisplayName()));
-        // Removing role and associated Discord ID if user is not on the server anymore.
-        if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_ENABLED == true && thisUser.getDiscordId() != null) {
-            plugin.getDiscordIntegration().attemptRevokeVerifiedRole(thisUser);
-        }
     }
 
     /**
