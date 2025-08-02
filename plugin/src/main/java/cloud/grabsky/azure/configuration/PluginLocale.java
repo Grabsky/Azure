@@ -133,6 +133,9 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("chat.attachment")
     public static String CHAT_ATTACHMENT;
 
+    @JsonPath("chat.gif")
+    public static String CHAT_GIF;
+
     // Commands > Azure
 
     @JsonPath("commands.azure_help")

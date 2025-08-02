@@ -34,15 +34,12 @@ import io.papermc.paper.event.connection.PlayerConnectionValidateLoginEvent;
 import net.kyori.adventure.text.Component;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.group.Group;
-import net.luckperms.api.node.types.PermissionNode;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.javacord.api.entity.permission.Role;
-import org.javacord.api.entity.server.Server;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -176,17 +173,8 @@ public final class AzureUserCache implements UserCache, Listener {
     }
 
     @Override
-    public @Nullable User getUser(final @NotNull UUID uniqueId) {
-        return internalUserMap.get(uniqueId);
-    }
-
-    @Override
-    public @Nullable User getUser(final @NotNull String name) {
-        for (final User user : internalUserMap.values())
-            if (user.getName().equals(name) == true)
-                return user;
-        // No user found. Returning null.
-        return null;
+    public @NotNull @Unmodifiable Map<UUID, User> getUsersMap() {
+        return Collections.unmodifiableMap(internalUserMap);
     }
 
     @Override
@@ -222,20 +210,6 @@ public final class AzureUserCache implements UserCache, Listener {
             // Returning the User instance.
             return user;
         });
-    }
-
-    @Override
-    public boolean hasUser(final @NotNull UUID uniqueId) {
-        return internalUserMap.containsKey(uniqueId);
-    }
-
-    @Override
-    public boolean hasUser(final @NotNull String name) {
-        for (final User user : internalUserMap.values())
-            if (user.getName().equals(name) == true)
-                return true;
-        // No user found. Returning false.
-        return false;
     }
 
     @SuppressWarnings("UnstableApiUsage")
@@ -336,33 +310,6 @@ public final class AzureUserCache implements UserCache, Listener {
         // Setting display name.
         if (thisUser.getDisplayName() != null)
             thisPlayer.displayName(miniMessage().deserialize(thisUser.getDisplayName()));
-        // Removing role and associated Discord ID if user is not on the server anymore.
-        if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == true && PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_ENABLED == true && plugin.getDiscord() != null) {
-            // Getting configured server.
-            final @Nullable Server server = plugin.getDiscord().getServerById(PluginConfig.DISCORD_INTEGRATIONS_DISCORD_SERVER_ID).orElse(null);
-            // Throwing IllegalStateException if configured server is inaccessible.
-            if (server == null)
-                throw new IllegalStateException("Server is inaccessible: " + PluginConfig.DISCORD_INTEGRATIONS_DISCORD_SERVER_ID);
-            // Checking if user has left the server
-            if (server.getMemberById(thisUser.getDiscordId()).isPresent() == false) {
-                // Removing permission from the player, if configured.
-                if ("".equals(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_PERMISSION) == false)
-                    // Loading LuckPerms' User and removing permission from them.
-                    plugin.getLuckPerms().getUserManager().modifyUser(thisUser.getUniqueId(), (it) -> {
-                        it.data().remove(PermissionNode.builder(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_PERMISSION).build());
-                    });
-                // Getting verification role.
-                final @Nullable Role role = server.getRoleById(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_ROLE_ID).orElse(null);
-                // If the role exists, it is now being removed from the user.
-                if (role != null)
-                    plugin.getDiscord().getUserById(thisUser.getDiscordId()).thenAccept(it -> server.removeRoleFromUser(it, role));
-                // Removing associated ID.
-                thisUser.setDiscordId(null);
-                // Saving... Hopefully this won't cause any CME or data loss due to the fact we're saving file earlier too.
-                // I think in the worst case scenario either this or country info would be lost.
-                this.saveUser(thisUser);
-            }
-        }
     }
 
     /**

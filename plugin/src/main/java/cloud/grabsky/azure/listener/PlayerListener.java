@@ -23,7 +23,6 @@ import cloud.grabsky.bedrock.components.ComponentBuilder;
 import cloud.grabsky.bedrock.components.Message;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.TranslatableComponent;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.luckperms.api.cacheddata.CachedMetaData;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -47,9 +46,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerRespawnEvent.RespawnReason;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.world.PortalCreateEvent;
-import org.javacord.api.entity.message.WebhookMessageBuilder;
 
-import java.net.URI;
 import java.util.HashSet;
 
 import org.jetbrains.annotations.NotNull;
@@ -145,56 +142,6 @@ public final class PlayerListener implements Listener {
             final World primaryWorld = plugin.getWorldManager().getPrimaryWorld();
             // Setting the respawn location.
             event.setRespawnLocation(plugin.getWorldManager().getSpawnPoint(primaryWorld));
-        }
-    }
-
-    /* DISCORD INTEGRATIONS - FORWARDING JOIN MESSAGE TO DISCORD SERVER */
-
-    @SneakyThrows
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerJoinForward(final @NotNull PlayerJoinEvent event) {
-        // Skipping in case discord integrations are not enabled or misconfigured.
-        if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_URL.isEmpty() == true)
-            return;
-        // Forwarding message to webhook...
-        if (plugin.getUserCache().getUser(event.getPlayer()).isVanished() == false) {
-            // Setting message placeholders.
-            final String message = PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_JOIN_MESSAGE_FORMAT);
-            // Creating new instance of WebhookMessageBuilder.
-            final WebhookMessageBuilder builder = new WebhookMessageBuilder().setContent(message);
-            // Setting username if specified.
-            if (PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_USERNAME.isEmpty() == false)
-                builder.setDisplayName(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_USERNAME));
-            // Setting avatar if specified.
-            if (PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
-                builder.setDisplayAvatar(new URI(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_AVATAR)).toURL());
-            // Sending the message.
-            builder.sendSilently(plugin.getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_URL);
-        }
-    }
-
-    /* DISCORD INTEGRATIONS - FORWARDING QUIT MESSAGE TO DISCORD SERVER */
-
-    @SneakyThrows
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerQuitForward(final @NotNull PlayerQuitEvent event) {
-        // Skipping in case discord integrations are not enabled or misconfigured.
-        if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_URL.isEmpty() == true)
-            return;
-        // Forwarding message to webhook...
-        if (plugin.getUserCache().getUser(event.getPlayer()).isVanished() == false) {
-            // Setting message placeholders.
-            final String message = PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_QUIT_MESSAGE_FORMAT);
-            // Creating new instance of WebhookMessageBuilder.
-            final WebhookMessageBuilder builder = new WebhookMessageBuilder().setContent(message);
-            // Setting username if specified.
-            if (PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_USERNAME.isEmpty() == false)
-                builder.setDisplayName(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_USERNAME));
-            // Setting avatar if specified.
-            if (PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
-                builder.setDisplayAvatar(new URI(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_AVATAR)).toURL());
-            // Sending the message.
-            builder.sendSilently(plugin.getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_JOIN_AND_QUIT_FORWARDING_WEBHOOK_URL);
         }
     }
 
@@ -309,31 +256,7 @@ public final class PlayerListener implements Listener {
                 event.setDeathMessage(null);
                 event.deathMessage(null);
                 // Discord integration... Must be handled here because we're cancelling the death message right after this event is called.
-                if (PluginConfig.DISCORD_INTEGRATIONS_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_DEATH_MESSAGE_FORWARDING_ENABLED == false || PluginConfig.DISCORD_INTEGRATIONS_DEATH_MESSAGE_FORWARDING_WEBHOOK_URL.isEmpty() == true)
-                    return;
-                // Forwarding message to webhook...
-                if (plugin.getUserCache().getUser(event.getPlayer()).isVanished() == false) {
-                    // Setting message placeholders.
-                    final String webhookMessage = MiniMessage.miniMessage().stripTags(text)
-                            .replace("› ", "") // Very dirty workaround but this had to be done ASAP; Will be improved in the future.
-                            .replace("<prefix>", "")
-                            .replace("<suffix>", "")
-                            .replace("<victim>", "**" + event.getPlayer().getName() + "**")
-                            .replace("<victim_displayname>", "**" + event.getPlayer().getName() + "**")
-                            .replace("<attacker>", "**" + (event.getDamageSource().getCausingEntity() != null ? event.getDamageSource().getCausingEntity().getName() : "") + "**")
-                            .replace("<attacker_displayname>", "**" + (event.getDamageSource().getCausingEntity() != null ? event.getDamageSource().getCausingEntity().getName() : "") + "**")
-                            .replace("<mob>", "**" + (event.getDamageSource().getCausingEntity() != null && event.getDamageSource().getCausingEntity() instanceof Mob mob ? PluginLocale.MOBS.getOrDefault(mob.getType().translationKey(), mob.getType().translationKey()) : "") + "**");
-                    // Creating new instance of WebhookMessageBuilder.
-                    final WebhookMessageBuilder builder = new WebhookMessageBuilder().setContent(webhookMessage);
-                    // Setting username if specified.
-                    if (PluginConfig.DISCORD_INTEGRATIONS_DEATH_MESSAGE_FORWARDING_WEBHOOK_USERNAME.isEmpty() == false)
-                        builder.setDisplayName(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_DEATH_MESSAGE_FORWARDING_WEBHOOK_USERNAME));
-                    // Setting avatar if specified.
-                    if (PluginConfig.DISCORD_INTEGRATIONS_DEATH_MESSAGE_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
-                        builder.setDisplayAvatar(new URI(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_DEATH_MESSAGE_FORWARDING_WEBHOOK_AVATAR)).toURL());
-                    // Sending the message.
-                    builder.sendSilently(plugin.getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_DEATH_MESSAGE_FORWARDING_WEBHOOK_URL);
-                }
+                plugin.getDiscordIntegration().onPlayerDeathForward(event, text);
             }
         }
     }

@@ -22,11 +22,12 @@ dependencies {
     implementation("cloud.grabsky:configuration-paper:1.21.4-54")
     // Must share version between 'plugin' and 'api' modules.
     implementation("net.kyori:adventure-nbt:$KYORI_NBT_VERSION")
-    // Moshi and Okio are already in the classpath.
-    implementation("org.javacord:javacord:3.8.0") {
-        exclude group: "com.squareup.moshi"
-        exclude group: "com.squareup.okio"
+    // JDA
+    implementation("net.dv8tion:JDA:6.0.0-rc.2") {
+        exclude module: "opus-java"
     }
+    // Discord Webhooks
+    implementation("club.minnced:discord-webhooks:0.8.4")
     // JEmoji (Shaded)
     implementation("net.fellbaum:jemoji:1.7.1")
     // LuckPerms API (Provided)

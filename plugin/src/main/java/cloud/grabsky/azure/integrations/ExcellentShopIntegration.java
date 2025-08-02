@@ -16,15 +16,13 @@ package cloud.grabsky.azure.integrations;
 
 import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.configuration.PluginConfig;
+import club.minnced.discord.webhook.send.WebhookMessageBuilder;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.javacord.api.entity.message.WebhookMessageBuilder;
 import su.nightexpress.nexshop.api.shop.event.AuctionListingCreateEvent;
-
-import java.net.URI;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -70,12 +68,12 @@ public enum ExcellentShopIntegration implements Listener {
         final WebhookMessageBuilder builder = new WebhookMessageBuilder().setContent(message);
         // Setting username if specified.
         if (PluginConfig.DISCORD_INTEGRATIONS_AUCTION_LISTINGS_FORWARDING_WEBHOOK_USERNAME.isEmpty() == false)
-            builder.setDisplayName(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_AUCTION_LISTINGS_FORWARDING_WEBHOOK_USERNAME));
+            builder.setUsername(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_AUCTION_LISTINGS_FORWARDING_WEBHOOK_USERNAME));
         // Setting avatar if specified.
         if (PluginConfig.DISCORD_INTEGRATIONS_AUCTION_LISTINGS_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
-            builder.setDisplayAvatar(new URI(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_AUCTION_LISTINGS_FORWARDING_WEBHOOK_AVATAR)).toURL());
+            builder.setAvatarUrl(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_AUCTION_LISTINGS_FORWARDING_WEBHOOK_AVATAR));
         // Sending the message.
-        builder.sendSilently(Azure.getInstance().getDiscord(), PluginConfig.DISCORD_INTEGRATIONS_AUCTION_LISTINGS_FORWARDING_WEBHOOK_URL);
+        Azure.getInstance().getDiscordIntegration().getWebhookClients().get("AUCTION_HOUSE").send(builder.build());
     }
 
 }

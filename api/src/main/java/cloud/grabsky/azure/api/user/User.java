@@ -17,6 +17,8 @@ package cloud.grabsky.azure.api.user;
 import cloud.grabsky.azure.api.AzureProvider;
 import cloud.grabsky.azure.api.Punishment;
 import cloud.grabsky.bedrock.util.Interval;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.audience.ForwardingAudience;
 import net.kyori.adventure.nbt.BinaryTagIO;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.text.Component;
@@ -27,6 +29,7 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
@@ -35,7 +38,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * {@link User} object stores some player information.
  */
-public interface User {
+public interface User extends Audience, ForwardingAudience {
 
     /**
      * Returns last known, cached name of this {@link User}.
@@ -173,6 +176,11 @@ public interface User {
     default CompoundBinaryTag getPlayerData() throws IOException {
         final File file = new File(new File(AzureProvider.getAPI().getWorldManager().getPrimaryWorld().getWorldFolder(), "playerdata"), getUniqueId() + ".dat");
         return BinaryTagIO.reader(1_000_000L).read(file.toPath(), BinaryTagIO.Compression.GZIP); // Should be automatically closed.
+    }
+
+    @Override
+    default @NotNull Iterable<? extends Audience> audiences() {
+        return Collections.singleton(this.toPlayer());
     }
 
 }
