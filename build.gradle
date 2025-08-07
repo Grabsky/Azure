@@ -1,5 +1,5 @@
 plugins {
-    id("java-library")
+    id "java-library"
 }
 
 final String VERSION = "1.21.8"
@@ -16,7 +16,7 @@ subprojects {
 
     ext {
         BEDROCK_VERSION = "1.21-67"
-        KYORI_NBT_VERSION = "4.23.0"
+        KYORI_NBT_VERSION = "4.24.0"
     }
 
     repositories {
@@ -29,11 +29,12 @@ subprojects {
     }
 
     dependencies {
-        compileOnly("org.jetbrains:annotations:24.0.1")
-        // Lombok
-        compileOnly("org.projectlombok:lombok:1.18.36")
-        annotationProcessor("org.projectlombok:lombok:1.18.36")
-        // Paper API
+        // https://github.com/JetBrains/java-annotations
+        compileOnly("org.jetbrains:annotations:26.0.2")
+        // https://github.com/projectlombok/lombok
+        compileOnly("org.projectlombok:lombok:1.18.38")
+        annotationProcessor("org.projectlombok:lombok:1.18.38")
+        // https://github.com/PaperMC/Paper
         compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
     }
 

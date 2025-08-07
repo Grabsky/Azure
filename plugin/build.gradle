@@ -1,6 +1,9 @@
 plugins {
-    id "com.gradleup.shadow" version "8.3.6"
+    // https://github.com/GradleUp/shadow
+    id "com.gradleup.shadow" version "9.0.0"
+    // https://github.com/jpenilla/run-task
     id "xyz.jpenilla.run-paper" version "2.3.1"
+    // https://github.com/eldoriarpg/plugin-yml
     id "de.eldoria.plugin-yml.paper" version "0.7.1"
 }
 
@@ -9,38 +12,40 @@ repositories {
     maven { url = "https://repo.extendedclip.com/content/repositories/placeholderapi/" }
     // Repository containing the 'AuroraQuests' dependency.
     maven { url = "https://repo.auroramc.gg/releases/" }
-    maven { url = "https://repo.auroramc.gg/snapshots/" }
     // Repository containing the 'ExcellentShop' dependency.
     maven { url = "https://repo.nightexpressdev.com/releases/" }
 }
 
 dependencies {
-    api(project(":azure-api"))
-    // Must share version between 'plugin' and 'api' modules.
-    implementation("cloud.grabsky:bedrock:$BEDROCK_VERSION")
-    implementation("cloud.grabsky:commands:1.20.1-40")
-    implementation("cloud.grabsky:configuration-paper:1.21.4-54")
-    // Must share version between 'plugin' and 'api' modules.
-    implementation("net.kyori:adventure-nbt:$KYORI_NBT_VERSION")
-    // JDA
-    implementation("net.dv8tion:JDA:6.0.0-rc.2") {
+    api(project(":api"))
+    // https://github.com/Grabsky/bedrock
+    paperLibrary("cloud.grabsky:bedrock:$BEDROCK_VERSION")
+    // https://github.com/Grabsky/commands
+    paperLibrary("cloud.grabsky:commands:1.20.1-40")
+    // https://github.com/Grabsky/configuration
+    paperLibrary("cloud.grabsky:configuration-paper:1.21.4-54")
+    // https://github.com/KyoriPowered/adventure
+    paperLibrary("net.kyori:adventure-nbt:$KYORI_NBT_VERSION")
+    // https://github.com/discord-jda/JDA
+    paperLibrary("net.dv8tion:JDA:6.0.0-rc.2") {
         exclude module: "opus-java"
     }
-    // Discord Webhooks
-    implementation("club.minnced:discord-webhooks:0.8.4")
-    // JEmoji (Shaded)
-    implementation("net.fellbaum:jemoji:1.7.1")
-    // LuckPerms API (Provided)
-    compileOnly("net.luckperms:api:5.4")
-    // PlaceholderAPI (Provided)
+    // https://github.com/MinnDevelopment/discord-webhooks
+    paperLibrary("club.minnced:discord-webhooks:0.8.4")
+    // https://github.com/felldo/JEmoji
+    paperLibrary("net.fellbaum:jemoji:1.7.4")
+    // https://github.com/mfnalex/MorePersistentDataTypes
+    paperLibrary("com.jeff-media:MorePersistentDataTypes:2.4.0")
+    // https://github.com/LuckPerms/LuckPerms
+    compileOnly("net.luckperms:api:5.5")
+    // https://github.com/PlaceholderAPI/PlaceholderAPI
     compileOnly("me.clip:placeholderapi:2.11.6")
-    // Aurora and AuroraQuests
+    // https://github.com/AuroraNetworkStudios/Aurora
     compileOnly("gg.auroramc:Aurora:2.3.4")
-    compileOnly("gg.auroramc:AuroraQuests:2.0.0-SNAPSHOT")
-    // ExcellentShop (Provided)
+    // https://github.com/AuroraNetworkStudios/AuroraQuests
+    compileOnly("gg.auroramc:AuroraQuests:2.0.1")
+    // https://github.com/nulli0n/ExcellentShop-spigot
     compileOnly("su.nightexpress.excellentshop:Core:4.15.0")
-    // MorePersistentDataTypes
-    implementation("com.jeff-media:MorePersistentDataTypes:2.4.0")
 }
 
 tasks {
@@ -57,12 +62,12 @@ tasks {
 paper {
     name = "Azure"
     main = "cloud.grabsky.azure.Azure"
+    loader = "cloud.grabsky.azure.Azure\$PluginLoader"
     apiVersion = "1.21.8"
+    generateLibrariesJson = true
     serverDependencies {
-        // Required
         "LuckPerms"      { load = "BEFORE"; required = true }
         "PlaceholderAPI" { load = "BEFORE"; required = true }
-        // Optional
         "AuroraQuests"   { load = "BEFORE"; required = false }
         "ExcellentShop"  { load = "BEFORE"; required = false }
     }
