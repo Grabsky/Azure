@@ -191,11 +191,12 @@ public final class DiscordIntegration implements Listener {
             message = EmojiManager.replaceAllEmojis(message, (emoji) -> "<white><lang:'" + emoji.getDiscordAliases().getFirst() + "'></white>");
             // Appending '(Gif)' or similar string to the message if it contains a gif attachment.
             message = (message.startsWith("https://tenor.com/view/") == true)
-                    ? (message.isBlank() == false)
-                            ? message + " " + PluginLocale.CHAT_ATTACHMENT
-                            : PluginLocale.CHAT_ATTACHMENT
+                    ? (message.contains(" ") == true)
+                            ? message + " " + PluginLocale.CHAT_GIF
+                            : PluginLocale.CHAT_GIF
                     : message;
             // Appending '(Attachment)' or similar string to the message if it contains an attachment like image etc.
+            // TO-DO: Display all attachments and their names but also filter for inappropriate words if that makes sense.
             message = (event.getMessage().getAttachments().isEmpty() == false)
                     ? (message.isBlank() == false)
                             ? message + " " + PluginLocale.CHAT_ATTACHMENT
