@@ -214,7 +214,7 @@ public final class AzureUserCache implements UserCache, Listener {
 
     @SuppressWarnings("UnstableApiUsage")
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onUserLogin(final @NotNull PlayerConnectionValidateLoginEvent event) {
+    public void onConnectionValidate(final @NotNull PlayerConnectionValidateLoginEvent event) {
         // NOTE: May want to replace it with PlayerLoginConnection once it's known for sure it works as expected.
         //       It currently allows the player to log-in despite the kickMessage being set.
         if (event.getConnection() instanceof PlayerConfigurationConnection connection) {

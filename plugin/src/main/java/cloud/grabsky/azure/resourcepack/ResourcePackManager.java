@@ -123,6 +123,7 @@ public final class ResourcePackManager implements Listener {
                 plugin.getLogger().severe("  Resource-pack " + holder.file.getName() + " will be excluded from the request.");
                 return null;
             }
+            plugin.getLogger().info("[DEBUG] " + "http://" + PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS + ":" + PluginConfig.RESOURCE_PACK_PORT + "/" + secret + "/" + holder.uniqueId);
             // Creating new context at path '/{SECRET}/{RESOURCE_PACK_UUID}' which points to a downloadable file.
             server.createContext("/" + secret + "/" + holder.uniqueId, (exchange) -> {
                 // Opening FileInputStream for the resource-pack file.
@@ -171,8 +172,8 @@ public final class ResourcePackManager implements Listener {
 
     @EventHandler @SuppressWarnings("UnstableApiUsage")
     public void onPlayerConnectionConfiguration(final @NotNull AsyncPlayerConnectionConfigureEvent event) {
-        if (PluginConfig.RESOURCE_PACK_SEND_ON_JOIN == true)
-            // UUID should never be null at this stage.
+        plugin.getLogger().info("[DEBUG] AsyncPlayerConnectionConfigureEvent called for profile identified with '" + event.getConnection().getProfile().getId() + "'...");
+        if (PluginConfig.RESOURCE_PACK_SEND_ON_JOIN == true && event.getConnection().getProfile().getId() != null)
             plugin.getResourcePackManager().sendResourcePacks(event.getConnection().getProfile().getId(), event.getConnection().getAudience()).join();
     }
 
