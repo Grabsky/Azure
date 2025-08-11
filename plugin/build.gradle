@@ -55,8 +55,13 @@ tasks {
     }
     runServer {
         minecraftVersion("1.21.8")
-        jvmArgs("--enable-preview")
     }
+}
+
+// Configuring runServer task to use JetBrains' JDK 21 for expanded hot-swap features.
+tasks.withType(xyz.jpenilla.runtask.task.AbstractRun.class).configureEach {
+    javaLauncher = javaToolchains.launcherFor { vendor = JvmVendorSpec.JETBRAINS; languageVersion = JavaLanguageVersion.of(21) }
+    jvmArgs("--enable-preview", "-XX:+AllowEnhancedClassRedefinition")
 }
 
 paper {
