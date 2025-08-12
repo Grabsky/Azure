@@ -91,18 +91,6 @@ public final class ResourcePackManager implements Listener {
             });
             // Generating new secret.
             this.secret = UUID.randomUUID().toString();
-            // Configuring the server to automatically close connections at any non-desired paths.
-            server.get("/*", (context) -> {
-                try {
-                    // Responding with error code 403.
-                    context.status(403);
-                    // Logging...
-                    plugin.debug("[ResourcePacks] [" + context.req().getRemoteAddr().replace("/", "") + "] [" + context.statusCode() + "] " + (context.req().getRequestURI().length() < 96 ? context.req().getRequestURI() : context.req().getRequestURI().substring(0, 96) + "...") + " (Forbidden)");
-                } catch (final Throwable thr) {
-                    plugin.debug("[ResourcePacks] [" + context.req().getRemoteAddr().replace("/", "") + "] [" + context.statusCode() + "] " + (context.req().getRequestURI().length() < 96 ? context.req().getRequestURI() : context.req().getRequestURI().substring(0, 96) + "...") + " (Error)");
-                    thr.printStackTrace();
-                }
-            });
             // Converting files to ResourcePackHolder objects.
             for (final String filename : Iterables.reversed(PluginConfig.RESOURCE_PACK_FILES)) {
                 final File file = Path.of(plugin.getDataFolder().getPath(), ".public", filename).toFile();
