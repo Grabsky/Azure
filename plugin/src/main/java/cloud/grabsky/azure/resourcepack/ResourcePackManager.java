@@ -29,6 +29,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -109,20 +110,16 @@ public final class ResourcePackManager implements Listener {
                     server.createContext("/" + secret + "/" + uniqueId, (exchange) -> {
                         try {
                             final long start = System.nanoTime();
-                            // Opening FileInputStream for the resource-pack file.
-                            final FileInputStream in = new FileInputStream(file);
-                            // Reading all bytes.
-                            final byte[] bytes = in.readAllBytes();
-                            // Closing the FileInputStream.
-                            in.close();
                             // Responding with code 200 and bytes length.
-                            exchange.sendResponseHeaders(200, bytes.length);
-                            // Writing bytes (file) to the response.
-                            exchange.getResponseBody().write(bytes);
+                            exchange.sendResponseHeaders(200, file.length());
+                            // Opening BufferedInputStream on the .zip file to prevent loading it all into the memory.
+                            final BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
+                            // Transferring the file to the response body.
+                            in.transferTo(exchange.getResponseBody());
+                            // Closing the BufferedInputStream.
+                            in.close();
                             // Closing the response.
                             exchange.getResponseBody().close();
-                            // Closing the exchange.
-                            exchange.close();
                             // Logging...
                             plugin.debug("[ResourcePacks] [" + exchange.getRemoteAddress().toString().replace("/", "") + "] [" + exchange.getResponseCode() + "] " + file.getName() + String.format(" (%.2fms)", (System.nanoTime() - start) / 1000000.0));
                         } catch (final Throwable thr) {
