@@ -96,7 +96,7 @@ public final class ResourcePackManager implements Listener {
             server.createContext("/", (exchange) -> {
                 try (exchange) {
                     // Responding with error code 403.
-                    exchange.sendResponseHeaders(403, 0);
+                    exchange.sendResponseHeaders(403, -1);
                     // Logging...
                     plugin.debug("[ResourcePacks] [" + exchange.getRemoteAddress().getAddress().toString().replace("/", "") + "] [" + exchange.getResponseCode() + "] " + (exchange.getRequestURI().toString().length() < 96 ? exchange.getRequestURI() : exchange.getRequestURI().toString().substring(0, 96) + "...") + " (Forbidden)");
                 } catch (final Throwable thr) {
