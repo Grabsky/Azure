@@ -106,6 +106,9 @@ public final class ResourcePackManager implements Listener {
                             final long start = System.nanoTime();
                             // Responding with code 200 and bytes length.
                             context.status(200);
+                            // Setting Content-Type to 'application/zip' and Content-Length to the file size.
+                            context.header("Content-Type", "application/zip");
+                            context.header("Content-Length", file.length() + "");
                             // Opening BufferedInputStream for the resource-pack file.
                             // It can't be done with try-with-resources because Javalin handles that on it's own and closes the stream after the response is sent.
                             final BufferedInputStream in = new BufferedInputStream(new FileInputStream(file), 8192);
