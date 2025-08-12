@@ -58,15 +58,16 @@ public final class ResourcePackManager implements Listener {
 
     private final @NotNull Azure plugin;
 
-    // Internal web-server, always listens on all available interfaces.
-    private @Nullable HttpServer server;
 
     // Holds information about resource-packs, such as their UUID and hash.
     private final List<ResourcePackHolder> holders = new ArrayList<>();
 
+    // Internal web-server, always listens on all available interfaces.
+    private @Nullable HttpServer server;
+
     // Secret is an additional identifier used in resource-pack request URLs.
     // New secret is generated every time the internal web server is restarted.
-    private String secret;
+    private @Nullable String secret;
 
     /**
      * Reloads resource-packs from configuration and starts internal web-server if necessary.
@@ -79,23 +80,29 @@ public final class ResourcePackManager implements Listener {
         if (this.server != null) {
             // Stopping the server.
             this.server.stop(0);
-            // Cleaning-up anything that could've potentially be left in the memory.
+            // Cleaning-up anything HttpServer could've potentially left in the memory.
             this.server = null;
+            // Cleaning-up the secret.
+            this.secret = null;
         }
-        // Generating new secret.
-        this.secret = UUID.randomUUID().toString();
         // Logging...
         if (PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS.isBlank() == false && PluginConfig.RESOURCE_PACK_PORT > 0) {
             this.server = HttpServer.create(new InetSocketAddress(PluginConfig.RESOURCE_PACK_PORT), 0);
             // Making sure web server uses virtual threads.
             this.server.setExecutor(Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name("AzureHttp", 0).factory()));
+            // Generating new secret.
+            this.secret = UUID.randomUUID().toString();
             // Configuring the server to automatically close connections at any non-desired paths.
             server.createContext("/", (exchange) -> {
-                exchange.sendResponseHeaders(403, 0);
-                // Closing the exchange immediately.
-                exchange.close();
-                // Logging...
-                plugin.debug("[ResourcePacks] [" + exchange.getRemoteAddress().getAddress().toString().replace("/", "") + "] [" + exchange.getResponseCode() + "] " + (exchange.getRequestURI().toString().length() < 96 ? exchange.getRequestURI() : exchange.getRequestURI().toString().substring(0, 96) + "...") + " (Forbidden)");
+                try (exchange) {
+                    // Responding with error code 403.
+                    exchange.sendResponseHeaders(403, 0);
+                    // Logging...
+                    plugin.debug("[ResourcePacks] [" + exchange.getRemoteAddress().getAddress().toString().replace("/", "") + "] [" + exchange.getResponseCode() + "] " + (exchange.getRequestURI().toString().length() < 96 ? exchange.getRequestURI() : exchange.getRequestURI().toString().substring(0, 96) + "...") + " (Forbidden)");
+                } catch (final Throwable thr) {
+                    plugin.getLogger().severe("[ResourcePacks] [" + exchange.getRemoteAddress().getAddress().toString().replace("/", "") + "] [" + exchange.getResponseCode() + "] " + (exchange.getRequestURI().toString().length() < 96 ? exchange.getRequestURI() : exchange.getRequestURI().toString().substring(0, 96) + "...") + " (Error)");
+                    thr.printStackTrace();
+                }
             });
             // Converting files to ResourcePackHolder objects.
             for (final String filename : Iterables.reversed(PluginConfig.RESOURCE_PACK_FILES)) {
@@ -108,25 +115,18 @@ public final class ResourcePackManager implements Listener {
                     holders.add(new ResourcePackHolder(uniqueId, file, Files.asByteSource(file).hash(Hashing.sha1()).toString()));
                     // Creating context at path '/{SECRET}/{RESOURCE_PACK_UUID}' which points to a downloadable file.
                     server.createContext("/" + secret + "/" + uniqueId, (exchange) -> {
-                        try {
+                        // Try-with-resources should automatically close the BufferedInputStream as well as the HttpExchange.
+                        try (final BufferedInputStream in = new BufferedInputStream(new FileInputStream(file), 8192); exchange) {
                             final long start = System.nanoTime();
                             // Responding with code 200 and bytes length.
                             exchange.sendResponseHeaders(200, file.length());
-                            // Opening BufferedInputStream on the .zip file to prevent loading it all into the memory.
-                            final BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
                             // Transferring the file to the response body.
                             in.transferTo(exchange.getResponseBody());
-                            // Closing the BufferedInputStream.
-                            in.close();
-                            // Closing the response.
-                            exchange.getResponseBody().close();
                             // Logging...
-                            plugin.debug("[ResourcePacks] [" + exchange.getRemoteAddress().toString().replace("/", "") + "] [" + exchange.getResponseCode() + "] " + file.getName() + String.format(" (%.2fms)", (System.nanoTime() - start) / 1000000.0));
+                            plugin.debug("[ResourcePacks] [" + exchange.getRemoteAddress().getAddress().toString().replace("/", "") + "] [" + exchange.getResponseCode() + "] " + file.getName() + String.format(" (%.2fms)", (System.nanoTime() - start) / 1000000.0));
                         } catch (final Throwable thr) {
+                            plugin.getLogger().severe("[ResourcePacks] [" + exchange.getRemoteAddress().getAddress().toString().replace("/", "") + "] [" + exchange.getResponseCode() + "] " + file.getName() + " (Error)");
                             thr.printStackTrace();
-                        } finally {
-                            // Closing the exchange.
-                            exchange.close();
                         }
                     });
                 }
@@ -144,11 +144,13 @@ public final class ResourcePackManager implements Listener {
      */
     public CompletableFuture<Void> sendResourcePacks(final @NotNull UUID uniqueId, final @NotNull Audience audience) {
         // Logging error if internal web server is null.
-        if (this.server == null)
+        if (this.server == null) {
             plugin.debug("[ResourcePacks] Requested resource-packs for '" + uniqueId + "' but the internal web server is null.");
+            return CompletableFuture.completedFuture(null);
+        }
         // Converting pack holders to ResourcePackInfo objects.
         final List<ResourcePackInfo> packs = holders.stream().map(holder -> {
-            // Creating on-demand URI with the generated secret.
+            // Creating URI this resource-pack will be accessible at.
             final URI uri = URI.create("http://" + PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS + ":" + PluginConfig.RESOURCE_PACK_PORT + "/" + secret + "/" + holder.uniqueId);
             // Wrapping and returning as ResourcePackInfo object.
             return ResourcePackInfo.resourcePackInfo(holder.uniqueId, uri, holder.hash);
