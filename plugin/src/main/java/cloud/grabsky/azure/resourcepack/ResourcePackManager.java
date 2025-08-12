@@ -94,7 +94,7 @@ public final class ResourcePackManager implements Listener {
                 // Closing the exchange immediately.
                 exchange.close();
                 // Logging...
-                plugin.getLogger().info("[ResourcePacks] [" + exchange.getRemoteAddress().toString().replace("/", "") + "] [" + exchange.getResponseCode() + "] ROOT ACCESS FORBIDDEN");
+                plugin.debug("[ResourcePacks] [" + exchange.getRemoteAddress().getAddress().toString().replace("/", "") + "] [" + exchange.getResponseCode() + "] " + (exchange.getRequestURI().toString().length() < 96 ? exchange.getRequestURI() : exchange.getRequestURI().toString().substring(0, 96) + "...") + " (Forbidden)");
             });
             // Converting files to ResourcePackHolder objects.
             for (final String filename : Iterables.reversed(PluginConfig.RESOURCE_PACK_FILES)) {
@@ -124,7 +124,7 @@ public final class ResourcePackManager implements Listener {
                             // Closing the exchange.
                             exchange.close();
                             // Logging...
-                            plugin.getLogger().info("[ResourcePacks] [" + exchange.getRemoteAddress().toString().replace("/", "") + "] [" + exchange.getResponseCode() + "] " + file.getName() + String.format(" (%.2fms)", (System.nanoTime() - start) / 1000000.0));
+                            plugin.debug("[ResourcePacks] [" + exchange.getRemoteAddress().toString().replace("/", "") + "] [" + exchange.getResponseCode() + "] " + file.getName() + String.format(" (%.2fms)", (System.nanoTime() - start) / 1000000.0));
                         } catch (final Throwable thr) {
                             thr.printStackTrace();
                         } finally {
@@ -148,7 +148,7 @@ public final class ResourcePackManager implements Listener {
     public CompletableFuture<Void> sendResourcePacks(final @NotNull UUID uniqueId, final @NotNull Audience audience) {
         // Logging error if internal web server is null.
         if (this.server == null)
-            plugin.getLogger().severe("[ResourcePacks] Requested resource-packs for '" + uniqueId + "' but the internal web server is null.");
+            plugin.debug("[ResourcePacks] Requested resource-packs for '" + uniqueId + "' but the internal web server is null.");
         // Converting pack holders to ResourcePackInfo objects.
         final List<ResourcePackInfo> packs = holders.stream().map(holder -> {
             // Creating on-demand URI with the generated secret.
@@ -169,7 +169,7 @@ public final class ResourcePackManager implements Listener {
                         // Completing the future (and releasing player from configuration phase) after processing the last resource-pack.
                         if (packs.getLast().id().equals(packId) == true) {
                             future.complete(null);
-                            plugin.getLogger().info("[ResourcePacks] Requested resource-packs for '" + uniqueId + "' successfully processed.");
+                            plugin.debug("[ResourcePacks] Resource-packs requested by '" + uniqueId + "' were successfully processed.");
                         }
                     }
                 })
@@ -182,8 +182,10 @@ public final class ResourcePackManager implements Listener {
 
     @EventHandler @SuppressWarnings("UnstableApiUsage")
     public void onPlayerConnectionConfiguration(final @NotNull AsyncPlayerConnectionConfigureEvent event) {
-        plugin.getLogger().info("[ResourcePacks] AsyncPlayerConnectionConfigureEvent called for " + event.getConnection().getProfile().getName() + " (" + event.getConnection().getProfile().getId() + ")");
-        if (PluginConfig.RESOURCE_PACK_SEND_ON_JOIN == true && event.getConnection().getProfile().getId() != null)
+        if (PluginConfig.RESOURCE_PACK_SEND_ON_JOIN == true && event.getConnection().getProfile().getId() != null) {
+            // Logging...
+            plugin.debug("[ResourcePacks] Player '" + event.getConnection().getProfile().getName() + "' identified with '" + event.getConnection().getProfile().getId() + "' requested resource-packs...");
+            // Sending resource-packs to the player.
             try {
                 plugin.getResourcePackManager().sendResourcePacks(event.getConnection().getProfile().getId(), event.getConnection().getAudience()).get(180, TimeUnit.SECONDS);
             } catch (final TimeoutException exception) {
@@ -200,6 +202,7 @@ public final class ResourcePackManager implements Listener {
                 // Disconnecting player from the server.
                 event.getConnection().disconnect(Component.translatable("disconnect.timeout"));
             }
+        }
     }
 
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)

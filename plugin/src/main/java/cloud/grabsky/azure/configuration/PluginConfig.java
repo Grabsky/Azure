@@ -44,6 +44,9 @@ import static cloud.grabsky.azure.util.Iterables.reversed;
 
 public final class PluginConfig implements JsonConfiguration {
 
+    @JsonPath("debug_mode")
+    public static boolean DEBUG_MODE;
+
     // General Settings
 
     @JsonPath("general_settings.clear_title_on_join")

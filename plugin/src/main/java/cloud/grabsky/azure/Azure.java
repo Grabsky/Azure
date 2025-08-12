@@ -311,6 +311,14 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
         }
     }
 
+    /**
+     * Logs a debug message to the console if debug mode is enabled in the plugin configuration.
+     */
+    public void debug(final @NotNull String message) {
+        if (PluginConfig.DEBUG_MODE == true)
+            this.getLogger().warning("[D] " + message);
+    }
+
     public static final class Placeholders extends PlaceholderExpansion {
         public static final Placeholders INSTANCE = new Placeholders(); // SINGLETON
 
