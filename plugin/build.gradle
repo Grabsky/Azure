@@ -36,6 +36,8 @@ dependencies {
     paperLibrary("net.fellbaum:jemoji:1.7.4")
     // https://github.com/mfnalex/MorePersistentDataTypes
     paperLibrary("com.jeff-media:MorePersistentDataTypes:2.4.0")
+    // https://github.com/javalin/javalin
+    paperLibrary("io.javalin:javalin:6.7.0")
     // https://github.com/LuckPerms/LuckPerms
     compileOnly("net.luckperms:api:5.5")
     // https://github.com/PlaceholderAPI/PlaceholderAPI

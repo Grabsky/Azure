@@ -19,7 +19,7 @@ import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.util.Iterables;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
-import com.sun.net.httpserver.HttpServer;
+import io.javalin.Javalin;
 import io.papermc.paper.event.connection.configuration.AsyncPlayerConnectionConfigureEvent;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.resource.ResourcePackInfo;
@@ -33,7 +33,6 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -42,7 +41,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -63,7 +61,7 @@ public final class ResourcePackManager implements Listener {
     private final List<ResourcePackHolder> holders = new ArrayList<>();
 
     // Internal web-server, always listens on all available interfaces.
-    private @Nullable HttpServer server;
+    private @Nullable Javalin server;
 
     // Secret is an additional identifier used in resource-pack request URLs.
     // New secret is generated every time the internal web server is restarted.
@@ -79,7 +77,7 @@ public final class ResourcePackManager implements Listener {
         // Restarting the HTTP server if necessary.
         if (this.server != null) {
             // Stopping the server.
-            this.server.stop(0);
+            this.server.stop();
             // Cleaning-up anything HttpServer could've potentially left in the memory.
             this.server = null;
             // Cleaning-up the secret.
@@ -87,20 +85,21 @@ public final class ResourcePackManager implements Listener {
         }
         // Logging...
         if (PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS.isBlank() == false && PluginConfig.RESOURCE_PACK_PORT > 0) {
-            this.server = HttpServer.create(new InetSocketAddress(PluginConfig.RESOURCE_PACK_PORT), 0);
-            // Making sure web server uses virtual threads.
-            this.server.setExecutor(Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name("AzureHttp", 0).factory()));
+            this.server = Javalin.create(config -> {
+                config.useVirtualThreads = true;
+                config.showJavalinBanner = false;
+            });
             // Generating new secret.
             this.secret = UUID.randomUUID().toString();
             // Configuring the server to automatically close connections at any non-desired paths.
-            server.createContext("/", (exchange) -> {
-                try (exchange) {
+            server.get("/*", (context) -> {
+                try {
                     // Responding with error code 403.
-                    exchange.sendResponseHeaders(403, -1);
+                    context.status(403);
                     // Logging...
-                    plugin.debug("[ResourcePacks] [" + exchange.getRemoteAddress().getAddress().toString().replace("/", "") + "] [" + exchange.getResponseCode() + "] " + (exchange.getRequestURI().toString().length() < 96 ? exchange.getRequestURI() : exchange.getRequestURI().toString().substring(0, 96) + "...") + " (Forbidden)");
+                    plugin.debug("[ResourcePacks] [" + context.req().getRemoteAddr().replace("/", "") + "] [" + context.statusCode() + "] " + (context.req().getRequestURI().length() < 96 ? context.req().getRequestURI() : context.req().getRequestURI().substring(0, 96) + "...") + " (Forbidden)");
                 } catch (final Throwable thr) {
-                    plugin.getLogger().severe("[ResourcePacks] [" + exchange.getRemoteAddress().getAddress().toString().replace("/", "") + "] [" + exchange.getResponseCode() + "] " + (exchange.getRequestURI().toString().length() < 96 ? exchange.getRequestURI() : exchange.getRequestURI().toString().substring(0, 96) + "...") + " (Error)");
+                    plugin.debug("[ResourcePacks] [" + context.req().getRemoteAddr().replace("/", "") + "] [" + context.statusCode() + "] " + (context.req().getRequestURI().length() < 96 ? context.req().getRequestURI() : context.req().getRequestURI().substring(0, 96) + "...") + " (Error)");
                     thr.printStackTrace();
                 }
             });
@@ -114,28 +113,27 @@ public final class ResourcePackManager implements Listener {
                     // Generating SHA-1 hash and adding new ResourcePackHolder object to the cache.
                     holders.add(new ResourcePackHolder(uniqueId, file, Files.asByteSource(file).hash(Hashing.sha1()).toString()));
                     // Creating context at path '/{SECRET}/{RESOURCE_PACK_UUID}' which points to a downloadable file.
-                    server.createContext("/" + secret + "/" + uniqueId, (exchange) -> {
-                        // Try-with-resources should automatically close the BufferedInputStream as well as the HttpExchange.
-                        try (final BufferedInputStream in = new BufferedInputStream(new FileInputStream(file), 8192); exchange) {
+                    server.get("/" + secret + "/" + uniqueId, (context) -> {
+                        try {
                             final long start = System.nanoTime();
                             // Responding with code 200 and bytes length.
-                            exchange.sendResponseHeaders(200, file.length());
+                            context.status(200);
+                            // Opening BufferedInputStream for the resource-pack file.
+                            // It can't be done with try-with-resources because Javalin handles that on it's own and closes the stream after the response is sent.
+                            final BufferedInputStream in = new BufferedInputStream(new FileInputStream(file), 8192);
                             // Transferring the file to the response body.
-                            in.transferTo(exchange.getResponseBody());
+                            context.result(in);
                             // Logging...
-                            plugin.debug("[ResourcePacks] [" + exchange.getRemoteAddress().getAddress().toString().replace("/", "") + "] [" + exchange.getResponseCode() + "] " + file.getName() + String.format(" (%.2fms)", (System.nanoTime() - start) / 1000000.0));
+                            plugin.debug("[ResourcePacks] [" + context.req().getRemoteAddr().replace("/", "") + "] [" + context.statusCode() + "] " + file.getName() + String.format(" (%.2fms)", (System.nanoTime() - start) / 1000000.0));
                         } catch (final Throwable thr) {
-                            plugin.getLogger().severe("[ResourcePacks] [" + exchange.getRemoteAddress().getAddress().toString().replace("/", "") + "] [" + exchange.getResponseCode() + "] " + file.getName() + " (Error)");
+                            plugin.getLogger().severe("[ResourcePacks] [" + context.req().getRemoteAddr().replace("/", "") + "] [" + context.statusCode() + "] " + file.getName() + " (Error)");
                             thr.printStackTrace();
                         }
                     });
                 }
             }
             // Starting the server.
-            server.start();
-            // Logging...
-            plugin.getLogger().info("[ResourcePacks] Internal web server started and should be accessible at http://" + PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS + ":" + PluginConfig.RESOURCE_PACK_PORT);
-            plugin.getLogger().info("[ResourcePacks] Secret: " + secret);
+            server.start(PluginConfig.RESOURCE_PACK_PORT);
         }
     }
 
