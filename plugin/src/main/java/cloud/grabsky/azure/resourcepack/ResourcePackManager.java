@@ -17,6 +17,7 @@ package cloud.grabsky.azure.resourcepack;
 import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.util.Iterables;
+import com.destroystokyo.paper.event.player.PlayerConnectionCloseEvent;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
 import io.javalin.Javalin;
@@ -37,7 +38,9 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -56,9 +59,11 @@ public final class ResourcePackManager implements Listener {
 
     private final @NotNull Azure plugin;
 
-
     // Holds information about resource-packs, such as their UUID and hash.
     private final List<ResourcePackHolder> holders = new ArrayList<>();
+
+    // Holds all pending resource-pack requests.
+    private final Map<UUID, RequestInfo> pendingRequests = new HashMap<>();
 
     // Internal web-server, always listens on all available interfaces.
     private @Nullable Javalin server;
@@ -152,16 +157,24 @@ public final class ResourcePackManager implements Listener {
                 .replace(true)
                 .required(PluginConfig.RESOURCE_PACK_IS_REQUIRED)
                 .prompt(PluginConfig.RESOURCE_PACK_PROMPT_MESSAGE)
+                // These callbacks may remain incomplete when player disconnects from the server.
+                // It is yet to be confirmed whether they expire or not, but we're "cleaning" them after player disconnects anyway.
                 .callback((packId, status, _) -> {
                     if (status.intermediate() == false) {
                         // Completing the future (and releasing player from configuration phase) after processing the last resource-pack.
                         if (packs.getLast().id().equals(packId) == true) {
+                            // Completing the future and releasing player from configuration phase.
                             future.complete(null);
+                            // Removing the future from pending requests.
+                            pendingRequests.remove(uniqueId);
+                            // Logging...
                             plugin.debug("[ResourcePacks] Resource-packs requested by '" + uniqueId + "' were successfully processed.");
                         }
                     }
                 })
                 .build();
+        // Adding this future to pending requests of that player.
+        pendingRequests.put(uniqueId, new RequestInfo(request, future));
         // Sending resource-packs to the player.
         audience.sendResourcePacks(request);
         // Returning the future. This will remain incomplete until all packs are processed.
@@ -175,7 +188,7 @@ public final class ResourcePackManager implements Listener {
             plugin.debug("[ResourcePacks] Player '" + event.getConnection().getProfile().getName() + "' identified with '" + event.getConnection().getProfile().getId() + "' requested resource-packs...");
             // Sending resource-packs to the player.
             try {
-                plugin.getResourcePackManager().sendResourcePacks(event.getConnection().getProfile().getId(), event.getConnection().getAudience()).get(180, TimeUnit.SECONDS);
+                 plugin.getResourcePackManager().sendResourcePacks(event.getConnection().getProfile().getId(), event.getConnection().getAudience()).get(180, TimeUnit.SECONDS);
             } catch (final TimeoutException exception) {
                 // Logging cancellation reason to the console.
                 plugin.getLogger().severe("Request invoked by " + event.getConnection().getProfile().getName() + " (" + event.getConnection().getProfile().getId() + ")" + " automatically cancelled after 180 seconds.");
@@ -193,6 +206,22 @@ public final class ResourcePackManager implements Listener {
         }
     }
 
+    @EventHandler
+    public void onPlayerConnectionClose(final @NotNull PlayerConnectionCloseEvent event) {
+        // Getting the UUID of the player.
+        final UUID uniqueId = event.getPlayerUniqueId();
+        // Cleaning up / removing pending request if it exists.
+        if (pendingRequests.containsKey(uniqueId) == true) {
+            // Completing the future.
+            if (pendingRequests.get(uniqueId).future().isDone() == false)
+                pendingRequests.get(uniqueId).future().complete(null);
+            // Cleaning-up the request callback.
+            pendingRequests.get(uniqueId).request().callback((_, _, _) -> {});
+            // Removing the future from pending requests.
+            pendingRequests.remove(uniqueId);
+        }
+    }
+
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     private static final class ResourcePackHolder {
 
@@ -206,5 +235,7 @@ public final class ResourcePackManager implements Listener {
         private final String hash;
 
     }
+
+    public record RequestInfo(ResourcePackRequest request, CompletableFuture<Void> future) {}
 
 }
