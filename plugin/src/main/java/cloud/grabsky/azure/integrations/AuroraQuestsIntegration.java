@@ -20,7 +20,6 @@ import gg.auroramc.quests.api.objective.Objective;
 import gg.auroramc.quests.api.objective.ObjectiveDefinition;
 import gg.auroramc.quests.api.profile.Profile;
 import gg.auroramc.quests.api.quest.Quest;
-import org.bukkit.Bukkit;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -60,15 +59,8 @@ public enum AuroraQuestsIntegration {
 
         @Override
         protected void activate() {
-            // Scheduling an asynchronous repeating task which progresses players in PLAY_ONE_MINUTE task every minute they play on a server. (Technically not true, but this implementation is close enough)
-            Azure.getInstance().getBedrockScheduler().repeatAsync(0L, 1200L, Long.MAX_VALUE, (_) -> {
-                // Iterating over all online players and adding one minute to their playtime.
-                Bukkit.getServer().getOnlinePlayers().forEach(_ -> {
-                    progress(1.0, meta());
-                });
-                // Returning true to continue the task.
-                return true;
-            });
+            // Scheduling an asynchronous repeating task which progresses player in PLAY_ONE_MINUTE task every minute they play on a server.
+            asyncInterval(() -> progress(1, meta()), 1200, 1200);
         }
 
     }
