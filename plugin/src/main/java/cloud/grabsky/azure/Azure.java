@@ -80,8 +80,12 @@ import cloud.grabsky.configuration.paper.PaperConfigurationMapper;
 import com.google.gson.Gson;
 import io.papermc.paper.plugin.loader.PluginClasspathBuilder;
 import io.papermc.paper.plugin.loader.library.impl.MavenLibraryResolver;
+import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import org.bukkit.Material;
@@ -117,6 +121,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
+import static net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText;
 
 public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
 
@@ -349,6 +354,14 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
             return Azure.getInstance().getPluginMeta().getVersion();
         }
 
+        private static final MiniMessage MINI_MESSAGE = MiniMessage.builder().tags(
+                TagResolver.resolver(
+                        StandardTags.color(),
+                        StandardTags.gradient(),
+                        StandardTags.rainbow()
+                )
+        ).build();
+
         @Override
         public String onRequest(final @NotNull OfflinePlayer offlinePlayer, final @NotNull String params) {
             // Placeholder: %azure_countdown_[TIMESTAMP]%
@@ -359,6 +372,41 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
                 } catch (final NumberFormatException e) {
                     return "00:00:00";
                 }
+            }
+            // Placeholder: %azure_strip_tags:<_input_>%
+            if (params.startsWith("strip_unsafe_tags:") == true) {
+                final String input = PlaceholderAPI.setBracketPlaceholders(offlinePlayer, params.split(":")[1]);
+                return MiniMessage.builder().tags(TagResolver.empty()).build().stripTags(
+                        input,
+                        // Stripping tags below. This leaves color, gradient and rainbow tags only.
+                        StandardTags.decorations(),
+                        StandardTags.hoverEvent(),
+                        StandardTags.clickEvent(),
+                        StandardTags.clickEvent(),
+                        StandardTags.keybind(),
+                        StandardTags.translatable(),
+                        StandardTags.translatableFallback(),
+                        StandardTags.insertion(),
+                        StandardTags.font(),
+                        StandardTags.reset(),
+                        StandardTags.newline(),
+                        StandardTags.selector(),
+                        StandardTags.selector(),
+                        StandardTags.score(),
+                        StandardTags.nbt(),
+                        StandardTags.pride(),
+                        StandardTags.shadowColor()
+                );
+            }
+            // Placeholder: %azure_is_displayname_valid:<input>%
+            if (params.startsWith("is_displayname_valid:") == true) {
+                final String input = PlaceholderAPI.setBracketPlaceholders(offlinePlayer, params.split(":")[1]);
+                final Component displayName = MINI_MESSAGE.deserialize(input.replace(" ", ""));
+                // Sending an error message if nick contains invalid formatting or is not equal to the player's name. Name modifications are not allowed, only colors.
+                if (input.contains("&") == true || input.contains("§") == true || plainText().serialize(displayName).equals(offlinePlayer.getName()) == false) {
+                    return "false";
+                }
+                return "true";
             }
             // Getting the UUID of the player.
             final UUID uniqueId = offlinePlayer.getUniqueId();
