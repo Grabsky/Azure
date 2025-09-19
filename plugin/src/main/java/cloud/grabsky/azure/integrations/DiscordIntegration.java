@@ -218,9 +218,9 @@ public final class DiscordIntegration implements Listener {
                     : message;
             // Appending '(Re: User)' in front of the message if it's a reply.
             if (event.getMessage().getReferencedMessage() != null) {
-                final @Nullable User user = plugin.getUserCache().fromDiscord(event.getMessage().getAuthor().getId());
+                final @Nullable User user = plugin.getUserCache().fromDiscord(event.getMessage().getReferencedMessage().getAuthor().getId());
                 message = (event.getMessage().getReferencedMessage() != null)
-                        ? "<#848484>(Re: <#A89468>" + (user != null ? user.getName() : event.getMessage().getAuthor().getName()) + "</#A89468>)</#848484> " + message
+                        ? "<#848484>(Re: <#A89468>" + (user != null ? user.getName() : event.getMessage().getReferencedMessage().getAuthor().getName()) + "</#A89468>)</#848484> " + message
                         : message;
             }
             // Parsing the message using MiniMessage, with just the translatable and color tags enabled.
