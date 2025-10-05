@@ -47,7 +47,9 @@ dependencies {
     // https://github.com/AuroraNetworkStudios/AuroraQuests
     compileOnly("gg.auroramc:AuroraQuests:2.0.1")
     // https://github.com/nulli0n/ExcellentShop-spigot
-    compileOnly("su.nightexpress.excellentshop:Core:4.15.0")
+    compileOnly("su.nightexpress.excellentshop:Core:4.20.0") {
+        exclude module: "SimpleClaimSystem"
+    }
 }
 
 tasks {
