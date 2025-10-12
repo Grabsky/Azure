@@ -20,6 +20,8 @@ publishing {
     publications {
         register("maven", MavenPublication.class) {
             from components.java
+            // Overriding artifactId of published components.
+            artifactId = "azure-api"
         }
     }
 }
