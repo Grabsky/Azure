@@ -107,24 +107,26 @@ public final class ResourcePackManager implements Listener {
                     holders.add(new ResourcePackHolder(uniqueId, file, Files.asByteSource(file).hash(Hashing.sha1()).toString()));
                     // Creating context at path '/{SECRET}/{RESOURCE_PACK_UUID}' which points to a downloadable file.
                     server.get("/" + secret + "/" + uniqueId, (context) -> {
-                        try {
-                            final long start = System.nanoTime();
-                            // Responding with code 200 and bytes length.
-                            context.status(200);
-                            // Setting Content-Type to 'application/zip' and Content-Length to the file size.
-                            context.header("Content-Type", "application/zip");
-                            context.header("Content-Length", file.length() + "");
-                            // Opening BufferedInputStream for the resource-pack file.
-                            // It can't be done with try-with-resources because Javalin handles that on it's own and closes the stream after the response is sent.
-                            final BufferedInputStream in = new BufferedInputStream(new FileInputStream(file), 8192);
-                            // Transferring the file to the response body.
-                            context.result(in);
-                            // Logging...
-                            plugin.debug("[ResourcePacks] [" + context.req().getRemoteAddr().replace("/", "") + "] [" + context.statusCode() + "] " + file.getName() + String.format(" (%.2fms)", (System.nanoTime() - start) / 1000000.0));
-                        } catch (final Throwable thr) {
-                            plugin.getLogger().severe("[ResourcePacks] [" + context.req().getRemoteAddr().replace("/", "") + "] [" + context.statusCode() + "] " + file.getName() + " (Error)");
-                            thr.printStackTrace();
-                        }
+                        CompletableFuture.runAsync(() -> {
+                            try {
+                                final long start = System.nanoTime();
+                                // Responding with code 200 and bytes length.
+                                context.status(200);
+                                // Setting Content-Type to 'application/zip' and Content-Length to the file size.
+                                context.header("Content-Type", "application/zip");
+                                context.header("Content-Length", file.length() + "");
+                                // Opening BufferedInputStream for the resource-pack file.
+                                // It can't be done with try-with-resources because Javalin handles that on it's own and closes the stream after the response is sent.
+                                final BufferedInputStream in = new BufferedInputStream(new FileInputStream(file), 8192);
+                                // Transferring the file to the response body.
+                                context.result(in);
+                                // Logging...
+                                plugin.debug("[ResourcePacks] [" + context.req().getRemoteAddr().replace("/", "") + "] [" + context.statusCode() + "] " + file.getName() + String.format(" (%.2fms)", (System.nanoTime() - start) / 1000000.0));
+                            } catch (final Throwable thr) {
+                                plugin.getLogger().severe("[ResourcePacks] [" + context.req().getRemoteAddr().replace("/", "") + "] [" + context.statusCode() + "] " + file.getName() + " (Error)");
+                                thr.printStackTrace();
+                            }
+                        });
                     });
                 }
             }
@@ -188,7 +190,7 @@ public final class ResourcePackManager implements Listener {
             plugin.debug("[ResourcePacks] Player '" + event.getConnection().getProfile().getName() + "' identified with '" + event.getConnection().getProfile().getId() + "' requested resource-packs...");
             // Sending resource-packs to the player.
             try {
-                 plugin.getResourcePackManager().sendResourcePacks(event.getConnection().getProfile().getId(), event.getConnection().getAudience()).get(180, TimeUnit.SECONDS);
+                 this.sendResourcePacks(event.getConnection().getProfile().getId(), event.getConnection().getAudience()).get(180, TimeUnit.SECONDS);
             } catch (final TimeoutException exception) {
                 // Logging cancellation reason to the console.
                 plugin.getLogger().severe("Request invoked by " + event.getConnection().getProfile().getName() + " (" + event.getConnection().getProfile().getId() + ")" + " automatically cancelled after 180 seconds.");
