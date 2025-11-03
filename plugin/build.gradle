@@ -58,14 +58,14 @@ tasks {
         archiveFileName = "${rootProject.name}-${project.version}.jar"
     }
     runServer {
-        minecraftVersion("1.21.8")
+        minecraftVersion("1.21.10")
     }
 }
 
 // Configuring runServer task to use JetBrains' JDK 21 for expanded hot-swap features.
 tasks.withType(xyz.jpenilla.runtask.task.AbstractRun.class).configureEach {
     javaLauncher = javaToolchains.launcherFor { vendor = JvmVendorSpec.JETBRAINS; languageVersion = JavaLanguageVersion.of(21) }
-    jvmArgs("--enable-preview", "-XX:+AllowEnhancedClassRedefinition")
+    jvmArgs("-XX:+AllowEnhancedClassRedefinition", "-Dcom.mojang.eula.agree=true", "-Dnet.kyori.ansi.colorLevel=truecolor", "--enable-preview")
 }
 
 paper {
