@@ -21,6 +21,8 @@ import com.destroystokyo.paper.event.player.PlayerConnectionCloseEvent;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
 import io.javalin.Javalin;
+import io.javalin.http.staticfiles.Location;
+import io.javalin.jetty.JettyPrecompressingResourceHandler;
 import io.papermc.paper.event.connection.configuration.AsyncPlayerConnectionConfigureEvent;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.resource.ResourcePackInfo;
@@ -30,11 +32,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -46,12 +47,12 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
@@ -60,7 +61,7 @@ public final class ResourcePackManager implements Listener {
     private final @NotNull Azure plugin;
 
     // Holds information about resource-packs, such as their UUID and hash.
-    private final List<ResourcePackHolder> holders = new ArrayList<>();
+    private final List<ResourcePackInfo> holders = new ArrayList<>();
 
     // Holds all pending resource-pack requests.
     private final Map<UUID, RequestInfo> pendingRequests = new HashMap<>();
@@ -71,6 +72,11 @@ public final class ResourcePackManager implements Listener {
     // Secret is an additional identifier used in resource-pack request URLs.
     // New secret is generated every time the internal web server is restarted.
     private @Nullable String secret;
+
+    static {
+        // Increasing maximum file size for precompressing to 20 MB.
+        JettyPrecompressingResourceHandler.resourceMaxSize = 20971520;
+    }
 
     /**
      * Reloads resource-packs from configuration and starts internal web-server if necessary.
@@ -85,51 +91,40 @@ public final class ResourcePackManager implements Listener {
             this.server.stop();
             // Cleaning-up anything HttpServer could've potentially left in the memory.
             this.server = null;
-            // Cleaning-up the secret.
-            this.secret = null;
         }
-        // Logging...
+        // Generating new secret.
+        this.secret = UUID.randomUUID().toString();
+        // Converting files to ResourcePackHolder objects.
+        for (final String filename : Iterables.reversed(PluginConfig.RESOURCE_PACK_FILES)) {
+            final File file = Path.of(plugin.getDataFolder().getPath(), ".public", filename).toFile();
+            // Checking whether file exists and is not a directory.
+            if (filename.endsWith(".zip") && file.exists() == true && file.isDirectory() == false) {
+                // Generating resource-pack UUID from the file name.
+                final UUID uniqueId = UUID.nameUUIDFromBytes(file.getName().getBytes(StandardCharsets.UTF_8));
+                // Generating SHA-1 hash and adding new ResourcePackHolder object to the cache.
+                holders.add(ResourcePackInfo.resourcePackInfo(
+                        uniqueId,
+                        URI.create("http://" + PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS + ":" + PluginConfig.RESOURCE_PACK_PORT + "/" + secret + "/" + URLEncoder.encode(file.getName(), StandardCharsets.UTF_8)),
+                        Files.asByteSource(file).hash(Hashing.sha1()).toString()
+                ));
+            }
+        }
+        // Creating and configuring Javalin (web-server) instance, and starting it afterwards.
         if (PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS.isBlank() == false && PluginConfig.RESOURCE_PACK_PORT > 0) {
             this.server = Javalin.create(config -> {
-                config.useVirtualThreads = true;
                 config.showJavalinBanner = false;
+                config.startupWatcherEnabled = false;
+                // NOTE: Virtual Threads can cause the internal web-server to hang indefinitely. Something yet to figure out.
+                config.useVirtualThreads = false;
+                // Creating static files configuration as a way to serve resource-packs.
+                config.staticFiles.add(staticFiles -> {
+                    staticFiles.hostedPath = "/" + secret;
+                    staticFiles.directory = plugin.getDataFolder().getAbsolutePath() + File.separator + ".public";
+                    staticFiles.location = Location.EXTERNAL;
+                    // Since resource-packs are generally lightweight, they can be cached in the memory.
+                    staticFiles.precompress = true;
+                });
             });
-            // Generating new secret.
-            this.secret = UUID.randomUUID().toString();
-            // Converting files to ResourcePackHolder objects.
-            for (final String filename : Iterables.reversed(PluginConfig.RESOURCE_PACK_FILES)) {
-                final File file = Path.of(plugin.getDataFolder().getPath(), ".public", filename).toFile();
-                // Checking whether file exists and is not a directory.
-                if (filename.endsWith(".zip") && file.exists() == true && file.isDirectory() == false) {
-                    // Generating resource-pack UUID from the file name.
-                    final UUID uniqueId = UUID.nameUUIDFromBytes(file.getName().getBytes(StandardCharsets.UTF_8));
-                    // Generating SHA-1 hash and adding new ResourcePackHolder object to the cache.
-                    holders.add(new ResourcePackHolder(uniqueId, file, Files.asByteSource(file).hash(Hashing.sha1()).toString()));
-                    // Creating context at path '/{SECRET}/{RESOURCE_PACK_UUID}' which points to a downloadable file.
-                    server.get("/" + secret + "/" + uniqueId, (context) -> {
-                        CompletableFuture.runAsync(() -> {
-                            try {
-                                final long start = System.nanoTime();
-                                // Responding with code 200 and bytes length.
-                                context.status(200);
-                                // Setting Content-Type to 'application/zip' and Content-Length to the file size.
-                                context.header("Content-Type", "application/zip");
-                                context.header("Content-Length", file.length() + "");
-                                // Opening BufferedInputStream for the resource-pack file.
-                                // It can't be done with try-with-resources because Javalin handles that on it's own and closes the stream after the response is sent.
-                                final BufferedInputStream in = new BufferedInputStream(new FileInputStream(file), 8192);
-                                // Transferring the file to the response body.
-                                context.result(in);
-                                // Logging...
-                                plugin.debug("[ResourcePacks] [" + context.req().getRemoteAddr().replace("/", "") + "] [" + context.statusCode() + "] " + file.getName() + String.format(" (%.2fms)", (System.nanoTime() - start) / 1000000.0));
-                            } catch (final Throwable thr) {
-                                plugin.getLogger().severe("[ResourcePacks] [" + context.req().getRemoteAddr().replace("/", "") + "] [" + context.statusCode() + "] " + file.getName() + " (Error)");
-                                thr.printStackTrace();
-                            }
-                        });
-                    });
-                }
-            }
             // Starting the server.
             server.start(PluginConfig.RESOURCE_PACK_PORT);
         }
@@ -144,27 +139,22 @@ public final class ResourcePackManager implements Listener {
             plugin.debug("[ResourcePacks] Requested resource-packs for '" + uniqueId + "' but the internal web server is null.");
             return CompletableFuture.completedFuture(null);
         }
-        // Converting pack holders to ResourcePackInfo objects.
-        final List<ResourcePackInfo> packs = holders.stream().map(holder -> {
-            // Creating URI this resource-pack will be accessible at.
-            final URI uri = URI.create("http://" + PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS + ":" + PluginConfig.RESOURCE_PACK_PORT + "/" + secret + "/" + holder.uniqueId);
-            // Wrapping and returning as ResourcePackInfo object.
-            return ResourcePackInfo.resourcePackInfo(holder.uniqueId, uri, holder.hash);
-        }).toList();
         // Preparing CompletableFuture that will be completed when all packs are loaded.
         final CompletableFuture<Void> future = new CompletableFuture<>();
+        // Creating AtomicInteger which will store amount of processed resource-packs.
+        final AtomicInteger amountProcessed = new AtomicInteger(0);
         // Creating the ResourcePackRequest instance.
         final ResourcePackRequest request = ResourcePackRequest.resourcePackRequest()
-                .packs(packs)
+                .packs(holders)
                 .replace(true)
                 .required(PluginConfig.RESOURCE_PACK_IS_REQUIRED)
                 .prompt(PluginConfig.RESOURCE_PACK_PROMPT_MESSAGE)
                 // These callbacks may remain incomplete when player disconnects from the server.
                 // It is yet to be confirmed whether they expire or not, but we're "cleaning" them after player disconnects anyway.
-                .callback((packId, status, _) -> {
+                .callback((_, status, _) -> {
                     if (status.intermediate() == false) {
                         // Completing the future (and releasing player from configuration phase) after processing the last resource-pack.
-                        if (packs.getLast().id().equals(packId) == true) {
+                        if (amountProcessed.incrementAndGet() == holders.size() - 1) {
                             // Completing the future and releasing player from configuration phase.
                             future.complete(null);
                             // Removing the future from pending requests.
@@ -224,20 +214,7 @@ public final class ResourcePackManager implements Listener {
         }
     }
 
-    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-    private static final class ResourcePackHolder {
-
-        @Getter(AccessLevel.PUBLIC)
-        private final UUID uniqueId;
-
-        @Getter(AccessLevel.PUBLIC)
-        private final File file;
-
-        @Getter(AccessLevel.PUBLIC)
-        private final String hash;
-
-    }
-
-    public record RequestInfo(ResourcePackRequest request, CompletableFuture<Void> future) {}
+    // Holds information about pending request.
+    record RequestInfo(@NotNull ResourcePackRequest request, @NotNull CompletableFuture<Void> future) { /* DATA CLASS */ }
 
 }
