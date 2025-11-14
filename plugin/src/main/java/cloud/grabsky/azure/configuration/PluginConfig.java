@@ -14,7 +14,6 @@
  */
 package cloud.grabsky.azure.configuration;
 
-import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.chat.ChatManager;
 import cloud.grabsky.configuration.JsonConfiguration;
 import cloud.grabsky.configuration.JsonNullable;
@@ -26,8 +25,6 @@ import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -385,36 +382,20 @@ public final class PluginConfig implements JsonConfiguration {
     public static List<String> COMMAND_TRIGGERS_ON_QUIT;
 
 
-    // Disabled Recipes
-
-    @JsonPath("disabled_recipes")
-    public static List<NamespacedKey> DISABLED_RECIPES;
-
-
     /* CONFIGURATION LIFECYCLE */
 
     @Override
     public void onReload() {
         ChatManager.CHAT_FORMATS_REVERSED = reversed(PluginConfig.CHAT_FORMATS_EXTRA);
         ChatManager.CHAT_TAGS_REVERSED = reversed(PluginConfig.CHAT_MESSAGE_TAGS_EXTRA);
-
         // Copying the automated messages list.
         final List<Component> shuffled = new ArrayList<>(CHAT_AUTOMATED_MESSAGES_CONTENTS);
         // Shuffling the copied list.
         Collections.shuffle(shuffled);
         // Updating iterator held within ChatManager class.
         ChatManager.AUTOMATED_MESSAGES_SHUFFLED = shuffled;
-
         // (Re)scheduling ChatManager tasks.
         ChatManager.scheduleAutomatedMessagesTask();
-
-        // Iterating over disabled recipes list and removing them from the server. May not be the best place to do that.
-        DISABLED_RECIPES.forEach(key -> {
-            if (Bukkit.removeRecipe(key) == false)
-                Azure.getInstance().getLogger().warning("Unknown recipe \"" + key.asString() + "\" could not be disabled.");
-        });
-        // Updating recipes for all players.
-        Bukkit.updateRecipes();
     }
 
 

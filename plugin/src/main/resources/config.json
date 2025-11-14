@@ -267,9 +267,5 @@
         "on_join": [],
         // Commands to be executed when player leaves the server.
         "on_quit": []
-    },
-    // Recipes to be unregistered after plugin has successfully reloaded. Keep in mind unregistered recipes are removed from players' recipe discovery list.
-    "disabled_recipes": [
-        // "minecraft:iron_pickaxe"
-    ]
+    }
 }
