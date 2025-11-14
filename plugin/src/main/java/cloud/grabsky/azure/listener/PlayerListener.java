@@ -78,9 +78,6 @@ public final class PlayerListener implements Listener {
             // Setting the respawn location.
             plugin.getBedrockScheduler().run(1L, (_) -> player.teleportAsync(plugin.getWorldManager().getSpawnPoint(primaryWorld)));
         }
-        // Clearing title. (if enabled)
-        if (PluginConfig.GENERAL_CLEAR_TITLE_ON_JOIN == true)
-            player.clearTitle();
         // Setting join message to null because it needs to be handled manually.
         event.joinMessage(null);
         // Sending join message to audience that can see the player associated with the event.

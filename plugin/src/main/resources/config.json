@@ -4,8 +4,6 @@
     "debug_mode": false,
 
     "general_settings": {
-        // Determines whether titles should be cleared on join.
-        "clear_title_on_join": false,
         // Determines whether player should respawn on spawn-point of the primary world.
         "respawn_on_primary_world_spawn": true,
         // Determines whether new players should spawn on spawn-point of the primary world.

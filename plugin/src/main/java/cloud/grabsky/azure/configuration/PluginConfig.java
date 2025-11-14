@@ -46,9 +46,6 @@ public final class PluginConfig implements JsonConfiguration {
 
     // General Settings
 
-    @JsonPath("general_settings.clear_title_on_join")
-    public static boolean GENERAL_CLEAR_TITLE_ON_JOIN;
-
     @JsonPath("general_settings.respawn_on_primary_world_spawn")
     public static boolean GENERAL_RESPAWN_ON_PRIMARY_WORLD_SPAWN;
 
