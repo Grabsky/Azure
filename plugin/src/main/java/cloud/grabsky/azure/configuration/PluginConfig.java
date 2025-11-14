@@ -373,14 +373,6 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("discord_integrations.auction_listings_forwarding.format")
     public static String DISCORD_INTEGRATIONS_AUCTION_LISTINGS_FORWARDING_FORMAT;
 
-    // Command Triggers
-
-    @JsonPath("command_triggers.on_join")
-    public static List<String> COMMAND_TRIGGERS_ON_JOIN;
-
-    @JsonPath("command_triggers.on_quit")
-    public static List<String> COMMAND_TRIGGERS_ON_QUIT;
-
 
     /* CONFIGURATION LIFECYCLE */
 

@@ -261,11 +261,5 @@
             // Message format. Supports PlaceholderAPI.
             "format": "Player **%player_name%** has listed **<amount>x <item>** to the auction house."
         }
-    },
-    "command_triggers": {
-        // Commands to be executed when player joins the server.
-        "on_join": [],
-        // Commands to be executed when player leaves the server.
-        "on_quit": []
     }
 }

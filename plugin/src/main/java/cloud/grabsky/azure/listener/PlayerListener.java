@@ -24,7 +24,6 @@ import cloud.grabsky.bedrock.components.Message;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.luckperms.api.cacheddata.CachedMetaData;
-import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.entity.Mob;
@@ -97,8 +96,6 @@ public final class PlayerListener implements Listener {
                     .placeholder("displayname", player.displayName())
                     .broadcast(audience -> audience.canSee(player) == true);
         }
-        // Dispatching configured commands.
-        PluginConfig.COMMAND_TRIGGERS_ON_JOIN.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), PlaceholderAPI.setPlaceholders(event.getPlayer(), command)));
     }
 
     @EventHandler // We need to somehow ensure this is called AFTER AzureUserCache#onPlayerJoin(...) listener. I guess registration order is enough?
@@ -119,8 +116,6 @@ public final class PlayerListener implements Listener {
                     .placeholder("displayname", player.displayName())
                     .broadcast(audience -> audience.canSee(player) == true);
         }
-        // Dispatching configured commands.
-        PluginConfig.COMMAND_TRIGGERS_ON_QUIT.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), PlaceholderAPI.setPlaceholders(event.getPlayer(), command)));
     }
 
     /* WORLD RESPAWN - Respawns players on spawn-point of the main world. */
