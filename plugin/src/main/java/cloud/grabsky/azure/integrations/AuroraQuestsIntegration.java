@@ -18,8 +18,12 @@ import cloud.grabsky.azure.Azure;
 import gg.auroramc.quests.api.factory.ObjectiveFactory;
 import gg.auroramc.quests.api.objective.Objective;
 import gg.auroramc.quests.api.objective.ObjectiveDefinition;
+import gg.auroramc.quests.api.objective.TypedObjective;
 import gg.auroramc.quests.api.profile.Profile;
 import gg.auroramc.quests.api.quest.Quest;
+import io.papermc.paper.event.block.VaultChangeStateEvent;
+import org.bukkit.block.data.type.Vault;
+import org.bukkit.event.EventPriority;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -35,8 +39,9 @@ public enum AuroraQuestsIntegration {
     public static boolean initialize(final @NotNull Azure plugin) {
         if (IS_INITIALIZED == false) {
             if (plugin.getServer().getPluginManager().isPluginEnabled("AuroraQuests") == true) {
-                // Registering objective to the AuroraQuests registry.
+                // Registering objectives to the AuroraQuests registry.
                 ObjectiveFactory.registerObjective("PLAY_ONE_MINUTE", PlayOneMinuteObjective.class);
+                ObjectiveFactory.registerObjective("UNLOCK_VAULT", UnlockVaultObjective.class);
                 // Marking the integration as initialized.
                 IS_INITIALIZED = true;
                 // Returning true if integration was successfully initialized.
@@ -59,8 +64,27 @@ public enum AuroraQuestsIntegration {
 
         @Override
         protected void activate() {
-            // Scheduling an asynchronous repeating task which progresses player in PLAY_ONE_MINUTE task every minute they play on a server.
+            // Scheduling an asynchronous repeating task which progresses for every minute spent on the server.
             asyncInterval(() -> progress(1, meta()), 1200, 1200);
+        }
+
+    }
+
+    public static final class UnlockVaultObjective extends TypedObjective {
+
+        public UnlockVaultObjective(final Quest quest, final ObjectiveDefinition definition, final Profile.TaskDataWrapper data) {
+            super(quest, definition, data);
+        }
+
+        @Override
+        protected void activate() {
+            onEvent(VaultChangeStateEvent.class, this::onVaultStateChange, EventPriority.MONITOR);
+        }
+
+        public void onVaultStateChange(final VaultChangeStateEvent event) {
+            if (event.getPlayer() != null && event.getNewState() == Vault.State.UNLOCKING) {
+                progress(1, meta(event.getBlock().getLocation(), event.getBlock().getType()));
+            }
         }
 
     }
