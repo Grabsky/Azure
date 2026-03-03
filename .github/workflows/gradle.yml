@@ -27,8 +27,8 @@ jobs:
         run: ./gradlew clean shadowJar publish --no-daemon
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VELA_USERNAME: ${{ secrets.VELA_USERNAME }}
-          VELA_PASSWORD: ${{ secrets.VELA_PASSWORD }}
+          REPSY_USERNAME: ${{ secrets.REPSY_USERNAME }}
+          REPSY_PASSWORD: ${{ secrets.REPSY_PASSWORD }}
       # Expose Release & Tag
       - name: Expose Release & Tag
         run: |
@@ -43,6 +43,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
+          prerelease: true
           # Configuring release name and tag.
           name: "${{ env.PROJECT_RELEASE_NAME }}"
           tag_name: "${{ env.PROJECT_TAG }}"

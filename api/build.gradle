@@ -10,10 +10,10 @@ publishing {
                 password = System.getenv("GITHUB_TOKEN")
             }
         }
-        maven { name = "vela"; url = "https://vela.grabsky.workers.dev/releases"
+        maven { name = "repsy"; url = "https://repo.repsy.io/grabsky/maven"
             credentials {
-                username = System.getenv("VELA_USERNAME")
-                password = System.getenv("VELA_PASSWORD")
+                username = System.getenv("REPSY_USERNAME")
+                password = System.getenv("REPSY_PASSWORD")
             }
         }
     }
