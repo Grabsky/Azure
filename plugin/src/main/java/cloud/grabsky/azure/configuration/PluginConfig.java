@@ -370,6 +370,20 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("discord_integrations.auction_listings_forwarding.format")
     public static String DISCORD_INTEGRATIONS_AUCTION_LISTINGS_FORWARDING_FORMAT;
 
+    // Discord Integrations > Temporary Channels
+
+    @JsonPath("discord_integrations.temporary_channels.enabled")
+    public static boolean DISCORD_INTEGRATIONS_TEMPORARY_CHANNELS_ENABLED;
+
+    @JsonPath("discord_integrations.temporary_channels.channel_id")
+    public static String DISCORD_INTEGRATIONS_TEMPORARY_CHANNELS_CHANNEL_ID;
+
+    @JsonPath("discord_integrations.temporary_channels.category_id")
+    public static String DISCORD_INTEGRATIONS_TEMPORARY_CHANNELS_CATEGORY_ID;
+
+    @JsonPath("discord_integrations.temporary_channels.new_channel_name")
+    public static String DISCORD_INTEGRATIONS_TEMPORARY_CHANNELS_NEW_CHANNEL_NAME;
+
 
     /* CONFIGURATION LIFECYCLE */
 

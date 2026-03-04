@@ -258,6 +258,15 @@
             "webhook_avatar": "",
             // Message format. Supports PlaceholderAPI.
             "format": "Player **%player_name%** has listed **<amount>x <item>** to the auction house."
+        },
+        "temporary_channels": {
+            "enabled": false,
+            // Discord channel ID of the "hub" channel.
+            "channel_id": "",
+            // Discord category ID for temporary channels.
+            "category_id": "",
+            // Name format of the new channel.
+            "new_channel_name": "<user>"
         }
     }
 }

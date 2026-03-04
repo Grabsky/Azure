@@ -31,12 +31,15 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -479,6 +482,31 @@ public final class DiscordIntegration implements Listener {
             });
         }
     }
+
+    @SubscribeEvent
+    public void onVoiceJoin(final GuildVoiceUpdateEvent event) {
+        if (PluginConfig.DISCORD_INTEGRATIONS_TEMPORARY_CHANNELS_ENABLED == true) {
+            // User entered the "hub" channel - creating a new channel for them.
+            if (event.getChannelJoined() != null && event.getChannelJoined().getId().equals(PluginConfig.DISCORD_INTEGRATIONS_TEMPORARY_CHANNELS_CHANNEL_ID) == true) {
+                final String name = PluginConfig.DISCORD_INTEGRATIONS_TEMPORARY_CHANNELS_NEW_CHANNEL_NAME.replace("<user>", event.getMember().getEffectiveName());
+                event.getGuild().getCategoryById(PluginConfig.DISCORD_INTEGRATIONS_TEMPORARY_CHANNELS_CATEGORY_ID).createVoiceChannel(name).queue(channel -> {
+                    // Moving player to the new channel.
+                    event.getGuild().moveVoiceMember(event.getMember(), channel).queue();
+                    // Grating them channel modification permissions.
+                    channel.upsertPermissionOverride(event.getMember()).setAllowed(Permission.MANAGE_CHANNEL).queue();
+                });
+            }
+            if (event.getChannelLeft() != null && event.getChannelLeft().getId().equals(PluginConfig.DISCORD_INTEGRATIONS_TEMPORARY_CHANNELS_CHANNEL_ID) == false) {
+                final AudioChannel channel = event.getChannelLeft();
+                if (channel.getParentCategory() != null && channel.getParentCategory().getId().equals(PluginConfig.DISCORD_INTEGRATIONS_TEMPORARY_CHANNELS_CATEGORY_ID) == true) {
+                    // Scheduling channel deletion if last member quit.
+                    if (channel.getMembers().isEmpty() == true)
+                        channel.delete().queue();
+                }
+            }
+        }
+    }
+
 
     /**
      * Returns verification code which is active for the next 5 minutes. Code expiration is handled by the {@link Cache} storage.
