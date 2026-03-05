@@ -1,10 +1,10 @@
 plugins {
     // https://github.com/GradleUp/shadow
-    id "com.gradleup.shadow" version "9.0.0"
+    id "com.gradleup.shadow" version "9.3.2"
     // https://github.com/jpenilla/run-task
-    id "xyz.jpenilla.run-paper" version "2.3.1"
+    id "xyz.jpenilla.run-paper" version "3.0.2"
     // https://github.com/eldoriarpg/plugin-yml
-    id "de.eldoria.plugin-yml.paper" version "0.7.1"
+    id "de.eldoria.plugin-yml.paper" version "0.8.0"
 }
 
 repositories {
@@ -21,19 +21,19 @@ dependencies {
     // https://github.com/Grabsky/bedrock
     paperLibrary("cloud.grabsky:bedrock:$BEDROCK_VERSION")
     // https://github.com/Grabsky/commands
-    paperLibrary("cloud.grabsky:commands:1.20.1-40")
+    paperLibrary("cloud.grabsky:commands:1.21.X-41")
     // https://github.com/Grabsky/configuration
-    paperLibrary("cloud.grabsky:configuration-paper:1.21.4-54")
+    paperLibrary("cloud.grabsky:configuration-paper:1.21.4-58")
     // https://github.com/KyoriPowered/adventure
     paperLibrary("net.kyori:adventure-nbt:$KYORI_NBT_VERSION")
     // https://github.com/discord-jda/JDA
-    paperLibrary("net.dv8tion:JDA:6.0.0-rc.2") {
+    paperLibrary("net.dv8tion:JDA:6.3.1") {
         exclude module: "opus-java"
     }
     // https://github.com/MinnDevelopment/discord-webhooks
     paperLibrary("club.minnced:discord-webhooks:0.8.4")
     // https://github.com/felldo/JEmoji
-    paperLibrary("net.fellbaum:jemoji:1.7.4")
+    paperLibrary("net.fellbaum:jemoji:1.7.5")
     // https://github.com/mfnalex/MorePersistentDataTypes
     paperLibrary("com.jeff-media:MorePersistentDataTypes:2.4.0")
     // https://github.com/javalin/javalin
@@ -41,13 +41,13 @@ dependencies {
     // https://github.com/LuckPerms/LuckPerms
     compileOnly("net.luckperms:api:5.5")
     // https://github.com/PlaceholderAPI/PlaceholderAPI
-    compileOnly("me.clip:placeholderapi:2.11.6")
+    compileOnly("me.clip:placeholderapi:2.12.2")
     // https://github.com/AuroraNetworkStudios/Aurora
-    compileOnly("gg.auroramc:Aurora:2.3.4")
+    compileOnly("gg.auroramc:Aurora:2.5.1")
     // https://github.com/AuroraNetworkStudios/AuroraQuests
-    compileOnly("gg.auroramc:AuroraQuests:2.0.1")
+    compileOnly("gg.auroramc:AuroraQuests:2.1.0")
     // https://github.com/nulli0n/ExcellentShop-spigot
-    compileOnly("su.nightexpress.excellentshop:Core:4.20.0") {
+    compileOnly("su.nightexpress.excellentshop:Core:4.22.0") {
         exclude module: "SimpleClaimSystem"
     }
 }
@@ -58,21 +58,21 @@ tasks {
         archiveFileName = "${rootProject.name}-${project.version}.jar"
     }
     runServer {
-        minecraftVersion("1.21.10")
+        minecraftVersion("1.21.11")
     }
 }
 
-// Configuring runServer task to use JetBrains' JDK 21 for expanded hot-swap features.
+// Configuring runServer task to use JetBrains' JDK 25 for expanded hot-swap features.
 tasks.withType(xyz.jpenilla.runtask.task.AbstractRun.class).configureEach {
-    javaLauncher = javaToolchains.launcherFor { vendor = JvmVendorSpec.JETBRAINS; languageVersion = JavaLanguageVersion.of(21) }
-    jvmArgs("-XX:+AllowEnhancedClassRedefinition", "-Dcom.mojang.eula.agree=true", "-Dnet.kyori.ansi.colorLevel=truecolor", "--enable-preview")
+    javaLauncher = javaToolchains.launcherFor { vendor = JvmVendorSpec.JETBRAINS; languageVersion = JavaLanguageVersion.of(25) }
+    jvmArgs("-XX:+AllowEnhancedClassRedefinition", "-Dcom.mojang.eula.agree=true", "-Dnet.kyori.ansi.colorLevel=truecolor")
 }
 
 paper {
     name = "Azure"
     main = "cloud.grabsky.azure.Azure"
     loader = "cloud.grabsky.azure.Azure\$PluginLoader"
-    apiVersion = "1.21.8"
+    apiVersion = "1.21.11"
     generateLibrariesJson = true
     serverDependencies {
         "LuckPerms"      { load = "BEFORE"; required = true }

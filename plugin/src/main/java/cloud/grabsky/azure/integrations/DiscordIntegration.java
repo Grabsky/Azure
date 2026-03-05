@@ -32,7 +32,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.Activity;
@@ -48,8 +48,8 @@ import net.dv8tion.jda.api.events.session.ShutdownEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
-import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
+import net.dv8tion.jda.api.modals.Modal;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MarkdownSanitizer;
@@ -259,7 +259,7 @@ public final class DiscordIntegration implements Listener {
         }
         // Otherwise, showing a modal.
         event.getInteraction().replyModal(Modal.create("verification_modal", PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_MODAL_LABEL)
-                .addComponents(ActionRow.of(TextInput.create("verification_code", PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_MODAL_INPUT_LABEL, TextInputStyle.SHORT)
+                .addComponents(Label.of(PluginConfig.DISCORD_INTEGRATIONS_VERIFICATION_MODAL_INPUT_LABEL, TextInput.create("verification_code", TextInputStyle.SHORT)
                         .setMinLength(7).setMaxLength(7).setRequired(true).build()
                 )).build()
         ).queue();

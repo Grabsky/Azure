@@ -2,7 +2,7 @@ plugins {
     id "java-library"
 }
 
-final String VERSION = "1.21.8"
+final String VERSION = "1.21.11"
 final String RUN_NUMBER = System.getenv("GITHUB_RUN_NUMBER") ?: "DEV"
 
 group = "cloud.grabsky"
@@ -15,8 +15,8 @@ subprojects {
     version = rootProject.version
 
     ext {
-        BEDROCK_VERSION = "1.21-67"
-        KYORI_NBT_VERSION = "4.24.0"
+        BEDROCK_VERSION = "1.21.X-70"
+        KYORI_NBT_VERSION = "4.26.1"
     }
 
     repositories {
@@ -25,25 +25,24 @@ subprojects {
         // Repository for the Paper API.
         maven { url = "https://repo.papermc.io/repository/maven-public/" }
         // Repository containing all my libraries.
-        maven { url = "https://vela.grabsky.workers.dev/releases/" }
+        maven { url = "https://repo.repsy.io/grabsky/maven" }
     }
 
     dependencies {
         // https://github.com/JetBrains/java-annotations
-        compileOnly("org.jetbrains:annotations:26.0.2")
+        compileOnly("org.jetbrains:annotations:26.1.0")
         // https://github.com/projectlombok/lombok
-        compileOnly("org.projectlombok:lombok:1.18.38")
-        annotationProcessor("org.projectlombok:lombok:1.18.38")
+        compileOnly("org.projectlombok:lombok:1.18.42")
+        annotationProcessor("org.projectlombok:lombok:1.18.42")
         // https://github.com/PaperMC/Paper
-        compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
+        compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     }
 
     compileJava {
         options.fork = true
-        options.compilerArgs += "--enable-preview"
-        // Setting compatibility to Java 21 and above.
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        // Setting compatibility to Java 25 and above.
+        sourceCompatibility = JavaVersion.VERSION_25
+        targetCompatibility = JavaVersion.VERSION_25
     }
 
     java {
