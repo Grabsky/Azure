@@ -43,7 +43,6 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          prerelease: true
           # Configuring release name and tag.
           name: "${{ env.PROJECT_RELEASE_NAME }}"
           tag_name: "${{ env.PROJECT_TAG }}"
