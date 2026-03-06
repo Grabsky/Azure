@@ -15,7 +15,7 @@ subprojects {
     version = rootProject.version
 
     ext {
-        BEDROCK_VERSION = "1.21.X-70"
+        BEDROCK_VERSION = "1.21.X-72"
         KYORI_NBT_VERSION = "4.26.1"
     }
 
@@ -45,9 +45,8 @@ subprojects {
         targetCompatibility = JavaVersion.VERSION_25
     }
 
-    java {
-        withSourcesJar()
-        withJavadocJar()
+    javadoc {
+        (options as CoreJavadocOptions).addStringOption("Xdoclint:none", "-quiet")
     }
 
 }

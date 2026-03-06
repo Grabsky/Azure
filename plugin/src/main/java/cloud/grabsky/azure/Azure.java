@@ -68,7 +68,7 @@ import cloud.grabsky.azure.resourcepack.ResourcePackManager;
 import cloud.grabsky.azure.user.AzureUserCache;
 import cloud.grabsky.azure.util.FileLogger;
 import cloud.grabsky.azure.world.AzureWorldManager;
-import cloud.grabsky.bedrock.BedrockPlugin;
+import cloud.grabsky.bedrock.BedrockScheduler;
 import cloud.grabsky.bedrock.helpers.Conditions;
 import cloud.grabsky.commands.RootCommandManager;
 import cloud.grabsky.configuration.ConfigurationHolder;
@@ -93,6 +93,7 @@ import org.bukkit.Registry;
 import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.repository.RemoteRepository;
@@ -122,10 +123,13 @@ import lombok.RequiredArgsConstructor;
 import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
 import static net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText;
 
-public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
+public final class Azure extends JavaPlugin implements AzureAPI, Listener {
 
     @Getter(AccessLevel.PUBLIC)
     private static Azure instance;
+
+    @Getter(AccessLevel.PUBLIC)
+    private BedrockScheduler bedrockScheduler;
 
     @Getter(AccessLevel.PUBLIC)
     private UserCache userCache;
@@ -155,9 +159,9 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-        // ...
         instance = this;
+        // Creating instance of BedrockScheduler for this plugin.
+        this.bedrockScheduler = new BedrockScheduler(this);
         // ...
         this.mapper = PaperConfigurationMapper.create(moshi -> {
             moshi.add(TagResolver.class, TagResolverAdapter.INSTANCE);
@@ -260,7 +264,6 @@ public final class Azure extends BedrockPlugin implements AzureAPI, Listener {
         }
     }
 
-    @Override
     public boolean onReload() {
         try {
             final File locale = ensureResourceExistence(this, new File(this.getDataFolder(), "locale.json"));

@@ -54,7 +54,6 @@ dependencies {
 
 tasks {
     shadowJar {
-        // Changing name of the artifact.
         archiveFileName = "${rootProject.name}-${project.version}.jar"
     }
     runServer {

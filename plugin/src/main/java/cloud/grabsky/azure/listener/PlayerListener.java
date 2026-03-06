@@ -160,9 +160,6 @@ public final class PlayerListener implements Listener {
             return;
         // Constructing a new HashSet with default entries.
         final HashSet<String> commands = new HashSet<>(PluginConfig.COMMAND_FILTER_DEFAULT);
-        // Sending debug message.
-        if (plugin.isDebugEnabled() == true)
-            plugin.getLogger().info("[DEBUG] Updating command map of " + event.getPlayer().getName() + "...");
         // Collecting commands to filter.
         PluginConfig.COMMAND_FILTER_EXTRA.stream()
                 .filter(holder -> event.getPlayer().hasPermission(holder.getPermission()) == true)

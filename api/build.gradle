@@ -32,3 +32,8 @@ dependencies {
     // https://github.com/KyoriPowered/adventure
     compileOnly("net.kyori:adventure-nbt:$KYORI_NBT_VERSION")
 }
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
