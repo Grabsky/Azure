@@ -23,7 +23,7 @@ dependencies {
     // https://github.com/Grabsky/commands
     paperLibrary("cloud.grabsky:commands:1.21.X-41")
     // https://github.com/Grabsky/configuration
-    paperLibrary("cloud.grabsky:configuration-paper:1.21.4-58")
+    paperLibrary("cloud.grabsky:configuration-paper:1.21.4-59")
     // https://github.com/KyoriPowered/adventure
     paperLibrary("net.kyori:adventure-nbt:$KYORI_NBT_VERSION")
     // https://github.com/discord-jda/JDA
