@@ -22,7 +22,6 @@ import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
-import io.javalin.jetty.JettyPrecompressingResourceHandler;
 import io.papermc.paper.event.connection.configuration.AsyncPlayerConnectionConfigureEvent;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.resource.ResourcePackInfo;
@@ -73,11 +72,6 @@ public final class ResourcePackManager implements Listener {
     // New secret is generated every time the internal web server is restarted.
     private @Nullable String secret;
 
-    static {
-        // Increasing maximum file size for precompressing to 20 MB.
-        JettyPrecompressingResourceHandler.resourceMaxSize = 20971520;
-    }
-
     /**
      * Reloads resource-packs from configuration and starts internal web-server if necessary.
      */
@@ -89,7 +83,7 @@ public final class ResourcePackManager implements Listener {
         if (this.server != null) {
             // Stopping the server.
             this.server.stop();
-            // Cleaning-up anything HttpServer could've potentially left in the memory.
+            // Cleaning up anything HttpServer could've potentially left in the memory.
             this.server = null;
         }
         // Generating new secret.
@@ -109,20 +103,21 @@ public final class ResourcePackManager implements Listener {
                 ));
             }
         }
-        // Creating and configuring Javalin (web-server) instance, and starting it afterwards.
+        // Creating and configuring Javalin (web-server) instance, and starting it afterward.
         if (PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS.isBlank() == false && PluginConfig.RESOURCE_PACK_PORT > 0) {
             this.server = Javalin.create(config -> {
-                config.showJavalinBanner = false;
-                config.startupWatcherEnabled = false;
+                config.startup.showJavalinBanner = false;
+                config.startup.startupWatcherEnabled = false;
                 // NOTE: Virtual Threads can cause the internal web-server to hang indefinitely. Something yet to figure out.
-                config.useVirtualThreads = false;
+                config.concurrency.useVirtualThreads = false;
                 // Creating static files configuration as a way to serve resource-packs.
                 config.staticFiles.add(staticFiles -> {
                     staticFiles.hostedPath = "/" + secret;
                     staticFiles.directory = plugin.getDataFolder().getAbsolutePath() + File.separator + ".public";
                     staticFiles.location = Location.EXTERNAL;
                     // Since resource-packs are generally lightweight, they can be cached in the memory.
-                    staticFiles.precompress = true;
+                    // Increasing maximum file size for precompressing to 20 MB.
+                    staticFiles.precompressMaxSize = 20971520;
                 });
             });
             // Starting the server.
