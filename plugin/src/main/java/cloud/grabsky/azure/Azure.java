@@ -60,7 +60,6 @@ import cloud.grabsky.azure.configuration.PluginConfig.DeleteButton;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.azure.configuration.adapters.BossBarAdapterFactory;
 import cloud.grabsky.azure.configuration.adapters.TagResolverAdapter;
-import cloud.grabsky.azure.integrations.AuroraQuestsIntegration;
 import cloud.grabsky.azure.integrations.DiscordIntegration;
 import cloud.grabsky.azure.integrations.ExcellentShopIntegration;
 import cloud.grabsky.azure.listener.PlayerListener;
@@ -250,8 +249,6 @@ public final class Azure extends JavaPlugin implements AzureAPI, Listener {
         AzureProvider.finalize(this);
         // Registering PlaceholderAPI placeholders...
         Placeholders.INSTANCE.register();
-        // Registering AuroraQuests integration...
-        AuroraQuestsIntegration.initialize(this);
         // Registering ExcellentShop integration...
         ExcellentShopIntegration.initialize(this);
     }

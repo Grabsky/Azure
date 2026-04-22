@@ -10,8 +10,6 @@ plugins {
 repositories {
     // Repository containing the 'PlaceholderAPI' dependency.
     maven { url = "https://repo.extendedclip.com/content/repositories/placeholderapi/" }
-    // Repository containing the 'AuroraQuests' dependency.
-    maven { url = "https://repo.auroramc.gg/releases/" }
     // Repository containing the 'ExcellentShop' dependency.
     maven { url = "https://repo.nightexpressdev.com/releases/" }
 }
@@ -42,10 +40,6 @@ dependencies {
     compileOnly("net.luckperms:api:5.5")
     // https://github.com/PlaceholderAPI/PlaceholderAPI
     compileOnly("me.clip:placeholderapi:2.12.2")
-    // https://github.com/AuroraNetworkStudios/Aurora
-    compileOnly("gg.auroramc:Aurora:2.5.1")
-    // https://github.com/AuroraNetworkStudios/AuroraQuests
-    compileOnly("gg.auroramc:AuroraQuests:2.1.0")
     // https://github.com/nulli0n/ExcellentShop-spigot
     compileOnly("su.nightexpress.excellentshop:Core:5.0.0-beta") {
         exclude module: "SimpleClaimSystem"
@@ -76,7 +70,6 @@ paper {
     serverDependencies {
         "LuckPerms"      { load = "BEFORE"; required = true }
         "PlaceholderAPI" { load = "BEFORE"; required = true }
-        "AuroraQuests"   { load = "BEFORE"; required = false }
         "ExcellentShop"  { load = "BEFORE"; required = false }
     }
 }
