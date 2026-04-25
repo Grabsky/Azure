@@ -98,7 +98,7 @@ public final class ResourcePackManager implements Listener {
                 // Generating SHA-1 hash and adding new ResourcePackHolder object to the cache.
                 holders.add(ResourcePackInfo.resourcePackInfo(
                         uniqueId,
-                        URI.create("http://" + PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS + ":" + PluginConfig.RESOURCE_PACK_PORT + "/" + secret + "/" + URLEncoder.encode(file.getName(), StandardCharsets.UTF_8)),
+                        URI.create("http://" + PluginConfig.RESOURCE_PACK_PUBLIC_ACCESS_ADDRESS + ":" + PluginConfig.RESOURCE_PACK_PORT + "/" + secret + "/" + URLEncoder.encode(file.getName(), StandardCharsets.UTF_8).replace("+", "%20")),
                         Files.asByteSource(file).hash(Hashing.sha1()).toString()
                 ));
             }
