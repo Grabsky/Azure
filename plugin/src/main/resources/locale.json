@@ -182,6 +182,8 @@
         "death.attack.sonic_boom": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> został zmieciony przez falę dźwiękową.",
         "death.attack.sonic_boom.item": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> został zmieciony przez falę dźwiękową.",
         "death.attack.sonic_boom.player": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> został zmieciony przez falę dźwiękową.",
+        "death.attack.spear": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> został przebity włócznią.",
+        "death.attack.spear.item": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> został przebity włócznią.",
         "death.attack.stalagmite": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> nadział się na stalagmit.",
         "death.attack.stalagmite.player": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> nadział się na stalagmit.",
         "death.attack.starve": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> umarł z głodu.",
