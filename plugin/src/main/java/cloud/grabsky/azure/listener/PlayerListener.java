@@ -64,7 +64,8 @@ public final class PlayerListener implements Listener {
     // Players with this permission are excluded from command filtering logic.
     private static final String PERMISSION_BYPASS_COMMAND_FILTER = "azure.plugin.bypass_command_filter";
 
-    // Represents the NamespacedKey of the end dimension.
+    // Represents the NamespacedKey of primary dimensions.
+    private static final NamespacedKey OVERWORLD = new NamespacedKey("minecraft", "overworld");
     private static final NamespacedKey THE_END = new NamespacedKey("minecraft", "the_end");
 
 
@@ -74,9 +75,9 @@ public final class PlayerListener implements Listener {
         // Teleporting new players to spawn. (if enabled)
         if (player.hasPlayedBefore() == false && PluginConfig.GENERAL_TELEPORT_NEW_PLAYERS_TO_PRIMARY_WORLD_SPAWN == true) {
             // Getting the primary world.
-            final World primaryWorld = plugin.getWorldManager().getPrimaryWorld();
+            final World primaryWorld = plugin.getServer().getWorld(OVERWORLD);
             // Setting the respawn location.
-            plugin.getBedrockScheduler().run(1L, (_) -> player.teleportAsync(plugin.getWorldManager().getSpawnPoint(primaryWorld)));
+            plugin.getBedrockScheduler().run(1L, (_) -> player.teleportAsync(primaryWorld.getSpawnLocation()));
         }
         // Setting join message to null because it needs to be handled manually.
         event.joinMessage(null);
@@ -124,16 +125,16 @@ public final class PlayerListener implements Listener {
             // Getting the world player is currently in. (THE_END)
             final World world = event.getPlayer().getLocation().getWorld();
             // Setting the respawn location.
-            event.setRespawnLocation(plugin.getWorldManager().getSpawnPoint(world));
+            event.setRespawnLocation(world.getSpawnLocation());
             // Returning
             return;
         }
         // Otherwise, defaulting respawn point to the spawn point of the primary world. Overridden by active Bed or Respawn Anchor.
         if (PluginConfig.GENERAL_RESPAWN_ON_PRIMARY_WORLD_SPAWN == true && event.isBedSpawn() == false && event.isAnchorSpawn() == false) {
             // Getting the primary world.
-            final World primaryWorld = plugin.getWorldManager().getPrimaryWorld();
+            final World primaryWorld = plugin.getServer().getWorld(NamespacedKey.minecraft("overworld"));
             // Setting the respawn location.
-            event.setRespawnLocation(plugin.getWorldManager().getSpawnPoint(primaryWorld));
+            event.setRespawnLocation(primaryWorld.getSpawnLocation());
         }
     }
 
@@ -293,7 +294,7 @@ public final class PlayerListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPortal(final @NotNull PlayerTeleportEvent event) {
         if (PluginConfig.GENERAL_END_PORTAL_TELEPORTS_TO_SPAWN == true && event.getCause() == PlayerTeleportEvent.TeleportCause.END_PORTAL && event.getTo().getWorld().key().equals(THE_END) == true)
-            event.setTo(plugin.getWorldManager().getSpawnPoint(event.getTo().getWorld()));
+            event.setTo(event.getTo().getWorld().getSpawnLocation());
     }
 
     /* CANCEL GENERATION OF END PLATFORM */

@@ -14,7 +14,6 @@
  */
 package cloud.grabsky.azure.api.user;
 
-import cloud.grabsky.azure.api.AzureProvider;
 import cloud.grabsky.azure.api.Punishment;
 import cloud.grabsky.bedrock.util.Interval;
 import net.kyori.adventure.audience.Audience;
@@ -27,8 +26,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -174,8 +173,8 @@ public interface User extends Audience, ForwardingAudience {
      * Returns {@link CompoundBinaryTag} object from contents of [_PRIMARY_WORLD_]/playerdata/[_UUID_].dat file.
      */
     default CompoundBinaryTag getPlayerData() throws IOException {
-        final File file = new File(new File(AzureProvider.getAPI().getWorldManager().getPrimaryWorld().getWorldFolder(), "playerdata"), getUniqueId() + ".dat");
-        return BinaryTagIO.reader(1_000_000L).read(file.toPath(), BinaryTagIO.Compression.GZIP); // Should be automatically closed.
+        final Path path = Bukkit.getServer().getLevelDirectory().resolve("players", "data", getUniqueId() + ".dat");
+        return BinaryTagIO.reader(1_000_000L).read(path, BinaryTagIO.Compression.GZIP); // Should be automatically closed.
     }
 
     @Override

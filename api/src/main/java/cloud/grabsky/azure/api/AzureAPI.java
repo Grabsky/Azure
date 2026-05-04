@@ -15,7 +15,6 @@
 package cloud.grabsky.azure.api;
 
 import cloud.grabsky.azure.api.user.UserCache;
-import cloud.grabsky.azure.api.world.WorldManager;
 
 public interface AzureAPI {
 
@@ -23,10 +22,5 @@ public interface AzureAPI {
      * Returns the {@link UserCache} instance.
      */
     UserCache getUserCache();
-
-    /**
-     * Returns the {@link WorldManager} instance.
-     */
-    WorldManager getWorldManager();
 
 }

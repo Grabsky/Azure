@@ -52,7 +52,6 @@ import cloud.grabsky.azure.commands.UnmuteCommand;
 import cloud.grabsky.azure.commands.UnverifyCommand;
 import cloud.grabsky.azure.commands.VanishCommand;
 import cloud.grabsky.azure.commands.VerifyCommand;
-import cloud.grabsky.azure.commands.WorldCommand;
 import cloud.grabsky.azure.commands.templates.CommandArgumentTemplate;
 import cloud.grabsky.azure.commands.templates.CommandExceptionTemplate;
 import cloud.grabsky.azure.configuration.PluginConfig;
@@ -66,7 +65,6 @@ import cloud.grabsky.azure.listener.PlayerListener;
 import cloud.grabsky.azure.resourcepack.ResourcePackManager;
 import cloud.grabsky.azure.user.AzureUserCache;
 import cloud.grabsky.azure.util.FileLogger;
-import cloud.grabsky.azure.world.AzureWorldManager;
 import cloud.grabsky.bedrock.BedrockScheduler;
 import cloud.grabsky.bedrock.helpers.Conditions;
 import cloud.grabsky.commands.RootCommandManager;
@@ -140,9 +138,6 @@ public final class Azure extends JavaPlugin implements AzureAPI, Listener {
     private ChatManager chatManager;
 
     @Getter(AccessLevel.PUBLIC)
-    private AzureWorldManager worldManager;
-
-    @Getter(AccessLevel.PUBLIC)
     private RootCommandManager commandManager;
 
     @Getter(AccessLevel.PUBLIC)
@@ -183,15 +178,6 @@ public final class Azure extends JavaPlugin implements AzureAPI, Listener {
         this.chatManager = new ChatManager(this);
         // Loading list of inappropriate words.
         chatManager.loadInappropriateWords();
-        // Creating new instance of WorldManager.
-        this.worldManager = new AzureWorldManager(this);
-        // Loading worlds with autoLoad == true
-        try {
-            this.worldManager.loadWorlds();
-        } catch (final IOException e) {
-            this.getLogger().severe("An error occurred while trying to load worlds.");
-            this.getLogger().severe("  " + e.getMessage());
-        }
         // ...
         this.punishmentsFileLogger = new FileLogger(this, new File(new File(this.getDataFolder(), "logs"), "punishments.log"));
         // Setting-up RootCommandManager... (applying templates, registering commands)
@@ -203,7 +189,6 @@ public final class Azure extends JavaPlugin implements AzureAPI, Listener {
                 .registerDependency(Azure.class, instance)
                 .registerDependency(LuckPerms.class, luckPerms)
                 .registerDependency(ChatManager.class, chatManager)
-                .registerDependency(AzureWorldManager.class, worldManager)
                 .registerDependency(UserCache.class, userCache)
                 // Registering commands...
                 .registerCommand(AdminChatCommand.class)
@@ -232,7 +217,6 @@ public final class Azure extends JavaPlugin implements AzureAPI, Listener {
                 .registerCommand(UnbanCommand.class)
                 .registerCommand(UnmuteCommand.class)
                 .registerCommand(VanishCommand.class)
-                .registerCommand(WorldCommand.class)
                 .registerCommand(SkullCommand.class)
                 .registerCommand(RepairCommand.class)
                 .registerCommand(NickCommand.class)
