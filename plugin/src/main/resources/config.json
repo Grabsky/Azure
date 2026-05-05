@@ -188,7 +188,9 @@
             // Chat format used to send message to players. Placeholders: [username, displayname, message]
             "chat_format": "(Discord) (<username>): <message>",
             // Chat format used to end message the console. Placeholders: [username, displayname, message]
-            "console_format": "(Discord) (<username>): <message>"
+            "console_format": "(Discord) (<username>): <message>",
+            // Text used as a replacement when server requests message deletion.
+            "deleted_message_text": "(Wiadomość usunięta przez serwer)"
         },
         // Player JOIN and QUIT messages forwarding to Discord server.
         "join_and_quit_forwarding": {

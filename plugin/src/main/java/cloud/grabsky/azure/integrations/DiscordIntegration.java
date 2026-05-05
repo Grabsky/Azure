@@ -16,6 +16,7 @@ package cloud.grabsky.azure.integrations;
 
 import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.api.user.User;
+import cloud.grabsky.azure.chat.MessageInfo;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.configuration.PluginLocale;
 import cloud.grabsky.azure.user.AzureUserCache;
@@ -55,6 +56,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MarkdownSanitizer;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.fellbaum.jemoji.EmojiManager;
+import net.kyori.adventure.chat.SignedMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -377,8 +379,16 @@ public final class DiscordIntegration implements Listener {
             // Setting avatar if specified.
             if (PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_AVATAR.isEmpty() == false)
                 builder.setAvatarUrl(PlaceholderAPI.setPlaceholders(event.getPlayer(), PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_WEBHOOK_AVATAR));
+            // Getting message signature. Can be null.
+            final @Nullable SignedMessage.Signature signature = event.signedMessage().signature();
             // Sending the message.
-            this.webhookClients.get("CHAT").send(builder.build());
+            this.webhookClients.get("CHAT").send(builder.build()).thenAccept(response -> {
+                if (signature != null) {
+                    final @Nullable MessageInfo messageInfo = plugin.getChatManager().getSignatureCache().getIfPresent(UUID.nameUUIDFromBytes(signature.bytes()));
+                    if (messageInfo != null)
+                        messageInfo.setDiscordMessageId(response.getId());
+                }
+            });
         }
     }
 

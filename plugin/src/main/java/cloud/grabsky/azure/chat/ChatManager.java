@@ -36,7 +36,6 @@ import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.event.player.AsyncChatDecorateEvent;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import me.clip.placeholderapi.PlaceholderAPI;
-import net.kyori.adventure.chat.SignedMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickCallback.Options;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -71,8 +70,12 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import lombok.AccessLevel;
+import lombok.Getter;
 
 import static cloud.grabsky.bedrock.helpers.Conditions.requirePresent;
 import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
@@ -89,9 +92,11 @@ public final class ChatManager implements Listener {
     private final Azure plugin;
 
     private final UserManager luckPermsUserManager;
-    private final Cache<UUID, SignedMessage.Signature> signatureCache;
     private final Map<UUID, Long> chatCooldowns;
     private final Map<UUID, UUID> lastRecipients;
+
+    @Getter(value = AccessLevel.PUBLIC, onMethod_ = @Internal)
+    private final Cache<UUID, MessageInfo> signatureCache;
 
     // Contains list of inappropriate words that are not allowed in chat.
     private Set<String> inappropriateWords;
@@ -189,12 +194,15 @@ public final class ChatManager implements Listener {
      * Requests deletion of a message associated with provided {@link UUID} (signatureUUID).
      */
     public boolean deleteMessage(final @NotNull UUID signatureUUID) {
-        final @Nullable SignedMessage.Signature signature = signatureCache.getIfPresent(signatureUUID);
+        final @Nullable MessageInfo messageInfo = signatureCache.getIfPresent(signatureUUID);
         // Returning 'false' if signature for this message is not set.
-        if (signature == null)
+        if (messageInfo == null)
             return false;
         // Requesting deletion of this message.
-        plugin.getServer().deleteMessage(signature);
+        plugin.getServer().deleteMessage(messageInfo.getSignature());
+        // If Discord message id is present, modifying "deleting" it there as well.
+        if (messageInfo.getDiscordMessageId() != null)
+            plugin.getDiscordIntegration().getWebhookClients().get("CHAT").edit(messageInfo.getDiscordMessageId(), PluginConfig.DISCORD_INTEGRATIONS_CHAT_FORWARDING_DELETED_MESSAGE_TEXT);
         // Returning 'true' as message deletion has been requested.
         return true;
     }
@@ -300,10 +308,10 @@ public final class ChatManager implements Listener {
             }
         }
         // ...
-        final UUID signatureUUID = (event.signedMessage().signature() != null) ? UUID.randomUUID() : null;
+        final UUID signatureUUID = (event.signedMessage().signature() != null) ? UUID.nameUUIDFromBytes(event.signedMessage().signature().bytes()) : null;
         // Caching signatures...
         if (signatureUUID != null) {
-            signatureCache.put(signatureUUID, event.signedMessage().signature());
+            signatureCache.put(signatureUUID, new MessageInfo(event.signedMessage().signature()));
         }
         // Customizing renderer...
         event.renderer((source, sourceDisplayName, msg, viewer) -> {

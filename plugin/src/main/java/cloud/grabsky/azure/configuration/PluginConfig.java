@@ -270,6 +270,9 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("discord_integrations.chat_forwarding.console_format")
     public static String DISCORD_INTEGRATIONS_CHAT_FORWARDING_CONSOLE_FORMAT;
 
+    @JsonPath("discord_integrations.chat_forwarding.deleted_message_text")
+    public static String DISCORD_INTEGRATIONS_CHAT_FORWARDING_DELETED_MESSAGE_TEXT;
+
     // Discord Integrations > Join and Quit Forwarding
 
     @JsonPath("discord_integrations.join_and_quit_forwarding.enabled")
