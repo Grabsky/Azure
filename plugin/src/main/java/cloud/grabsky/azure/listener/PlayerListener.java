@@ -24,6 +24,7 @@ import cloud.grabsky.bedrock.components.Message;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.luckperms.api.cacheddata.CachedMetaData;
+import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.entity.Mob;
@@ -73,11 +74,11 @@ public final class PlayerListener implements Listener {
     public void onPlayerJoin(final @NotNull PlayerJoinEvent event) {
         final Player player = event.getPlayer();
         // Teleporting new players to spawn. (if enabled)
-        if (player.hasPlayedBefore() == false && PluginConfig.GENERAL_TELEPORT_NEW_PLAYERS_TO_PRIMARY_WORLD_SPAWN == true) {
-            // Getting the primary world.
-            final World primaryWorld = plugin.getServer().getWorld(OVERWORLD);
-            // Setting the respawn location.
-            plugin.getBedrockScheduler().run(1L, (_) -> player.teleportAsync(primaryWorld.getSpawnLocation()));
+        if (player.hasPlayedBefore() == false && PluginConfig.GENERAL_TELEPORT_NEW_PLAYERS_TO_PRIMARY_SPAWN_POINT == true) {
+            // Getting the primary spawn location.
+            final Location location = PluginConfig.GENERAL_PRIMARY_SPAWN_POINT.toLocation();
+            // Teleporting player to the spawn location.
+            plugin.getBedrockScheduler().run(1L, (_) -> player.teleportAsync(location != null ? location : plugin.getServer().getWorld(OVERWORLD).getSpawnLocation()));
         }
         // Setting join message to null because it needs to be handled manually.
         event.joinMessage(null);
@@ -130,11 +131,11 @@ public final class PlayerListener implements Listener {
             return;
         }
         // Otherwise, defaulting respawn point to the spawn point of the primary world. Overridden by active Bed or Respawn Anchor.
-        if (PluginConfig.GENERAL_RESPAWN_ON_PRIMARY_WORLD_SPAWN == true && event.isBedSpawn() == false && event.isAnchorSpawn() == false) {
-            // Getting the primary world.
-            final World primaryWorld = plugin.getServer().getWorld(NamespacedKey.minecraft("overworld"));
+        if (PluginConfig.GENERAL_FALLBACK_RESPAWN_TO_PRIMARY_SPAWN_POINT == true && event.isBedSpawn() == false && event.isAnchorSpawn() == false) {
+            // Getting the primary spawn location.
+            final Location location = PluginConfig.GENERAL_PRIMARY_SPAWN_POINT.toLocation();
             // Setting the respawn location.
-            event.setRespawnLocation(primaryWorld.getSpawnLocation());
+            event.setRespawnLocation(location != null ? location : plugin.getServer().getWorld(OVERWORLD).getSpawnLocation());
         }
     }
 
@@ -293,8 +294,10 @@ public final class PlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPortal(final @NotNull PlayerTeleportEvent event) {
-        if (PluginConfig.GENERAL_END_PORTAL_TELEPORTS_TO_SPAWN == true && event.getCause() == PlayerTeleportEvent.TeleportCause.END_PORTAL && event.getTo().getWorld().key().equals(THE_END) == true)
-            event.setTo(event.getTo().getWorld().getSpawnLocation());
+        if (PluginConfig.GENERAL_END_PORTAL_TELEPORTS_PRIMARY_SPAWN_POINT == true && event.getCause() == PlayerTeleportEvent.TeleportCause.END_PORTAL && event.getTo().getWorld().key().equals(THE_END) == true) {
+            final Location location = PluginConfig.GENERAL_PRIMARY_SPAWN_POINT.toLocation();
+            event.setTo(location != null ? location : plugin.getServer().getWorld(OVERWORLD).getSpawnLocation());
+        }
     }
 
     /* CANCEL GENERATION OF END PLATFORM */

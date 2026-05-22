@@ -25,6 +25,9 @@ import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,20 +49,23 @@ public final class PluginConfig implements JsonConfiguration {
 
     // General Settings
 
-    @JsonPath("general_settings.respawn_on_primary_world_spawn")
-    public static boolean GENERAL_RESPAWN_ON_PRIMARY_WORLD_SPAWN;
+    @JsonPath("general_settings.primary_spawn_point")
+    public static LazyLocation GENERAL_PRIMARY_SPAWN_POINT;
 
-    @JsonPath("general_settings.teleport_new_players_to_primary_world_spawn")
-    public static boolean GENERAL_TELEPORT_NEW_PLAYERS_TO_PRIMARY_WORLD_SPAWN;
+    @JsonPath("general_settings.teleport_new_players_to_primary_spawn_point")
+    public static boolean GENERAL_TELEPORT_NEW_PLAYERS_TO_PRIMARY_SPAWN_POINT;
+
+    @JsonPath("general_settings.fallback_respawn_to_primary_spawn_point")
+    public static boolean GENERAL_FALLBACK_RESPAWN_TO_PRIMARY_SPAWN_POINT;
+
+    @JsonPath("general_settings.end_portal_teleports_primary_spawn_point")
+    public static boolean GENERAL_END_PORTAL_TELEPORTS_PRIMARY_SPAWN_POINT;
 
     @JsonPath("general_settings.use_blocked_command_error_message_for_unknown_command")
     public static boolean USE_BLOCKED_COMMAND_ERROR_MESSAGE_FOR_UNKNOWN_COMMAND;
 
     @JsonPath("general_settings.player_idle_time")
     public static long GENERAL_PLAYER_IDLE_TIME;
-
-    @JsonPath("general_settings.end_portal_teleports_to_spawn")
-    public static boolean GENERAL_END_PORTAL_TELEPORTS_TO_SPAWN;
 
     @JsonPath("general_settings.disable_end_platform_generation")
     public static boolean GENERAL_DISABLE_END_PLATFORM_GENERATION;
@@ -473,6 +479,34 @@ public final class PluginConfig implements JsonConfiguration {
 
         @Getter(AccessLevel.PUBLIC)
         private final String state;
+
+    }
+
+    // Moshi should be able to create instance of the object despite the constructor being private.
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class LazyLocation {
+
+        @Getter(AccessLevel.PUBLIC)
+        private final NamespacedKey world;
+
+        @Getter(AccessLevel.PUBLIC)
+        private final double x;
+
+        @Getter(AccessLevel.PUBLIC)
+        private final double y;
+
+        @Getter(AccessLevel.PUBLIC)
+        private final double z;
+
+        @Getter(AccessLevel.PUBLIC)
+        private final float yaw;
+
+        @Getter(AccessLevel.PUBLIC)
+        private final float pitch;
+
+        public @Nullable Location toLocation() {
+            return (Bukkit.getWorld(world) != null) ? new Location(Bukkit.getWorld(world), x, y, z, yaw, pitch) : null;
+        }
 
     }
 

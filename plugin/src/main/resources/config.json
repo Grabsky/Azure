@@ -4,16 +4,20 @@
     "debug_mode": false,
 
     "general_settings": {
-        // Determines whether player should respawn on spawn-point of the primary world.
-        "respawn_on_primary_world_spawn": true,
-        // Determines whether new players should spawn on spawn-point of the primary world.
-        "teleport_new_players_to_primary_world_spawn": true,
+        // The primary spawn point across all worlds.
+        "primary_spawn_point": { "world": "minecraft:overworld", "x": 0.5, "y": 96, "z": 0.5, "yaw": 0, "pitch": 0 },
+        // Determine whether new players should spawn on the primary spawn point.
+        "teleport_new_players_to_primary_spawn_point": false,
+        // Determine whether player should respawn on the primary spawn point.
+        // Player's respawn points, such as beds, respawn anchors, take priority over this setting.
+        "fallback_respawn_to_primary_spawn_point": false,
+        // Whether entering the end portal should teleport player to the primary spawn point.
+        "end_portal_teleports_to_spawn": false,
         // Determines whether to use $.command_filter.blocked_command_error_message as unknown command message.
         "use_blocked_command_error_message_for_unknown_command": false,
         // Seconds to pass before player is marked as idle.
         "player_idle_time": 300,
-        // Whether entering the end portal should teleport player to the spawn point.
-        "end_portal_teleports_to_spawn": false,
+
         // Whether entering the end portal should not cause end platform to be generated.
         "disable_end_platform_generation": false
     },
