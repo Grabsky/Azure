@@ -24,13 +24,10 @@ import cloud.grabsky.bedrock.components.Message;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.luckperms.api.cacheddata.CachedMetaData;
-import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
-import org.bukkit.World;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.command.UnknownCommandEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -42,9 +39,6 @@ import org.bukkit.event.player.PlayerCommandSendEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLevelChangeEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerRespawnEvent.RespawnReason;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.world.PortalCreateEvent;
 
 import java.util.HashSet;
@@ -73,13 +67,6 @@ public final class PlayerListener implements Listener {
     @EventHandler // We need to somehow ensure this is called AFTER AzureUserCache#onPlayerJoin(...) listener. I guess registration order is enough?
     public void onPlayerJoin(final @NotNull PlayerJoinEvent event) {
         final Player player = event.getPlayer();
-        // Teleporting new players to spawn. (if enabled)
-        if (player.hasPlayedBefore() == false && PluginConfig.GENERAL_TELEPORT_NEW_PLAYERS_TO_PRIMARY_SPAWN_POINT == true) {
-            // Getting the primary spawn location.
-            final Location location = PluginConfig.GENERAL_PRIMARY_SPAWN_POINT.toLocation();
-            // Teleporting player to the spawn location.
-            plugin.getBedrockScheduler().run(1L, (_) -> player.teleportAsync(location != null ? location : plugin.getServer().getWorld(OVERWORLD).getSpawnLocation()));
-        }
         // Setting join message to null because it needs to be handled manually.
         event.joinMessage(null);
         // Sending join message to audience that can see the player associated with the event.
@@ -114,28 +101,6 @@ public final class PlayerListener implements Listener {
                     .replace("<suffix>", requirePresent(metaData.getSuffix(), ""))
                     .placeholder("displayname", player.displayName())
                     .broadcast(audience -> audience.canSee(player) == true);
-        }
-    }
-
-    /* WORLD RESPAWN - Respawns players on spawn-point of the main world. */
-
-    @EventHandler
-    public void onPlayerRespawn(final @NotNull PlayerRespawnEvent event) {
-        // THE END: Setting respawn location to spawn point of the end world.
-        if (event.getPlayer().getLocation().getWorld().getKey().equals(THE_END) == true && event.getRespawnReason() == RespawnReason.DEATH) {
-            // Getting the world player is currently in. (THE_END)
-            final World world = event.getPlayer().getLocation().getWorld();
-            // Setting the respawn location.
-            event.setRespawnLocation(world.getSpawnLocation());
-            // Returning
-            return;
-        }
-        // Otherwise, defaulting respawn point to the spawn point of the primary world. Overridden by active Bed or Respawn Anchor.
-        if (PluginConfig.GENERAL_FALLBACK_RESPAWN_TO_PRIMARY_SPAWN_POINT == true && event.isBedSpawn() == false && event.isAnchorSpawn() == false) {
-            // Getting the primary spawn location.
-            final Location location = PluginConfig.GENERAL_PRIMARY_SPAWN_POINT.toLocation();
-            // Setting the respawn location.
-            event.setRespawnLocation(location != null ? location : plugin.getServer().getWorld(OVERWORLD).getSpawnLocation());
         }
     }
 
@@ -287,16 +252,6 @@ public final class PlayerListener implements Listener {
             user.setMaxLevel(event.getNewLevel());
             // Saving...
             plugin.getUserCache().as(AzureUserCache.class).saveUser(user);
-        }
-    }
-
-    /* TELEPORT PLAYER TO THE WORLD SPAWN WHEN ENTERING THROUGH THE END PORTAL */
-
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onPortal(final @NotNull PlayerTeleportEvent event) {
-        if (PluginConfig.GENERAL_END_PORTAL_TELEPORTS_PRIMARY_SPAWN_POINT == true && event.getCause() == PlayerTeleportEvent.TeleportCause.END_PORTAL && event.getTo().getWorld().key().equals(THE_END) == true) {
-            final Location location = PluginConfig.GENERAL_PRIMARY_SPAWN_POINT.toLocation();
-            event.setTo(location != null ? location : plugin.getServer().getWorld(OVERWORLD).getSpawnLocation());
         }
     }
 

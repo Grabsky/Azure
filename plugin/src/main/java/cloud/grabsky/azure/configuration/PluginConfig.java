@@ -49,18 +49,6 @@ public final class PluginConfig implements JsonConfiguration {
 
     // General Settings
 
-    @JsonPath("general_settings.primary_spawn_point")
-    public static LazyLocation GENERAL_PRIMARY_SPAWN_POINT;
-
-    @JsonPath("general_settings.teleport_new_players_to_primary_spawn_point")
-    public static boolean GENERAL_TELEPORT_NEW_PLAYERS_TO_PRIMARY_SPAWN_POINT;
-
-    @JsonPath("general_settings.fallback_respawn_to_primary_spawn_point")
-    public static boolean GENERAL_FALLBACK_RESPAWN_TO_PRIMARY_SPAWN_POINT;
-
-    @JsonPath("general_settings.end_portal_teleports_primary_spawn_point")
-    public static boolean GENERAL_END_PORTAL_TELEPORTS_PRIMARY_SPAWN_POINT;
-
     @JsonPath("general_settings.use_blocked_command_error_message_for_unknown_command")
     public static boolean USE_BLOCKED_COMMAND_ERROR_MESSAGE_FOR_UNKNOWN_COMMAND;
 
