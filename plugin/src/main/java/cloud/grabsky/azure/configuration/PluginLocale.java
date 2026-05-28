@@ -586,6 +586,12 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.hat_success")
     public static Component COMMAND_HAT_SUCCESS;
 
+    @JsonPath("commands.hat_failure_on")
+    public static Component COMMAND_HAT_FAILURE_ON;
+
+    @JsonPath("commands.hat_failure_off")
+    public static Component COMMAND_HAT_FAILURE_OFF;
+
     // Commands > Player
 
     @JsonPath("commands.player_usage")

@@ -366,6 +366,8 @@
         "feed_success_target": "<dark_gray>› <gray>Twoje punkty głodu zostały uzupełnione.",
         // Hat
         "hat_success": "<dark_gray>› <gray>Twój hełm został zaktualizowany.",
+        "hat_failure_on": "<dark_gray>› <red>Ten przedmiot nie może zostać założony na głowę.",
+        "hat_failure_off": "<dark_gray>› <red>Ten przedmiot nie może zostać zdjęty z głowy.",
         // Player
         "player_usage": "<dark_gray>› <gray>Użycie: <gold>/player <white>(player)",
         "player_hidden_entry": "<white>ᴜᴋʀʏᴛᴇ",
