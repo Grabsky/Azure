@@ -205,7 +205,7 @@ public final class PlayerListener implements Listener {
                         .placeholder("victim_displayname", event.getPlayer().displayName())
                         .placeholder("attacker", (event.getDamageSource().getCausingEntity() != null) ? event.getDamageSource().getCausingEntity().getName() : "N/A")
                         .placeholder("attacker_displayname", (event.getDamageSource().getCausingEntity() != null && event.getDamageSource().getCausingEntity() instanceof Player attacker) ? attacker.displayName() : ComponentBuilder.EMPTY)
-                        .placeholder("mob", (event.getDamageSource().getCausingEntity() != null && event.getDamageSource().getCausingEntity() instanceof Mob mob) ? PluginLocale.MOBS.getOrDefault(mob.getType().translationKey(), mob.getType().translationKey()) : ComponentBuilder.EMPTY);
+                        .placeholder("mob", (event.getDamageSource().getCausingEntity() != null && event.getDamageSource().getCausingEntity() instanceof Mob mob) ? PluginLocale.MOBS.getOrDefault(mob.getType().translationKey(), mob.getType().translationKey()) : "???");
                 // Broadcasting the message.
                 message.broadcast();
                 // Preventing vanilla death message from appearing in chat.
