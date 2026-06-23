@@ -41,7 +41,7 @@ dependencies {
     // https://github.com/PlaceholderAPI/PlaceholderAPI
     compileOnly("me.clip:placeholderapi:2.12.2")
     // https://github.com/nulli0n/ExcellentShop-spigot
-    compileOnly("su.nightexpress.excellentshop:Core:5.0.0-beta") {
+    compileOnly("su.nightexpress.excellentshop:Core:5.1.2") {
         exclude module: "SimpleClaimSystem"
     }
 }
