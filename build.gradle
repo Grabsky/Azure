@@ -2,7 +2,7 @@ plugins {
     id "java-library"
 }
 
-final String VERSION = "26.1"
+final String VERSION = "26.1+"
 final String RUN_NUMBER = System.getenv("GITHUB_RUN_NUMBER") ?: "DEV"
 
 group = "cloud.grabsky"
@@ -15,8 +15,8 @@ subprojects {
     version = rootProject.version
 
     ext {
-        BEDROCK_VERSION = "1.21.X-72"
-        KYORI_NBT_VERSION = "4.26.1"
+        BEDROCK_VERSION = "1.21.X-77"
+        KYORI_NBT_VERSION = "5.2.0"
     }
 
     repositories {
@@ -32,10 +32,10 @@ subprojects {
         // https://github.com/JetBrains/java-annotations
         compileOnly("org.jetbrains:annotations:26.1.0")
         // https://github.com/projectlombok/lombok
-        compileOnly("org.projectlombok:lombok:1.18.42")
-        annotationProcessor("org.projectlombok:lombok:1.18.42")
+        compileOnly("org.projectlombok:lombok:1.18.46")
+        annotationProcessor("org.projectlombok:lombok:1.18.46")
         // https://github.com/PaperMC/Paper
-        compileOnly("io.papermc.paper:paper-api:26.1.2.build.+")
+        compileOnly("io.papermc.paper:paper-api:26.2.build.+")
     }
 
     compileJava {
