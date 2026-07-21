@@ -51,7 +51,7 @@ tasks {
         archiveFileName = "${rootProject.name}-${project.version}.jar"
     }
     runServer {
-        minecraftVersion("26.1.2")
+        minecraftVersion("26.2")
     }
 }
 
@@ -65,7 +65,7 @@ paper {
     name = "Azure"
     main = "cloud.grabsky.azure.Azure"
     loader = "cloud.grabsky.azure.Azure\$PluginLoader"
-    apiVersion = "26.1"
+    apiVersion = "26.2"
     generateLibrariesJson = true
     serverDependencies {
         "LuckPerms"      { load = "BEFORE"; required = true }

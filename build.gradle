@@ -2,7 +2,7 @@ plugins {
     id "java-library"
 }
 
-final String VERSION = "26.1+"
+final String VERSION = "26.2"
 final String RUN_NUMBER = System.getenv("GITHUB_RUN_NUMBER") ?: "DEV"
 
 group = "cloud.grabsky"
