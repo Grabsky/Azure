@@ -25,7 +25,7 @@ dependencies {
     // https://github.com/KyoriPowered/adventure
     paperLibrary("net.kyori:adventure-nbt:$KYORI_NBT_VERSION")
     // https://github.com/discord-jda/JDA
-    paperLibrary("net.dv8tion:JDA:6.5.0") {
+    paperLibrary("net.dv8tion:JDA:6.7.0") {
         exclude module: "opus-java"
     }
     // https://github.com/MinnDevelopment/discord-webhooks
@@ -35,7 +35,7 @@ dependencies {
     // https://github.com/mfnalex/MorePersistentDataTypes
     paperLibrary("com.jeff-media:MorePersistentDataTypes:2.4.0")
     // https://github.com/javalin/javalin
-    paperLibrary("io.javalin:javalin:7.2.2")
+    paperLibrary("io.javalin:javalin:7.2.3")
     // https://github.com/LuckPerms/LuckPerms
     compileOnly("net.luckperms:api:5.5")
     // https://github.com/PlaceholderAPI/PlaceholderAPI
@@ -51,9 +51,9 @@ tasks {
         archiveFileName = "${rootProject.name}-${project.version}.jar"
     }
     runServer {
-        minecraftVersion("26.2")
+        minecraftVersion("26.3")
         downloadPlugins {
-            modrinth("axiom-paper-plugin", "6.0.1+26.2")
+            modrinth("axiom-paper-plugin", "6.0.1+26.3")
             modrinth("placeholderapi", "2.12.3")
         }
     }
@@ -69,7 +69,7 @@ paper {
     name = "Azure"
     main = "cloud.grabsky.azure.Azure"
     loader = "cloud.grabsky.azure.Azure\$PluginLoader"
-    apiVersion = "26.2"
+    apiVersion = "26.3"
     generateLibrariesJson = true
     serverDependencies {
         "LuckPerms"      { load = "BEFORE"; required = true }
