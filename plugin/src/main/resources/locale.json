@@ -35,6 +35,7 @@
         "entity.minecraft.cave_spider": "Pająk Jaskiniowy",
         "entity.minecraft.chicken": "Kura",
         "entity.minecraft.cod": "Dorsz",
+        "entity.minecraft.copper_golem": "Miedziany Golem",
         "entity.minecraft.cow": "Krowa",
         "entity.minecraft.creaking": "Trzeszcz",
         "entity.minecraft.creeper": "Creeper",
@@ -48,6 +49,7 @@
         "entity.minecraft.evoker": "Przywoływacz",
         "entity.minecraft.fox": "Lis",
         "entity.minecraft.frog": "Żaba",
+        "entity.minecraft.frostbite": "Zmarzlak",
         "entity.minecraft.ghast": "Ghast",
         "entity.minecraft.giant": "Olbrzym",
         "entity.minecraft.glow_squid": "Świecąca Kałamarnica",
@@ -91,6 +93,7 @@
         "entity.minecraft.squid": "Kałamarnica",
         "entity.minecraft.stray": "Tułacz",
         "entity.minecraft.strider": "Magmołaz",
+        "entity.minecraft.sulfur_cube": "Kostka Siarki",
         "entity.minecraft.tadpole": "Kijanka",
         "entity.minecraft.trader_llama": "Lama Handlarza",
         "entity.minecraft.trident": "Trójząb",
@@ -118,7 +121,7 @@
         "default": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> zginął.",
         // Specialized death messages.
         "death.attack.anvil": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> został zmiażdżony przez spadające kowadło.",
-        "death.attack.anvil.player": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> został zmiażdżony przez spadające kowadło podczas walki z <attacker_displayname><gray>",
+        "death.attack.anvil.player": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> został zmiażdżony przez spadające kowadło podczas walki z <attacker_displayname><gray>.",
         "death.attack.arrow": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> został zastrzelony.",
         "death.attack.arrow.item": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> został zastrzelony.",
         "death.attack.badRespawnPoint.link": "celową funkcję w grze",
@@ -141,8 +144,8 @@
         "death.attack.fall.player": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> zaliczył twarde lądowanie.",
         "death.attack.fallingBlock": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> został zmiażdżony przez spadający blok.",
         "death.attack.fallingBlock.player": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> został zmiażdżony przez spadający blok.",
-        "death.attack.fallingStalactite": "Spadający stalaktyt zrobił z gracza <prefix><victim_displayname><reset><gray> szaszłyk.",
-        "death.attack.fallingStalactite.player": "Spadający stalaktyt zrobił z gracza <prefix><victim_displayname><reset><gray> szaszłyk.",
+        "death.attack.fallingStalactite": "<dark_gray>› <gray>Spadający stalaktyt zrobił z gracza <prefix><victim_displayname><reset><gray> szaszłyk.",
+        "death.attack.fallingStalactite.player": "<dark_gray>› <gray>Spadający stalaktyt zrobił z gracza <prefix><victim_displayname><reset><gray> szaszłyk.",
         "death.attack.fireball": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> został trafiony kulą ognia.",
         "death.attack.fireball.item": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> został trafiony kulą ognia.",
         "death.attack.fireworks": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> wyleciał z hukiem.",
@@ -150,8 +153,8 @@
         "death.attack.fireworks.player": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> wyleciał z hukiem.",
         "death.attack.flyIntoWall": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> doświadczył energii kinetycznej.",
         "death.attack.flyIntoWall.player": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> doświadczył energii kinetycznej.",
-        "death.attack.freeze": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> zamarzł na śmierć",
-        "death.attack.freeze.player": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> zamarzł na śmierć",
+        "death.attack.freeze": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> zamarzł na śmierć.",
+        "death.attack.freeze.player": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> zamarzł na śmierć.",
         "death.attack.generic": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> zginął.",
         "death.attack.generic.player": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> zginął z ręki gracza <attacker_displayname><gray>.",
         "death.attack.genericKill": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> został zabity.",
@@ -168,8 +171,8 @@
         "death.attack.lava.player": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> próbował pływać w lawie.",
         "death.attack.lightningBolt": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> został porażony piorunem.",
         "death.attack.lightningBolt.player": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> został porażony piorunem.",
-        "death.attack.mace_smash": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> został zmiażdzony przez gracza <attacker_displayname><gray>",
-        "death.attack.mace_smash.item": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset> został zmiażdzony przez gracza <attacker_displayname><gray>",
+        "death.attack.mace_smash": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> został zmiażdżony przez gracza <attacker_displayname><gray>.",
+        "death.attack.mace_smash.item": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> został zmiażdżony przez gracza <attacker_displayname><gray>.",
         "death.attack.magic": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> został zabity magią.",
         "death.attack.magic.player": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> został zabity magią.",
         "death.attack.message_too_long": "<dark_gray>› <gray>%s<gray>...",
@@ -200,8 +203,8 @@
         "death.attack.sweetBerryBush.player": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> wpuścił się w maliny.",
         "death.attack.thorns": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> został zabity przez ciernie.",
         "death.attack.thorns.item": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> został zabity przez ciernie.",
-        "death.attack.thrown": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> został został zabity przez ciernie.",
-        "death.attack.thrown.item": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> został zabity przez ciernie.",
+        "death.attack.thrown": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> zginął od trafienia rzuconym pociskiem.",
+        "death.attack.thrown.item": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> zginął od trafienia rzuconym pociskiem.",
         "death.attack.trident": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> został przebity trójzębem.",
         "death.attack.trident.item": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> został przebity trójzębem.",
         "death.attack.wither": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> obumarł.",
@@ -217,8 +220,8 @@
         "death.fell.accident.weeping_vines": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> spadł z płaczących pnączy.",
         "death.fell.assist": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> spadł z wysokiego miejsca.",
         "death.fell.assist.item": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> spadł z wysokiego miejsca.",
-        "death.fell.finish": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> zginął na wskutek upadku.",
-        "death.fell.finish.item": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> zginął na wskutek upadku.",
+        "death.fell.finish": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> zginął wskutek upadku.",
+        "death.fell.finish.item": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> zginął wskutek upadku.",
         "death.fell.killer": "<dark_gray>› <gray>Gracz <prefix><victim_displayname><reset><gray> spadł z wysokiego miejsca."
     },
     // ...
@@ -228,8 +231,8 @@
         "on_cooldown": "<dark_gray>› <red>Musisz chwilę poczekać...",
         "muted": "<dark_gray>› <gray>Jesteś wyciszony przez kolejne <red><duration_left><gray>.",
         "muted_permanent": "<dark_gray>› <gray>Jesteś <red>permanentnie<gray> wyciszony.",
-        "attachment": "(\uD83D\uDCCE Załącznik)",
-        "gif": "(\uD83D\uDDBC\uFE0F Gif)"
+        "attachment": "<gray>(<white>\uD83D\uDCCE<gray> Załącznik)",
+        "gif": "<gray>(<white>🖼<gray> Gif)"
     },
     // ...
     "commands": {
@@ -246,18 +249,25 @@
             "<gray>Zostałeś <red>tymczasowo<gray> zbanowany.",
             "",
             "",
+            "<gray>Pozostało: <red><duration_left>",
+            "",
             "<gray>Powód: <red><reason>",
             "",
             "",
             "<gray>Twoja blokada zostanie usunięta za <red><duration_left>",
-            ""
+            "",
+            "",
+            "<gray>example.com/discord<dark_gray>  •  <gray>contact@example.com"
         ],
         "ban_disconnect_message_permanent": [
             "<gray>Zostałeś <red>permanentnie<gray> zbanowany.",
             "",
             "",
             "<gray>Powód: <red><reason>",
-            ""
+            "",
+            "",
+            "<gray>example.com/discord<dark_gray>  •  <gray>contact@example.com"
+
         ],
         // Mute
         "mute_usage": "<dark_gray>› <gray>Użycie: <gold>/mute <white>(player) (duration) <gray>(reason)",
@@ -281,7 +291,7 @@
             "<gray>Powód: <red><reason>",
             "",
             "",
-            "<gray>Uważasz, że to pomyłka? Skontaktuj się z nami na <gold>https://firedot.pl/discord<gray> lub napisz na nasz adres <gold>administracja@firedot.pl"
+            "<gray>example.com/discord<dark_gray>  •  <gray>contact@example.com"
         ],
         // Delete
         "delete_usage": "<dark_gray>› <gray>Użycie: <gold>/delete <white>(signature_uuid)",
@@ -299,14 +309,10 @@
         "gamemode_info": "<dark_gray>› <gray>Tryb gry gracza <gold><player><gray> to <gold><mode><gray>.",
         "gamemode_set_success_sender": "<dark_gray>› <gray>Ustawiono tryb <gold><player><gray> na <gold><mode><gray>.",
         "gamemode_set_success_target": "<dark_gray>› <gray>Twój tryb został ustawiony na <gold><mode><gray>.",
-        // Get
-        "get_usage": "<dark_gray>› <gray>Użycie: <gold>/get <white>(item) (amount)",
-        "get_success": "<dark_gray>› <gray>Otrzymałeś: <gold><item><gray>.",
-        "get_failure_not_found": "<dark_gray>› <red>Przedmiot <gold><input><gray> nie jest skonfigurowany.",
         // Give
-        "give_usage": "<dark_gray>› <gray>Użycie: <gold>/give <white>(player) (material) (amount) <gray>(--silent)",
-        "give_success_sender": "<dark_gray>› <gray>Gracz <gold><player><gray> otrzymał <gold><item><gray>.",
-        "give_success_target": "<dark_gray>› <gray>Otrzymałeś <gold><item><gray>.",
+        "item_usage": "<dark_gray>› <gray>Użycie: <gold>/item <white>(player) (material) (amount) <gray>(--silent)",
+        "item_success_sender": "<dark_gray>› <gray>Gracz <gold><player><gray> otrzymał <gold><item><gray>.",
+        "item_success_target": "<dark_gray>› <gray>Otrzymałeś <gold><item><gray>.",
         // Pack
         "pack_help": [
             "",
@@ -331,7 +337,7 @@
         "speed_set_success_walk": "<dark_gray>› <gray>Ustawiono prędkość chodzenia dla <gold><player><gray> na <gold><speed><gray>.",
         "speed_set_success_fly": "<dark_gray>› <gray>Ustawiono prędkość latania dla <gold><player><gray> na <gold><speed><gray>.",
         // Teleport
-        "teleport_usage": "<dark_gray>› <gray>Użycie: <gold>/teleport <white>(target) (destination) <gray>(--silent)",
+        "teleport_usage": "<dark_gray>› <gray>Użycie: <gold>/teleport <white>(target) (destination) <gray>(--verbose)",
         "teleport_player_success_sender": "<dark_gray>› <gold><target><gray> został przeniesiony do <gold><destination><gray>.",
         "teleport_player_success_target": "<dark_gray>› <gray>Zostałeś przeniesiony do <gold><destination><gray>.",
         "teleport_player_success_destination": "<dark_gray>› <gold><target><gray> został do Ciebie przeniesiony.",
@@ -409,12 +415,12 @@
         // Skull
         "skull_usage": "<dark_gray>› <gray>Użycie: <gold>/skull <gray>(texture)",
         "skull_success_player": "<dark_gray>› <gray>Otrzymałeś głowę gracza <gold><player><gray>.",
-        "skull_success_base64": "<dark_gray>› <gray>Otrzymałes zakodowaną głowę nieznanego gracza.",
+        "skull_success_base64": "<dark_gray>› <gray>Otrzymałeś zakodowaną głowę nieznanego gracza.",
         "skull_failure": "<dark_gray>› <red>Argument musi być <gold>nickiem gracza<red> lub <gold>zakodowanym skinem<red>.",
         // Nick
         "nick_success_set": "<dark_gray>› <gray>Nick gracza <gold><player><gray> został ustawiony na: <nick>",
         "nick_success_set_target": "<dark_gray>› <gray>Twój nick został ustawiony na: <nick>",
-        "nick_success_reset": "<dark_gray>› <gray>Nick gracza <gold><target><gray> został zresetowany.",
+        "nick_success_reset": "<dark_gray>› <gray>Nick gracza <gold><player><gray> został zresetowany.",
         "nick_success_reset_target": "<dark_gray>› <gray>Twój nick został zresetowany.",
         "nick_failure_invalid_format": [
             "",
@@ -439,7 +445,7 @@
             "",
             "<dark_gray>› <gray>Rozpoczęto weryfikację. Dokończ w trzech krokach poniżej:",
             "",
-            "  <gold>1. <gray>Dołącz do naszego serwera Discord. <click:open_url:'https://example.com'><hover:show_text:'<gray>Kliknij, aby otworzyć link w przeglądarce.'><#848484>(Kliknij)</hover></click>",
+            "  <gold>1. <gray>Dołącz do naszego serwera Discord. <click:open_url:'https://discord.com'><hover:show_text:'<gray>Kliknij, aby otworzyć link w przeglądarce.'><#848484>(Kliknij)</hover></click>",
             "  <gold>2. <gray>Na kanale <gold>#weryfikacja<gray>, naciśnij przycisk <#57F287>Zweryfikuj<gray>.",
             "  <gold>3. <gray>Wpisz kod <gold><code><gray> i zaakceptuj formularz. <click:copy_to_clipboard:'<code>'><hover:show_text:'<gray>Kliknij, aby skopiować kod do schowka'><#848484>(Skopiuj)</hover></click>",
             "",

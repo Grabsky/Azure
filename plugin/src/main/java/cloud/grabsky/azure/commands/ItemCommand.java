@@ -36,12 +36,12 @@ import org.jetbrains.annotations.NotNull;
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
 
-@Command(name = "give", permission = "azure.command.give", usage = "/give (player) (material) (amount) (--silent)")
-public final class GiveCommand extends RootCommand {
+@Command(name = "item", aliases = {"i"}, permission = "azure.command.item", usage = "/item (player) (material) (amount) (--silent)")
+public final class ItemCommand extends RootCommand {
 
-    private static final ExceptionHandler.Factory GIVE_USAGE = (exception) -> {
+    private static final ExceptionHandler.Factory ITEM_USAGE = (exception) -> {
         if (exception instanceof MissingInputException)
-            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_GIVE_USAGE).send(context.getExecutor().asCommandSender());
+            return (ExceptionHandler<CommandLogicException>) (e, context) -> Message.of(PluginLocale.COMMAND_ITEM_USAGE).send(context.getExecutor().asCommandSender());
         // Let other exceptions be handled internally.
         return null;
     };
@@ -61,9 +61,9 @@ public final class GiveCommand extends RootCommand {
     public void onCommand(final @NotNull RootCommandContext context, final @NotNull ArgumentQueue arguments) throws CommandLogicException {
         final CommandSender sender = context.getExecutor().asCommandSender();
         // ...
-        final var target = arguments.next(Player.class).asRequired(GIVE_USAGE);
-        final var material = arguments.next(Material.class).asRequired(GIVE_USAGE);
-        final var amount = arguments.next(Integer.class, IntegerArgument.ofRange(1, 64)).asRequired(GIVE_USAGE);
+        final var target = arguments.next(Player.class).asRequired(ITEM_USAGE);
+        final var material = arguments.next(Material.class).asRequired(ITEM_USAGE);
+        final var amount = arguments.next(Integer.class, IntegerArgument.ofRange(1, 64)).asRequired(ITEM_USAGE);
         final var isSilent = arguments.next(String.class).asOptional("--not-silent").equalsIgnoreCase("--silent");
         // ...
         if (sender != target && sender.hasPermission(this.getPermission() + ".others") == false) {
@@ -77,7 +77,7 @@ public final class GiveCommand extends RootCommand {
         target.getInventory().addItem(item);
         // ...
         if (sender != target) {
-            Message.of(PluginLocale.COMMAND_GIVE_SUCCESS_SENDER)
+            Message.of(PluginLocale.COMMAND_ITEM_SUCCESS_SENDER)
                     .placeholder("player", target)
                     .placeholder("amount", amount)
                     .placeholder("item", display)
@@ -85,7 +85,7 @@ public final class GiveCommand extends RootCommand {
         }
         // ...
         if (isSilent == false) {
-            Message.of(PluginLocale.COMMAND_GIVE_SUCCESS_TARGET)
+            Message.of(PluginLocale.COMMAND_ITEM_SUCCESS_TARGET)
                     .placeholder("amount", amount)
                     .placeholder("item", display)
                     .send(target);

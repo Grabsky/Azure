@@ -248,27 +248,16 @@ public final class PluginLocale implements JsonConfiguration {
     @JsonPath("commands.gamemode_set_success_target")
     public static String COMMAND_GAMEMODE_SET_SUCCESS_TARGET;
 
-    // Commands > Get
+    // Commands > Item
 
-    @JsonPath("commands.get_usage")
-    public static Component COMMAND_GET_USAGE;
-
-    @JsonPath("commands.get_success")
-    public static String COMMAND_GET_SUCCESS;
-
-    @JsonPath("commands.get_failure_not_found")
-    public static String COMMAND_GET_FAILURE_NOT_FOUND;
-
-    // Commands > Give
-
-    @JsonPath("commands.give_usage")
-    public static Component COMMAND_GIVE_USAGE;
+    @JsonPath("commands.item_usage")
+    public static Component COMMAND_ITEM_USAGE;
 
     @JsonPath("commands.give_success_sender")
-    public static String COMMAND_GIVE_SUCCESS_SENDER;
+    public static String COMMAND_ITEM_SUCCESS_SENDER;
 
     @JsonPath("commands.give_success_target")
-    public static String COMMAND_GIVE_SUCCESS_TARGET;
+    public static String COMMAND_ITEM_SUCCESS_TARGET;
 
     // Commands > Pack
 

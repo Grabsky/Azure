@@ -29,7 +29,7 @@ import cloud.grabsky.azure.commands.EnderchestCommand;
 import cloud.grabsky.azure.commands.FeedCommand;
 import cloud.grabsky.azure.commands.FlyCommand;
 import cloud.grabsky.azure.commands.GameModeCommand;
-import cloud.grabsky.azure.commands.GiveCommand;
+import cloud.grabsky.azure.commands.ItemCommand;
 import cloud.grabsky.azure.commands.HatCommand;
 import cloud.grabsky.azure.commands.HealCommand;
 import cloud.grabsky.azure.commands.InventoryCommand;
@@ -199,7 +199,7 @@ public final class Azure extends JavaPlugin implements AzureAPI, Listener {
                 .registerCommand(EnderchestCommand.class)
                 .registerCommand(FeedCommand.class)
                 .registerCommand(GameModeCommand.class)
-                .registerCommand(GiveCommand.class)
+                .registerCommand(ItemCommand.class)
                 .registerCommand(HatCommand.class)
                 .registerCommand(HealCommand.class)
                 .registerCommand(InventoryCommand.class)
