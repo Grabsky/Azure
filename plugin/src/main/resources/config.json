@@ -13,7 +13,7 @@
     },
     "chat_settings": {
         // Chat cooldown in milliseconds. Set to 0 to disable. Bypass: azure.plugin.chat.can_bypass_cooldown
-        "cooldown": 1000,
+        "cooldown": 500,
         // Message to be sent when player joins the server.
         "server_join_message": "<dark_gray>› <gray><prefix><player><reset><gray> dołączył do gry.",
         // Message to be sent when player leaves the server.
@@ -27,7 +27,7 @@
         // Whether advancement message should be global. Must also be enabled with setting above.
         "advancement_message_send_global": false,
         // Advancement message format. Set to "" to use vanilla message. Placeholders: [player, displayname, advancement]
-        "advancement_message_format": "<dark_gray>› <green>Gratulacje! <gray>Odblokowałeś osiągnięcie <advancement><gray>...",
+        "advancement_message_format": "<dark_gray>› <green>Gratulacje! <gray>Odblokowałeś osiągnięcie: <advancement><gray>",
         // Sound to be played when player is mentioned. Can be null.
         "mention_sound": { "key": "minecraft:block.note_block.xylophone", "source": "master", "volume": 1.0, "pitch": 2.0 },
         // Chat filtering settings.
@@ -38,7 +38,7 @@
             "disallow_inappropriate_words": true,
             // Console commands to execute message contains any word marked as INAPPROPRIATE.
             "punishment_commands": [
-                "mute <player> 10s Używanie nieodpowiednich słów. --silent"
+                "mute <player> 10s Używanie nieodpowiednich słów --silent"
             ]
         },
         // Chat formats. Supports MiniMessage tags and some placeholders.
@@ -72,9 +72,9 @@
                 // Determines how long message signature should be stored for. In seconds.
                 "cache_expiration_rate": 300,
                 // Message delete button styling. Position can either be BEFORE or AFTER.
-                "button_active": { "position": "BEFORE", "text": "<gray>×", "hover": "<gray>Naciśnij, aby usunąć wiadomość." },
+                "button_active": { "position": "BEFORE", "text": "<gray>× ", "hover": "<gray>Naciśnij, aby usunąć wiadomość." },
                 // Message delete button styling. Position can either be BEFORE or AFTER.
-                "button_inactive": { "position": "BEFORE", "text": "<dark_gray>×", "hover": "<gray>Nie możesz usunąć tej wiadomości." }
+                "button_inactive": { "position": "BEFORE", "text": "<dark_gray>× ", "hover": "<gray>Nie możesz usunąć tej wiadomości." }
             }
         },
         "automated_messages": {
@@ -120,7 +120,7 @@
         "port": 25578,
         // Names of compressed resource-pack files inside "plugins/Azure/.public/".
         "pack_files": [],
-        // Whether resource-pack should be send when player joins the server.
+        // Whether resource-pack should be sent when player joins the server.
         "send_on_join": false,
         // Marks resource-packs as forced. Player won't be able to join the server without accepting them.
         "is_required": true,
@@ -147,7 +147,7 @@
         // Discord bot token. Keep it secure.
         "discord_bot_token": "",
         // Discord bot activity to be displayed.
-        "discord_bot_activity": { "refresh_rate": 0, "type": "LISTENING", "state": "server chat..." },
+        "discord_bot_activity": { "refresh_rate": 10, "type": "PLAYING", "state": "Online: %server_online%/%server_max_players%" },
         // Discord server ID.
         "discord_server_id": "",
         // Verification.
@@ -178,7 +178,7 @@
             // Discord webhook username. Supports PlaceholderAPI.
             "webhook_username": "%player_name%",
             // Discord webhook avatar URL. Supports PlaceholderAPI.
-            "webhook_avatar": "https://minotar.net/armor/bust/%player_uuid%/100.png",
+            "webhook_avatar": "https://api.mcskin.me/pfp/%player_name%",
             // Chat format used to send message to players. Placeholders: [username, displayname, message]
             "chat_format": "(Discord) (<username>): <message>",
             // Chat format used to end message the console. Placeholders: [username, displayname, message]
@@ -197,9 +197,9 @@
             // Discord webhook avatar URL. Supports PlaceholderAPI.
             "webhook_avatar": "",
             // Join message format. Supports PlaceholderAPI.
-            "join_message_format": "Player **%player_name%** has joined the server.",
+            "join_message_format": "Gracz **%player_name%** dołączył do gry.",
             // Quit message format. Supports PlaceholderAPI.
-            "quit_message_format": "Player **%player_name%** has left the server."
+            "quit_message_format": "Gracz **%player_name%** wyszedł z gry."
         },
         // Server START and STOP messages forwarding to Discord server.
         "start_and_stop_forwarding": {
@@ -211,10 +211,10 @@
             "webhook_username": "",
             // Discord webhook avatar URL. Supports PlaceholderAPI.
             "webhook_avatar": "",
-            // Start message format. Supports PlaceholderAPI.
-            "start_message_format": "Server is now online...",
-            // Stoop message format. Supports PlaceholderAPI.
-            "stop_message_format": "Server is shutting down..."
+            // Join message format. Supports PlaceholderAPI.
+            "start_message_format": "Serwer został włączony.",
+            // Quit message format. Supports PlaceholderAPI.
+            "stop_message_format": "Serwer został wyłączony."
         },
         // Player JOIN and QUIT messages forwarding to Discord server.
         "death_message_forwarding": {
@@ -233,14 +233,18 @@
             "enabled": false,
             // Discord webhook URL. Keep it secure.
             "webhook_url": "",
-            // Punishment message formats.
-            "kick_format": "Player **<name>** has been kicked for **<reason>**.",
-            "mute_format": "Player **<name>** has been muted (**<duration>**) for **<reason>**.",
-            "permanent_mute_format": "Player **<name>** has been permanently muted for **<reason>**.",
-            "ban_format": "Player **<name>** has been banned (**<duration>**) for **<reason>**.",
-            "permanent_ban_format": "Player **<name>** has been permanently banned for **<reason>**.",
-            "unmute_format": "Player **<name>** has been unmuted.",
-            "unban_format": "Player **<name>** has been unbanned."
+            // Discord webhook username. Supports PlaceholderAPI.
+            "webhook_username": "FireDOT",
+            // Discord webhook avatar URL. Supports PlaceholderAPI.
+            "webhook_avatar": "",
+            // Punishment message formats. Supports PlaceholderAPI.
+            "kick_format": "Gracz **<name>** został wyrzucony za **<reason>**.",
+            "mute_format": "Gracz **<name>** został wyciszony (**<duration>**) za **<reason>**.",
+            "permanent_mute_format": "Gracz **<name>** został wyciszony za **<reason>**.",
+            "ban_format": "Gracz **<name>** został zbanowany (**<duration>**) za **<reason>**.",
+            "permanent_ban_format": "Gracz **<name>** został zbanowany za **<reason>**.",
+            "unmute_format": "Gracz **<name>** został odciszony.",
+            "unban_format": "Gracz **<name>** został odbanowany."
         },
         // Auction listing messages forwarding to Discord servers. Requires ExcellentShop to work.
         "auction_listings_forwarding": {
@@ -253,7 +257,7 @@
             // Discord webhook avatar URL. Supports PlaceholderAPI.
             "webhook_avatar": "",
             // Message format. Supports PlaceholderAPI.
-            "format": "Player **%player_name%** has listed **<amount>x <item>** to the auction house."
+            "format": "Gracz **%player_name%** wystawił **<amount>x <item>** na aukcję."
         },
         "temporary_channels": {
             "enabled": false,
