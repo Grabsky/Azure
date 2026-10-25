@@ -52,9 +52,6 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("general_settings.use_blocked_command_error_message_for_unknown_command")
     public static boolean USE_BLOCKED_COMMAND_ERROR_MESSAGE_FOR_UNKNOWN_COMMAND;
 
-    @JsonPath("general_settings.player_idle_time")
-    public static long GENERAL_PLAYER_IDLE_TIME;
-
     @JsonPath("general_settings.disable_end_platform_generation")
     public static boolean GENERAL_DISABLE_END_PLATFORM_GENERATION;
 

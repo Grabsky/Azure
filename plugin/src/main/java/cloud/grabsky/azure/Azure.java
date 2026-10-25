@@ -84,7 +84,6 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Registry;
 import org.bukkit.Statistic;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.eclipse.aether.artifact.DefaultArtifact;
@@ -96,7 +95,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -329,8 +327,6 @@ public final class Azure extends JavaPlugin implements AzureAPI, Listener {
             final String identifier = params.toLowerCase();
             // Handling placeholders based on the identifier.
             return switch (identifier) {
-                // Placeholder: %azure_is_idle%
-                case "is_idle" -> (offlinePlayer instanceof Player player && player.getIdleDuration().get(ChronoUnit.SECONDS) >= PluginConfig.GENERAL_PLAYER_IDLE_TIME) ? "true" : "false";
                 // Placeholder: %azure_mined_blocks%
                 case "total_mined_blocks" -> calculateTotalBlock(offlinePlayer, Statistic.MINE_BLOCK);
                 // Placeholder: %azure_displayname%
