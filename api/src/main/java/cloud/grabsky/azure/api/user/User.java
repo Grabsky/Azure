@@ -85,11 +85,6 @@ public interface User extends Audience, ForwardingAudience {
     @NotNull String getLastCountryCode();
 
     /**
-     * Returns maximum level this {@link User} had.
-     */
-    int getMaxLevel();
-
-    /**
      * Returns {@code true} if this {@link User} is currently vanished.
      */
     boolean isVanished();

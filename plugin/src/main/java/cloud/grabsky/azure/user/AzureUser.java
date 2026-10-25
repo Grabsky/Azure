@@ -66,10 +66,6 @@ public final class AzureUser implements User {
     private @NotNull String lastCountryCode;
 
     @Getter(AccessLevel.PUBLIC)
-    @Setter(value = AccessLevel.PUBLIC, onMethod_ = @Internal)
-    private int maxLevel;
-
-    @Getter(AccessLevel.PUBLIC)
     private boolean isVanished;
 
     @Getter(AccessLevel.PUBLIC)

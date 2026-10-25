@@ -17,8 +17,6 @@ package cloud.grabsky.azure.listener;
 import cloud.grabsky.azure.Azure;
 import cloud.grabsky.azure.configuration.PluginConfig;
 import cloud.grabsky.azure.configuration.PluginLocale;
-import cloud.grabsky.azure.user.AzureUser;
-import cloud.grabsky.azure.user.AzureUserCache;
 import cloud.grabsky.bedrock.components.ComponentBuilder;
 import cloud.grabsky.bedrock.components.Message;
 import me.clip.placeholderapi.PlaceholderAPI;
@@ -37,7 +35,6 @@ import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerCommandSendEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLevelChangeEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.PortalCreateEvent;
 
@@ -118,7 +115,7 @@ public final class PlayerListener implements Listener {
             event.setCancelled(true);
     }
 
-    /* COMMAND FILTERING - Defined here because it's so small it doesn't deserve it's own class. */
+    /* COMMAND FILTERING - Defined here because it's so small it doesn't deserve its own class. */
 
     @EventHandler
     public void onPlayerSendCommandMap(final @NotNull PlayerCommandSendEvent event) {
@@ -238,20 +235,6 @@ public final class PlayerListener implements Listener {
             if (PluginConfig.CHAT_ADVANCEMENT_MESSAGE_SEND_GLOBAL == true)
                 message.broadcast();
             else message.send(player);
-        }
-    }
-
-    /* STORE MAXIMUM LEVEL */
-
-    @EventHandler
-    public void onLevelChange(final @NotNull PlayerLevelChangeEvent event) {
-        final AzureUser user = ((AzureUser) plugin.getUserCache().getUser(event.getPlayer()));
-        // Checking if new level is greater than maximum recorded level of this player.
-        if (event.getNewLevel() > user.getMaxLevel() == true) {
-            // Updating maximum level of this player.
-            user.setMaxLevel(event.getNewLevel());
-            // Saving...
-            plugin.getUserCache().as(AzureUserCache.class).saveUser(user);
         }
     }
 

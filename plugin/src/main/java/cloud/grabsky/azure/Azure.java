@@ -29,11 +29,11 @@ import cloud.grabsky.azure.commands.EnderchestCommand;
 import cloud.grabsky.azure.commands.FeedCommand;
 import cloud.grabsky.azure.commands.FlyCommand;
 import cloud.grabsky.azure.commands.GameModeCommand;
-import cloud.grabsky.azure.commands.ItemCommand;
 import cloud.grabsky.azure.commands.HatCommand;
 import cloud.grabsky.azure.commands.HealCommand;
 import cloud.grabsky.azure.commands.InventoryCommand;
 import cloud.grabsky.azure.commands.InvulnerableCommand;
+import cloud.grabsky.azure.commands.ItemCommand;
 import cloud.grabsky.azure.commands.KickCommand;
 import cloud.grabsky.azure.commands.MessageCommand;
 import cloud.grabsky.azure.commands.MuteCommand;
@@ -76,12 +76,8 @@ import cloud.grabsky.configuration.paper.PaperConfigurationMapper;
 import com.google.gson.Gson;
 import io.papermc.paper.plugin.loader.PluginClasspathBuilder;
 import io.papermc.paper.plugin.loader.library.impl.MavenLibraryResolver;
-import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import org.bukkit.Material;
@@ -100,12 +96,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
@@ -118,7 +111,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
-import static net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText;
 
 public final class Azure extends JavaPlugin implements AzureAPI, Listener {
 
@@ -309,13 +301,6 @@ public final class Azure extends JavaPlugin implements AzureAPI, Listener {
     public static final class Placeholders extends PlaceholderExpansion {
         public static final Placeholders INSTANCE = new Placeholders(); // SINGLETON
 
-        // SimpleDateFormat responsible for formatting countdown time.
-        private final static SimpleDateFormat COUNTDOWN_FORMAT = new SimpleDateFormat("HH:mm:ss");
-
-        static {
-            COUNTDOWN_FORMAT.setTimeZone(TimeZone.getTimeZone("Europe/Warsaw"));
-        }
-
         @Override
         public boolean persist() {
             return true;
@@ -336,60 +321,8 @@ public final class Azure extends JavaPlugin implements AzureAPI, Listener {
             return Azure.getInstance().getPluginMeta().getVersion();
         }
 
-        private static final MiniMessage MINI_MESSAGE = MiniMessage.builder().tags(
-                TagResolver.resolver(
-                        StandardTags.color(),
-                        StandardTags.gradient(),
-                        StandardTags.rainbow()
-                )
-        ).build();
-
         @Override
         public String onRequest(final @NotNull OfflinePlayer offlinePlayer, final @NotNull String params) {
-            // Placeholder: %azure_countdown_[TIMESTAMP]%
-            if (params.startsWith("countdown_") == true) {
-                try {
-                    final String number = params.replace("countdown_", "");
-                    return COUNTDOWN_FORMAT.format(new Date(Math.clamp(Long.parseLong(number) - System.currentTimeMillis(), 0, Long.MAX_VALUE)));
-                } catch (final NumberFormatException e) {
-                    return "00:00:00";
-                }
-            }
-            // Placeholder: %azure_strip_tags:<_input_>%
-            if (params.startsWith("strip_unsafe_tags:") == true) {
-                final String input = PlaceholderAPI.setBracketPlaceholders(offlinePlayer, params.split(":")[1]);
-                return MiniMessage.builder().tags(TagResolver.empty()).build().stripTags(
-                        input,
-                        // Stripping tags below. This leaves color, gradient and rainbow tags only.
-                        StandardTags.decorations(),
-                        StandardTags.hoverEvent(),
-                        StandardTags.clickEvent(),
-                        StandardTags.clickEvent(),
-                        StandardTags.keybind(),
-                        StandardTags.translatable(),
-                        StandardTags.translatableFallback(),
-                        StandardTags.insertion(),
-                        StandardTags.font(),
-                        StandardTags.reset(),
-                        StandardTags.newline(),
-                        StandardTags.selector(),
-                        StandardTags.selector(),
-                        StandardTags.score(),
-                        StandardTags.nbt(),
-                        StandardTags.pride(),
-                        StandardTags.shadowColor()
-                );
-            }
-            // Placeholder: %azure_is_displayname_valid:<input>%
-            if (params.startsWith("is_displayname_valid:") == true) {
-                final String input = PlaceholderAPI.setBracketPlaceholders(offlinePlayer, params.split(":")[1]);
-                final Component displayName = MINI_MESSAGE.deserialize(input.replace(" ", ""));
-                // Sending an error message if nick contains invalid formatting or is not equal to the player's name. Name modifications are not allowed, only colors.
-                if (input.contains("&") == true || input.contains("§") == true || plainText().serialize(displayName).equals(offlinePlayer.getName()) == false) {
-                    return "false";
-                }
-                return "true";
-            }
             // Getting the UUID of the player.
             final UUID uniqueId = offlinePlayer.getUniqueId();
             // Getting the placeholder identifier.
@@ -412,7 +345,7 @@ public final class Azure extends JavaPlugin implements AzureAPI, Listener {
                             // Returning player's name with prefix if present.
                             if (luckpermsUser != null)
                                 yield Conditions.requirePresent(luckpermsUser.getCachedData().getMetaData().getPrefix(), "") + Conditions.requirePresent(luckpermsUser.getCachedData().getMetaData().getMetaValue("color"), "") + offlinePlayer.getName();
-                            // Otherwise, returning returning just the player's name.
+                            // Otherwise, returning just the player's name.
                             yield offlinePlayer.getName();
                         }
                         // Returning the User display name, if present.
@@ -426,10 +359,6 @@ public final class Azure extends JavaPlugin implements AzureAPI, Listener {
                 // Placeholder: %azure_is_verified%
                 case "is_verified" -> (Azure.getInstance().getUserCache() != null && Azure.getInstance().getUserCache().hasUser(uniqueId) == true)
                         ? String.valueOf(Azure.getInstance().getUserCache().getUser(uniqueId).getDiscordId() != null)
-                        : "N/A";
-                // Placeholder: %azure_max_level%
-                case "max_level" -> (Azure.getInstance().getUserCache() != null && Azure.getInstance().getUserCache().hasUser(uniqueId) == true)
-                        ? String.valueOf(Azure.getInstance().getUserCache().getUser(uniqueId).getMaxLevel())
                         : "N/A";
                 // Anything else is not a valid placeholder.
                 default -> null;
