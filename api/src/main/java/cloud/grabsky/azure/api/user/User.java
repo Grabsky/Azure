@@ -95,16 +95,9 @@ public interface User extends Audience, ForwardingAudience {
     boolean isSpying();
 
     /**
-     * Changes vanish state of this {@link User}. This also hides the player, changes gamemode, shows {@link net.kyori.adventure.bossbar.BossBar} etc.
+     * Changes vanish state of this {@link User}. This also hides the player and shows {@link net.kyori.adventure.bossbar.BossBar}.
      */
-    default void setVanished(final boolean state) {
-        setVanished(state, true);
-    }
-
-    /**
-     * Changes vanish state of this {@link User}. This also hides the player, shows {@link net.kyori.adventure.bossbar.BossBar} etc.
-     */
-    void setVanished(final boolean state, final boolean updateGamemodeWhenDisabling);
+    void setVanished(final boolean state);
 
     /**
      * Returns most recent ban {@link Punishment} of this {@link User}.

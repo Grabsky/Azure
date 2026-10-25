@@ -95,7 +95,7 @@ public final class GameModeCommand extends RootCommand {
         final User targetUser = userCache.getUser(target);
         // Disabling vanish state if enabled.
         if (targetUser.isVanished() == true) {
-            targetUser.setVanished(false, false);
+            targetUser.setVanished(false);
             // Sending message to the player.
             Message.of(PluginLocale.COMMAND_VANISH_SUCCESS_TARGET).placeholder("state", PluginLocale.DISABLED.color(NamedTextColor.RED)).send(target);
         }
